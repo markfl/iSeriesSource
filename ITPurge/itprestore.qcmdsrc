@@ -1,0 +1,14 @@
+             CMD        PROMPT('Restore Purge Files')
+
+             PARM       KWD(PURGEGROUP) TYPE(*NAME) MIN(1) +
+                          PROMPT('Group name')
+
+             PARM       KWD(SAVF) TYPE(SAVF) MIN(1) PROMPT('Restore +
+                          file')
+ SAVF:       QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*CURLIB)) +
+                          CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(ARCLIB) TYPE(*NAME) MIN(1) +
+                          PROMPT('Restore library')
+

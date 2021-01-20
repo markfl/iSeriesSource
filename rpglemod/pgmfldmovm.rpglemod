@@ -1,0 +1,183 @@
+          Ctl-opt NoMain Option(*NoDebugio);
+
+          Dcl-f qpgmfldrl1 Usage(*Input) Keyed UsrOpn;
+          Dcl-f qpgmfldrl2 Usage(*Input) Keyed UsrOpn
+                Rename(rpgmfldref:rpgmfldrl2);
+
+š         Dcl-Proc GetAttributes Export;
+
+          Dcl-Pi GetAttributes Ind;
+             @_Program  Like(program) Const;
+             @_Library  Like(library) Const;
+             @_Field    Like(extField);
+             @_Type     Like(Type);
+             @_Size     Like(Size);
+             @_Dec      Like(Dec);
+          End-Pi;
+
+          Dcl-Ds @KeyDs  likerec(rpgmfldref : *key);
+          Dcl-Ds @KeyDs1 likerec(rpgmfldrl2 : *key);
+
+          Dcl-s  @a        Packed(3) Inz(*Zeros);
+          Dcl-s  @b        Packed(3) Inz(*Zeros);
+          Dcl-s  @OpenInd1 Ind       Inz(*Off);
+          Dcl-s  @OpenInd2 Ind       Inz(*Off);
+
+          /define mflores003
+          /copy qcpysrc,mflores
+          /undefine mflores003
+
+b001      If Not %Open(qpgmfldrl1);
+             Open qpgmfldrl1;
+             @OpenInd1 = *On;
+e001      EndIf;
+
+          Clear @_Type;
+          Clear @_Size;
+          Clear @_Dec;
+
+          @KeyDs.program  = @_Program;
+          @KeyDs.library  = @_Library;
+          @KeyDs.intfield = @ToUpper(@_Field);
+
+          Chain %Kds(@KeyDs) rpgmfldref;
+b001      If %Found(qpgmfldrl1);
+b002         If  type <> %Trim('N')
+             And type <> %Trim('BEGSR');
+
+                @_Size = Size;
+                @_Dec  = dec;
+
+e002         EndIf;
+
+b002         If @OpenInd1;
+                Close qpgmfldrl1;
+e002         EndIf;
+             @_Type = type;
+             Return *On;
+
+x001      Else;
+             @a = %Scan('(':@_Field);
+b002         If @a > *Zeros;
+                Clear @KeyDs.intfield;
+                @KeyDs.intfield = %Subst(@_Field:1:@a-1);
+
+                Chain %Kds(@KeyDs) rpgmfldref;
+b003            If %Found(qpgmfldrl1);
+b004               If  type <> %Trim('N')
+                   And type <> %Trim('BEGSR');
+
+                      @_Field = @KeyDs.intfield;
+                      @_Size  = Size;
+                      @_Dec   = dec;
+
+e004               EndIf;
+
+b004               If @OpenInd1;
+                      Close qpgmfldrl1;
+e004               EndIf;
+                   @_Type  = type;
+                   Return *On;
+
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+b001      If @OpenInd1;
+             Close qpgmfldrl1;
+e001      EndIf;
+
+b001      If Not %Open(qpgmfldrl2);
+             Open qpgmfldrl2;
+             @OpenInd2 = *On;
+e001      EndIf;
+
+          @KeyDs1.program  = @_Program;
+          @KeyDs1.intfield = @ToUpper(@_Field);
+
+          Chain %Kds(@KeyDs1:2) rpgmfldrl2;
+b001      If %Found(qpgmfldrl2);
+b002         If  type <> %Trim('N')
+             And type <> %Trim('BEGSR');
+
+                @_Size = Size;
+                @_Dec  = dec;
+
+e002         EndIf;
+
+b002         If @OpenInd2;
+                Close qpgmfldrl2;
+e002         EndIf;
+             @_Type = type;
+             Return *On;
+x001      Else;
+
+b002         If @OpenInd2;
+                Close qpgmfldrl2;
+e002         EndIf;
+
+             @a = %Scan('''':@_Field);
+b002         If @a > *Zeros;
+                @b = %Scan('''':@_Field:@a+1);
+b003            If @b > *Zeros;
+
+                   @_Type = 'CONST';
+                   @_Size = @b-(@a+1);
+
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+b001      If @OpenInd1;
+             Close qpgmfldrl1;
+e001      EndIf;
+
+b001      If @OpenInd2;
+             Close qpgmfldrl2;
+e001      EndIf;
+
+          Return *Off;
+
+š         End-Proc;
+
+š         Dcl-Proc SetAttributes export;
+
+          Dcl-Pi SetAttributes;
+             @_Field    Like(extField) Const;
+             @_Type     Like(Type)     Const;
+             @_Size     Like(Size)     Const;
+             @_Dec      Like(Dec)      Const;
+             @_OutField Char(15);
+             @_OutAtr   Char(8);
+          End-Pi;
+
+          @_OutField = @_Field;
+b001      If @_Size > *Zeros;
+             @_OutAtr   = %Char(@_Size);
+e001      EndIf;
+
+b001      If %Trim(@_Type) = 'P'
+          Or %Trim(@_Type) = 'S';
+b002         If @_Dec > *Zeros;
+                @_OutAtr = %Trim(@_OutAtr) + ',' + %Char(@_Dec);
+x002         Else;
+                @_OutAtr = %Trim(@_OutAtr) + ',0';
+e002         EndIf;
+e001      EndIf;
+
+b001      If %Trim(@_Type) = 'BEGSR';
+x001      Else;
+b002         If %Trim(@_Type) = 'CONST'
+             Or %Trim(@_Type) = 'D'
+             Or %Trim(@_Type) = 'T'
+             Or %Trim(@_Type) = 'N'
+             Or %Trim(@_Type) = 'EXCEPT'
+             Or %Trim(@_Type) = 'PROTOTYPE';
+                @_OutAtr = %Trim(@_Type);
+x002         Else;
+                @_OutAtr = %Trim(@_OutAtr) + ',' + %Trim(@_Type);
+e002         EndIf;
+e001      EndIf;
+
+š         End-Proc;
+

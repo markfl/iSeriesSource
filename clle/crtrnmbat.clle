@@ -1,0 +1,38 @@
+             PGM
+
+             CRTRNMBCH  FRMSRCFILE(QCLLEOLD) TOMBR(RNMCLLEOLD) +
+                          EXTENSION(CLLEOLD)
+
+             CRTRNMBCH  FRMSRCFILE(QCLLESRC) TOMBR(RNMCLLE) +
+                          EXTENSION(CLLE)
+
+             CRTRNMBCH  FRMSRCFILE(QCMDSRC) TOMBR(RNMCMD) +
+                          EXTENSION(CMDSRC)
+
+             CRTRNMBCH  FRMSRCFILE(QCPPLE) TOMBR(RNMCPPLE) +
+                          EXTENSION(CPPLE)
+
+             CRTRNMBCH  FRMSRCFILE(QCPYOLD) TOMBR(RNMCPYOLD) +
+                          EXTENSION(CPYOLD)
+
+             CRTRNMBCH  FRMSRCFILE(QCPYSRC) TOMBR(RNMCPY) +
+                          EXTENSION(CPYSRC)
+
+             CRTRNMBCH  FRMSRCFILE(QDDSSRC) TOMBR(RNMDDS) +
+                          EXTENSION(DDSSRC)
+
+             CRTRNMBCH  FRMSRCFILE(QRPGSRC) TOMBR(RNMRPG) +
+                          EXTENSION(RPGSRC)
+
+             CRTRNMBCH  FRMSRCFILE(QRPGLEMOD) TOMBR(RNMRPGMOD) +
+                          EXTENSION(RPGLEMOD)
+
+             CRTRNMBCH  FRMSRCFILE(QRPGLEOLD) TOMBR(RNMRPGOLD) +
+                          EXTENSION(RPGLEOLD)
+
+             CRTRNMBCH  FRMSRCFILE(QRPGLESRC) TOMBR(RNMRPGLE) +
+                          EXTENSION(RPGLESRC)
+
+             CRTRNMBCH  TOMBR(RNM) EXTENSION(BAT)
+
+             ENDPGM

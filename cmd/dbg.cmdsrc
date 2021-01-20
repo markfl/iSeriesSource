@@ -1,0 +1,19 @@
+             CMD        PROMPT('Start Debug')
+
+             PARM       KWD(PGM) TYPE(PGM) MAX(10) PROMPT(PGM)
+ PGM:        QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(DFTPGM) TYPE(*NAME) DFT(*PGM) +
+                          SPCVAL((*PGM) (*NONE)) PROMPT('Default +
+                          program')
+
+             PARM       KWD(UPDPROD) TYPE(*CHAR) LEN(4) RSTD(*YES) +
+                          DFT(*YES) VALUES(*YES *NO) PROMPT('Update +
+                          production files')
+
+             PARM       KWD(OPMSRC) TYPE(*CHAR) LEN(4) RSTD(*YES) +
+                          DFT(*YES) VALUES(*YES *NO) PROMPT('OPM +
+                          source level debug')

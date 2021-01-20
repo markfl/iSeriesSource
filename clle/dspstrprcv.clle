@@ -1,0 +1,21 @@
+             PGM        PARM(&PROC &SCHEMA)
+
+             DCL        VAR(&PROC) TYPE(*CHAR) LEN(128)
+             DCL        VAR(&SCHEMA) TYPE(*CHAR) LEN(128)
+             DCL        VAR(&LIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MSG) TYPE(*CHAR) LEN(14)
+
+             CHGVAR     VAR(&LIB) VALUE(%SST(&SCHEMA 1 10))
+             IF         COND(&LIB *NE '*ALL') THEN(DO)
+             CHKOBJ     OBJ(*LIBL/&LIB) OBJTYPE(*LIB)
+             MONMSG     MSGID(CPF9801) EXEC(GOTO CMDLBL(NOLIB))
+             ENDDO
+
+             GOTO       CMDLBL(END)
+
+ NOLIB:      CHGVAR     VAR(&MSG) VALUE('0000' *CAT &LIB)
+             SNDPGMMSG  MSGID(CPF9801) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+
+ END:        ENDPGM

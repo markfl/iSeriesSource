@@ -1,0 +1,32 @@
+             PGM
+
+             CLRPFM     FILE(ECTM856FPP)
+             CLRPFM     FILE(EC856DTM)
+             CLRPFM     FILE(EC856EQP)
+             CLRPFM     FILE(EC856HDR)
+             CLRPFM     FILE(EC856ITM)
+             CLRPFM     FILE(EC856ORD)
+             CLRPFM     FILE(EC856PFC)
+             CLRPFM     FILE(EC856REF)
+             CLRPFM     FILE(EC856SHP)
+             CLRPFM     FILE(EC856ADR)
+             CLRPFM     FILE(EC856QTY)
+
+             DBG        PGM(IB856BR)
+
+             CALL       PGM(TESTIB856R)
+
+             CALL       PGM(IB856BR)
+
+/*           RGZPFM     FILE(EC856DTM) KEYFILE(*FILE)   +
+             RGZPFM     FILE(EC856EQP) KEYFILE(*FILE)   +
+             RGZPFM     FILE(EC856HDR) KEYFILE(*FILE)   +
+             RGZPFM     FILE(EC856ITM) KEYFILE(*FILE)   +
+             RGZPFM     FILE(EC856ORD) KEYFILE(*FILE)   +
+             RGZPFM     FILE(EC856PFC) KEYFILE(*FILE)   +
+             RGZPFM     FILE(EC856REF) KEYFILE(*FILE)   +
+             RGZPFM     FILE(EC856SHP) KEYFILE(*FILE)   */
+
+             ENDDBG
+
+ END:        ENDPGM

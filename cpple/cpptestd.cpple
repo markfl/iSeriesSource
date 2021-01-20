@@ -1,0 +1,11 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A          R SFL                       SFL
+     A            NAME          10A  B 10 25
+     A            PHONE         10A  B    +5
+     A          R SFLCTL                    SFLCTL(SFL)
+     A                                      SFLSIZ(6)
+     A                                      SFLPAG(5)
+     A                                      SFLDSP
+     A                                      SFLDSPCTL
+     A                                 22 25'<Page Down> For Next Page'
+     A                                 23 25'<Page Up> For Previous Page'

@@ -1,0 +1,2293 @@
+
+      /IF DEFINED(mflores001)
+
+          Dcl-Ds @statusDs PsDs;
+             @_proc     *Proc;                                        // Program name
+             @_status   *Status;                                      // Program status code
+             @_prevstat Zoned(5:0) Pos(16);                           // Previous status code
+             @_rptsrcln Char(8)    Pos(21);                           // RPG src line number
+             @_routine  *Routine;                                     // RPG routine
+             @_parms    *Parms;                                       // Number of parameters
+             @_excptype Char(3)    Pos(40);                           // Except type CPF,MCH
+             @_excpnbr  Char(4)    Pos(43);                           // Msg number
+             @_reserved Char(4)    Pos(47);                           // Reserved
+             @_wrkamsg  Char(30)   Pos(51);                           // Wrk area for msg
+             @_pgmlib   Char(10)   Pos(81);                           // Program library
+             @_excpdata Char(80)   Pos(91);                           // Exception data
+             @_excpid   Char(4)    Pos(171);                          // Exception id
+             @_unused1  Char(16)   Pos(175);                          // Unused
+             @_jobdate  Char(8)    Pos(191);                          // Date job entered sys
+             @_year     Zoned(2:0) Pos(199);                          // 1st digits 4 digit y
+             @_lstf     Char(8)    Pos(201);                          // Last file used
+             @_lstfsts  Char(35)   Pos(209);                          // Status on last file
+             @_jobname  Char(10)   Pos(244);                          // Job name
+             @_user     Char(10)   Pos(254);                          // User name
+             @_jobnbr   Zoned(6:0) Pos(264);                          // Job number
+             @_rundate  Zoned(6:0) Pos(270);                          // Date job started
+             @_sysdate  Zoned(6:0) Pos(276);                          // System date
+             @_runtime  Zoned(6:0) Pos(282);                          // Time hhmmss
+             @_cmpdate  Char(6)    Pos(288);                          // Date pgm compiled
+             @_cmptime  Char(6)    Pos(294);                          // Time pgm compiled
+             @_cmplvl   Char(4)    Pos(300);                          // Level of compiler
+             @_srcf     Char(10)   Pos(304);                          // Pgm source file
+             @_srcl     Char(10)   Pos(314);                          // Pgm source library
+             @_srcm     Char(10)   Pos(324);                          // Pgm source member
+             @_program  Char(10)   Pos(334);                          // Pgm containing proc
+             @_module   Char(10)   Pos(344);                          // Mod containing proc
+             @_unused2  Char(4)    Pos(354);                          // Unused
+             @_userprf  Char(10)   Pos(358);                          // User profile
+             @_error    Int(10)    Pos(368);                          // XML Error Code
+             @_elements Int(20)    Pos(372);                          // XML Array Elements
+             @_unused3  Char(50)   Pos(380);                          // Unused
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores002)
+
+          Dcl-Pr @TimeStamp TIMESTAMP;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores003)
+
+          Dcl-Pr @ToUpper VarChar(32767);
+              char1    VarChar(32767) Const;
+              integer1 Int(3)         Const Options(*NoPass);
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores004)
+
+          Dcl-Pr @ToLower VarChar(32767);
+              char1    VarChar(32767) Const;
+              integer1 Int(3)         Const Options(*NoPass);
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores005)
+
+          Dcl-Pr SndPgmMsg;
+              char1 Char(32767) Const Options(*VarSize);              // Message Text
+              int1  Int(10)     Const;                                // Message Text Size
+              char1 Char(7)     Const Options(*NoPass);               // Message Id
+              char1 Char(20)    Const Options(*NoPass);               // Message File Name
+              char1 Char(10)    Const Options(*NoPass);               // Message Type
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores006)
+
+          /Title Retrieve Job Information Function Prototype
+
+          Dcl-Pr RetrieveJobInformation  Ind;
+              char1 Char(10) Const;                                   // Job
+              char1 Char(10) Const Options(*NoPass);                  // User
+              char1 Char(6)  Const Options(*NoPass);                  // Job Number
+              char1 Char(10) Const Options(*NoPass);                  // Information Format
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores007)
+
+          /Title Retrieve Job Information Data Structures
+
+          Dcl-Ds Jobi0100Ds Qualified;
+             @BytesReturned         Int(10);
+             @BytesAvailable        Int(10);
+             @JobName               Char(10);
+             @UserName              Char(10);
+             @JobNumber             Char(6);
+             @InternalJobIdentifier Char(16);
+             @JobStatus             Char(10);
+             @JobType               Char(1);
+             @JobSubType            Char(1);
+             @Reserved1             Char(2);
+             @RunPriority           Int(10);
+             @TimeSlice             Int(10);
+             @DefaultWait           Int(10);
+             @Purge                 Char(10);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores008)
+
+          Dcl-Ds Jobi0150Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @JobName Char(10);
+             @UserName Char(10);
+             @JobNumber Char(6);
+             @InternalJobIdentifier Char(16);
+             @JobStatus Char(10);
+             @JobType Char(1);
+             @JobSubType Char(1);
+             @Reserved1 Char(2);
+             @RunPriority Int(10);
+             @TimeSlice Int(10);
+             @DefaultWait Int(10);
+             @Purge Char(10);
+             //   Start Of 150
+             @TimeSliceEndPool Char(10);
+             @ProcessingUnitTimeUsed Int(10);
+             @SystemPoolIdentifier Int(10);
+             @MaximumProcessingUnitTime Int(10);
+             @TemporaryStorageUsedInKilobytes Int(10);
+             @MaximumTemporaryStorageInKilobytes Int(10);
+             @ThreadCount Int(10);
+             @MaximumThreads Int(10);
+             @TemporaryStorageUsedInMegabytes Int(10);
+             @MaximumTemporaryStorageInMegabytes Int(10);
+             @Reserved2 Char(4);
+             @ProcessingUnitTimeUsedTotal Int(20);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores009)
+
+          Dcl-Ds Jobi0200Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @JobName Char(10);
+             @UserName Char(10);
+             @JobNumber Char(6);
+             @InternalJobIdentifier Char(16);
+             @JobStatus Char(10);
+             @JobType Char(1);
+             @JobSubType Char(1);
+             @SubsystemDescriptionName Char(10);
+             @RunPriority Int(10);
+             @SytemPoolIdentifier Int(10);
+             @ProcessingUnitTimeUsed Int(10);
+             @NumberOfAuxiliaryIORequests Int(10);
+             @NumberOfInteractiveTransactions Int(10);
+             @ResponseTimeTotal Int(10);
+             @FunctionType Char(1);
+             @FunctionName Char(10);
+             @ActiveJobStatus Char(4);
+             @NumberOfDatabaseLockWaits Int(10);
+             @NumberOfInternalMachineLockWaits Int(10);
+             @NumberOfNonDatabaseLockWaits Int(10);
+             @TimeSpentOnDatabaseLockWaits Int(10);
+             @TimeSpentOnInternalMachineLockWaits Int(10);
+             @TimeSpentOnNonDatabaseLockWaits Int(10);
+             @Reserved1 Char(1);
+             @CurrentSystemPoolIdentifier Int(10);
+             @ThreadCount Int(10);
+             @ProcessingUnitTimeUsedTotal Int(20);
+             @NumberOfAuxiliaryIORequestsTotal Int(20);
+             @ProcessingUnitTimeUsedForDatabaseTotalForJob Int(20);
+             @PageFaults Int(20);
+             @ActiveJobSatusForJobsEnding Char(4);
+             @MemoryPoolName Char(10);
+             @MessageReply Char(1);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores010)
+
+          Dcl-Ds Jobi0300Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @JobName Char(10);
+             @UserName Char(10);
+             @JobNumber Char(6);
+             @InternalJobIdentifier Char(16);
+             @JobStatus Char(10);
+             @JobType Char(1);
+             @JobSubType Char(1);
+             @JobQueueName Char(10);
+             @JobQueueLibraryName Char(10);
+             @JobQueuePriority Char(2);
+             @OutputQueueName Char(10);
+             @OutputQueueLibraryName Char(10);
+             @OutputQueuePriority Char(2);
+             @PrinterDeviceName Char(10);
+             @SubmittersJobName Char(10);
+             @SubmittersUserName Char(10);
+             @SubmittersJobNumber Char(6);
+             @SubmittersMessageQueueName Char(10);
+             @SubmittersMessageQueueLibraryName Char(10);
+             @StatusOfJobOnTheJobQueue Char(10);
+             @DateAndTimeJobWasPutOnThisJobQueue Char(8);
+             @JobDate Char(7);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores011)
+
+          Dcl-Ds Jobi0400Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @JobName Char(10);
+             @UserName Char(10);
+             @JobNumber Char(6);
+             @InternalJobIdentifier Char(16);
+             @JobStatus Char(10);
+             @JobType Char(1);
+             @JobSubType Char(1);
+             @DateAndTimeJobEnteredSystem Char(13);
+             @DateAndTimeJobBecameActive Char(13);
+             @JobAccountingCode Char(15);
+             @JobDescriptionName Char(10);
+             @JobDescriptionLibraryName Char(10);
+             @UnitOfWorkID Char(24);
+             @ModeName Char(8);
+             @InquiryMessageReply Char(10);
+             @LoggingOfCLPrograms Char(10);
+             @BreakMessageHandling Char(10);
+             @StatusMessageHandling Char(10);
+             @DeviceRecoveryAction Char(13);
+             @DDMCpmversatopmHandling Char(10);
+             @DateSeparator Char(1);
+             @DateFormat Char(4);
+             @PrintText Char(30);
+             @SubmittersJobName Char(10);
+             @SubmittersUserName Char(10);
+             @SubmittersJobNumber Char(6);
+             @SubmittersMessageQueueName Char(10);
+             @SubmittersMessageQueueLibraryName Char(10);
+             @TimeSeparator Char(1);
+             @CodedCharacterSetID Int(10);
+             @DateAndTimeJobIsScheduledToRun Char(8);
+             @PrintKeyFormat Char(10);
+             @SortSequenceTableName Char(10);
+             @SortSequenceLibraryName Char(10);
+             @LanguageID Char(3);
+             @CountryOrRegionID Char(2);
+             @CompletionStatus Char(1);
+             @SignedOnJob Char(1);
+             @JobSwitches Char(8);
+             @JobMessageQueueFullAction Char(10);
+             @Reserved1 Char(1);
+             @JobMessageQueueMaximumSize Int(10);
+             @DefaultCodedCharacterSetIdentifier Int(10);
+             @RoutingData Char(80);
+             @DecimalFormat Char(1);
+             @CharacterIdentifierControl Char(10);
+             @ServerType Char(30);
+             @AllowMultipleThreads Char(1);
+             @JobLogPending Char(1);
+             @Reserved2 Char(1);
+             @JobEndReason Int(10);
+             @JobTypeEnhanced Int(10);
+             @DateAndTimeJobEnded Char(13);
+             @Reserved3 Char(1);
+             @SpooledFileAction Char(10);
+             @OffsetToASPGroupInformation Int(10);
+             @NumberOfEntriesInASPGroupInformation Int(10);
+             @LengthOfOneASPGroupInformationEntry Int(10);
+             @Data VarChar(32767);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores012)
+
+          Dcl-Ds Jobi0500Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @JobName Char(10);
+             @UserName Char(10);
+             @JobNumber Char(6);
+             @InternalJobIdentifier Char(16);
+             @JobStatus Char(10);
+             @JobType Char(1);
+             @JobSubType Char(1);
+             @Reserved1 Char(2);
+             @EndSeverity Int(10);
+             @LoggingSeverity Int(10);
+             @LoggingLevel Char(1);
+             @LoggingText Char(10);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores013)
+
+          Dcl-Ds Jobi0600Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @JobName Char(10);
+             @UserName Char(10);
+             @JobNumber Char(6);
+             @InternalJobIdentifier Char(16);
+             @JobStatus Char(10);
+             @JobType Char(1);
+             @JobSubType Char(1);
+             @JobSwitches Char(8);
+             @EndStatus Char(1);
+             @SubsystemDescriptionName Char(10);
+             @SubsystemDescriptionLibraryName Char(10);
+             @CurrentUserProfile Char(10);
+             @DBCSCapable Char(1);
+             @ExitKey Char(1);
+             @CancelKey Char(1);
+             @ProductReturnCode Int(10);
+             @UserReturnCode Int(10);
+             @ProgramReturnCode Int(10);
+             @SpecialEnvionment Char(10);
+             @DeviceName Char(10);
+             @GroupProfileName Char(10);
+             @GroupProfileNameSupplemental Char(150);
+             @JobUserIdentity Char(10);
+             @JobUserIdentitySetting Char(1);
+             @ClientIPAddress Char(15);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores014)
+
+          Dcl-Ds Jobi0700Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @JobName Char(10);
+             @UserName Char(10);
+             @JobNumber Char(6);
+             @InternalJobIdentifier Char(16);
+             @JobStatus Char(10);
+             @JobType Char(1);
+             @JobSubType Char(1);
+             @Reserved1 Char(2);
+             @NumberOfLibrariesInSYSLIBL Int(10);
+             @NumberOfProductLibraries Int(10);
+             @CurrentLibraryExistence Int(10);
+             @NumberOfLibrariesInUSRLIBL Int(10);
+             @Libraries Char(3100);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores015)
+
+          Dcl-Ds Jobi0750Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @JobName Char(10);
+             @UserName Char(10);
+             @JobNumber Char(6);
+             @InternalJobIdentifier Char(16);
+             @JobStatus Char(10);
+             @JobType Char(1);
+             @JobSubType Char(1);
+             @Reserved1 Char(2);
+             @OffsetToLibrariesInSystemLibraryList Int(10);
+             @NumberOfLibrariesInSystemLibraryList Int(10);
+             @OffsetToProductLibraries Int(10);
+             @NumberOfProductLibraries Int(10);
+             @OffsetToCurrentLibrary Int(10);
+             @NumberOfCurrentLibraries Int(10);
+             @OffsetToLibrariesInUserLibraryList Int(10);
+             @NumberOfLibrariesInUserLibraryList Int(10);
+             @LengthOfOneLibraryArrayEntry Int(10);
+             @Libraries Char(3100);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores016)
+
+          Dcl-Ds Jobi0800Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @JobName Char(10);
+             @UserName Char(10);
+             @JobNumber Char(6);
+             @InternalJobIdentifier Char(16);
+             @JobStatus Char(10);
+             @JobType Char(1);
+             @JobSubType Char(1);
+             @Reserved1 Char(2);
+             @SignalStatus Int(10);
+             @SignalBlockingMask Char(8);
+             @PendingSignalSet Char(8);
+             @OffsetToSignalMonitorData Int(10);
+             @NumberOfSignalMonitors Int(10);
+             @ProcessIDNumber Int(10);
+             @SignalMonitorData VarChar(32767);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores017)
+
+          Dcl-Ds Jobi0900Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @JobName Char(10);
+             @UserName Char(10);
+             @JobNumber Char(6);
+             @InternalJobIdentifier Char(16);
+             @JobStatus Char(10);
+             @JobType Char(1);
+             @JobSubType Char(1);
+             @ServerModeForStructuredQueryLanguage Char(1);
+             @Reserved1 Char(1);
+             @OffsetToSQLOpenCursorData Int(10);
+             @SizeOfSQLOpenCursorData Int(10);
+             @NumberOfSQLOpenCursors Int(10);
+             @OffsetToCurrentSQLStatement Int(10);
+             @LengthOfCurrentSQLStatement Int(10);
+             @StatusOfCurrentSQLStatement Int(10);
+             @CCSIDOfCurrentSQLStatement Int(10);
+             @RelationalDatabaseName Char(18);
+             @SQLStatementObjectName Char(10);
+             @SQLStatementLibraryName Char(10);
+             @SQLStatementObjectType Char(10);
+             @Reserved2 Char(4);
+             @Cumulative#OfSQLCursorsFullOpens Int(20);
+             @Cumulative#OfSQLCursorsPseudoOpens Int(20);
+             @OffsetToCurrentSQLStatementName Int(10);
+             @LengthOfCurrentSQLStatementName Int(10);
+             @SQLcurrentLOBLocatorCount Int(10);
+             @SQLActivationGroupCount Int(10);
+             @SQLCurrentDescriptorCount Int(20);
+             @CLICurrentHandleCount Int(20);
+             @OffsetToClientAccountingString Int(10);
+             @LengthOfClientAccountingString Int(10);
+             @OffsetToClientApplicationName Int(10);
+             @LengthOfClientApplicationName Int(10);
+             @OffsetToClientProgramIdentifier Int(10);
+             @LengthOfClientProgramIdentifier Int(10);
+             @OffsetToClientUserIdentifier Int(10);
+             @LengthOfClientUserIdentifier Int(10);
+             @OffsetToClientWorkstationName Int(10);
+             @LengthOfClientWorkstationName Int(10);
+             @OffsetToInterfaceName Int(10);
+             @LengthToInterfaceName Int(10);
+             @OffsetToInterfaceType Int(10);
+             @LengthToInterfaceType Int(10);
+             @OffsetToInterfaceLevel Int(10);
+             @LengthToInterfaceLevel Int(10);
+             @NumberOfSQLPseudoClosedCursors Int(10);
+             @LocalPortNumberForServerJob Int(10);
+             @ClientIPAddressForServerJobType Char(1);
+             @ClientIPAddressForServerJob Char(45);
+             @QueryOptionsLibraryName Char(10);
+             @TimeStampSQLStatementStarted Char(8);
+             @ServerModeConnectingJob Char(28);
+             @ServerModeConnectedThread Char(8);
+             @Data VarChar(32767);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores018)
+
+          Dcl-Ds Jobi1000Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @JobName Char(10);
+             @UserName Char(10);
+             @JobNumber Char(6);
+             @InternalJobIdentifier Char(16);
+             @JobStatus Char(10);
+             @JobType Char(1);
+             @JobSubType Char(1);
+             @Reserved1 Char(2);
+             @ElapsedTime Int(20);
+             @DiskIOCountTotalCountDuringThe@ElapsedTime Int(20);
+             @DiskIODuringTheElapsedTimeAsynchronous Int(20);
+             @DiskIODuringTheElapsedTimeSynchronous Int(20);
+             @InteractiveResponseTimeTotalDuringTheElapsedTime Int(10);
+             @InteractiveTransactionsCountDuringTheElapsedTime Int(10);
+             @ProcessingUnitUsedPercentDuringTheElapsedTime Int(10);
+             @ProcessingUnitUsedForDataBasePercentDuringTheElapsedTime Int(10);
+             @ProcessingUnitUsedTimeDuringTheElapsedTime Int(20);
+             @ProcessingUnitUsedForDataBaseTimeDuringTheElapsedTime Int(20);
+             @LockWaitTimeTimeDuringTheElapsedTime Int(20);
+             @PageFaultCountTotalCountDuringTheElapsedTime Int(20);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores019)
+
+          Dcl-Ds LibraryInfoDs Qualified;
+             @libraryName Char(10);
+             @LibraryTextDescription Char(50);
+             @LibraryASPNumber Int(10);
+             @LibraryASPName Char(10);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores020)
+
+          Dcl-Ds SignalDataDs Qualified;
+             @SignalNumber Int(10);
+             @SignalAction Int(10);
+             @DefaultSignalAction Int(10);
+             @MaximumNumberOfSignalsRetained Int(10);
+             @CurrentNumberOfPendingSignals Int(10);
+             @Reserved2 Char(12);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores021)
+
+          /Title Retrieve Member Description Function Prototype
+
+          Dcl-Pr RetrieveMemberDescription  Ind;
+              char1 Char(10) Const;                                   // File Name
+              char1 Char(10) Const;                                   // Library Name
+              char1 Char(10) Const Options(*NoPass);                  // Member Name
+              char1 Char(10) Const Options(*NoPass);                  // Information Format
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores022)
+
+          /Title Retrieve Member Description Data Structures
+
+          Dcl-Ds Mbrd0100Ds Qualified Inz;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @DatabaseFileName Char(10);
+             @DatabaseFileLibraryName Char(10);
+             @MemberName Char(10);
+             @FileAttribute Char(10);
+             @SourceType Char(10);
+             @CreationDateAndTime Char(13);
+             @LastSourceChangeDateAndTime Char(13);
+             @MemberTextDescription Char(50);
+             @SourceFile Char(1);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores023)
+
+          Dcl-Ds Mbrd0200Ds Qualified Inz;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @DatabaseFileName Char(10);
+             @DatabaseFileLibraryName Char(10);
+             @MemberName Char(10);
+             @FileAttribute Char(10);
+             @SourceType Char(10);
+             @CreationDateAndTime Char(13);
+             @LastSourceChangeDateAndTime Char(13);
+             @MemberTextDescription Char(50);
+             @SourceFile Char(1);
+             //   Start Of Two
+             @RemoteFile Char(1);
+             @LogicalFileOrPhysicalFile Char(1);
+             @ODPSharing Char(1);
+             Reserved1 Char(2);
+             @Current#RecordsAllMembers Int(10);
+             @#OfDeletedLessRecords Int(10);
+             @DataSpaceSize Int(10);
+             @AccessPathSize Int(10);
+             @#OfPhysicalFileMembers Int(10);
+             @ChangeDateAndTime Char(13);
+             @SaveDateAndTime Char(13);
+             @RestoreDateAndTime Char(13);
+             @ExpirationDate Char(7);
+             Reserved2 Char(6);
+             @#OfDaysUsed Int(10);
+             @DateLastUsed Char(7);
+             @UseResetDate Char(7);
+             Reserved3 Char(2);
+             @DataSpaceSizeMultiplier Int(10);
+             @AccessPathSizeMultiplier Int(10);
+             @MemberDextDescriptionCCSID Int(10);
+             @OffsetToAdditionalMBRD0200FormatInformation Int(10);
+             @LengthOfAdditionalMBRD0200FormatInformation Int(10);
+             @Current#OfRcordsForAllMembers Int(10);
+             @#OfDeletedRecords Int(10);
+             Reserved4 Char(6);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores024)
+
+          Dcl-Ds Mbrd0300Ds Qualified Inz;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @DatabaseFileName Char(10);
+             @DatabaseFileLibraryName Char(10);
+             @MemberName Char(10);
+             @FileAttribute Char(10);
+             @SourceType Char(10);
+             @CreationDateAndTime Char(13);
+             @LastSourceChangeDateAndTime Char(13);
+             @MemberTextDescription Char(50);
+             @SourceFile Char(1);
+             //   Start Of Two
+             @RemoteFile Char(1);
+             @LogicalFileOrPhysicalFile Char(1);
+             @ODPSharing Char(1);
+             Reserved1 Char(2);
+             @Current#RecordsAllMembers Int(10);
+             @#OfDeletedLessRecords Int(10);
+             @DataSpaceSize Int(10);
+             @AccessPathSize Int(10);
+             @#OfPhysicalFileMembers Int(10);
+             @ChangeDateAndTime Char(13);
+             @SaveDateAndTime Char(13);
+             @RestoreDateAndTime Char(13);
+             @ExpirationDate Char(7);
+             Reserved2 Char(6);
+             @#OfDaysUsed Int(10);
+             @DateLastUsed Char(7);
+             @UseResetDate Char(7);
+             Reserved3 Char(2);
+             @DataSpaceSizeMultiplier Int(10);
+             @AccessPathSizeMultiplier Int(10);
+             @MemberDextDescriptionCCSID Int(10);
+             @OffsetToAdditionalMBRD0200FormatInformation Int(10);
+             @LengthOfAdditionalMBRD0200FormatInformation Int(10);
+             @Current#OfRcordsForAllMembers Int(10);
+             @#OfDeletedRecords Int(10);
+             Reserved4 Char(6);
+             //   Start Of Three
+             @JoinMember Char(1);
+             @AccessPathMaintenance Char(1);
+             @SQLFileType Char(10);
+             @Reserved5 Char(1);
+             @AllowReadOperation Char(1);
+             @AllowWriteOperation Char(1);
+             @AllowUpdateOperation Char(1);
+             @AllowDeleteOperation Char(1);
+             @Reserved6 Char(1);
+             @RecordsToForceAWrite Int(10);
+             @MaximumPercentDeletedRecordsAllowed Int(10);
+             @Initial#OfRecords Int(10);
+             @Increment#OfRecords Int(10);
+             @Maximum#OfRecords Int(10);
+             @Current#OfRecords Int(10);
+             @RecordCapacity Int(10);
+             @RecordFormatSelectorProgramName Char(10);
+             @RecordFormatSelectorLibraryName Char(10);
+             @#OfConstraintIndexes Int(5);
+             @OffsetToConstraintIndexesInformation Int(10);
+             @Reserved7 Char(46);
+             @RecordFormatAndBasedOnFileList Char(112);
+             @ConstraintIndexesInformation Char(320);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores025)
+
+          /Title Retrieve Member Description Function Prototype
+
+          Dcl-Pr RetrieveMemberList  Ind;
+              char1 Char(10) Const;                                   // File Name
+              char1 Char(10) Const;                                   // Library Name
+              char1 Char(10) Const Options(*NoPass);                  // Information Format
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores026)
+
+          /Title Retrieve Member List Data Structures
+
+          Dcl-Ds Mbrl0100Ds Qualified Inz;
+             @MemberNameUsed Char(10);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores027)
+
+          Dcl-Ds Mbrl0200Ds Qualified Inz;
+             @MemberNameUsed Char(10);
+             //   Start Of Two
+             @SourceType Char(10);
+             @CreationDateAndTime Char(13);
+             @LastSourceChangeDateAndTime Char(13);
+             @MemberTextDescription Char(50);
+             @MemberTextDescriptionCCSID Int(10);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores028)
+
+          Dcl-Ds Mbrl0310Ds Qualified Inz;
+             @MemberNameUsed Char(10);
+             @Rezerved1 Char(2);
+             @OffsetToMemberDescriptionInformation Int(10);
+             @Rezerved2 Char(16);
+             //   Start Of Two
+             //   Start Of Three
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores029)
+
+          Dcl-Ds Mbrl0320Ds Qualified Inz;
+             @MemberNameUsed Char(10);
+             @Rezerved1 Char(2);
+             @OffsetToMemberDescriptionInformation Int(10);
+             @Rezerved2 Char(16);
+             //   Start Of Two
+             //   Start Of Three
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores030)
+
+          Dcl-Ds Mbrl0330Ds Qualified Inz;
+             @MemberNameUsed Char(10);
+             @Rezerved1 Char(2);
+             @OffsetToMemberDescriptionInformation Int(10);
+             @Rezerved2 Char(16);
+             //   Start Of Two
+             //   Start Of Three
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores031)
+
+          /Title Retrieve Object Description Function Prototype
+
+          Dcl-Pr RetrieveObjectDescription  Ind;
+              char1 Char(10) Const;                                   // Object
+              char1 Char(10) Const;                                   // Library
+              char1 Char(10) Const;                                   // Object Type
+              char1 Char(10) Const Options(*NoPass);                  // Information Format
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores032)
+
+          /Title Retrieve Object Description Data Structures
+
+          Dcl-Ds Objd0100Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @ObjectName Char(10);
+             @ObjectLibraryName Char(10);
+             @ObjectType Char(10);
+             @ReturnLibrary Char(10);
+             @AuxiliaryStoragePool Int(10);
+             @ObjectOwner Char(10);
+             @ObjectDomain Char(2);
+             @CreationDateAndTime Char(13);
+             @ObjectChangeDateAndTime Char(13);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores033)
+
+          Dcl-Ds Objd0200Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @ObjectName Char(10);
+             @ObjectLibraryName Char(10);
+             @ObjectType Char(10);
+             @ReturnLibrary Char(10);
+             @AuxiliaryStoragePool Int(10);
+             @ObjectOwner Char(10);
+             @ObjectDomain Char(2);
+             @CreationDateAndTime Char(13);
+             @ObjectChangeDateAndTime Char(13);
+             //   Start Of Two
+             @ExtendedObjectAttribute Char(10);
+             @TextDescription Char(50);
+             @SourceFileName Char(10);
+             @SourceFileLibraryName Char(10);
+             @SourceFileMemberName Char(10);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores034)
+
+          Dcl-Ds Objd0300Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @ObjectName Char(10);
+             @ObjectLibraryName Char(10);
+             @ObjectType Char(10);
+             @ReturnLibrary Char(10);
+             @AuxiliaryStoragePool Int(10);
+             @ObjectOwner Char(10);
+             @ObjectDomain Char(2);
+             @CreationDateAndTime Char(13);
+             @ObjectChangeDateAndTime Char(13);
+             //   Start Of Two
+             @ExtendedObjectAttribute Char(10);
+             @TextDescription Char(50);
+             @SourceFileName Char(10);
+             @SourceFileLibraryName Char(10);
+             @SourceFileMemberName Char(10);
+             //   Start Of Three
+             @SourceFileUpdatedDateAndTime Char(13);
+             @ObjectSavedDateAndTime Char(13);
+             @ObjectRestoredDateAndTime Char(13);
+             @CreatorsUserProfile Char(10);
+             @SystemWhereObjectWasCreated Char(8);
+             @ResetDate Char(7);
+             @SaveSize Int(10);
+             @SaveSequenceNumber Int(10);
+             @Storage Char(10);
+             @SaveCommand Char(10);
+             @SaveVolumeID Char(71);
+             @SaveDevice Char(10);
+             @SaveFileName Char(10);
+             @SaveFileLibraryName Char(10);
+             @SaveLabel Char(17);
+             @SystemLevel Char(9);
+             @Compiler Char(16);
+             @ObjectLevel Char(8);
+             @UserChanged Char(1);
+             @LicensedProgram Char(16);
+             @ProgramTemporaryFixPTF Char(10);
+             @AuthorizedProgramAnalysisReportAPAR Char(10);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores035)
+
+          Dcl-Ds Objd0400Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @ObjectName Char(10);
+             @ObjectLibraryName Char(10);
+             @ObjectType Char(10);
+             @ReturnLibrary Char(10);
+             @AuxiliaryStoragePool Int(10);
+             @ObjectOwner Char(10);
+             @ObjectDomain Char(2);
+             @CreationDateAndTime Char(13);
+             @ObjectChangeDateAndTime Char(13);
+             //   Start Of Two
+             @ExtendedObjectAttribute Char(10);
+             @TextDescription Char(50);
+             @SourceFileName Char(10);
+             @SourceFileLibraryName Char(10);
+             @SourceFileMemberName Char(10);
+             //   Start Of Three
+             @SourceFileUpdatedDateAndTime Char(13);
+             @ObjectSavedDateAndTime Char(13);
+             @ObjectRestoredDateAndTime Char(13);
+             @CreatorsUserProfile Char(10);
+             @SystemWhereObjectWasCreated Char(8);
+             @ResetDate Char(7);
+             @SaveSize Int(10);
+             @SaveSequenceNumber Int(10);
+             @Storage Char(10);
+             @SaveCommand Char(10);
+             @SaveVolumeID Char(71);
+             @SaveDevice Char(10);
+             @SaveFileName Char(10);
+             @SaveFileLibraryName Char(10);
+             @SaveLabel Char(17);
+             @SystemLevel Char(9);
+             @Compiler Char(16);
+             @ObjectLevel Char(8);
+             @UserChanged Char(1);
+             @LicensedProgram Char(16);
+             @ProgramTemporaryFixPTF Char(10);
+             @AuthorizedProgramAnalysisReportAPAR Char(10);
+             //   Start Of Four
+             @LastUsedDate Char(7);
+             @UsageInformationUpdated Char(1);
+             @DaysUsedCount Int(10);
+             @ObjectSize Int(10);
+             @ObjectSizeMultiplier Int(10);
+             @ObjectCompressionStatus Char(1);
+             @AllowChangeByProgram Char(1);
+             @ChangedByProgram Char(1);
+             @UserDefinedAttribute Char(10);
+             @ObjectOverflowedASPIndicator Char(1);
+             @SaveArchiveDateAndTime Char(13);
+             @ObjectAuditingValue Char(10);
+             @PrimaryGroup Char(10);
+             @JournalStatus Char(1);
+             @JournalName Char(10);
+             @JournalLibraryName Char(10);
+             @JournalImages Char(1);
+             @JournalEntriesToBeOmitted Char(1);
+             @JournalStartDateAndTime Char(13);
+             @DigitallySigned Char(1);
+             @SavedSizeInUnits Int(10);
+             @SavedSizeMultiplier Int(10);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores036)
+
+     DApiErrorDs       Ds
+     D                               10i 0 Inz(%Size(ApiErrorDs))
+     D                               10i 0
+     D  AeMsgId                       7a
+     D                                1a
+     D                              128a
+
+       // Dcl-Ds ApiErrorDs;
+       //            Int(10) Inz(%Size(ApiErrorDs));
+       //            Int(10) Inz;
+       //    AeMsgId Char(7);
+       //            Char(1);
+       //            Char(128);
+       // End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores037)
+
+          /Title Retrieve Object Description Function Prototype
+
+          Dcl-Pr RetrieveObjectList Ind;
+              char1 Char(10) Const;                                   // Object
+              char1 Char(10) Const;                                   // Library
+              char1 Char(10) Const Options(*NoPass);                  // Object Type
+              char1 Char(10) Const Options(*NoPass);                  // Information Format
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores038)
+
+          /Title Retrieve Object List Data Structures
+
+          Dcl-Ds Objl0100Ds Qualified Inz;
+             @ObjectNameUsed        Char(10);
+             @ObjectLibraryNameUsed Char(10);
+             @ObjectTypeUsed        Char(10);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores039)
+
+          Dcl-Ds Objl0200Ds Qualified Inz;
+             @ObjectNameUsed Char(10);
+             @ObjectLibraryNameUsed Char(10);
+             @ObjectTypeUsed Char(10);
+             //   Start Of Two
+             Status Char(1);
+             @ExtendedObjectStatus Char(10);
+             @TextDescription Char(50);
+             @UserDefinedAttribute Char(10);
+             @Reserved Char(7);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores040)
+
+          Dcl-Ds Objl0300Ds Qualified Inz;
+             @ObjectNameUsed Char(10);
+             @ObjectLibraryNameUsed Char(10);
+             @ObjectTypeUsed Char(10);
+             //   Start Of Two
+             Status Char(1);
+             @ExtendedObjectStatus Char(10);
+             @TextDescription Char(50);
+             @UserDefinedAttribute Char(10);
+             @Reserved1 Char(7);
+             //   Start Of Three
+             @ObjectAuxiliaryStoragePoolASPNumber Int(10);
+             @ObjectOwner Char(10);
+             @ObjectDomain Char(2);
+             @CreationDateAndTime Char(8);
+             @ChangeDateAndTime Char(8);
+             @Storage Char(10);
+             @ObjectCompressionStatus Char(1);
+             @AllowChangeByProgram Char(1);
+             @ChangedByProgram Char(1);
+             @ObjectAuditingValue Char(10);
+             @DigitallySigned Char(1);
+             @DigitallySignedBySystemTrustedSource Char(1);
+             @DigitallySignedMoreThanOnce Char(1);
+             @Reserved2 Char(2);
+             @LibraryAuxiliaryStoragePoolASPNumber Int(10);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores041)
+
+          Dcl-Ds Objl0400Ds Qualified Inz;
+             @ObjectNameUsed Char(10);
+             @ObjectLibraryNameUsed Char(10);
+             @ObjectTypeUsed Char(10);
+             //   Start Of Two
+             Status Char(1);
+             @ExtendedObjectStatus Char(10);
+             @TextDescription Char(50);
+             @UserDefinedAttribute Char(10);
+             @Reserved1 Char(7);
+             //   Start Of Three
+             @ObjectAuxiliaryStoragePoolASPNumber Int(10);
+             @ObjectOwner Char(10);
+             @ObjectDomain Char(2);
+             @CreationDateAndTime Char(8);
+             @ChangeDateAndTime Char(8);
+             @Storage Char(10);
+             @ObjectCompressionStatus Char(1);
+             @AllowChangeByProgram Char(1);
+             @ChangedByProgram Char(1);
+             @ObjectAuditingValue Char(10);
+             @DigitallySigned Char(1);
+             @DigitallySignedBySystemTrustedSource Char(1);
+             @DigitallySignedMoreThanOnce Char(1);
+             @Reserved2 Char(2);
+             @LibraryAuxiliaryStoragePoolASPNumber Int(10);
+             //   Start Of Four
+             @SourceFileName Char(10);
+             @SourceFileLibraryName Char(10);
+             @SourceFileMemberName Char(10);
+             @SourceFileUpdatedDateAndTime Char(13);
+             @CreatorsUserProfile Char(10);
+             @SystemWhereObjectWasCreated Char(8);
+             @SystemLevel Char(9);
+             @Compiler Char(16);
+             @ObjectLevel Char(8);
+             @UserChanged Char(1);
+             @LiscensedProgram Char(16);
+             @ProgramTemporaryFixPTF Char(10);
+             @AuthorizedProgramAnalysisReportAPAR Char(10);
+             @PrimaryGroup Char(10);
+             @Reservered Char(11);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores042)
+
+          Dcl-Ds Objl0500Ds Qualified Inz;
+             QUSOBJNU03 Char(10);
+             //                                              Object Name Used
+             QUSOLNU03 Char(10);
+             //                                              Object Lib Name Used
+             QUSOBJTU03 Char(10);
+             //                                              Object Type Used
+             QUSIS04 Char(1);
+             //                                              Information Status
+             QUSEOA02 Char(10);
+             //                                              Extended Obj Attr
+             QUSTD09 Char(50);
+             //                                              Text Description
+             QUSUDA02 Char(10);
+             //                                              User Defined Attr
+             QUSERVED25 Char(7);
+             //                                              Reserved
+             QUSASP01 Bindec(4);
+             //                                              Aux Storage Pool
+             QUSOBJO01 Char(10);
+             //                                              Object Owner
+             QUSOBJD01 Char(2);
+             //                                              Object Domain
+             QUSCDT04 Char(8);
+             //                                              Create Date Time
+             QUSCDT05 Char(8);
+             //                                              Change Date Time
+             QUSORAGE01 Char(10);
+             //                                              Storage
+             QUSOBJCS01 Char(1);
+             //                                              Object Compress Status
+             QUSAC01 Char(1);
+             //                                              Allow Change
+             QUSCBPGM01 Char(1);
+             //                                              Changed By Program
+             QUSOBJAV01 Char(10);
+             //                                              Object Audit Value
+             QUSDS02 Char(1);
+             //                                              Digitally Signed
+             //                                                         @A3A
+             QUSDSST01 Char(1);
+             //                                              Digitally Signed Sys Trust
+             //                                                         @A4A
+             QUSDSM01 Char(1);
+             //                                              Digitally Signed Multiple
+             //                                                         @A5C
+             QUSRSV209 Char(2);
+             //                                              Reserved2
+             //                                                         @A4C
+             QUSLASPN11 Bindec(4);
+             //                                              Lib ASP Number
+             //                                                         @A3A
+             QUSSFILN00 Char(10);
+             //                                              Source File Name
+             QUSSFLN00 Char(10);
+             //                                              Source File Lib Name
+             QUSSFMN00 Char(10);
+             //                                              Source File Mbr Name
+             QUSSFUDT00 Char(13);
+             //                                              Source File Update Date Time
+             QUSCUP00 Char(10);
+             //                                              Creator User Profile
+             QUSSOBJC00 Char(8);
+             //                                              System Object Creation
+             QUSSL00 Char(9);
+             //                                              System Level
+             QUSPILER00 Char(16);
+             //                                              Compiler
+             QUSOBJL01 Char(8);
+             //                                              Object Level
+             QUSUC00 Char(1);
+             //                                              User Changed
+             QUSLPGM00 Char(16);
+             //                                              Licensed Program
+             QUSPTF00 Char(10);
+             //                                              PTF
+             QUSAPAR00 Char(10);
+             //                                              APAR
+             QUSPG00 Char(10);
+             //                                              Primary Group
+             QUSRSV700 Char(2);
+             //                                              Reserved7
+             //                                                         @B1A
+             QUSOSA00 Char(1);
+             //                                              Optimum Space Alignment
+             //                                                         @B1M
+             QUSASS00 Bindec(4);
+             //                                              Associated Space Size
+             //                                                         @B0A
+             QUSRSV301 Char(4);
+             //                                              Reserved3
+             //                                                         @B1C
+             QUSOSDT Char(8);
+             //                                              Object Saved Date Time
+             QUSORDT Char(8);
+             //                                              Object Restored Date Time
+             QUSSS00 Bindec(4);
+             //                                              Save Size
+             QUSSSM Bindec(4);
+             //                                              Save Size Multiplier
+             QUSSSNBR Bindec(4);
+             //                                              Save Sequence Number
+             QUSSCMD Char(10);
+             //                                              Save Command
+             QUSSVID Char(71);
+             //                                              Save Volume ID
+             QUSSD01 Char(10);
+             //                                              Save Device
+             QUSSFILN01 Char(10);
+             //                                              Save File Name
+             QUSSFLN01 Char(10);
+             //                                              Save File Lib Name
+             QUSSL01 Char(17);
+             //                                              Save Label
+             QUSSADT Char(8);
+             //                                              Save Active Date Time
+             QUSJS27 Char(1);
+             //                                              Journal Status
+             //                                                         @A1A
+             QUSJN17 Char(10);
+             //                                              Journal Name
+             //                                                         @A1A
+             QUSJLIB Char(10);
+             //                                              Journal Library
+             //                                                         @A1A
+             QUSJI Char(1);
+             //                                              Journal Images
+             //                                                         @A1A
+             QUSJEO Char(1);
+             //                                              Journal Entries Omitted
+             //                                                         @A1A
+             QUSJSDT Char(8);
+             //                                              Journal Start Date Time
+             //                                                         @A1A
+             QUSRSV400 Char(13);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores043)
+
+          Dcl-Ds Objl0600Ds Qualified Inz;
+             QUSOBJNU04 Char(10);
+             //                                              Object Name Used
+             QUSOLNU04 Char(10);
+             //                                              Object Lib Name Used
+             QUSOBJTU04 Char(10);
+             //                                              Object Type Used
+             QUSIS05 Char(1);
+             //                                              Information Status
+             QUSEOA03 Char(10);
+             //                                              Extended Obj Attr
+             QUSTD10 Char(50);
+             //                                              Text Description
+             QUSUDA03 Char(10);
+             //                                              User Defined Attr
+             QUSERVED26 Char(7);
+             //                                              Reserved
+             QUSASP02 Bindec(4);
+             //                                              Aux Storage Pool
+             QUSOBJO02 Char(10);
+             //                                              Object Owner
+             QUSOBJD02 Char(2);
+             //                                              Object Domain
+             QUSCDT06 Char(8);
+             //                                              Create Date Time
+             QUSCDT07 Char(8);
+             //                                              Change Date Time
+             QUSORAGE02 Char(10);
+             //                                              Storage
+             QUSOBJCS02 Char(1);
+             //                                              Object Compress Status
+             QUSAC02 Char(1);
+             //                                              Allow Change
+             QUSCBPGM02 Char(1);
+             //                                              Changed By Program
+             QUSOBJAV02 Char(10);
+             //                                              Object Audit Value
+             QUSDS03 Char(1);
+             //                                              Digitally Signed
+             //                                                         @A3A
+             QUSDSST02 Char(1);
+             //                                              Digitally Signed Sys Trust
+             //                                                         @A4A
+             QUSDSM02 Char(1);
+             //                                              Digitally Signed Multiple
+             //                                                         @A5C
+             QUSRSV210 Char(2);
+             //                                              Reserved2
+             //                                                         @A4C
+             QUSLASPN12 Bindec(4);
+             //                                              Lib ASP Number
+             //                                                         @A3A
+             QUSSFILN02 Char(10);
+             //                                              Source File Name
+             QUSSFLN02 Char(10);
+             //                                              Source File Lib Name
+             QUSSFMN01 Char(10);
+             //                                              Source File Mbr Name
+             QUSSFUDT01 Char(13);
+             //                                              Source File Update Date Time
+             QUSCUP01 Char(10);
+             //                                              Creator User Profile
+             QUSSOBJC01 Char(8);
+             //                                              System Object Creation
+             QUSSL02 Char(9);
+             //                                              System Level
+             QUSPILER01 Char(16);
+             //                                              Compiler
+             QUSOBJL02 Char(8);
+             //                                              Object Level
+             QUSUC01 Char(1);
+             //                                              User Changed
+             QUSLPGM01 Char(16);
+             //                                              Licensed Program
+             QUSPTF01 Char(10);
+             //                                              PTF
+             QUSAPAR01 Char(10);
+             //                                              APAR
+             QUSPG01 Char(10);
+             //                                              Primary Group
+             QUSRSV701 Char(2);
+             //                                              Reserved7
+             //                                                         @B1A
+             QUSOSA01 Char(1);
+             //                                              Optimum Space Alignment
+             //                                                         @B1M
+             QUSASS01 Bindec(4);
+             //                                              Associated Space Size
+             //                                                         @B0A
+             QUSRSV302 Char(4);
+             //                                              Reserved3
+             //                                                         @B1C
+             QUSOSDT00 Char(8);
+             //                                              Object Saved Date Time
+             QUSORDT00 Char(8);
+             //                                              Object Restored Date Time
+             QUSSS01 Bindec(4);
+             //                                              Save Size
+             QUSSSM00 Bindec(4);
+             //                                              Save Size Multiplier
+             QUSSSNBR00 Bindec(4);
+             //                                              Save Sequence Number
+             QUSSCMD00 Char(10);
+             //                                              Save Command
+             QUSSVID00 Char(71);
+             //                                              Save Volume ID
+             QUSSD02 Char(10);
+             //                                              Save Device
+             QUSSFILN03 Char(10);
+             //                                              Save File Name
+             QUSSFLN03 Char(10);
+             //                                              Save File Lib Name
+             QUSSL03 Char(17);
+             //                                              Save Label
+             QUSSADT00 Char(8);
+             //                                              Save Active Date Time
+             QUSJS28 Char(1);
+             //                                              Journal Status
+             //                                                         @A3A
+             QUSJN18 Char(10);
+             //                                              Journal Name
+             //                                                         @A3A
+             QUSJLIB00 Char(10);
+             //                                              Journal Library
+             //                                                         @A3A
+             QUSJI00 Char(1);
+             //                                              Journal Images
+             //                                                         @A3A
+             QUSJEO00 Char(1);
+             //                                              Journal Entries Omitted
+             //                                                         @A3A
+             QUSJSDT00 Char(8);
+             //                                              Journal Start Date Time
+             //                                                         @A3A
+             QUSRSV401 Char(13);
+             //                                              Reserved4
+             //                                                         @A3C
+             QUSLUDT Char(8);
+             //                                              Last Used Date Time
+             QUSRDT Char(8);
+             //                                              Reset Date Time
+             QUSDUC Bindec(4);
+             //                                              Days Used Count
+             QUSUIU Char(1);
+             //                                              Usage Information Update
+             QUSASPDN01 Char(10);
+             //                                              Object ASP Device Name
+             //                                                         @A3A
+             QUSASPDN02 Char(10);
+             //                                              Lib ASP Device Name
+             //                                                         @A3A
+             QUSRSV500 Char(3);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores044)
+
+          Dcl-Ds Objl0700Ds Qualified Inz;
+             QUSOBJNU05 Char(10);
+             //                                              Object Name Used
+             QUSOLNU05 Char(10);
+             //                                              Object Lib Name Used
+             QUSOBJTU05 Char(10);
+             //                                              Object Type Used
+             QUSIS06 Char(1);
+             //                                              Information Status
+             QUSEOA04 Char(10);
+             //                                              Extended Obj Attr
+             QUSTD11 Char(50);
+             //                                              Text Description
+             QUSUDA04 Char(10);
+             //                                              User Defined Attr
+             QUSERVED27 Char(7);
+             //                                              Reserved
+             QUSASP03 Bindec(4);
+             //                                              Aux Storage Pool
+             QUSOBJO03 Char(10);
+             //                                              Object Owner
+             QUSOBJD03 Char(2);
+             //                                              Object Domain
+             QUSCDT08 Char(8);
+             //                                              Create Date Time
+             QUSCDT09 Char(8);
+             //                                              Change Date Time
+             QUSORAGE03 Char(10);
+             //                                              Storage
+             QUSOBJCS03 Char(1);
+             //                                              Object Compress Status
+             QUSAC03 Char(1);
+             //                                              Allow Change
+             QUSCBPGM03 Char(1);
+             //                                              Changed By Program
+             QUSOBJAV03 Char(10);
+             //                                              Object Audit Value
+             QUSDS04 Char(1);
+             //                                              Digitally Signed
+             //                                                         @A3A
+             QUSDSST03 Char(1);
+             //                                              Digitally Signed Sys Trust
+             //                                                         @A4A
+             QUSDSM03 Char(1);
+             //                                              Digitally Signed Multiple
+             //                                                         @A5C
+             QUSRSV211 Char(2);
+             //                                              Reserved2
+             //                                                         @A4C
+             QUSLASPN13 Bindec(4);
+             //                                              Lib ASP Number
+             //                                                         @A3A
+             QUSSFILN04 Char(10);
+             //                                              Source File Name
+             QUSSFLN04 Char(10);
+             //                                              Source File Lib Name
+             QUSSFMN02 Char(10);
+             //                                              Source File Mbr Name
+             QUSSFUDT02 Char(13);
+             //                                              Source File Update Date Time
+             QUSCUP02 Char(10);
+             //                                              Creator User Profile
+             QUSSOBJC02 Char(8);
+             //                                              System Object Creation
+             QUSSL04 Char(9);
+             //                                              System Level
+             QUSPILER02 Char(16);
+             //                                              Compiler
+             QUSOBJL03 Char(8);
+             //                                              Object Level
+             QUSUC02 Char(1);
+             //                                              User Changed
+             QUSLPGM02 Char(16);
+             //                                              Licensed Program
+             QUSPTF02 Char(10);
+             //                                              PTF
+             QUSAPAR02 Char(10);
+             //                                              APAR
+             QUSPG02 Char(10);
+             //                                              Primary Group
+             QUSRSV702 Char(2);
+             //                                              Reserved7
+             //                                                         @B1A
+             QUSOSA02 Char(1);
+             //                                              Optimum Space Alignment
+             //                                                         @B1M
+             QUSASS02 Bindec(4);
+             //                                              Associated Space Size
+             //                                                         @B0A
+             QUSRSV303 Char(4);
+             //                                              Reserved3
+             //                                                         @B1C
+             QUSOSDT01 Char(8);
+             //                                              Object Saved Date Time
+             QUSORDT01 Char(8);
+             //                                              Object Restored Date Time
+             QUSSS02 Bindec(4);
+             //                                              Save Size
+             QUSSSM01 Bindec(4);
+             //                                              Save Size Multiplier
+             QUSSSNBR01 Bindec(4);
+             //                                              Save Sequence Number
+             QUSSCMD01 Char(10);
+             //                                              Save Command
+             QUSSVID01 Char(71);
+             //                                              Save Volume ID
+             QUSSD03 Char(10);
+             //                                              Save Device
+             QUSSFILN05 Char(10);
+             //                                              Save File Name
+             QUSSFLN05 Char(10);
+             //                                              Save File Lib Name
+             QUSSL05 Char(17);
+             //                                              Save Label
+             QUSSADT01 Char(8);
+             //                                              Save Active Date Time
+             QUSJS29 Char(1);
+             //                                              Journal Status
+             //                                                         @A3A
+             QUSJN19 Char(10);
+             //                                              Journal Name
+             //                                                         @A3A
+             QUSJLIB01 Char(10);
+             //                                              Journal Library
+             //                                                         @A3A
+             QUSJI01 Char(1);
+             //                                              Journal Images
+             //                                                         @A3A
+             QUSJEO01 Char(1);
+             //                                              Journal Entries Omitted
+             //                                                         @A3A
+             QUSJSDT01 Char(8);
+             //                                              Journal Start Date Time
+             //                                                         @A3A
+             QUSRSV402 Char(13);
+             //                                              Reserved4
+             //                                                         @A3C
+             QUSLUDT00 Char(8);
+             //                                              Last Used Date Time
+             QUSRDT00 Char(8);
+             //                                              Reset Date Time
+             QUSDUC00 Bindec(4);
+             //                                              Days Used Count
+             QUSUIU00 Char(1);
+             //                                              Usage Information Update
+             QUSASPDN03 Char(10);
+             //                                              Object ASP Device Name
+             //                                                         @A3A
+             QUSASPDN04 Char(10);
+             //                                              Lib ASP Device Name
+             //                                                         @A3A
+             QUSRSV501 Char(3);
+             //                                              Reserved5
+             //                                                         @A3C
+             QUSOBJS Bindec(4);
+             //                                              Object Size
+             QUSOBJSM Bindec(4);
+             //                                              Object Size Multiplier
+             QUSOASPI Char(1);
+             //                                              Overflow ASP Indicator
+             QUSOASPG Char(10);
+             //                                              Object ASP Group
+             //                                                         @C1A
+             QUSLASPG Char(10);
+             //                                              Library ASP Group
+             //                                                         @C1A
+             QUSSJRFA Char(10);
+             //                                              Starting Jrn Rcv For Apply
+             //                                                         @C1A
+             QUSSJRL Char(10);
+             //                                              Starting Jrn Rcv Lib
+             //                                                         @C1A
+             QUSLASPD00 Char(10);
+             //                                              Starting Jrn Rcv Lib ASP Dev
+             //                                                         @C1A
+             QUSLASPG00 Char(10);
+             //                                              Starting Jrn Rcv Lib ASP Gro
+             //                                                         @C1A
+             QAUTCO0 Char(10);
+             //                                              Authority colllection value
+             //
+             QUSRSV6 Char(1);
+             //                                              Starting Jrn Rcv Lib ASP Gro
+             //                                                         @C1A
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores045)
+
+          Dcl-Pr OffsetPtr Pointer;
+              pointer1 Pointer;
+              integer1 Int(10) Value;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores046)
+
+          Dcl-Pr CrtUsrSpc  ExtPgm('QUSCRTUS');
+              char1    Char(20) Const;
+              char1    Char(10) Const;
+              integer1 Int(10)  Const;
+              char1    Char(1)  Const;
+              char1    Char(10) Const;
+              char1    Char(50) Const;
+              char1    Char(10) Const;
+              char1    Char(256);
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores047)
+
+          Dcl-Pr DltUsrSpc  ExtPgm('QUSDLTUS');
+              char1 Char(20) Const;
+              char1 Char(256);
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores048)
+
+          Dcl-Pr RtvPtrUS  ExtPgm('QUSPTRUS');
+              char1    Char(20) Const;
+              pointer1 Pointer;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores049)
+
+             //  API Error Code Structure
+             //
+
+          Dcl-Ds dsEC;
+             //                                     Bytes Provided (size of struct)
+             dsECBytesP Int(10);
+             //                                     Bytes Available (returned by API
+             dsECBytesA Int(10);
+             //                                     Msg ID of Error Msg Returned
+             dsECMsgID Char(7);
+             //                                     Reserved
+             dsECReserv Char(1);
+             //                                     Msg Data of Error Msg Returned
+             dsECMsgDta Char(240);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores050)
+
+          Dcl-s p_ListHeader Pointer;
+
+          Dcl-Ds ListHeaderDs Based(p_ListHeader) Qualified;
+             dsLHFill1 Char(103);
+             //                                      Status (I=Incomplete,C=Complete
+             //                                              F=Partially Complete)
+             dsLHStatus Char(1);
+             dsLHFill2 Char(12);                                      // Filler
+             dsLHHdrOff Int(10);                                      // Header Offset
+             dsLHHdrSiz Int(10);                                      // Header Size
+             dsLHLstOff Int(10);                                      // List Offset
+             dsLHLstSiz Int(10);                                      // List Size
+             dsLHEntCnt Int(10);                                      // Count of Entries in
+             //                                                                          List
+             dsLHEntSiz Int(10);                                      // Size of a single
+             //                                                                          entry
+
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores051)
+
+          Dcl-s @ListHeader Pointer;
+
+     D*@ListHeaderDs    Ds                  LikeDs(ListHeaderDs)
+     D*                                     Based(@ListHeader)
+
+          Dcl-Ds @ListHeaderDs Based(@ListHeader) LikeDs(ListHeaderDs);
+
+      /ENDIF
+
+      /IF DEFINED(mflores052)
+
+          /Title Get Message Function Prototype
+
+          Dcl-Pr GetMessage  Ind;
+              char1 VarChar(512);
+              char1 VarChar(512);
+              char1 Char(10) Const;
+              char1 Char(10) Const;
+              char1 Char(7)  Const;
+              char1 Char(8)  Const Options(*NoPass);
+              char1 VarChar(512)   Options(*NoPass);
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores053)
+
+          /Title Get Message Data Structure Definitions
+
+          Dcl-Ds RTVM0100Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @LengthOfMessageReturned Int(10);
+             @LengthOfMessageAvailable Int(10);
+             @LengthOfMessageHelpReturned Int(10);
+             @LengthOfMessageHelpAvailable Int(10);
+             @MsgData Char(65535);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores054)
+
+          Dcl-Ds RTVM0200Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @MessageSeverity Int(10);
+             @AlertIndex Int(10);
+             @AlertOption Char(9);
+             @LogIndicator Char(1);
+             @Reserved Char(2);
+             @LengthOfDefaultReplyReturned Int(10);
+             @LengthOfDefaultReplyAvailable Int(10);
+             @LengthOfMessageReturned Int(10);
+             @LengthOfMessageAvailable Int(10);
+             @LengthOfMessageHelpReturned Int(10);
+             @LengthOfMessageHelpAvailable Int(10);
+             @MsgData Char(65535);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores055)
+
+          Dcl-Ds RTVM0300Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @MessageSeverity Int(10);
+             @AlertIndex Int(10);
+             @AlertOption Char(9);
+             @LogIndicator Char(1);
+             @MessageId Char(7);
+             @Reserved Char(3);
+             @NumberOfSubstitutionVariableFormats Int(10);
+             @CCSIDConversionStatusIndicatorOfText Int(10);
+             @CCSIDConversionStatusIndicatorOfReplacementData Int(10);
+             @CCSIDOfTextReturned Int(10);
+             @OffsetOfDefaultReply Int(10);
+             @LengthOfDefaultReplyReturned Int(10);
+             @LengthOfDefaultReplyAvailable Int(10);
+             @OffsetOfMessage Int(10);
+             @LengthOfMessageReturned Int(10);
+             @LengthOfMessageAvailable Int(10);
+             @OffsetOfMessageHelp Int(10);
+             @LengthOfMessageHelpReturned Int(10);
+             @LengthOfMessageHelpAvailable Int(10);
+             @OffsetOfSubstitutionVariableFormats Int(10);
+             @LengthOfSubstitutionVariableFormatsReturned Int(10);
+             @LengthOfSubstitutionVariableFormatsAvailable Int(10);
+             @LengthOfSubstitutionVariableFormatElement Int(10);
+             @MsgData Char(65535);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores056)
+
+          Dcl-Ds RTVM0400Ds Qualified;
+             @BytesReturned Int(10);
+             @BytesAvailable Int(10);
+             @MessageSeverity Int(10);
+             @AlertIndex Int(10);
+             @AlertOption Char(9);
+             @LogIndicator Char(1);
+             @Reserveda Char(3);
+             @MessageId Char(7);
+             @NumberOfSubstitutionVariableFormats Int(10);
+             @CCSIDConversionStatusIndicatorOfText Int(10);
+             @CCSIDConversionStatusIndicatorOfReplacementData Int(10);
+             @CCSIDOfTextReturned Int(10);
+             @OffsetOfDefaultReply Int(10);
+             @LengthOfDefaultReplyReturned Int(10);
+             @LengthOfDefaultReplyAvailable Int(10);
+             @OffsetOfMessage Int(10);
+             @LengthOfMessageReturned Int(10);
+             @LengthOfMessageAvailable Int(10);
+             @OffsetOfMessageHelp Int(10);
+             @LengthOfMessageHelpReturned Int(10);
+             @LengthOfMessageHelpAvailable Int(10);
+             @OffsetOfSubstitutionVariableFormats Int(10);
+             @LengthOfSubstitutionVariableFormatsReturned Int(10);
+             @LengthOfSubstitutionVariableFormatsAvailable Int(10);
+             @LengthOfSubstitutionVariableFormatElement Int(10);
+             @ReplyType Char(10);
+             @Reservedb Char(2);
+             @MaximumReplyLength Int(10);
+             @MaximumReplyDecimalPositions Int(10);
+             @OffsetOfValidReplyValueEntries Int(10);
+             @NumberOfValidReplyValuesEntriesReturned Int(10);
+             @LengthOfValidReplyValueEntriesReturned Int(10);
+             @LengthOfValidReplyValueEntriesAvailable Int(10);
+             @LengthOfValidReplyValueEntry Int(10);
+             @OffsetOfSpecialReplyValueEntries Int(10);
+             @NumberOfSpecialReplyValuesReturned Int(10);
+             @LengthOfSpecialReplyValueEntriesReturned Int(10);
+             @LengthOfSpecialReplyValueEntriesAvailable Int(10);
+             @LengthOfSpecialReplyValueEntry Int(10);
+             @OffsetOfLowerRangeReplyValue Int(10);
+             @LengthOfLowerRangeReplyValueReturned Int(10);
+             @LengthOfLowerRangeReplyValueAvailable Int(10);
+             @OffsetOfUpperRangeReplyValue Int(10);
+             @LengthOfUpperRangeReplyValueReturned Int(10);
+             @LengthOfUPperRangeReplyValueAvailable Int(10);
+             @OffsetOfRelationalTestEntry Int(10);
+             @LengthOfRelationalTestEntryReturned Int(10);
+             @LengthOfRelationalTestEntryAvailable Int(10);
+             @MessageCreationDate Char(7);
+             Reservedc Char(1);
+             @MessageCreationLevelNumber Int(10);
+             @MessageModificationDate Char(7);
+             Reservedd Char(1);
+             @MessageModificationLevelNumber Int(10);
+             @StoredCCSIDOfMessage Int(10);
+             @OffsetOfDumpListEntries Int(10);
+             @NumberOfDumpListEntriesReturned Int(10);
+             @LengthOfDumpListEntriesReturned Int(10);
+             @LengthOfDumpListEntriesAvailable Int(10);
+             @DefaultProgramName Char(10);
+             @DefaultProgramLibraryName Char(10);
+             @MsgData Char(65535);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores057)
+
+          Dcl-Ds ERRC0100Ds Qualified;
+             @BytesProvided  Int(10);
+             @BytesAvailable Int(10);
+             @ExceptionId    Char(7);
+             @Reserved       Char(1);
+             @ExcData        VarChar(65535);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores058)
+
+          Dcl-Ds ERRC0200Ds Qualified;
+             @Key                      Int(10);
+             @BytesProvided            Int(10);
+             @BytesAvailable           Int(10);
+             @ExceptionId              Char(7);
+             @Reserved                 Char(1);
+             @CCSIDOfTheCCHARData      Int(10);
+             @OffsetToTheExceptionData Int(10);
+             @LengthToTheExceptionData Int(10);
+             @ExcData                  VarChar(65535);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores059)
+
+          Dcl-Pr @CallCmd  ExtPgm('QCMDEXC');
+              char1 Const Like(@Command);
+              char1 Const Like(@Length);
+          End-Pr;
+
+          Dcl-s @Command Char(32767)  Inz(*Blanks);
+          Dcl-s @Length  Packed(15:5) Inz(*Zeros);
+
+      /ENDIF
+
+      /IF DEFINED(mflores060)
+
+          Dcl-Pr CheckObsolete Ind;
+             *n Char(10) Const;
+             *n Char(10) Const Options(*NoPass);
+             *n Char(08) Const Options(*NoPass);
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores061)
+
+          Dcl-Pr @Check# Ind;
+             *n VarChar(32767) Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores062)
+
+          Dcl-Pr @CheckAlpha Ind;
+              *n VarChar(32767) Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores064)
+
+          Dcl-Pr DeleteComp;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores065)
+
+          Dcl-Pr ConvertFieldName Char(10);
+              *n Char(10) Const;
+              *n Char(7)  Const;
+              *n Char(10) Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores066)
+
+          Dcl-Pr Fields;
+              *n LikeDs(@FieldDs) Const;
+              *n Packed(3:0)      Const;
+              *n Ind              Const;
+              *n Ind              Const;
+              *n Char(7)          Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores067)
+
+          Dcl-Pr CheckForSubstringFields;
+             *n Char(10) Const;
+             *n Char(7)  Const;
+             *n Char(10) Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores068)
+
+          Dcl-Pr WhereClause;
+             *n Char(7)            Const;
+             *n Ind                Const;
+             *n Char(10) Dim(1500) Const;
+             *n Char(10) Dim(1500) Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores069)
+
+          Dcl-Pr OrderByClause;
+             *n Char(7) Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores070)
+
+          Dcl-pr @LongDate Char(11);
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores071)
+
+          Dcl-pr @LongerDate Char(17);
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores072)
+
+          Dcl-c @Up 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+          Dcl-c @Lo 'abcdefghijklmnopqrstuvwxyz';
+
+      /ENDIF
+
+      /IF DEFINED(mflores073)
+
+          Dcl-s @OffSet Int(10)     Inz(*Zeros);
+          Dcl-s @Entry  Packed(5:0) Inz(*Zeros);
+
+      /ENDIF
+
+      /IF DEFINED(mflores074)
+
+          Dcl-c @Yes Const('Y');
+          Dcl-c @No  Const('N');
+
+      /ENDIF
+
+      /IF DEFINED(mflores075)
+
+          Dcl-s @UsrSpace Char(20) Inz('MBRDATA   QTEMP     ');
+
+      /ENDIF
+
+      /IF DEFINED(mflores080)
+
+          Dcl-Ds @ReturnValueDs;
+             @Dimension1   Char(6);
+             @Size1        Char(4);
+             @Dimension2   Char(6);
+             @Size2        Char(4);
+             @ReturnValue1 Char(10) Pos(1);
+             @ReturnValue2 Char(10) Pos(11);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores081)
+
+          Dcl-Ds @SFLDROPReturnDs Qualified;
+             @CMDKey Char(4);
+             @Ind    Ind;
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores082)
+
+     D@FieldDataDs     Ds                  Qualified
+     D  @FmtNam                      10a
+     D  @FldNam                      10A
+     D  @FldLen                       5i 0
+     D  @FldPlen                      5i 0
+     D  @FldDec                       1a
+     D  @FldIO                        1a
+     D  @FldAtr                       1a
+     D  @FldDTUS                      1a
+     D  @FldEdt                      20a
+     D  @FldRow                      10i 0
+     D  @FldCol                      10i 0
+     D  @FldSpcKeys                  15a   Dim(30)
+     D  @FldIBuf                      5i 0
+     D  @FldOBuf                      5i 0
+     D  @FldCom                    4000a   Varying
+     D  @FldCom1                     34a   Overlay(@fldCom:3)
+     D  @FldCom2                     34a   Overlay(@fldCom:37)
+     D  @FldCom3                     34a   Overlay(@fldCom:71)
+     D  @FldSK                57    506a
+
+      /ENDIF
+
+      /IF DEFINED(mflores083)
+
+          Dcl-Ds @FieldDs LikeDs(@FieldDataDS) Occurs(1000);
+
+          Dcl-s  @FieldNumber Int(10)        Inz(*Zeros);
+          Dcl-s  @FieldCntr   Int(10)        Inz(*Zeros);
+          Dcl-s  @RcdFmt      Like(@FieldDataDs.@FmtNam)
+                              Inz(*Blanks) Dim(1000);
+          Dcl-s  @FieldA      Like(@FieldDataDs.@FldNam)
+                              Inz(*Blanks) Dim(1000);
+          Dcl-s  @SpcKeys     Like(@FieldDataDs.@FldSK)
+                              Inz(*Blanks) Dim(1000);
+          Dcl-s  @IBuf        Like(@FieldDataDs.@FldIBuf)
+                              Inz(*Blanks) Dim(1000);
+          Dcl-s  @OBuf        Like(@FieldDataDs.@FldOBuf)
+                              Inz(*Blanks) Dim(1000);
+
+      /ENDIF
+
+      /IF DEFINED(mflores084)
+
+          Dcl-Ds @DisplayFileRcdDs Qualified;
+             @File        Char(10);
+             @Library     Char(10);
+             @Format      Char(10);
+             @DisplayFile Char(20) Pos(1);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(mflores087)
+
+     DInlRcvVar        Ds                  Qualified
+     D                               10i 0
+     D   BytAvl                      10i 0
+
+      /ENDIF
+
+      /IF DEFINED(mflores100)
+
+          Dcl-c @Command01a Const(X'01');                             // F01 Key
+          Dcl-c @Command02b Const(X'02');                             // F02 Key
+          Dcl-c @Command03c Const(X'03');                             // F03 Key
+          Dcl-c @Command04d Const(X'04');                             // F04 Key
+          Dcl-c @Command05e Const(X'05');                             // F05 Key
+          Dcl-c @Command06f Const(X'06');                             // F06 Key
+          Dcl-c @Command07g Const(X'07');                             // F07 Key
+          Dcl-c @Command08h Const(X'08');                             // F08 Key
+          Dcl-c @Command09i Const(X'09');                             // F09 Key
+          Dcl-c @Command10j Const(X'0A');                             // F10 Key
+          Dcl-c @Command11k Const(X'0B');                             // F11 Key
+          Dcl-c @Command12l Const(X'0C');                             // F12 Key
+          Dcl-c @Command13c Const(X'0D');                             // F13 Key
+          Dcl-c @Command14  Const(X'0E');                             // F14 Key
+          Dcl-c @Command15  Const(X'0F');                             // F15 Key
+          Dcl-c @Command16  Const(X'10');                             // F16 Key
+          Dcl-c @Command17  Const(X'11');                             // F17 Key
+          Dcl-c @Command18  Const(X'12');                             // F18 Key
+          Dcl-c @Command19  Const(X'13');                             // F19 Key
+          Dcl-c @Command20  Const(X'14');                             // F20 Key
+          Dcl-c @Command21  Const(X'15');                             // F21 Key
+          Dcl-c @Command22  Const(X'16');                             // F22 Key
+          Dcl-c @Command23  Const(X'17');                             // F23 Key
+          Dcl-c @Command24  Const(X'18');                             // F24 Key
+
+      /ENDIF
+
+      /IF DEFINED(mflores101)
+
+          Dcl-c @RollUp   Const('ROLLUP');
+          Dcl-c @RollDown Const('ROLLDOWN');
+          Dcl-c @Print    Const('PRINT');
+          Dcl-c @Home     Const('HOME');
+          Dcl-c @Clear    Const('CLEAR');
+          Dcl-c @Help     Const('HELP');
+
+      /ENDIF
+
+      /IF DEFINED(mflores102)
+
+          Dcl-c Bit0 Const(x'80');
+          Dcl-c Bit1 Const(x'40');
+          Dcl-c Bit2 Const(x'20');
+          Dcl-c Bit3 Const(x'10');
+          Dcl-c Bit4 Const(x'08');
+          Dcl-c Bit5 Const(x'04');
+          Dcl-c Bit6 Const(x'02');
+          Dcl-c Bit7 Const(x'01');
+
+      /ENDIF
+
+      /IF DEFINED(mflores103)
+
+          Dcl-c SFLDsp    Const(x'40');
+          Dcl-c SFLCtlDsp Const(x'20');
+          Dcl-c Format    Const(x'00');
+
+      /ENDIF
+
+      /IF DEFINED(mflores104)
+
+          Dcl-c Category01 Const(x'01');
+          Dcl-c Category02 Const(x'02');
+          Dcl-c Category03 Const(x'03');
+          Dcl-c Category04 Const(x'04');
+          Dcl-c Category17 Const(x'17');
+          Dcl-c Category18 Const(x'18');
+          Dcl-c Category19 Const(x'19');
+          Dcl-c Category20 Const(x'20');
+          Dcl-c Category21 Const(x'21');
+          Dcl-c Category22 Const(x'22');
+          Dcl-c Category23 Const(x'23');
+          Dcl-c Category24 Const(x'24');
+          Dcl-c Category25 Const(x'25');
+
+      /ENDIF
+
+      /IF DEFINED(mflores131)
+
+          Dcl-pr @GetScreenSize Ind;
+             Char1 Char(30) Const;
+             Ds1   Like(@ReturnValueDs);
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores132)
+
+          Dcl-pr @GetSubfileSize Ind;
+             *n Char(30) Const;
+             *n Int(10)  Dim(2);
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores133)
+
+          Dcl-pr @GetSubfilePage Ind;
+             *n Char(30) Const;
+             *n Int(10)  Dim(2);
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores134)
+
+          Dcl-pr @GetSubfileDrop Ind;
+             *n Char(30) Const;
+             *n LikeDs(@SFLDROPReturnDs);
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores136)
+
+          Dcl-pr @GetRecordLevelCmdKeys Ind;
+             *n Char(30) Const;
+             *n Char(99);
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores137)
+
+          Dcl-pr @GetFieldNamesAndConstants Ind;
+             *n Like(@DisplayFileRcdDs) Const;
+             *n Int(10);
+             *n Like(@FieldDataDs);
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores138)
+
+          Dcl-pr @GetSubfileSFLEnd Ind;
+             *n Char(30) Const;
+             *n Char(20) Dim(16);
+             *n Int(10)  Dim(16);
+             *n Int(10)  Dim(16);
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores139)
+
+          Dcl-pr @GetSpecialKeys Ind;
+             *n Char(30) Const;
+             *n Char(8)  Const;
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores140)
+
+          Dcl-pr @GetSubfileCSRRRN Ind;
+             *n Char(30) Const;
+             *n Char(20) Dim(16);
+             *n Int(10)  Dim(16);
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores141)
+
+          Dcl-pr @GetRecordCommandKeys Ind;
+             *n Char(30) Const;
+             *n Char(10) Dim(16);
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores142)
+
+          Dcl-pr @GetFileLevelIndicators Ind;
+             *n Char(30) Const;
+             *n Char(99);
+             *n Like(@FieldDataDs.@FldIBuf) Dim(99);
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores143)
+
+          Dcl-pr @CheckForWindow Ind;
+             *n Char(30) Const;
+             *n Char(4);
+             *n Int(10);
+             *n Int(10);
+             *n Int(10);
+             *n Int(10);
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores144)
+
+          Dcl-pr @TestFormat Ind;
+             *n Char(30) Const;
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores201)
+
+          Dcl-pr @ClearMessageQueue ExtPgm('@CLRMSGQ');
+             *n Char(10) Const;
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores202)
+
+          Dcl-pr @SendMessageToQueue ExtPgm('@SNDMSGQ');
+             *n Char(10)  Const;
+             *n Char(7)   Const;
+             *n Char(10)  Const;
+             *n Char(10)  Const;
+             *n Char(256) Const;
+          End-pr;
+
+      /ENDIF
+
+      /IF DEFINED(mflores203)
+
+          Dcl-Ds @FieldRefDs ExtName('QADSPFFD') Qualified End-Ds;
+
+      /ENDIF
+

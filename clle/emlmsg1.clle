@@ -1,0 +1,9 @@
+             PGM        PARM(&JOBTYPE)
+
+             DCL        VAR(&JOBTYPE) TYPE(*CHAR) LEN(1)
+
+             RTVJOBA    TYPE(&JOBTYPE)
+
+             RETURN
+
+ END:        ENDPGM

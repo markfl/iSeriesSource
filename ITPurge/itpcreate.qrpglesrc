@@ -1,0 +1,343 @@
+     H/title    Build Save Files
+     H Option(*NoDebugio)
+     H copyright ('(C) Copyright Hub Group, Inc. 2015')
+      **************************************************************************
+      *                                                                        *
+      *   H U B   G R O U P ,   I N C .                                        *
+      *                                                                        *
+      **************************************************************************
+      *                                                                        *
+      *  Program Title: Build Save Files                                       *
+      *                                                                        *
+      *  Date Written:  08/28/2015                                             *
+      *                                                                        *
+      *  Input:                                                                *
+      *                                                                        *
+      *  Output:                                                               *
+      *                                                                        *
+      **************************************************************************
+      *            Design                                                      *
+      * Date       Request Mod Pgmr Description                                *
+      * ---------- ------- --- ---- ------------------------------------------ *
+      * 08-28-15   42268       MF   Initial Creation                           *
+      *                                                                        *
+      **************************************************************************
+
+     ‚* Purge File Driver
+     Fitppurgel1if   e           k Disk
+
+     ‚* File Description
+     Fqafdrfmt  if   f  290    10aiDisk    KeyLoc(14)
+
+     ‚* File Field distription
+     Fqddssrc   o    f   92        Disk    UsrOpn
+
+      * Program Status Data Structure
+     D                sds
+     D QProg             *Proc
+     D QParms            *Parms
+     D QErrorMessage          91    170
+     D QUser                 254    263
+
+‚     * Procedure Prototype
+     Ditpcreate        pr
+     D                               +0    Const Like(purgroup)
+     D                               +0    Const Like(purfrmlib)
+
+‚     * Procedure Interface
+     Ditpcreate        pi
+     D  @PGroup                      +0    Const Like(purgroup)
+     D  @PLibrary                    +0    Const Like(purfrmlib)
+
+     D CrtSource       pr
+
+     D ReadPurgeFile   pr
+     D                               +0    Const Like(purgroup)
+
+     D AddMembers      pr              n
+     D                               +0    Const Like(purfrmfile)
+     D                               +0    Const Like(purfrmlib)
+     D                               +0    Const Like(purtofile)
+
+     D AddSource       pr
+     D                               +0    Const Like(purfrmfile)
+
+     D CreateSaveFile  pr
+     D                               +0    Const Like(purfrmfile)
+     D                               +0    Const Like(purfrmlib)
+
+     D DltSource       pr
+
+     D/DEFINE ITPSHARE09
+     D/DEFINE ITPSHARE21
+     D/DEFINE ITPSHARE25
+     D/copy qcpysrc,itpshare
+     D/UNDEFINE ITPSHARE09
+     D/UNDEFINE ITPSHARE21
+     D/UNDEFINE ITPSHARE25
+
+      /free
+
+          // Create Source File
+          CrtSource();
+
+          // Create Source File
+          ReadPurgeFile(@PGroup);
+
+          // Delete Source File
+          DltSource();
+
+          *Inlr = *On;
+          Return;
+
+          // ************************************************************************
+          // *‚Program Initialization Subroutine
+          // ************************************************************************
+
+          BegSr *InzSr;
+
+
+          EndSr;
+
+      /end-free
+
+      ************************************************************************
+      *‚CrtSource = Create Source File
+      ************************************************************************
+
+     P CrtSource       b
+
+     D CrtSource       pi
+
+     DCrtSrcPf         c                   'CRTSRCPF FILE(QTEMP/QDDSSRC)'
+
+     D/DEFINE ITPSHARE15
+     D/copy qcpysrc,itpshare
+
+      /free
+
+          @Command = CrtSrcPf;
+          @Length  = %Len(%Trim(@Command));
+          @RunCommand(@Command: @Length);
+
+      /end-free
+
+     P CrtSource       e
+
+      ************************************************************************
+      *‚ReadPurgeFile = Read Purge File and Process
+      ************************************************************************
+
+     P ReadPurgeFile   b
+
+     D ReadPurgeFile   pi
+     D  @Group                       +0    Const Like(purgroup)
+
+      /free
+
+          //‚get first purge record
+          Setll *Loval  ritppurgep;
+          Setll @Group ritppurgep;
+          Reade @Group ritppurgep;
+b001      Dow not %Eof(itppurgel1);
+
+             // Add & overide dds member
+b002         If AddMembers(purfrmfile: purfrmlib: purtofile);
+
+                // Update member source
+                AddSource(purfrmfile);
+
+                // Create save file
+                CreateSaveFile(purtofile: @PLibrary);
+
+                // Execute update itppurgep file routine
+                SetStatusForITPPURGEP(@Group: @CreateStatus: purseq);
+
+e002         EndIf;
+
+             //‚get next purge record
+             Reade @Group ritppurgep;
+
+e001      EndDo;
+
+      /end-free
+
+     P ReadPurgeFile   e
+
+      ************************************************************************
+      *‚AddMembers = Add Members to QDDSSRC & overide to QDDSSRC
+      ************************************************************************
+
+     P AddMembers      b
+
+     D AddMembers      pi              n
+     D  @PFromFile                   +0    Const Like(purfrmfile)
+     D  @PFromLib                    +0    Const Like(purfrmlib)
+     D  @PToFile                     +0    Const Like(purtofile)
+
+     D/copy qcpysrc,itpshare
+
+     DAddPfm1          c                   'ADDPFM FILE(QTEMP/QDDSSRC) MBR('
+     DAddPfm2          c                   ') TEXT('''
+     DAddPfm3          c                   ''') SRCTYPE(PF)'
+     DOvrdbf           c                   'OVRDBF FILE(QDDSSRC) TOFILE(QTEMP/-
+     D                                     QDDSSRC) MBR('
+
+     D  @FromLib       s             +0    Like(purfrmlib) Inz(*Blanks)
+     D  @Text          s             50a   Inz(*Blanks)
+     D  @MsgId         s              7a   Inz(*Blanks)
+
+     D@FileLibDs       ds
+     D                               10a   Inz('QCPFMSG   ')
+     D                               10a   Inz('QSYS      ')
+
+      /free
+
+          @FromLib = @PFromLib;
+b001      If RetrieveObjectDescription(@PFromFile: @FromLib: @MsgID:
+                                       @FileLibDs: @Text);
+e001      EndIf;
+
+          // Start monitor for duplicate files with different keys
+b001      Monitor;
+
+             @Command = AddPfm1 + %Trim(@PToFile) + AddPfm2
+                      + %Trim(@Text) + AddPfm3;
+             @Length  = %Len(%Trim(@Command));
+             @RunCommand(@Command: @Length);
+
+             @Command = Ovrdbf + %Trim(@PToFile) + ')';
+             @Length  = %Len(%Trim(@Command));
+             @RunCommand(@Command: @Length);
+
+             // Check for qddssrc file open
+b002         If Not %Open(qddssrc);
+
+                // Open file
+                Open qddssrc;
+
+e002         EndIf;
+
+             Return *On;
+
+x001      On-Error;
+
+             Return *Off;
+
+e001      EndMon;
+
+      /end-free
+
+     P AddMembers      e
+
+      ************************************************************************
+      *‚AddSource = Add Source records for Backup Files
+      ************************************************************************
+
+     P AddSource       b
+
+     D AddSource       pi
+     D  @PFromFile                   +0    Const Like(purfrmfile)
+
+     D@AspecDs         ds            92
+     D  @seq                          6s 2
+     D  @date                         6s 0
+     D  @aspec                18     18a
+     D  @r                    29     29a
+     D  @field                31     40a
+     D                        43     46a
+     D                        47     47a
+     D                        48     49a
+     D  @text                 57     92a
+
+     D/copy qcpysrc,itpshare
+
+     D  @qafdrfmtds  e ds                  ExtName(qafdrfmt)
+
+     DDltOvr           c                   'DLTOVR FILE(*ALL)'
+
+      /free
+
+          // Get from file info
+          Chain @PFromFile qafdrfmt @qafdrfmtds;
+b001      If %found(qafdrfmt);
+
+             // Initialize data structure fields
+             @seq   = 1;
+             @date  = *Zeros;
+             @aspec = 'A';
+             @r     = 'R';
+             @field = rfname;
+             @text  = 'FORMAT(' + %Trim(@PFromFile) + ')';
+
+             // write record
+             Write qddssrc @AspecDs;
+
+e001      EndIf;
+
+          // Close file
+          Close qddssrc;
+
+          @Command = DltOvr;
+          @Length  = %Len(%Trim(@Command));
+          @RunCommand(@Command: @Length);
+
+      /end-free
+
+     P AddSource       e
+
+      ************************************************************************
+      *‚CreateSaveFile - Create Save File From Source
+      ************************************************************************
+
+     P CreateSaveFile  b
+
+     D CreateSaveFile  pi
+     D  @PToFile                     +0    Const Like(purfrmfile)
+     D  @PLibrary                    +0    Const Like(purfrmlib)
+
+     DCrtSrcPf1        c                   'CRTPF FILE('
+     DCrtSrcPf2        c                   ') SRCFILE(QTEMP/QDDSSRC) OPTION(*NO-
+     D                                     SRC *NOLIST) SIZE(*NOMAX)'
+
+     D/copy qcpysrc,itpshare
+
+      /free
+
+          // Start monitor for duplicate files with different keys
+b001      Monitor;
+
+             @Command = CrtSrcPf1 + %Trim(@PLibrary) + '/'
+                      + %Trim(@PToFile) + CrtSrcPf2;
+             @Length  = %Len(%Trim(@Command));
+             @RunCommand(@Command: @Length);
+
+x001      On-Error;
+e001      EndMon;
+
+      /end-free
+
+     P CreateSaveFile  e
+
+      ************************************************************************
+      *‚DltSource = Delete Source File
+      ************************************************************************
+
+     P DltSource       b
+
+     D DltSource       pi
+
+     DDltSrcPf         c                   'DLTF FILE(QTEMP/QDDSSRC)'
+
+     D/copy qcpysrc,itpshare
+
+      /free
+
+          @Command = DltSrcPf;
+          @Length  = %Len(%Trim(@Command));
+          @RunCommand(@Command: @Length);
+
+      /end-free
+
+     P DltSource       e
+

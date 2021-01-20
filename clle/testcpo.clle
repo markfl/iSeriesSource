@@ -1,0 +1,11 @@
+             PGM        PARM(&BOOKING)
+
+             DCL        VAR(&BOOKING) TYPE(*CHAR) LEN(9)
+
+             DBG        PGM(UNBCPORDER)
+
+             CALL       PGM(UNBCPORDER) PARM(&BOOKING)
+
+             ENDDBG
+
+ END:        ENDPGM

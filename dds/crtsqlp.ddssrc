@@ -1,0 +1,13 @@
+     A                                      REF(QSYS/QAFDACCP)
+     A                                      UNIQUE
+     A          R RCRTSQLP
+     A            DATABASE       7A
+     A            APBOF     R
+     A            APFILE    R
+     A            APKEYN    R
+     A            APKEYF    R
+     A          K DATABASE
+     A          K APBOF
+     A          K APKEYN
+     A          K APKEYF
+     A          K APFILE

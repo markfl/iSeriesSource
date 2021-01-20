@@ -1,0 +1,65 @@
+          Ctl-opt DftActGrp(*No) Option(*NoDebugio);
+
+     Fqpgmmodrl2ip   e           k Disk    Prefix(Mod_)
+
+          Dcl-f qpgmfldref Usage(*Output);
+          Dcl-f qpgmfldrl1 Usage(*Input) Keyed Prefix(@M_)
+                                         Rename(rpgmfldref:rpgmfldrl1);
+          Dcl-f qpgmfldrl4 Usage(*Input) Keyed Prefix(@O_) UsrOpn
+                                         Rename(rpgmfldref:rpgmfldrl4);
+          Dcl-s @First Ind Inz(*Off);
+          Dcl-s @Sequence Like(Sequence) Inz(*Zeros);
+
+     Irpgmmodref
+     I                                          Mod_object    l1
+     I                                          Mod_library   l1
+     I                                          Mod_module    l1
+
+b001      If Not @First;
+             Open qpgmfldrl4;
+             SetGt  *Hival                    rpgmfldrl4;
+             SetGt  (Mod_object: Mod_library) rpgmfldrl4;
+             ReadPe (Mod_object: Mod_library) rpgmfldrl4;
+             @Sequence = @O_Sequence;
+             Close qpgmfldrl4;
+             @First = *On;
+e001      EndIf;
+
+b001      If  *Inl1
+          And Mod_object <> Mod_module;
+
+             Setll *Loval rpgmfldrl1;
+             Setll Mod_module rpgmfldrl1;
+             Reade Mod_module rpgmfldrl1;
+b002         Dow Not %Eof(qpgmfldrl1);
+
+                program   = Mod_object;
+                library   = Mod_library;
+                srcfile   = @M_srcfile;
+                srctype   = @M_srctype;
+                intfield  = @M_intfield;
+                extfield  = @M_extfield;
+                type      = @M_type;
+                module    = Mod_module;
+                objtype   = Mod_modattr;
+                function  = Mod_exportproc;
+                size      = @M_size;
+                dec       = @M_dec;
+                usedinpgm = @M_usedinpgm;
+                intext    = @M_intext;
+                extfile   = @M_extfile;
+                fielddesc = @M_fielddesc;
+
+                @Sequence += 1;
+                Sequence = @Sequence;
+
+                Write rpgmfldref;
+
+                Reade Mod_module rpgmfldrl1;
+
+e002         EndDo;
+e001      EndIf;
+
+          BegSr *Inzsr;
+          EndSr;
+

@@ -1,0 +1,75 @@
+          Ctl-opt NoMain Option(*NoDebugio);
+     H/Title Retrieve Object Description
+
+          Dcl-proc RetrieveObjectDescription Export;
+
+          Dcl-pi RetrieveObjectDescription Ind;
+             @Object  Char(10) Const;
+             @Library Char(10) Const;
+             @Type    Char(10) Const;
+             @PFormat Char(10) Const Options(*NoPass);
+          End-pi;
+
+          Dcl-s @Format  Like(@PFormat) Inz(@Format1);
+
+          Dcl-c @Format1 Const('OBJD0100');
+          Dcl-c @Format2 Const('OBJD0200');
+          Dcl-c @Format3 Const('OBJD0300');
+          Dcl-c @Format4 Const('OBJD0400');
+
+     DRtvObjD          pr                  ExtPgm('QUSROBJD')
+     D                            32767a   Options(*VarSize)
+     D                               10i 0 Const
+     D                                8a   Const
+     D                               20a   Const
+     D                               10a   Const
+     D                            32767a   Options(*VarSize)
+
+      /define mflores032
+      /define mflores033
+      /define mflores034
+      /define mflores035
+      /define mflores036
+      /copy qcpysrc,mflores
+
+b001      If %Parms = 4;
+             @Format = @PFormat;
+e001      EndIf;
+
+b001      Select;
+
+x001         When @Format = 'OBJD0100';
+
+                RtvObjD(Objd0100Ds: %Size(Objd0100Ds): @Format1:
+                        @Object + @Library: @Type: ApiErrorDs);
+
+x001         When @Format = 'OBJD0200';
+
+                RtvObjD(Objd0200Ds: %Size(Objd0200Ds): @Format2:
+                        @Object + @Library: @Type: ApiErrorDs);
+
+x001         When @Format = 'OBJD0300';
+
+                RtvObjD(Objd0300Ds: %Size(Objd0300Ds): @Format3:
+                        @Object + @Library: @Type: ApiErrorDs);
+
+x001         When @Format = 'OBJD0400';
+
+                RtvObjD(Objd0400Ds: %Size(Objd0400Ds): @Format4:
+                        @Object + @Library: @Type: ApiErrorDs);
+
+e001      EndSl;
+
+b001      If  AeMsgId <> 'CPF9810';
+
+             // Object found
+             Return *On;
+
+x001      Else;
+
+             // Object not found
+             Return *Off;
+
+e001      EndIf;
+
+          End-Proc;

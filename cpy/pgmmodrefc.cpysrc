@@ -1,0 +1,43 @@
+
+b001         If modlib <> *Blanks;
+                @Command = @dspmod1  + %Trim(modlib) + '/' + %Trim(module)
+                                     + @dspmod2;
+x001         Else;
+                @Command = @dspmod1  + %Trim(module)
+                                     + @dspmod2;
+e001         EndIf;
+
+b001         Monitor;
+
+                @Length = %Len(%Trim(@Command));
+                @CallCmd(@Command: @Length);
+
+                @Command = @ovrdbf;
+                @Length = %Len(%Trim(@Command));
+                @CallCmd(@Command: @Length);
+
+                Open qabndmex ;
+
+                Read qbndmexp;
+b002            Dow Not %Eof(qabndmex);
+
+                   Exportproc = %Trim(exsynm);
+
+                   Write rpgmmodref;
+
+                   Read qbndmexp;
+e002            EndDo;
+
+                Close qabndmex;
+
+                @Command = @dltf;
+                @Length = %Len(%Trim(@Command));
+                @CallCmd(@Command: @Length);
+x001         On-Error;
+
+                Clear Exportproc;
+
+                Write rpgmmodref;
+
+e001         EndMon;
+

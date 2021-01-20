@@ -1,0 +1,23 @@
+             PGM
+
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+
+             ALCOBJ     OBJ((*CURLIB/ISFLORESM *DTAARA *EXCL)) WAIT(1)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+             SETENVLIBL
+
+             IF         COND(&MSGID *EQ ' ') THEN(DO)
+             CHGMSGQ    MSGQ(*USRPRF) DLVRY(*BREAK)
+             STRIM
+             DLCOBJ     OBJ((*CURLIB/ISFLORESM *DTAARA *EXCL))
+             SIGNOFF
+             ENDDO
+
+             ELSE       CMD(DO)
+             STRPDM
+             SIGNOFF
+             ENDDO
+
+ END:        ENDPGM

@@ -1,0 +1,75 @@
+          Ctl-opt DftActGrp(*No) Option(*NoDebugio);
+
+     Fqabndbnd  ip   e             Disk
+
+          Dcl-f qpgmmodref Usage(*Input:*Output);
+          Dcl-f qdspobjdl3 Usage(*Input) Keyed Prefix(@_);
+
+      /copy qcpysrc,pgmmodreff
+
+     D @statusDs      sds
+     D  @_proc           *Proc
+
+          Dcl-Ds @KeyDs      likerec(qlidobjd : *key);
+
+      /copy qcpysrc,pgmmodrefd
+
+      /define mflores059
+      /copy qcpysrc,mflores
+      /undefine mflores059
+
+          Clear @_odlbnm;
+          Clear @_odobtx;
+          Clear @_odsrcf;
+          Clear @_odsrcl;
+          Clear @_odsrcm;
+
+          @KeyDs.@_odobnm = bnobnm;
+          @KeyDs.@_odlbnm = bnolnm;
+          @KeyDs.@_odobtp = bnobtp;
+
+b001      If  bnolnm <> '*LIBL'
+          And bnolnm <> 'QTEMP';
+             Chain %Kds(@KeyDs) qlidobjd;
+b002         If %Found(qdspobjdl3);
+                modlib  = @_odlbnm;
+                odobtx  = @_odobtx;
+                odsrcf  = @_odsrcf;
+                odsrcl  = @_odsrcl;
+                odsrcm  = @_odsrcm;
+e002         EndIf;
+x001      Else;
+             Chain %Kds(@KeyDs:2) qlidobjd;
+b002         If %Found(qdspobjdl3);
+                odobtx  = @_odobtx;
+                modlib  = @_odlbnm;
+                odsrcf  = @_odsrcf;
+                odsrcl  = @_odsrcl;
+                odsrcm  = @_odsrcm;
+                crtdate = %Date(@_odcdat:*mdy0);
+e002         EndIf;
+e001      EndIf;
+
+          Object  = bndrnm;
+          Library = bndrlb;
+          pgmattr = '*BNDDIR';
+          pgmproc = @_proc;
+          module  = bnobnm;
+          objattr = bnobtp;
+          modattr = bnobtp;
+          Clear exportproc;
+          Clear signature;
+
+b001      If  modattr = '*MODULE';
+
+      /copy qcpysrc,pgmmodrefc
+
+x001      Else;
+
+             Write rpgmmodref;
+
+e001      EndIf;
+
+          BegSr *Inzsr;
+
+          EndSr;

@@ -1,0 +1,29 @@
+          Ctl-opt DftActGrp(*No);
+
+          Dcl-pi hrstowrkr;
+             @StrTime Char(6)    Const;
+             @HourWrk Char(5)    Const;
+             @EndTime Char(8);
+          End-pi hrstowrkr;
+
+     D                 ds
+     D  @HoursToWork           1      4s 2
+     D  @Hrs                   1      2
+     D  @Min                   3      4
+
+     D  @worktime2     s               t   TimFmt(*USA)
+
+          Dcl-s @worktime1 Time;
+          Dcl-s @Minutes   Packed(5:0) Inz(*Zeros);
+
+          @Hrs = %SubSt(@HourWrk:1:2);
+          @Min = %SubSt(@HourWrk:4:2);
+          @worktime1 = %Time(@StrTime:*HMS0);
+          @Minutes = @HoursToWork * 60;
+     C     @worktime1    adddur    @Minutes:*Mn  @worktime2
+
+          @EndTime = %Char(@worktime2);
+
+          *inlr = *On;
+          Return;
+

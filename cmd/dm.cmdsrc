@@ -1,0 +1,14 @@
+             CMD        PROMPT('Display User Messages')
+
+             PARM       KWD(MSGQ) TYPE(MSGQ) DFT(*USRPRF) +
+                          SNGVAL((*WRKUSR) (*SYSOPR) (*USRPRF) +
+                          (*WRKSTN)) CHOICE(*NONE) PROMPT('Message +
+                          queue')
+
+ MSGQ:       QUAL       TYPE(*NAME)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*CURLIB)) CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(OUTPUT) TYPE(*CHAR) LEN(8) RSTD(*YES) +
+                          DFT(*) VALUES(* *PRINT *PRTWRAP) +
+                          PROMPT('Output')

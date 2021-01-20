@@ -1,0 +1,607 @@
+          Ctl-opt Option(*NoDebugio) DftActGrp(*No) BndDir('MFLORES');
+
+          Dcl-f qpgmfldml1 Usage(*Input) Keyed;
+          Dcl-f pgmfldmovd Workstn sfile(sfl01:SFLrcd) InfDs(@InfDs);
+          Dcl-f qdatadiff  Usage(*Input) Keyed;
+          Dcl-f qfldofintp Usage(*Input) Keyed;
+
+          Dcl-Pi pgmfldmovr;
+             @P_Program Char(10);
+             @P_Library Char(10);
+          End-Pi;
+
+          Dcl-Pr DisplaySubfilePage;
+          End-Pr;
+
+          Dcl-s  @SaveRrn Like(SFLrcd) Inz(*Zeros);
+          Dcl-Ds @KeyDs   likerec(rpgmfldmov : *key);
+
+          /define mflores003
+          /copy qcpysrc,mflores
+          /undefine mflores003
+
+          /define indds01
+          /define indds01_SBFIND
+          /define indds02_SBFIND
+          /define indds02a
+          /define indds02b
+          /define IndDs02_SbfInd1
+          /define indds02_Ind01_09
+          /define indds02_Ind10_20
+          /copy qcpysrc,IndDs
+          /undefine indds01
+          /undefine indds01_SBFIND
+          /undefine indds02a
+          /undefine indds02b
+          /undefine IndDs02_SbfInd1
+          /undefine indds02_SBFIND
+          /undefine indds02_Ind01_09
+          /undefine indds02_Ind10_20
+
+          ScreenResultInd_10_20 Char(11) Overlay(@IndicatorArray:10);
+
+          ScreenErrorInd_21_99  Char(79) Overlay(@IndicatorArray:21);
+
+          @FieldChanged05    Ind Overlay(@Screen_05);
+          @FieldChanged06    Ind Overlay(@Screen_06);
+          @DisplayUsed10     Ind Overlay(@ScrResult_10);
+          @FieldFound11      Ind Overlay(@ScrResult_11);
+          @FieldMisMatch12   Ind Overlay(@ScrResult_12);
+          @RPGFree13         Ind Overlay(@ScrResult_13);
+          @DisplayLabels14   Ind Overlay(@ScrResult_14);
+          @DisplayAllLInes15 Ind Overlay(@ScrResult_15);
+
+          /define indds02c
+          /define indds_Exit
+          /define indds_Refresh
+          /copy qcpysrc,IndDs
+          /undefine indds02c
+          /undefine indds_Exit
+          /undefine indds_Refresh
+
+          Dcl-s @DisplayLabelsKey    Char(1) Inz(@Command10j);
+          Dcl-s @DisplayHighLightKey Char(1) Inz(@Command12l);
+
+          /define pgmfldmov01
+          /copy qcpysrc,pgmfldmov
+          /undefine pgmfldmov01
+
+          // Execute Initialize subtoutine
+          Initialize(@P_Program: @P_Library);
+
+b001      If @FieldChanged05;
+             @P_Program = @1program;
+             @P_Library = @1library;
+e001      Endif;
+
+          *Inlr = *On;
+          Return;
+
+          Begsr *Inzsr;
+
+             @DisplayLabels14 = *On;
+
+          Endsr;
+
+š         Dcl-Proc Initialize;
+
+          Dcl-Pi Initialize;
+             @Program  Like(program);
+             @Library  Like(library);
+          End-Pi;
+
+          @1program = @Program;
+          @1library = @Library;
+
+          // Execute Subfile Initialization routine
+          InitSubfile(@Program: @Library);
+
+          // Execute Subfile Fill First Page routine
+          FillSubfilePage();
+
+b001      Dow @FunctionKey <> @ExitKey
+          And Not @FieldChanged05;
+
+             // Execute Subfile display routine
+             DisplaySubfilePage();
+
+e001      EndDo;
+
+š         End-Proc;
+
+š         Dcl-Proc InitSubfile;
+
+          Dcl-Pi InitSubfile;
+             @Program  Like(program);
+             @Library  Like(library);
+             @SrcSeq   Like(@1SrcSeq) Options(*NoPass);
+          End-Pi;
+
+          // Initialize subfile
+          SubfileControlInd_01_03 = *Off;
+          Write ctl01;
+          @SflDspCtl_02 = *On;
+
+          // Clear relative record number
+          Clear SflRcd;
+
+          @1program = @Program;
+          @1library = @Library;
+
+          // Set key fields
+          @KeyDs.Program  = @Program;
+          @KeyDs.Library  = @Library;
+          @KeyDs.SrcSeq   = *Zeros;
+b001      If %Parms() >= 3;
+             @KeyDs.SrcSeq   = @SrcSeq;
+e001      EndIf;
+
+          // set file pointer to bof
+          Setll *Loval rpgmfldmov;
+          Setll %Kds(@KeyDs) rpgmfldmov;
+
+š         End-Proc;
+
+š         Dcl-Proc FillSubfilePage;
+
+          Dcl-Pi FillSubfilePage;
+          End-Pi;
+
+          Dcl-s @a        Packed(5:0) Inz(*Zeros);
+          Dcl-s @b        Packed(5:0) Inz(*Zeros);
+          Dcl-s @rrn      Packed(5:0) Inz(*Zeros);
+          Dcl-s @FullPage Packed(5:0) Inz(*Zeros) Static;
+
+          Dcl-Ds @KeyDs1 likerec(rfldofint : *key);
+
+          /define mflores077
+          /copy qcpysrc,mflores
+          /undefine mflores077
+
+          // read next file field record
+          Reade %Kds(@KeyDs:2) rpgmfldmov;
+
+b001      Dow Not %Eof(qpgmfldml1);
+
+             @FieldFound11    = *Off;
+             @FieldMisMatch12 = MisMatch;
+             @RPGFree13       = Free;
+
+b002         Select;
+x002            When spectype = 'D';
+                   @DspecDs = @ToUpper(DataLine);
+                   whflde   = %Trim(@DField);
+                   Chain whflde rqdatadiff;
+b003               If %Found(qdatadiff);
+                      @FieldFound11 = *On;
+x004               Else;
+                      @KeyDs1.Program   = @P_Program;
+                      @KeyDs1.FieldName = whflde;
+                      Chain %Kds(@KeyDs1) rfldofint;
+b005                  If %Found(qfldofintp);
+                         @FieldFound11 = *On;
+e005                  EndIf;
+e003               EndIf;
+b003               If Not @FieldFound11;
+                      @a = %Scan('LIKE(':@DKeyWord);
+b004                  If @a > *Zeros;
+                         @b = %Scan(')':@DKeyWord:@a);
+b005                     If @b > *Zeros;
+                            whflde   = %SubSt(@DKeyWord:@a+5:@b-(@a+5));
+                            @KeyDs1.Program   = @P_Program;
+                            @KeyDs1.FieldName = whflde;
+                            Chain %Kds(@KeyDs1) rfldofint;
+b006                        If %Found(qfldofintp);
+                               @FieldFound11 = *On;
+e006                        EndIf;
+e005                     EndIf;
+e004                  EndIf;
+e003               EndIf;
+
+x002            When spectype = 'I';
+                   @IspecDs = DataLine;
+b003               If  @IField1 <> *Blanks;
+                      whflde = %Trim(@IField1);
+                      Chain whflde rqdatadiff;
+b004                  If %Found(qdatadiff);
+                         @FieldFound11 = *On;
+x004                  Else;
+                         @KeyDs1.Program   = @P_Program;
+                         @KeyDs1.FieldName = whflde;
+                         Chain %Kds(@KeyDs1) rfldofint;
+b005                     If %Found(qfldofintp);
+                            @FieldFound11 = *On;
+e005                     EndIf;
+e004                  EndIf;
+e003               EndIf;
+b003               If  Not @FieldFound11
+                   And @IField2 <> *Blanks;
+                      whflde = %Trim(@IField2);
+                      Chain whflde rqdatadiff;
+b004                  If %Found(qdatadiff);
+                         @FieldFound11 = *On;
+x004                  Else;
+                         @KeyDs1.Program   = @P_Program;
+                         @KeyDs1.FieldName = whflde;
+                         Chain %Kds(@KeyDs1) rfldofint;
+b005                     If %Found(qfldofintp);
+                            @FieldFound11 = *On;
+e005                     EndIf;
+e004                  EndIf;
+e003               EndIf;
+
+x002            When spectype = 'C';
+                   @CspecDs = DataLine;
+
+b003               If  @DisplayLabels14
+                   And %Trim(@CF1Atr) = 'N'
+                   Or  @DisplayLabels14
+                   And CheckBypassProcess(FullLine);
+                      // read next file field record
+                      Reade %Kds(@KeyDs:2) rpgmfldmov;
+                      Iter;
+e003               EndIf;
+
+b003               If  @CField1 <> *Blanks;
+                      whflde = %Trim(@CField1);
+                      Chain whflde rqdatadiff;
+b004                  If %Found(qdatadiff);
+                         @FieldFound11 = *On;
+x004                  Else;
+                         @KeyDs1.Program   = @P_Program;
+                         @KeyDs1.FieldName = whflde;
+                         Chain %Kds(@KeyDs1) rfldofint;
+b005                     If %Found(qfldofintp);
+                            @FieldFound11 = *On;
+e005                     EndIf;
+e004                  EndIf;
+e003               EndIf;
+
+b003               If  @DisplayLabels14
+                   And %Trim(@CF2Atr) = 'N'
+                   Or  @DisplayLabels14
+                   And CheckBypassProcess(FullLine);
+                      // read next file field record
+                      Reade %Kds(@KeyDs:2) rpgmfldmov;
+                      Iter;
+e003               EndIf;
+
+b003               If  Not @FieldFound11
+                   And @CField2 <> *Blanks;
+                      whflde = %Trim(@CField2);
+                      Chain whflde rqdatadiff;
+b004                  If %Found(qdatadiff);
+                         @FieldFound11 = *On;
+x004                  Else;
+                         @KeyDs1.Program   = @P_Program;
+                         @KeyDs1.FieldName = whflde;
+                         Chain %Kds(@KeyDs1) rfldofint;
+b005                     If %Found(qfldofintp);
+                            @FieldFound11 = *On;
+e005                     EndIf;
+e004                  EndIf;
+e003               EndIf;
+
+b003               If  @DisplayLabels14
+                   And %Trim(@CRsAtr) = 'N'
+                   Or  @DisplayLabels14
+                   And CheckBypassProcess(FullLine);
+                      // read next file field record
+                      Reade %Kds(@KeyDs:2) rpgmfldmov;
+                      Iter;
+e003               EndIf;
+
+b003               If  Not @FieldFound11
+                   And @CResult <> *Blanks;
+                      whflde = %Trim(@CResult);
+                      Chain whflde rqdatadiff;
+b004                  If %Found(qdatadiff);
+                         @FieldFound11 = *On;
+x004                  Else;
+                         @KeyDs1.Program   = @P_Program;
+                         @KeyDs1.FieldName = whflde;
+                         Chain %Kds(@KeyDs1) rfldofint;
+b005                     If %Found(qfldofintp);
+                            @FieldFound11 = *On;
+e005                     EndIf;
+e004                  EndIf;
+e003               EndIf;
+
+x002            When spectype = 'F';
+                   @CspecFreeDs = DataLine;
+b003               If  @CFField1 <> *Blanks;
+                      whflde = %Trim(@CFField1);
+                      Chain whflde rqdatadiff;
+b004                  If %Found(qdatadiff);
+                         @FieldFound11 = *On;
+x004                  Else;
+                         @KeyDs1.Program   = @P_Program;
+                         @KeyDs1.FieldName = whflde;
+                         Chain %Kds(@KeyDs1) rfldofint;
+b005                     If %Found(qfldofintp);
+                            @FieldFound11 = *On;
+e005                     EndIf;
+e004                  EndIf;
+e003               EndIf;
+b003               If  Not @FieldFound11
+                   And @CFField2 <> *Blanks;
+                      whflde = %Trim(@CFField2);
+                      Chain whflde rqdatadiff;
+b004                  If %Found(qdatadiff);
+                         @FieldFound11 = *On;
+x004                  Else;
+                         @KeyDs1.Program   = @P_Program;
+                         @KeyDs1.FieldName = whflde;
+                         Chain %Kds(@KeyDs1) rfldofint;
+b005                     If %Found(qfldofintp);
+                            @FieldFound11 = *On;
+e005                     EndIf;
+e004                  EndIf;
+e003               EndIf;
+b003               If  Not @FieldFound11
+                   And @CFResult <> *Blanks;
+                      whflde = %Trim(@CFResult);
+                      Chain whflde rqdatadiff;
+b004                  If %Found(qdatadiff);
+                         @FieldFound11 = *On;
+x004                  Else;
+                         @KeyDs1.Program   = @P_Program;
+                         @KeyDs1.FieldName = whflde;
+                         Chain %Kds(@KeyDs1) rfldofint;
+b005                     If %Found(qfldofintp);
+                            @FieldFound11 = *On;
+e005                     EndIf;
+e004                  EndIf;
+e003               EndIf;
+
+x002            When spectype = 'O';
+                   @OspecDs = DataLine;
+b003               If  @OFieldName <> *Blanks;
+                      whflde = %Trim(@OFieldName);
+                      Chain whflde rqdatadiff;
+b004                  If %Found(qdatadiff);
+                         @FieldFound11 = *On;
+x004                  Else;
+                         @KeyDs1.Program   = @P_Program;
+                         @KeyDs1.FieldName = whflde;
+                         Chain %Kds(@KeyDs1) rfldofint;
+b005                     If %Found(qfldofintp);
+                            @FieldFound11 = *On;
+e005                     EndIf;
+e004                  EndIf;
+e003               EndIf;
+
+b003               If  @DisplayLabels14
+                   And CheckBypassProcess(DataLine)
+                   Or  @DisplayLabels14
+                   And CheckBypassProcess(FullLine);
+                      // read next file field record
+                      Reade %Kds(@KeyDs:2) rpgmfldmov;
+                      Iter;
+e003               EndIf;
+e002         EndSl;
+
+b002         If  @DisplayAllLines15
+             And Not @FieldFound11
+             And Not @FieldMisMatch12;
+                // read next file field record
+                Reade %Kds(@KeyDs:2) rpgmfldmov;
+                Iter;
+e002         EndIf;
+
+b002         If  @1Specs <> *Blanks
+             And @1Specs <> SpecType;
+                // read next file field record
+                Reade %Kds(@KeyDs:2) rpgmfldmov;
+                Iter;
+e002         EndIf;
+
+             // Incriment relative record number
+             @Rrn   += 1;
+             SflRcd += 1;
+
+             @1sseq     = SrcSeq;
+             @1sdatalin = dataline;
+             @1sfulllin = fullline;
+
+             // Write subfile record
+             Write sfl01;
+
+             // Check for page is full
+b002         If @Rrn = @FullPage;
+
+                // read next file field record
+                Reade %Kds(@KeyDs:2) rpgmfldmov;
+b003            If not %Eof(qpgmfldml1);
+
+                   @SaveRRN = SflRcd;
+                   // set file pointer back to prior record
+                   Readpe %Kds(@KeyDs:2) rpgmfldmov;
+                   Leave;
+
+x003            Else;
+
+                   // set on stop roll key ind.
+                  @SflEnd_03 = *On;
+
+e003            EndIf;
+x002         Else;
+
+                // read next file field record
+                Reade %Kds(@KeyDs:2) rpgmfldmov;
+
+e002         EndIf;
+e001      EndDo;
+
+b001      If SflRcd > *Zeros;
+             // set on display subfile ind.
+             @SflDsp_01 = *On;
+e001      EndIf;
+
+b001      If %Eof(qpgmfldml1);
+             // set on no more roll key allowed
+             @SflEnd_03 = *On;
+e001      EndIf;
+
+š         End-Proc;
+
+š         Dcl-Proc DisplaySubfilePage;
+
+          Dcl-Pi DisplaySubfilePage;
+          End-Pi;
+
+          // display screen
+          SflRcd = 1;
+          Write cmd01;
+          Exfmt ctl01;
+
+          ScreenErrorInd_21_99 = *Off;
+
+b001      If @FunctionKey = @DisplayLabelsKey;
+b002         If @DisplayLabels14;
+                @DisplayLabels14 = *Off;
+x002         Else;
+                @DisplayLabels14 = *On;
+e002         EndIf;
+e001      EndIf;
+
+b001      If @FunctionKey = @DisplayHighLightKey;
+             @DisplayLabels14 = *On;
+b002         If @DisplayAllLines15;
+                @DisplayAllLines15 = *Off;
+x002         Else;
+                @DisplayAllLines15 = *On;
+e002         EndIf;
+e001      EndIf;
+
+b001      Dow @FunctionKey = @RollUp;
+
+             sflrcd = @SaveRRN;
+
+             // Execute Subfile Fill First Page routine
+             FillSubfilePage();
+
+             // display screen
+             Write cmd01;
+             Exfmt ctl01;
+
+b002         If @FunctionKey = @RefreshKey;
+                Leave;
+e002         EndIf;
+
+b002         If @FunctionKey = @DisplayLabelsKey;
+b003            If @DisplayLabels14;
+                   @DisplayLabels14 = *Off;
+x003            Else;
+                   @DisplayLabels14 = *On;
+e003            EndIf;
+                Leave;
+e002         EndIf;
+
+b002         If @FunctionKey = @DisplayHighLightKey;
+                @DisplayLabels14 = *On;
+b003            If @DisplayAllLines15;
+                   @DisplayAllLines15 = *Off;
+x003            Else;
+                   @DisplayAllLines15 = *On;
+e003            EndIf;
+                Leave;
+e002         EndIf;
+e001      EndDo;
+
+b001      If @FieldChanged06
+          Or @FunctionKey = @RefreshKey
+          Or @FunctionKey = @DisplayLabelsKey
+          Or @FunctionKey = @DisplayHighLightKey;
+
+             // Execute Subfile Initialization routine
+             InitSubfile(@1Program: @1Library: @1SrcSeq);
+
+             // Execute Subfile Fill First Page routine
+             FillSubfilePage();
+
+e001      EndIf;
+
+š         End-Proc;
+
+š         Dcl-Proc CheckBypassProcess;
+
+          Dcl-Pi CheckBypassProcess  Ind;
+             @P_srcdta  Const Like(fullline);
+          End-Pi;
+
+          Dcl-s @Psrcdta Like(@P_srcdta);
+          Dcl-s @aa      Packed(3:0) Inz(*Zeros);
+
+          /define mflores03
+          /copy qcpysrc,mflores
+          /undefine mflores03
+
+          @Psrcdta = @ToUpper(@P_srcdta);
+
+          @aa = %Scan('BEGSR':@Psrcdta);
+b001      If @aa = *Zeros;
+             @aa = %Scan('ENDSR':@Psrcdta);
+b002         If @aa = *Zeros;
+                @aa = %Scan('PARM':@Psrcdta);
+b003            If @aa = *Zeros;
+                   @aa = %Scan('KFLD':@Psrcdta);
+b004               If @aa = *Zeros;
+                      @aa = %Scan('TIME':@Psrcdta);
+b005                  If @aa = *Zeros;
+                         @aa = %Scan(' IF':@Psrcdta);
+b006                     If @aa = *Zeros;
+                            @aa = %Scan(' OR':@Psrcdta);
+b007                        If @aa = *Zeros;
+                               @aa = %Scan(' AND':@Psrcdta);
+b008                           If @aa = *Zeros;
+                                  @aa = %Scan('PARM':@Psrcdta);
+b009                              If @aa = *Zeros;
+                                     @aa = %Scan(' DO':@Psrcdta);
+b010                                 If @aa = *Zeros;
+x010                                 Else;
+                                        Return *On;
+e010                                 EndIf;
+x009                              Else;
+                                     Return *On;
+e009                              EndIf;
+x008                           Else;
+                                  Return *On;
+e008                           EndIf;
+x007                        Else;
+                               Return *On;
+e007                        EndIf;
+x006                     Else;
+                            Return *On;
+e006                     EndIf;
+x005                  Else;
+                         Return *On;
+e005                  EndIf;
+x004               Else;
+                      Return *On;
+e004               EndIf;
+x003            Else;
+                   Return *On;
+e003            EndIf;
+x002         Else;
+                Return *On;
+e002         EndIf;
+x001      Else;
+             Return *On;
+e001      EndIf;
+
+          @aa = %Scan('EXCPT':@Psrcdta);
+b001      If @aa = *Zeros;
+             @aa = %Scan('EXCEPT':@Psrcdta);
+b002         If @aa = *Zeros;
+x002         Else;
+                Return *On;
+e001         EndIf;
+x001      Else;
+             Return *On;
+e001      EndIf;
+
+          Return *Off;
+
+š         End-Proc;
+

@@ -1,0 +1,23 @@
+     Fqadsppgm  ip   e           k Disk
+
+      /define mflores059
+      /copy qcpysrc,mflores
+      /undefine mflores059
+
+          Dcl-c @Cmd1 Const('DSPPGMREF  PGM(');
+          Dcl-c @Cmd2 Const(') OUTPUT(*OUTFILE)');
+          Dcl-c @Cmd3 Const(' OUTFILE(QTEMP/QADSPPGMO)');
+          Dcl-c @Cmd4 Const(' OUTMBR(*FIRST *ADD)');
+
+b001      If whobjt = 'P';
+
+             @Command = @Cmd1 + %Trim(whlnam) + '/' + %Trim(whfnam)
+                              + @Cmd2 + @Cmd3 + @Cmd4;
+             @Length = %Len(%Trim(@Command));
+b002         Monitor;
+                @CallCmd(@Command: @Length);
+x002         On-Error;
+e002         EndMon;
+
+e001      EndIf;
+

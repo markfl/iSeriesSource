@@ -1,0 +1,27 @@
+     H Option(*Nodebugio) BndDir('MFLORES') DftActGrp(*No)
+     D/define mflores002
+     D/copy qcpysrc,mflores
+     D  @TimeStampc    s             26a
+     D  @TimeStamp1    s               z   Inz(*Loval)
+     D  @TimeStamp2    s               z   Inz(*Loval)
+     D  @cDate         s              8s 0 Inz(20150422)
+     D  @cTime         s              6s 0 Inz(122425)
+     D  @Date          s               d
+     D  @Time          s               t
+     D  @MSec          s               t
+     D  @TimeS         s             26a
+
+          @TimeStampC =  %Char(%TimeStamp());
+          @TimeStamp1 = @TimeStamp();
+          dsply @TimeStampC;
+          dsply @TimeStamp1;
+          dsply %Char(%TimeStamp(@TimeStampC):*iso);
+          @Date = %Date(@cDate:*iso);
+          @Time = %Time(@cTime);
+          @TimeS = %Char(@Date) + '-' + %Char(@Time);
+          dsply @TimeS;
+          @TimeStamp2 = %TimeStamp(@TimeS);
+          @TimeStamp2 += %Mseconds(@cTime);
+          dsply @TimeStamp;
+          *inlr = *On;
+

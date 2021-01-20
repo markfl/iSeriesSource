@@ -1,0 +1,41 @@
+             PGM
+
+             DCLF       FILE(QAFDMBRL)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             DLTF       FILE(QTEMP/QAFDMBRL)
+             MONMSG     MSGID(CPF0000)
+
+             DSPFD      FILE(&CURLIB/QORDERSRC) TYPE(*MBRLIST) +
+                          OUTPUT(*OUTFILE) OUTFILE(QTEMP/QAFDMBRL)
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(DIAG))
+
+             OVRDBF     FILE(QAFDMBRL) TOFILE(QTEMP/QAFDMBRL)
+
+             RMVMSG     CLEAR(*ALL)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* b01 */    DOWHILE    COND(&@MSGID *NE CPF0864)
+
+             CPYSRCF    FROMFILE(TPSTST50/QRPGLESRC) +
+                          TOFILE(&CURLIB/QORDERSRC) +
+                          FROMMBR(ORDERCRT) TOMBR(&MLNAME)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* e01 */    ENDDO
+
+             DLTOVR     FILE(*ALL)
+
+             DLTF       FILE(QTEMP/QAFDMBRL)
+             MONMSG     MSGID(CPF0000)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+ END:        ENDPGM

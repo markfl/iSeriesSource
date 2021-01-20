@@ -1,0 +1,31 @@
+             PGM        PARM(&JOB &USER &NBR &TIMESTAMP)
+
+             DCL        VAR(&JOB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&USER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&NBR) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&TIMESTAMP) TYPE(*CHAR) LEN(26)
+
+             DLTF       FILE(QTEMP/CNVJOBLOG)
+             MONMSG     MSGID(CPF0000)
+
+             CRTPF      FILE(QTEMP/CNVJOBLOG) RCDLEN(132) SIZE(*NOMAX)
+             MONMSG     MSGID(CPF0000)
+
+             CLRPFM     FILE(QTEMP/CNVJOBLOG)
+             MONMSG     MSGID(CPF0000)
+
+             DSPJOBLOG  JOB(&NBR/&USER/&JOB) OUTPUT(*PRINT)
+
+             CPYSPLF    FILE(QPJOBLOG) TOFILE(QTEMP/CNVJOBLOG)
+             DLTSPLF    FILE(QPJOBLOG) SPLNBR(*LAST)
+
+             OVRDBF     FILE(INPUT) TOFILE(QTEMP/CNVJOBLOG)
+
+             CALL       PGM(CNVJOBLOG) PARM(&JOB &USER &NBR &TIMESTAMP)
+
+             DLTOVR     FILE(INPUT)
+
+             DLTF       FILE(QTEMP/CNVJOBLOG)
+             MONMSG     MSGID(CPF0000)
+
+ END:        ENDPGM

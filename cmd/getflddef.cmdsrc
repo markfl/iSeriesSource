@@ -1,0 +1,33 @@
+             CMD        PROMPT('Get File Field Definitions')
+
+             PARM       KWD(PGM) TYPE(PGM) MIN(1) PROMPT('Program')
+ PGM:        QUAL       TYPE(*GENERIC) SPCVAL((*ALL)) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*CURLIB) (*USRLIBL) (*ALLUSR) (*ALL)) +
+                          CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(SRCFILE) TYPE(SRCFILE) PROMPT('To Source +
+                          File')
+ SRCFILE:    QUAL       TYPE(*NAME) DFT(QRPGLESRC)
+             QUAL       TYPE(*NAME) DFT(EMPBASSRC) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(SRCTYPE) TYPE(*CHAR) LEN(8) RSTD(*YES) +
+                          DFT(RPGLE) VALUES(RPGLE RPG CLP) +
+                          CHOICE(*NONE) PROMPT('Source Type')
+
+             PARM       KWD(OUTFILE) TYPE(OUTFILE) PROMPT('File to +
+                          receive output')
+ OUTFILE:    QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*CURLIB)) CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(OUTMBR) TYPE(OUTMBR) CHOICE(*NONE) +
+                          PROMPT('Output member options')
+ OUTMBR:     ELEM       TYPE(*NAME) DFT(*FIRST) SPCVAL((*FIRST) +
+                          (*FILE)) PROMPT('Member to receive output')
+             ELEM       TYPE(*CHAR) LEN(8) RSTD(*YES) DFT(*REPLACE) +
+                          VALUES(*REPLACE *ADD) SPCVAL((*FIRST) +
+                          (*SRCFILE)) CHOICE(*NONE) PROMPT('Replace +
+                          or add records')

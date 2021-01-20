@@ -1,0 +1,65 @@
+      ********************************************************************
+      *                                                                  *
+      * File Name:ÉITPPURKEY                                           Ä *
+      ********************************************************************
+      * Description.: ITPPURKEY Purge Key Driver File                    *
+      *                                                                  *
+      *                                                                  *
+      * Author......: MF                                                 *
+      * Date written: 08/28/2015                                         *
+      ********************************************************************
+      *                   Change Control Information                     *
+      ********************************************************************
+Key   * Start  Spec# Description Of Changes                   AS/400 Id. *
+----  * -----  ----- ---------------------------------------- ---------- *
+      *                                                                  *
+      ********************************************************************
+      *
+
+     A                                      REF(HREF)
+     A          R RITPPURKEY                TEXT('Purge Master Driver File')
+
+     A            KEYGROUP  R               REFFLD(AUDFNM)
+     A                                      COLHDG('Archive' 'Group')
+     A                                      TEXT('Archive Group')
+     A            KEYSEQ    R               REFFLD(CALCNT)
+     A                                      COLHDG('Sequence' 'Number')
+     A                                      TEXT('Sequence Number')
+     A            KEYKEYFLD1    50A         COLHDG('First' 'Key' 'Field')
+     A                                      TEXT('First Key Field')
+     A            KEYKEYFLD2    50A         COLHDG('Second' 'Key' 'Field')
+     A                                      TEXT('Second Key Field')
+     A            KEYKEYFLD3    50A         COLHDG('Third' 'Key' 'Field')
+     A                                      TEXT('Third Key Field')
+     A            KEYKEYFLD4    50A         COLHDG('Fourth' 'Key' 'Field')
+     A                                      TEXT('Fourth Key Field')
+     A            KEYFRMFILER               REFFLD(AUDFNM)
+     A                                      COLHDG('Physical' 'File')
+     A                                      TEXT('Physical File')
+     A            KEYFRMLIB R               REFFLD(AUDFNM)
+     A                                      COLHDG('Physical' 'File' 'Library')
+     A                                      TEXT('Physical File Library')
+     A                                      DFT('*USRLIBL')
+     A            KEYSTATUS R               REFFLD(AACFLG)
+     A                                      COLHDG('Run' 'Status' 'Code')
+     A                                      TEXT('Run Status Code')
+     A* 0=Initialization
+     A* 9=Run Complete
+     A            KEYCRTUSR R               REFFLD(BCTPRF)
+     A                                      COLHDG('Create' 'User')
+     A                                      TEXT('Create user')
+     A            KEYCRTPGM R               REFFLD(PGMVNM)
+     A                                      COLHDG('Create' 'Program')
+     A                                      TEXT('Create program')
+     A            KEYCRTMS  R               REFFLD(APVDTM)
+     A                                      COLHDG('Create' 'Date/Time')
+     A                                      TEXT('Create date/time')
+     A            KEYLSTUSR R               REFFLD(BCTPRF)
+     A                                      COLHDG('Change' 'User')
+     A                                      TEXT('Change user')
+     A            KEYLSTPGM R               REFFLD(PGMVNM)
+     A                                      COLHDG('Change' 'Program')
+     A                                      TEXT('Change program')
+     A            KEYLSTMS  R               REFFLD(APVDTM)
+     A                                      COLHDG('Change' 'Date/Time')
+     A                                      TEXT('Change date/time')

@@ -1,0 +1,13 @@
+             PGM        PARM(&RRN)
+
+             DCL        VAR(&RRN) TYPE(*CHAR) LEN(5)
+
+             DBG        PGM(TPSCARCRT)
+
+             CALL       PGM(TESTCARCR4) PARM(&RRN)
+
+             ENDDBG
+
+             RCLRSC
+
+ END:        ENDPGM

@@ -1,0 +1,24 @@
+     D  @Arl           s            200a   Inz(*Blanks)
+     D  @Arr           s            200a   Inz(*Blanks)
+     D  @Par           s              4a   Inz(*Blanks) Dim(100)
+     C                   Movel     '*'           @Arl
+     C                   Move      '*'           @Arl
+     C                   Movel     '*'           @Arr
+     C                   Move      '*'           @Arr
+     C                   Movea     @Arl          @Par
+     C                   Movea     @Arr          @Par(51)
+      /free
+          Reset @Arl;
+          Reset @Arr;
+          Reset @Par;
+          %SubSt(@Arl:1:1)  = '*';
+          %SubSt(@Arl:200:1)  = '*';
+          %SubSt(@Arr:1:1)  = '*';
+          %SubSt(@Arr:200:1)  = '*';
+          %Subarr(@Par: 1: 50) = @Arl;
+          %Subarr(@Par: 51: 50) = @Arr;
+
+          *Inlr = *On;
+          Return;
+
+      /end-free

@@ -1,0 +1,58 @@
+          Ctl-opt Option(*NoDebugio) DftActGrp(*No);
+
+          Dcl-f xmlmsgwebq Usage(*Input) Rename(xmlmsgwebq:rxmlmsgweb);
+     Fqsysprt   o    f  198        Printer
+
+          Dcl-pi prtxmlmsg;
+             @P_rrn Char(5);
+          End-pi;
+
+     D @InDoc          s          32500a   Varying
+     D @OutDoc         s          32500a   Varying
+
+          Dcl-s @Rrn      Zoned(5:0) Inz(*Zeros);
+          Dcl-s @Status   Int(3:0)   Inz(*Zeros);
+          Dcl-s @a        Packed(9:0) Inz(*Zeros);
+          Dcl-s @b        Packed(9:0) Inz(*Zeros);
+          Dcl-s @Last     Packed(9:0) Inz(*Zeros);
+          Dcl-s @BeginTag Char(100)  Inz(*Blanks);
+          Dcl-s @EndTag   Char(100)  Inz(*Blanks);
+
+          Dcl-s @First    Ind      Inz(*Off);
+          Dcl-s @EndFound Ind      Inz(*Off);
+
+b001      If %Parms() = *Zeros;
+             @Rrn = 492;
+x001      Else;
+             @Rrn = %Uns(@P_rrn);
+e001      EndIf;
+
+          Clear @InDoc;
+          Clear @OutDoc;
+
+          Chain @Rrn rxmlmsgweb;
+b001      If %Found(xmlmsgwebq);
+             @InDoc = %Trim(xmlmsg);
+b002         Dow Not @EndFound;
+b003            If Not @First;
+                   @a = %Scan('<':@InDoc);
+                   @b = %Scan('>':@InDoc:@a);
+                   @BeginTag = %Subst(@InDoc:@a:@b);
+                   @EndTag   = '</' + %Subst(@InDoc:@a+1:@b-@a-1) + '>';
+                   @Last = %Scan(@EndTag:@InDoc);
+                   Except Heading;
+                   Except Detail;
+                   leave;
+e003            EndIf;
+e002         EndDo;
+e001      EndIf;
+
+          *Inlr = *On;
+          Return;
+
+     OQsysprt   e            Heading        2  2
+     O          e            Detail
+     O                       @BeginTag           +1
+     O                       @Last               +1
+     O          e            Detail
+     O                       @EndTag             +1

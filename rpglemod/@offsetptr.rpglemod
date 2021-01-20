@@ -1,0 +1,29 @@
+     H Option(*Nodebugio) Nomain
+     H/Title Work With User Space
+
+     POffsetPtr        b                   Export
+
+     DOffsetPtr        pi              *
+     D   pePointer                     *
+     D   peOffset                    10I 0 Value
+
+     D  p_NewPtr       s               *
+     D  wkMove         s              1A   Dim(4097) Based(p_NewPtr)
+
+      /free
+
+          p_NewPtr = pePointer;
+b001      If peOffset > *Zeros;
+b002         Dow peOffset > 4096;
+                p_NewPtr = %addr(wkMove(4097));
+                peOffset = peOffset - 4096;
+e002         EndDo;
+             p_NewPtr = %addr(wkMove(peOffset+1));
+e001      EndIf;
+
+          Return p_NewPtr;
+
+      /end-free
+
+     POffsetPtr        e
+

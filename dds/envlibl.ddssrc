@@ -1,0 +1,9 @@
+     A          R RENVLIBL
+     A            ENV           10A         COLHDG('Environment')
+     A                                      TEXT('Environment')
+     A            SEQUENCE       3S 0       COLHDG('Sequence')
+     A                                      TEXT('Sequence')
+     A            LIBRARY       10A         COLHDG('Library')
+     A                                      TEXT('Library')
+     A          K ENV
+     A          K SEQUENCE

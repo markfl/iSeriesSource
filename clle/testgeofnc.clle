@@ -1,0 +1,11 @@
+             PGM
+
+             DCL        VAR(&FENCE) TYPE(*CHAR) LEN(50) VALUE('482112')
+
+             DBG        PGM(TESTGEOFNR)
+
+             CALL       PGM(TESTGEOFNR) PARM(&FENCE)
+
+             ENDDBG
+
+ END:        ENDPGM

@@ -1,0 +1,14 @@
+          Ctl-opt DftActGrp(*No) Option(*NoDebugio);
+
+     Fdsppgmrefqup   e           k Disk    Rename(dsppgmrefq:rdsppgmref)
+
+     Irdsppgmref
+     I                                          whpnam        l1
+
+b001      If Not *Inl1;
+             Delete rdsppgmref;
+e001      EndIf;
+
+          BegSr *Inzsr;
+          EndSr;
+

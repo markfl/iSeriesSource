@@ -1,0 +1,548 @@
+          Ctl-opt Option(*NoDebugio) DftActGrp(*NO) BndDir('MFLORES');
+
+          Dcl-f programd   Workstn sfile(sfl01:SFLrcd) InfDs(@InfDs);
+          Dcl-f qpgmfldrl1 Usage(*Input) Keyed
+                     Rename(rpgmfldref:rpgmfldl1);
+          Dcl-f qpgmfldrl2 Usage(*Input) Keyed
+                     Rename(rpgmfldref:rpgmfldl2);
+          Dcl-f qdatadiff  Usage(*Input) Keyed;
+
+          Dcl-Pi programr;
+             @P_Program Char(10);
+             @P_Library Char(10);
+             @P_Text    Char(50);
+          End-Pi;
+
+          Dcl-Pr DisplaySubfilePage;
+          End-Pr;
+
+          Dcl-s  @SaveRrn Like(SFLrcd) Inz(*Zeros);
+          Dcl-Ds @KeyDsL1 likerec(rpgmfldl1 : *key);
+          Dcl-Ds @KeyDsL2 likerec(rpgmfldl2 : *key);
+
+          /define mflores001
+          /define mflores074
+          /copy qcpysrc,mflores
+          /undefine mflores001
+          /undefine mflores074
+
+          /define indds01
+          /define indds01_sbfind
+          /define indds02_sbfind
+          /define indds02_sbfind1
+          /define indds02a
+          /define indds02b
+          /define indds02_Ind01_09
+          /define indds02_Ind10_20
+          /copy qcpysrc,IndDs
+          /undefine indds01
+          /undefine indds01_sbfind
+          /undefine indds02_sbfind
+          /undefine indds02_sbfind1
+          /undefine indds02a
+          /undefine indds02b
+          /undefine indds02_Ind01_09
+          /undefine indds02_Ind10_20
+
+          @FieldChanged_05 Ind Overlay(@Screen_05);
+          @DisplayUsed_10  Ind Overlay(@ScrResult_10);
+          @FieldFound_11   Ind Overlay(@ScrResult_11);
+          @OmitLabels_12   Ind Overlay(@ScrResult_12);
+
+          /define indds02c
+          /define indds_Exit
+          /define indds_Refresh
+          /copy qcpysrc,IndDs
+          /undefine indds02c
+          /undefine indds_Exit
+          /undefine indds_Refresh
+
+          Dcl-s @DisplayAllKey    Char(1) Inz(@Command08h);
+          Dcl-s @DisplayLabelsKey Char(1) Inz(@Command10j);
+
+          // Execute Initialize subtoutine
+          Initialize(@P_Program: @P_Library: @P_Text);
+
+          *Inlr = *On;
+          Return;
+
+          Begsr *Inzsr;
+
+             @DisplayUsed_10 = *On;
+             @OmitLabels_12  = *On;
+
+          Endsr;
+
+š         Dcl-Proc Initialize;
+
+          Dcl-Pi Initialize;
+             @Program  Like(program);
+             @Library  Like(library);
+             @Text Char(50);
+          End-Pi;
+
+          @1program = @Program;
+          @1library = @Library;
+          odobtx    = @Text;
+          Sflmode   = *Off;
+
+          // Execute Subfile Initialization routine
+          InitSubfile(@Program: @Library: @1SrcType: @1IntField);
+
+          // Execute Subfile Fill First Page routine
+          FillSubfilePage(@Program: @Library: @1SrcType);
+
+b001      Dow @FunctionKey <> @ExitKey;
+
+             // Execute Subfile display routine
+             DisplaySubfilePage();
+
+e001      EndDo;
+
+š         End-Proc;
+
+š         Dcl-Proc InitSubfile;
+
+          Dcl-Pi InitSubfile;
+             @Program  Like(program);
+             @Library  Like(library);
+             @SrcType  Like(srctype);
+             @Field  Like(intfield);
+          End-Pi;
+
+          // Initialize subfile
+          SubfileControlInd_01_03 = *Off;
+          Write ctl01;
+          @SflDspCtl_02 = *On;
+
+          // Clear relative record number
+          Clear SflRcd;
+
+          // Set key fields
+          @KeyDsL1.Program  = @Program;
+          @KeyDsL1.Library  = @Library;
+          @KeyDsL1.IntField = @Field;
+          @KeyDsL2.srctype  = @srctype;
+          @KeyDsL2.Program  = @Program;
+          @KeyDsL2.Library  = @Library;
+          @KeyDsL2.IntField = @Field;
+
+          // set file pointer to bof
+          Setll *Loval rpgmfldl1;
+          Setll *Loval rpgmfldl2;
+
+          // Start search select
+b001      Select;
+
+             // Check for source type entered
+x001         When @Program <> *Blanks
+             And  @Library <> *Blanks
+             And  @Field   <> *Blanks
+             And  @SrcType =  *Blanks;
+
+                // set file pointer to first record by key
+                Setll %Kds(@KeyDsL1) rpgmfldl1;
+
+             // Check for source type entered
+x001         When @Program <> *Blanks
+             And  @Library <> *Blanks
+             And  @Field   =  *Blanks
+             And  @SrcType =  *Blanks;
+
+                // set file pointer to first record by key
+                Setll %Kds(@KeyDsL1:2) rpgmfldl1;
+
+             // Check for source type entered
+x001         When @Program <> *Blanks
+             And  @Library =  *Blanks
+             And  @Field   =  *Blanks
+             And  @SrcType =  *Blanks;
+
+                // set file pointer to first record by key
+                Setll %Kds(@KeyDsL1:1) rpgmfldl1;
+
+             // Check for source type entered
+x001         When @SrcType <> *Blanks
+             And  @Program <> *Blanks
+             And  @Library <> *Blanks
+             And  @Field   <> *Blanks;
+
+                // set file pointer to first record by key
+                Setll %Kds(@KeyDsL2) rpgmfldl2;
+
+             // Check for source type entered
+x001         When @SrcType <> *Blanks
+             And  @Program <> *Blanks
+             And  @Library <> *Blanks
+             And  @Field   =  *Blanks;
+
+                // set file pointer to first record by key
+                Setll %Kds(@KeyDsL2:3) rpgmfldl2;
+
+             // Check for source type entered
+x001         When @SrcType <> *Blanks
+             And  @Program <> *Blanks
+             And  @Library =  *Blanks
+             And  @Field   =  *Blanks;
+
+                // set file pointer to first record by key
+                Setll %Kds(@KeyDsL2:2) rpgmfldl2;
+
+             // Check for source type entered
+x001         When @SrcType <> *Blanks
+             And  @Program =  *Blanks
+             And  @Library =  *Blanks
+             And  @Field   =  *Blanks;
+
+                // set file pointer to first record by key
+                Setll %Kds(@KeyDsL2:1) rpgmfldl2;
+
+e001      EndSl;
+
+š         End-Proc;
+
+š         Dcl-Proc FillSubfilePage;
+
+          Dcl-Pi FillSubfilePage;
+             @Program  Like(program);
+             @Library  Like(library);
+             @SrcType  Like(srctype);
+          End-Pi;
+
+          Dcl-s @rrn Packed(5:0) Inz(*Zeros);
+          Dcl-s @FullPage Packed(5:0) Inz(15);
+
+          // Read next record routine
+          ReadNextRecord(@Program: @Library: @SrcType);
+
+b001      Dow Not @SflEnd_03;
+
+             @FieldFound_11 = *Off;
+
+b002         If  @Program =  *Blanks
+             And @Library <> *Blanks
+             And @Library <> library;
+
+                // Read next record routine
+                ReadNextRecord(@Program: @Library: @SrcType);
+                Iter;
+
+e002         EndIf;
+
+b002         If  @DisplayUsed_10
+             And UsedInPGM <> @yes;
+
+                // Read next record routine
+                ReadNextRecord(@Program: @Library: @SrcType);
+                Iter;
+
+e002         EndIf;
+
+b002         If  @OmitLabels_12
+             And type <> 'A'
+             And type <> 'I'
+             And type <> 'S'
+             And type <> 'P'
+             And type <> 'DS';
+
+                // Read next record routine
+                ReadNextRecord(@Program: @Library: @SrcType);
+                Iter;
+
+e002         EndIf;
+
+             // Incriment relative record number
+             @Rrn   += 1;
+             SflRcd += 1;
+
+             @1sprogram = program;
+             @1slibrary = library;
+             @1ssrctype = srctype;
+             @1sifield  = intfield;
+             @1sfunctn  = function;
+             @1module   = module;
+             @1stype    = type;
+             @1ssize    = size;
+             @1sdec     = *Blanks;
+b001         If type = 'P'
+             Or type = 'S';
+                @1sdec     = %Char(dec);
+e001         EndIf;
+             @1susedin  = usedinpgm;
+             @1sintext  = intext;
+             @1sextfile = extfile;
+             @1sfieldd  = fielddesc;
+
+             whflde = %Subst(intfield:1:10);
+             Chain whflde rqdatadiff;
+b002         If %Found(qdatadiff);
+
+                @FieldFound_11 = *On;
+
+e002         EndIf;
+
+             // Write subfile record
+             Write sfl01;
+
+             // Check for page is full
+b002         If @Rrn = @FullPage;
+
+                // Read next record routine
+                ReadNextRecord(@Program: @Library: @SrcType);
+b003            If not %Eof(qpgmfldrl1);
+
+                   @SaveRRN = SflRcd;
+                   // Read next record routine
+                   ReadPriorRecord(@Program: @Library: @SrcType);
+                   Leave;
+
+x003            Else;
+
+                   // set on stop roll key ind.
+                  @SflEnd_03 = *On;
+
+e003            EndIf;
+x002         Else;
+
+                // Read next record routine
+                ReadNextRecord(@Program: @Library: @SrcType);
+
+e002         EndIf;
+e001      EndDo;
+
+b001      If SflRcd > *Zeros;
+             // set on display subfile ind.
+             @SflDsp_01 = *On;
+e001      EndIf;
+
+b001      If %Eof(qpgmfldrl1);
+             // set on no more roll key allowed
+             @SflEnd_03 = *On;
+e001      EndIf;
+
+š         End-Proc;
+
+š         Dcl-Proc DisplaySubfilePage;
+
+          Dcl-Pi DisplaySubfilePage;
+          End-Pi;
+
+          // display screen
+          SflRcd = 1;
+          Write cmd01;
+          Exfmt ctl01;
+
+b001      If @FunctionKey = @DisplayAllKey;
+b002         If @DisplayUsed_10;
+                @DisplayUsed_10 = *Off;
+x002         Else;
+                @DisplayUsed_10 = *On;
+e002         EndIf;
+e001      EndIf;
+
+b001      If @FunctionKey = @DispLayLabelsKey;
+b002         If @OmitLabels_12;
+                @OmitLabels_12 = *Off;
+x002         Else;
+                @OmitLabels_12 = *On;
+e002         EndIf;
+e001      EndIf;
+
+b001      Dow @FunctionKey = @RollUp;
+
+             sflrcd = @SaveRRN;
+
+             // Execute Subfile Fill First Page routine
+             FillSubfilePage(@1Program: @1Library: @1SrcType);
+
+             // display screen
+             Write cmd01;
+             Exfmt ctl01;
+
+b002         If @FunctionKey = @RefreshKey;
+                Leave;
+e002         EndIf;
+
+b002         If @FunctionKey = @DisplayAllKey;
+b003            If @DisplayUsed_10;
+                   @DisplayUsed_10 = *Off;
+x003            Else;
+                   @DisplayUsed_10 = *On;
+e003            EndIf;
+                Leave;
+e002         EndIf;
+
+b002         If @FunctionKey = @DispLayLabelsKey;
+b003            If @OmitLabels_12;
+                   @OmitLabels_12 = *Off;
+x003            Else;
+                   @OmitLabels_12 = *On;
+e003            EndIf;
+                Leave;
+e002         EndIf;
+e001      EndDo;
+
+b001      If @FieldChanged_05
+          Or @FunctionKey = @RefreshKey
+          Or @FunctionKey = @DisplayAllKey
+          Or @FunctionKey = @DispLayLabelsKey;
+
+b002         If @FunctionKey = @RefreshKey;
+                @DisplayUsed_10 = *On;
+                @OmitLabels_12  = *On;
+e002         EndIf;
+
+             // Execute Subfile Initialization routine
+             InitSubfile(@1Program: @1Library: @1SrcType: @1IntField);
+
+             // Execute Subfile Fill First Page routine
+             FillSubfilePage(@1Program: @1Library: @1SrcType);
+
+e001      EndIf;
+
+š         End-Proc;
+
+š         Dcl-Proc ReadNextRecord;
+
+          Dcl-Pi ReadNextRecord;
+             @Program  Like(program);
+             @Library  Like(library);
+             @SrcType  Like(srctype);
+          End-Pi;
+
+          // Start search select
+b001      Select;
+
+             // Check for source type entered
+x001         When @Program <> *Blanks
+             And  @Library <> *Blanks
+             And  @SrcType =  *Blanks;
+
+                // read next file field record
+                Reade %Kds(@KeyDsL1:2) rpgmfldl1;
+                // Check for end of file
+b002            If %Eof(qpgmfldrl1);
+                   @SflEnd_03 = *On;
+e002            EndIf;
+
+             // Check for source type entered
+x001         When @Program <> *Blanks
+             And  @Library =  *Blanks
+             And  @SrcType =  *Blanks;
+
+                // read next file field record
+                Reade %Kds(@KeyDsL1:1) rpgmfldl1;
+                // Check for end of file
+b002            If %Eof(qpgmfldrl1);
+                   @SflEnd_03 = *On;
+e002            EndIf;
+
+             // Check for source type entered
+x001         When @Program <> *Blanks
+             And  @Library <> *Blanks
+             And  @SrcType <> *Blanks;
+
+                // read next file field record
+                Reade %Kds(@KeyDsL2:3) rpgmfldl2;
+                // Check for end of file
+b002            If %Eof(qpgmfldrl2);
+                   @SflEnd_03 = *On;
+e002            EndIf;
+
+             // Check for source type entered
+x001         When @Program <> *Blanks
+             And  @Library =  *Blanks
+             And  @SrcType <> *Blanks;
+
+                // read next file field record
+                Reade %Kds(@KeyDsL2:2) rpgmfldl2;
+                // Check for end of file
+b002            If %Eof(qpgmfldrl2);
+                   @SflEnd_03 = *On;
+e002            EndIf;
+
+             // Check for source type entered
+x001         When @Program =  *Blanks
+             And  @Library =  *Blanks
+             And  @SrcType <> *Blanks;
+
+                // read next file field record
+                Reade %Kds(@KeyDsL2:1) rpgmfldl2;
+                // Check for end of file
+b002            If %Eof(qpgmfldrl2);
+                   @SflEnd_03 = *On;
+e002            EndIf;
+
+x001         Other;
+
+                // read first file field record
+                Read rpgmfldl1;
+                // Check for end of file
+b002            If %Eof(qpgmfldrl1);
+                   @SflEnd_03 = *On;
+e002            EndIf;
+
+e001      EndSl;
+
+š         End-Proc;
+
+š         Dcl-Proc ReadPriorRecord;
+
+          Dcl-Pi ReadPriorRecord;
+             @Program  Like(program);
+             @Library  Like(library);
+             @SrcType  Like(srctype);
+          End-Pi;
+
+          // Start search select
+b001      Select;
+
+             // Check for source type entered
+x001         When @Program <> *Blanks
+             And  @Library <> *Blanks
+             And  @SrcType =  *Blanks;
+
+                // read prior file field record
+                Readpe %Kds(@KeyDsL1:2) rpgmfldl1;
+
+             // Check for source type entered
+x001         When @Program <> *Blanks
+             And  @Library =  *Blanks
+             And  @SrcType =  *Blanks;
+
+                // read prior file field record
+                Readpe %Kds(@KeyDsL1:1) rpgmfldl1;
+
+             // Check for source type entered
+x001         When @Program <> *Blanks
+             And  @Library <> *Blanks
+             And  @SrcType <> *Blanks;
+
+                // read prior file field record
+                Readpe %Kds(@KeyDsL2:3) rpgmfldl2;
+
+             // Check for source type entered
+x001         When @Program <> *Blanks
+             And  @Library =  *Blanks
+             And  @SrcType <> *Blanks;
+
+                // read prior file field record
+                Readpe %Kds(@KeyDsL2:2) rpgmfldl2;
+
+             // Check for source type entered
+x001         When @Program =  *Blanks
+             And  @Library =  *Blanks
+             And  @SrcType <> *Blanks;
+
+                // read prior file field record
+                Readpe %Kds(@KeyDsL2:1) rpgmfldl2;
+
+x001         Other;
+
+                // read prior file field record
+                Readp rpgmfldl1;
+
+e001      EndSl;
+
+š         End-Proc;
+

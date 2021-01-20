@@ -1,0 +1,13 @@
+             PGM
+
+             DCL        VAR(&PDIV) TYPE(*CHAR) LEN(4) VALUE(HUBG)
+             DCL        VAR(&PWHS) TYPE(*CHAR) LEN(4) VALUE(HCMO)
+             DCL        VAR(&PMSGID) TYPE(*CHAR) LEN(7)
+
+             DBG        PGM(OSRCLEX)
+
+             CALL       PGM(OSRCLEX) PARM(&PDIV &PWHS &PMSGID)
+
+             ENDDBG
+
+ END:        ENDPGM

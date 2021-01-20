@@ -1,0 +1,114 @@
+
+     D/Define SYPSPR02
+     D/Define SYPSPR03
+     D/copy qcpysrc,sypspr2get
+
+     D/IF DEFINED(XMLUTIL01)
+
+     D  @XmlDoc        s          32000a   Varying
+
+     D OutDataDs       ds                  Qualified
+     D  @XmlOut                      +0    Like(@XmlDoc)
+
+     D@NameSpace...
+     DDefine           s             11a
+
+     D/ENDIF
+
+     D/IF DEFINED(XMLUTIL02)
+
+     DXMLRemove...
+     DNameSpace        pr              n
+     D                               64a   Const
+     D                               +0    Const Like(sp2prckey1)
+     D                               10a   Const
+     D                               10a   Const
+     D                                6a   Const
+     D                                 z   Const
+     D                            32000a   Const
+     D                               +0    Like(@XMLDoc)
+     D                               +0    LikeDs(OutDataDs)
+
+     D/ENDIF
+
+     D/IF DEFINED(XMLUTIL03)
+
+     DXMLGet...
+     DProcessTag       pr              n
+     D                               +0    Const Like(sp2prckey1)
+     D                               +0    Like(sp2prckey1)
+
+     D/ENDIF
+
+     D/IF DEFINED(XMLUTIL04)
+
+     DXMLGet...
+     DNameSpace        pr              n
+     D                               +0    Const Like(sp2prckey1)
+     D                               +0    Const Like(@XMLDoc)
+     D                               +0    Like(@NameSpaceDefine)
+     D                                9p 0 Options(*NoPass)
+
+     D/ENDIF
+
+     D/IF DEFINED(XMLUTIL05)
+
+     DXMLGetXML...
+     DFileInfo         pr              n
+     D                               +0    Const Like(@XMLDoc)
+     D                               +0    Like(@XMLDoc)
+
+     D/ENDIF
+
+     D/IF DEFINED(XMLUTIL06)
+
+     DXMLGetTagStart   pr              n
+     D                               +0    Const Like(@XMLDoc)
+     D                               +0    Const Like(sp2prckey1)
+     D                               +0    Const Like(@NameSpaceDefine)
+     D                                9p 0
+
+     D/ENDIF
+
+     D/IF DEFINED(XMLUTIL07)
+
+     D @DebugMode      s               n   Inz(*Off)
+
+     DXMLCheck...
+     DDebugMode        pr              n
+     D                               10a   Const
+     D                               10a   Const
+
+     DXMLDebugMode     pr
+     D                               64a   Const
+     D                               10a   Const
+     D                               10a   Const
+     D                               10a   Const
+     D                                6a   Const
+     D                                 z   Const
+     D                               +0    Const Like(@XMLDoc)
+
+     D/ENDIF
+
+     D/IF DEFINED(XMLUTIL08)
+
+     DXMLSendError     pr            +0    Like(@XMLDoc)
+     D                               +0    Const Like(@XMLDoc)
+     D                                3p 0 Const
+     D                               10a
+
+     D/ENDIF
+
+     D/IF DEFINED(XMLUTIL09)
+
+     DXMLSetError      pr                  LikeDs(OutDataDs)
+     D                               64a   Const
+     D                               10a   Const
+     D                               10a   Const
+     D                               10a   Const
+     D                                6a   Const
+     D                                 z   Const
+     D                               +0    Const Like(@XMLDoc)
+
+     D/ENDIF
+

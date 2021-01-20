@@ -1,0 +1,19 @@
+             CMD        PROMPT('Change Source Date')
+
+             PARM       KWD(FILE) TYPE(FILE) PROMPT('File')
+ FILE:       QUAL       TYPE(*NAME) DFT(QRPGLESRC)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(MEMBER) TYPE(*NAME) DFT(*FIRST) +
+                          SPCVAL((*FIRST)) PROMPT('Member')
+
+             PARM       KWD(TAG) TYPE(*CHAR) LEN(5) PROMPT('From tag')
+
+             PARM       KWD(TODATE) TYPE(*CHAR) LEN(6) PROMPT('To +
+                          date YYMMDD')
+
+             PARM       KWD(SRCTYPE) TYPE(*SNAME) LEN(5) RSTD(*YES) +
+                          DFT(RPGLE) VALUES(RPGLE RPG CLLE CLP DDS +
+                          CMD) PROMPT('Source type')

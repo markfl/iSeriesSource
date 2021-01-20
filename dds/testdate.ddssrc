@@ -1,0 +1,9 @@
+     A          R RTESTDATE
+     A            DATE1           L
+     A            DATE2           L         DATFMT(*USA)
+     A            DATE3           L         DATFMT(*JIS)
+     A            DATE4           L         DATFMT(*EUR)
+     A            TIME1           T
+     A            TIME2           T         TIMFMT(*HMS)
+     A            TIME3           T         TIMFMT(*USA)
+     A            TIMESTAMP       Z

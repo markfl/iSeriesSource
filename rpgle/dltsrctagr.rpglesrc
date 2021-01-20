@@ -1,0 +1,27 @@
+          Ctl-opt Option(*NoDebugio) DftActGrp(*No);
+
+     Fqrpglesrc up   f  112        Disk
+          Dcl-f qrpglesrco Disk(112) Usage(*Output);
+
+          Dcl-Pi dltsrctagr;
+             @InTag Char(9);
+          End-Pi;
+
+          Dcl-Ds @SourceDs ExtName('QRPGLESRC') Prefix(@_) End-Ds;
+
+     Iqrpglesrc ns
+     I                                  1    6 2srcseq
+     I                                  7   12 0srcdat
+     I                                 13   21  srctag
+     I                                 13  112  srcdta
+
+b001      If srctag <> @InTag;
+
+             @_srcseq = srcseq;
+             @_srcdat = srcdat;
+             @_srcdta = srcdta;
+
+             Write qrpglesrco @SourceDs;
+
+e001      EndIf;
+

@@ -1,0 +1,50 @@
+          Ctl-opt Option(*NoDebugio) BndDir('MFLORES');
+
+          Dcl-f qdbasedil2 Disk Usage(*Input)  Keyed Prefix(@1)
+                                               Rename(qwhdrffd:rqwhdrffd2);
+          Dcl-f qdbasedil4 Disk Usage(*Input)  Keyed Prefix(@2)
+                                               Rename(qwhdrffd:rqwhdrffd4);
+          Dcl-f qadspffdo Disk(1066) Usage(*Output);
+
+          /define fndfldusg01
+          /define fndfldusg02
+          /define fndfldusg03
+          /copy qcpysrc,fndfldusg
+          /undefine fndfldusg01
+          /undefine fndfldusg02
+          /undefine fndfldusg03
+
+          Dcl-Pi fndfldusg1;
+             @Field Like(@1whrfld);
+          End-Pi;
+
+          Dcl-Ds @qadspffdDs2 ExtName('QADSPFFD') Prefix(@1) End-Ds;
+          Dcl-Ds @qadspffdDs4 ExtName('QADSPFFD') Prefix(@2) End-Ds;
+          Dcl-Ds @qadspffdDsI LikeDs(@qadspffdDsIn);
+          Dcl-Ds @qadspffdDsO LikeDs(@qadspffdDsOut);
+
+          Setll *Loval rqwhdrffd2;
+          Setll @Field rqwhdrffd2;
+          Reade @Field rqwhdrffd2;
+b001      Dow Not %Eof(qdbasedil2);
+             If whflde <> whrfld;
+                @qadspffdDsIn = @qadspffdDs2;
+                @qadspffdDsO  = SetFields(@qadspffdDsIn);
+                Write qadspffdo @qadspffdDsO;
+e002         EndIf;
+             Reade @Field rqwhdrffd2;
+e001      EndDo;
+
+          Setll *Loval rqwhdrffd4;
+          Setll @Field rqwhdrffd4;
+          Reade @Field rqwhdrffd4;
+b001      Dow Not %Eof(qdbasedil4);
+             @qadspffdDsIn = @qadspffdDs4;
+             @qadspffdDsO  = SetFields(@qadspffdDsIn);
+             Write qadspffdo @qadspffdDsO;
+             Reade @Field rqwhdrffd4;
+e001      EndDo;
+
+          *Inlr = *On;
+          Return;
+

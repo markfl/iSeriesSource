@@ -1,0 +1,125 @@
+     H Option(*Nodebugio) Nomain
+     H/Title Send Program Message
+      **********************************************************************************************
+      *
+      * Author.....: Mark Flores
+      * Date.......: 30-Oct-2015
+      * Description: API To SNDPGMMSG
+      *
+      **********************************************************************************************
+      * Change Control Information
+      *---------------------------------------------------------------------------------------------
+      * Date     Task #  Description of Changes                     Pgmr ID
+      * -------- ------- ------------------------------------------ ----------
+      * 11/11/05  42361      Program Creation                       Flores M
+      **********************************************************************************************
+
+     P SndPgmMsg       b                   Export
+
+     D SndPgmMsg       pi
+     D  @P_MsgDta                 32767a   Const Options(*VarSize)
+     D  @P_MsgDta...
+     D  Length                       10i 0 Const
+     D  @P_MsgId                      7a   Const Options(*NoPass)
+     D  @P_MsgF                      20a   Const Options(*NoPass)
+     D  @P_MsgType                   10a   Const Options(*NoPass)
+
+     D  @CallStack...
+     D  Entry          s          32767a   Inz('*') Varying
+     D  @CallStack...
+     D  Counter        s             10i 0 Inz(4)
+     D  @MsgKey        s              4a   Inz(*Blanks)
+
+     D@ErrorCodeDs     ds            16
+     D  @BytesProv                   10i 0 Inz(16)
+     D  @BytesAvail                  10i 0
+     D  @ExceptionID                  7
+
+     D* Optional Parameter Group 1
+     D  @LengthOfCall...
+     D  StackEntry     s             10i 0 Inz(*Zeros)
+     D  @CallStackEntry...
+     D  Qualification  s              4a   Inz(*Blanks)
+     D  @DispalyProgramMessagesScreen...
+     D  WaitTime       s             10i 0 Inz(*Zeros)
+
+     D* Optional Parameter Group 2
+     D  @CallStackEntry...
+     D  DataType       s              4a   Inz(*Blanks)
+     D  @CodedCharacterSet...
+     D  Identifier     s             10i 0 Inz(*Zeros)
+
+     DSndPgmMsgApi     pr                  ExtPgm('QMHSNDPM')
+     D                                7a   Const
+     D                               20a   Const
+     D                            32767a   Const Options(*VarSize)
+     D                               10i 0 Const
+     D                               10a   Const
+     D                            32767a   Const Options(*VarSize)
+     D                               10i 0 Const
+     D                                4a
+     D                               16a
+
+     D  @PMsgDta       s                   Like(@P_MsgDta)       Inz(*Blanks)
+     D  @PMsgDta...
+     D  Length         s                   Like(@P_MsgDtaLength) Inz(*Zeros)
+     D  @PMsgId        s                   Like(@P_MsgId)        Inz(*Blanks)
+     D  @PMsgF         s                   Like(@P_MsgF)         Inz(*Blanks)
+     D  @PMsgType      s                   Like(@P_MsgType)      Inz(*Blanks)
+
+     D  @DftMsgId      s              7a   Inz('CPF9898')
+     D  @DftMsgF       s             20a   Inz('QCPFMSG   QSYS      ')
+     D  @DftMsgType    s             10a   Inz('*DIAG')
+
+      /free
+
+          // Set parms
+          @PMsgDta       = %Trim(@P_MsgDta);
+          @PMsgDtaLength = @P_MsgDtaLength;
+
+          // Start Parms Check Select
+b001      Select;
+
+             // Check if Message type passed to procedure
+x001         When %Parms() = 5;
+
+                // Set parms
+                @PMsgId   = @P_MsgId;
+                @PMsgF    = @P_MsgF;
+                @PMsgType = @P_MsgType;
+
+             // Check if Message type passed to procedure
+x001         When %Parms() = 4;
+
+                // Set parms
+                @PMsgId   = @P_MsgId;
+                @PMsgF    = @P_MsgF;
+                @PMsgType = @DftMsgType;
+
+             // Check if Message type passed to procedure
+x001         When %Parms() = 3;
+
+                // Set parms
+                @PMsgId   = @P_MsgId;
+                @PMsgF    = @DftMsgF;
+                @PMsgType = @DftMsgType;
+
+             // Check if Message type passed to procedure
+x001         When %Parms() = 2;
+
+                // Set parms
+                @PMsgId   = @DftMsgId;
+                @PMsgF    = @DftMsgF;
+                @PMsgType = @DftMsgType;
+
+e001      EndSl;
+
+          // Send the program message
+          SndPgmMsgApi(@PMsgId: @PMsgF: @PMsgDta: @PMsgDtaLength:
+                       @PMsgType: %Trim(@CallStackEntry): @CallStackCounter:
+                       @MsgKey: @ErrorCodeDs);
+
+
+      /end-free
+
+     P SndPgmMsg       e

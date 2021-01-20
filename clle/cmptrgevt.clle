@@ -1,0 +1,18 @@
+             PGM
+
+             SBMJOB     CMD(CRTPGM PGM(QTEMP/TRGGPSEVT) +
+                          MODULE(TRGGPSEVT CRTDRPORD $CNLUTL +
+                          $GPSEVT $GPSUTL) ENTMOD(TRGGPSEVT) +
+                          BNDSRVPGM(($SPAPIJOB) ($SPAPISTR) +
+                          ($SPENTINF) ($SPEQPUTL) ($SPMILEAGE) +
+                          ($SPNFYUTL) ($SPORDUTL) ($SPTNDUTL) +
+                          ($SPTPSUTL) (QC2SYS) (QC2UTIL1) +
+                          (QRNXUTIL) ($SPAGTUTL) ($SPAPIC) +
+                          ($SPCOMINF) ($SPCSTUTL) ($SPLOGGING) +
+                          ($SPUSRPRF) (HTTPAPIR4) (QAXIS10HT) +
+                          (QP0LLIB1) (QTQICONV) (QC3HMAC) +
+                          ($SPLONGLAT) ($SPEQPINV) ($SPWEBUTL)) +
+                          BNDDIR(TPSBNDMOD GLBLBND UTILITY QC2LE +
+                          HTTPAPI) DETAIL(*FULL))
+
+ END:        ENDPGM

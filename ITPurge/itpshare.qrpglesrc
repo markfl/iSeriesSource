@@ -1,0 +1,1646 @@
+     H/title    Purge Files Shared Modules
+     H Option(*NoDebugio) NoMain
+     H copyright ('(C) Copyright Hub Group, Inc. 2015')
+      **************************************************************************
+      *                                                                        *
+      *   H U B   G R O U P ,   I N C .                                        *
+      *                                                                        *
+      **************************************************************************
+      *                                                                        *
+      *  Program Title: Purge Files Shared Modules                             *
+      *                                                                        *
+      *  Date Written:  08/28/2015                                             *
+      *                                                                        *
+      *  Input:                                                                *
+      *                                                                        *
+      *  Output:                                                               *
+      *                                                                        *
+      **************************************************************************
+      *            Design                                                      *
+      * Date       Request Mod Pgmr Description                                *
+      * ---------- ------- --- ---- ------------------------------------------ *
+      * 08-28-15   42268       MF   Initial Creation                           *
+      *                                                                        *
+      **************************************************************************
+
+     ‚* Purge File Driver
+     Fitppurgel1uf   e           k Disk    UsrOpn Rename(ritppurgep:ritppurgl1)
+
+     ‚* Purge File Driver
+     Fitppurgel2if   e           k Disk    UsrOpn Rename(ritppurgep:ritppurgl2)
+
+     ‚* Purge Key File Driver
+     Fitppurkey1uf   e           k Disk    UsrOpn Rename(ritppurkey:ritppurkl1)
+
+     ‚* Purge Key File Driver
+     Fitppurkey2if   e           k Disk    UsrOpn Rename(ritppurkey:ritppurkl2)
+
+     ‚* File Field distription
+     Fqadspffd  if   e           k Disk    UsrOpn
+
+     D/DEFINE ITPSHARE19
+     D/DEFINE ITPSHARE20
+     D/copy qcpysrc,itpshare
+     D/UNDEFINE ITPSHARE19
+     D/UNDEFINE ITPSHARE20
+
+      ************************************************************************
+      *‚CopyData = Copy Data from source file to save file
+      ************************************************************************
+
+     PCopyData         b                   Export
+
+     DCopyData         pi              n
+     D  @MsgDta                     256a
+     D  @PFromFileLib                25a   Const
+     D  @PToFile                     25a   Const
+     D  @PKeyFld1                    +0    Const Like(purkeyfld1)
+     D  @PKeyFld2                    +0    Const Like(purkeyfld2)
+     D  @PKeyFld3                    +0    Const Like(purkeyfld3)
+     D  @PKeyFld4                    +0    Const Like(purkeyfld4)
+     D  @PAndOr2                     +0    Const Like(purandor2)
+     D                                     Options(*NoPass)
+     D  @PAndOr3                     +0    Const Like(purandor3)
+     D                                     Options(*NoPass)
+     D  @PAndOr4                     +0    Const Like(purandor4)
+     D                                     Options(*NoPass)
+     D  @PKeyCnd1                    +0    Const Like(purkeycnd1)
+     D                                     Options(*NoPass)
+     D  @PKeyCnd2                    +0    Const Like(purkeycnd2)
+     D                                     Options(*NoPass)
+     D  @PKeyCnd3                    +0    Const Like(purkeycnd3)
+     D                                     Options(*NoPass)
+     D  @PKeyCnd4                    +0    Const Like(purkeycnd4)
+     D                                     Options(*NoPass)
+     D  @PAlwBlk1                      n   Const Options(*NoPass)
+     D  @PAlwBlk2                      n   Const Options(*NoPass)
+     D  @PAlwBlk3                      n   Const Options(*NoPass)
+     D  @PAlwBlk4                      n   Const Options(*NoPass)
+     D  @PRJust1                       n   Const Options(*NoPass)
+     D  @PRJust2                       n   Const Options(*NoPass)
+     D  @PRJust3                       n   Const Options(*NoPass)
+     D  @PRJust4                       n   Const Options(*NoPass)
+     D  @PZrFill1                      n   Const Options(*NoPass)
+     D  @PZrFill2                      n   Const Options(*NoPass)
+     D  @PZrFill3                      n   Const Options(*NoPass)
+     D  @PZrFill4                      n   Const Options(*NoPass)
+     D  @PFlSize1                    +0    Const Like(purflsize1)
+     D                                     Options(*NoPass)
+     D  @PFlSize2                    +0    Const Like(purflsize2)
+     D                                     Options(*NoPass)
+     D  @PFlSize3                    +0    Const Like(purflsize3)
+     D                                     Options(*NoPass)
+     D  @PFlSize4                    +0    Const Like(purflsize4)
+     D                                     Options(*NoPass)
+     D  @PKey1                       +0    Const Like(keykeyfld1)
+     D                                     Options(*NoPass)
+     D  @PKey2                       +0    Const Like(keykeyfld2)
+     D                                     Options(*NoPass)
+     D  @PKey3                       +0    Const Like(keykeyfld3)
+     D                                     Options(*NoPass)
+     D  @PKey4                       +0    Const Like(keykeyfld4)
+     D                                     Options(*NoPass)
+
+     D  @FromFileLib   s             +0    Like(@PFromFileLib) Inz(*Blanks)
+     D  @ToFile        s             +0    Like(@PToFile)      Inz(*Blanks)
+     D  @KeyFld1       s             +0    Like(purkeyfld1)    Inz(*Blanks)
+     D  @KeyFld2       s             +0    Like(purkeyfld2)    Inz(*Blanks)
+     D  @KeyFld3       s             +0    Like(purkeyfld3)    Inz(*Blanks)
+     D  @KeyFld4       s             +0    Like(purkeyfld4)    Inz(*Blanks)
+     D  @AndOr2        s             +0    Like(purandor2)     Inz(*Blanks)
+     D  @AndOr3        s             +0    Like(purandor3)     Inz(*Blanks)
+     D  @AndOr4        s             +0    Like(purandor4)     Inz(*Blanks)
+     D  @KeyCnd1       s             +0    Like(purkeycnd1)    Inz(*Blanks)
+     D  @KeyCnd2       s             +0    Like(purkeycnd2)    Inz(*Blanks)
+     D  @KeyCnd3       s             +0    Like(purkeycnd3)    Inz(*Blanks)
+     D  @KeyCnd4       s             +0    Like(purkeycnd4)    Inz(*Blanks)
+     D  @AlwBlk1       s               n                       Inz(*Off)
+     D  @AlwBlk2       s               n                       Inz(*Off)
+     D  @AlwBlk3       s               n                       Inz(*Off)
+     D  @AlwBlk4       s               n                       Inz(*Off)
+     D  @RJust1        s               n                       Inz(*Off)
+     D  @RJust2        s               n                       Inz(*Off)
+     D  @RJust3        s               n                       Inz(*Off)
+     D  @RJust4        s               n                       Inz(*Off)
+     D  @ZrFill1       s               n                       Inz(*Off)
+     D  @ZrFill2       s               n                       Inz(*Off)
+     D  @ZrFill3       s               n                       Inz(*Off)
+     D  @ZrFill4       s               n                       Inz(*Off)
+     D  @FlSize1       s             +0    Like(purflsize1)    Inz(*Blanks)
+     D  @FlSize2       s             +0    Like(purflsize2)    Inz(*Blanks)
+     D  @FlSize3       s             +0    Like(purflsize3)    Inz(*Blanks)
+     D  @FlSize4       s             +0    Like(purflsize4)    Inz(*Blanks)
+     D  @Key1          s             +0    Like(keykeyfld1)    Inz(*Blanks)
+     D  @Key2          s             +0    Like(keykeyfld2)    Inz(*Blanks)
+     D  @Key3          s             +0    Like(keykeyfld3)    Inz(*Blanks)
+     D  @Key4          s             +0    Like(keykeyfld4)    Inz(*Blanks)
+
+     D  @SelectStmt    s            256a   Inz(*Blanks)
+
+      /Free
+
+          Exec SQL set option commit = *none;
+
+          // Set parms to pass
+          @MsgDta      = *Blanks;
+          @FromFileLib = @PFromFileLib;
+          @ToFile      = @PToFile;
+          @KeyFld1    = @PKeyFld1;
+          @KeyFld2    = @PKeyFld2;
+          @KeyFld3    = @PKeyFld3;
+          @KeyFld4    = @PKeyFld4;
+
+          // Check for all parameters passed
+b001      If %Parms() >= 20;
+
+             @AndOr2      = @PAndOr2;
+             @AndOr3      = @PAndOr3;
+             @AndOr4      = @PAndOr4;
+             @KeyCnd1     = @PKeyCnd1;
+             @KeyCnd2     = @PKeyCnd2;
+             @KeyCnd3     = @PKeyCnd3;
+             @KeyCnd4     = @PKeyCnd4;
+             @AlwBlk1     = @PAlwBlk1;
+             @AlwBlk2     = @PAlwBlk2;
+             @AlwBlk3     = @PAlwBlk3;
+             @AlwBlk4     = @PAlwBlk4;
+             @RJust1      = @PRJust1;
+             @RJust2      = @PRJust2;
+             @RJust3      = @PRJust3;
+             @RJust4      = @PRJust4;
+             @ZrFill1     = @PZrFill1;
+             @ZrFill2     = @PZrFill2;
+             @ZrFill3     = @PZrFill3;
+             @ZrFill4     = @PZrFill4;
+             @FlSize1     = @PFlSize1;
+             @FlSize2     = @PFlSize2;
+             @FlSize3     = @PFlSize3;
+             @FlSize4     = @PFlSize4;
+             @Key1        = @PKey1;
+             @Key2        = @PKey2;
+             @Key3        = @PKey3;
+             @Key4        = @PKey4;
+
+e001      EndIf;
+
+          // Build Select statement
+          @SelectStmt = 'Insert into ' + %Trim(@ToFile);
+
+          // Copy records from input file to output file
+b001      If BuildSelect(@FromFileLib:
+                         @KeyFld1: @KeyFld2: @KeyFld3: @KeyFld4:
+                                   @AndOr2:  @AndOr3:  @AndOr4:
+                         @KeyCnd1: @KeyCnd2: @KeyCnd3: @KeyCnd4:
+                         @AlwBlk1: @AlwBlk2: @AlwBlk3: @AlwBlk4:
+                         @RJust1:  @RJust2:  @RJust3:  @RJust4:
+                         @ZrFill1: @ZrFill2: @ZrFill3: @ZrFill4:
+                         @FlSize1: @FlSize2: @FlSize3: @FlSize4:
+                         @Key1:    @Key2:    @Key3:    @Key4:
+                         @SelectStmt);
+
+             Exec SQL Declare SQLStmt statement;
+             Exec SQL Prepare SQLStmt From :@SelectStmt;
+
+             // Check for record found
+b002         If Sqlcod <> *Zeros;
+b003            If sqlerrmc <> *Blanks;
+
+                   // Set error message id
+                   @MsgDta = %SubSt(sqlerrmc:1:50);
+                   SndPgmMsg(*Blanks: *Blanks: *Blanks:
+                             @MsgDta: %Len(%Trim(@MsgDta)));
+
+e003            EndIf;
+e002         EndIf;
+
+             Exec SQL Execute SQLStmt;
+
+             // Check for record found
+b002         If  Sqlcod <> *Zeros
+             And Sqlcod <> 100;
+b003            If sqlerrmc <> *Blanks;
+
+                   // Set error message id
+                   @MsgDta = %SubSt(sqlerrmc:1:50);
+                   SndPgmMsg(*Blanks: *Blanks: *Blanks:
+                             @MsgDta: %Len(%Trim(@MsgDta)));
+
+e003            EndIf;
+x002         Else;
+
+                // Set error message id
+                @MsgDta = %Char(SqlEr3) + ' records copied from ' +
+                          %Trim(@FromFileLib) + ' to ' + %Trim(@ToFile) + '.';
+                SndPgmMsg(*Blanks: *Blanks: *Blanks:
+                          @MsgDta: %Len(%Trim(@MsgDta)));
+
+e002         EndIf;
+
+             // Return
+             Return *On;
+
+x001      Else;
+
+             // Return
+             Return *Off;
+
+e001      EndIf;
+
+      /End-free
+
+     PCopyData         e
+
+      ************************************************************************
+      *‚DeleteData = Delete Data from source
+      ************************************************************************
+
+     PDeleteData       b                   Export
+
+     DDeleteData       pi
+     D  @MsgDta                     256a
+     D  @PFromFileLib                25a   Const
+     D  @PKeyFld1                    +0    Const Like(purkeyfld1)
+     D  @PKeyFld2                    +0    Const Like(purkeyfld2)
+     D  @PKeyFld3                    +0    Const Like(purkeyfld3)
+     D  @PKeyFld4                    +0    Const Like(purkeyfld4)
+     D  @PAndOr2                     +0    Const Like(purandor2)
+     D                                     Options(*NoPass)
+     D  @PAndOr3                     +0    Const Like(purandor3)
+     D                                     Options(*NoPass)
+     D  @PAndOr4                     +0    Const Like(purandor4)
+     D                                     Options(*NoPass)
+     D  @PKeyCnd1                    +0    Const Like(purkeycnd1)
+     D                                     Options(*NoPass)
+     D  @PKeyCnd2                    +0    Const Like(purkeycnd2)
+     D                                     Options(*NoPass)
+     D  @PKeyCnd3                    +0    Const Like(purkeycnd3)
+     D                                     Options(*NoPass)
+     D  @PKeyCnd4                    +0    Const Like(purkeycnd4)
+     D                                     Options(*NoPass)
+     D  @PAlwBlk1                      n   Const Options(*NoPass)
+     D  @PAlwBlk2                      n   Const Options(*NoPass)
+     D  @PAlwBlk3                      n   Const Options(*NoPass)
+     D  @PAlwBlk4                      n   Const Options(*NoPass)
+     D  @PRJust1                       n   Const Options(*NoPass)
+     D  @PRJust2                       n   Const Options(*NoPass)
+     D  @PRJust3                       n   Const Options(*NoPass)
+     D  @PRJust4                       n   Const Options(*NoPass)
+     D  @PZrFill1                      n   Const Options(*NoPass)
+     D  @PZrFill2                      n   Const Options(*NoPass)
+     D  @PZrFill3                      n   Const Options(*NoPass)
+     D  @PZrFill4                      n   Const Options(*NoPass)
+     D  @PFlSize1                    +0    Const Like(purflsize1)
+     D                                     Options(*NoPass)
+     D  @PFlSize2                    +0    Const Like(purflsize2)
+     D                                     Options(*NoPass)
+     D  @PFlSize3                    +0    Const Like(purflsize3)
+     D                                     Options(*NoPass)
+     D  @PFlSize4                    +0    Const Like(purflsize4)
+     D                                     Options(*NoPass)
+     D  @PKey1                       +0    Const Like(keykeyfld1)
+     D                                     Options(*NoPass)
+     D  @PKey2                       +0    Const Like(keykeyfld2)
+     D                                     Options(*NoPass)
+     D  @PKey3                       +0    Const Like(keykeyfld3)
+     D                                     Options(*NoPass)
+     D  @PKey4                       +0    Const Like(keykeyfld4)
+     D                                     Options(*NoPass)
+
+     D  @FromFileLib   s             +0    Like(@PFromFileLib) Inz(*Blanks)
+     D  @KeyFld1       s             +0    Like(purkeyfld1)    Inz(*Blanks)
+     D  @KeyFld2       s             +0    Like(purkeyfld2)    Inz(*Blanks)
+     D  @KeyFld3       s             +0    Like(purkeyfld3)    Inz(*Blanks)
+     D  @KeyFld4       s             +0    Like(purkeyfld4)    Inz(*Blanks)
+     D  @AndOr2        s             +0    Like(purandor2)     Inz(*Blanks)
+     D  @AndOr3        s             +0    Like(purandor3)     Inz(*Blanks)
+     D  @AndOr4        s             +0    Like(purandor4)     Inz(*Blanks)
+     D  @KeyCnd1       s             +0    Like(purkeycnd1)    Inz(*Blanks)
+     D  @KeyCnd2       s             +0    Like(purkeycnd2)    Inz(*Blanks)
+     D  @KeyCnd3       s             +0    Like(purkeycnd3)    Inz(*Blanks)
+     D  @KeyCnd4       s             +0    Like(purkeycnd4)    Inz(*Blanks)
+     D  @AlwBlk1       s               n                       Inz(*Off)
+     D  @AlwBlk2       s               n                       Inz(*Off)
+     D  @AlwBlk3       s               n                       Inz(*Off)
+     D  @AlwBlk4       s               n                       Inz(*Off)
+     D  @RJust1        s               n                       Inz(*Off)
+     D  @RJust2        s               n                       Inz(*Off)
+     D  @RJust3        s               n                       Inz(*Off)
+     D  @RJust4        s               n                       Inz(*Off)
+     D  @ZrFill1       s               n                       Inz(*Off)
+     D  @ZrFill2       s               n                       Inz(*Off)
+     D  @ZrFill3       s               n                       Inz(*Off)
+     D  @ZrFill4       s               n                       Inz(*Off)
+     D  @FlSize1       s             +0    Like(purflsize1)    Inz(*Blanks)
+     D  @FlSize2       s             +0    Like(purflsize2)    Inz(*Blanks)
+     D  @FlSize3       s             +0    Like(purflsize3)    Inz(*Blanks)
+     D  @FlSize4       s             +0    Like(purflsize4)    Inz(*Blanks)
+     D  @Key1          s             +0    Like(keykeyfld1)    Inz(*Blanks)
+     D  @Key2          s             +0    Like(keykeyfld2)    Inz(*Blanks)
+     D  @Key3          s             +0    Like(keykeyfld3)    Inz(*Blanks)
+     D  @Key4          s             +0    Like(keykeyfld4)    Inz(*Blanks)
+
+     D  @Where         s            256a   Inz(*Blanks)
+     D  @SelectStmt    s            256a   Inz(*Blanks)
+
+      /Free
+
+          // Set parms to pass
+          @MsgDta      = *Blanks;
+          @FromFileLib = @PFromFileLib;
+          @KeyFld1    = @PKeyFld1;
+          @KeyFld2    = @PKeyFld2;
+          @KeyFld3    = @PKeyFld3;
+          @KeyFld4    = @PKeyFld4;
+
+          // Check for all parameters passed
+b001      If %Parms() >= 19;
+
+             @AndOr2   = @PAndOr2;
+             @AndOr3   = @PAndOr3;
+             @AndOr4   = @PAndOr4;
+             @KeyCnd1  = @PKeyCnd1;
+             @KeyCnd2  = @PKeyCnd2;
+             @KeyCnd3  = @PKeyCnd3;
+             @KeyCnd4  = @PKeyCnd4;
+             @AlwBlk1  = @PAlwBlk1;
+             @AlwBlk2  = @PAlwBlk2;
+             @AlwBlk3  = @PAlwBlk3;
+             @AlwBlk4  = @PAlwBlk4;
+             @RJust1   = @PRJust1;
+             @RJust2   = @PRJust2;
+             @RJust3   = @PRJust3;
+             @RJust4   = @PRJust4;
+             @ZrFill1  = @PZrFill1;
+             @ZrFill2  = @PZrFill2;
+             @ZrFill3  = @PZrFill3;
+             @ZrFill4  = @PZrFill4;
+             @FlSize1  = @PFlSize1;
+             @FlSize2  = @PFlSize2;
+             @FlSize3  = @PFlSize3;
+             @FlSize4  = @PFlSize4;
+             @Key1     = @PKey1;
+             @Key2     = @PKey2;
+             @Key3     = @PKey3;
+             @Key4     = @PKey4;
+
+e001      EndIf;
+
+          // Build Select statement
+          @SelectStmt = 'Delete from ' + %Trim(@FromFileLib);
+
+b001      If BuildWhereClause(@KeyFld1: @KeyFld2: @KeyFld3: @KeyFld4:
+                                        @AndOr2:  @AndOr3:  @AndOr4:
+                              @KeyCnd1: @KeyCnd2: @KeyCnd3: @KeyCnd4:
+                              @AlwBlk1: @AlwBlk2: @AlwBlk3: @AlwBlk4:
+                              @RJust1:  @RJust2:  @RJust3:  @RJust4:
+                              @ZrFill1: @ZrFill2: @ZrFill3: @ZrFill4:
+                              @FlSize1: @FlSize2: @FlSize3: @FlSize4:
+                              @Key1:    @Key2:    @Key3:    @Key4:
+                              @Where);
+
+             @SelectStmt = %Trim(@SelectStmt) +  ' ' +  %Trim(@Where);
+
+             Exec SQL Declare SQLStmt statement;
+             Exec SQL Prepare SQLStmt From :@SelectStmt;
+
+             // Check for record found
+b002         If Sqlcod <> *Zeros;
+b003            If sqlerrmc <> *Blanks;
+
+                   // Set error message id
+                   @MsgDta = %SubSt(sqlerrmc:1:50);
+                   SndPgmMsg(*Blanks: *Blanks: *Blanks:
+                             @MsgDta: %Len(%Trim(@MsgDta)));
+
+e003            EndIf;
+e002         EndIf;
+
+             Exec SQL Execute SQLStmt;
+
+             // Check for record found
+b002         If  Sqlcod <> *Zeros
+             And Sqlcod <> 100;
+b003            If sqlerrmc <> *Blanks;
+
+                   // Set error message id
+                   @MsgDta = %SubSt(sqlerrmc:1:50);
+                   SndPgmMsg(*Blanks: *Blanks: *Blanks:
+                             @MsgDta: %Len(%Trim(@MsgDta)));
+
+e003            EndIf;
+x002         Else;
+
+                // Set error message id
+                @MsgDta = %Char(SqlEr3) + ' records deleted from ' +
+                          %Trim(@FromFileLib) + '.';
+                SndPgmMsg(*Blanks: *Blanks: *Blanks:
+                          @MsgDta: %Len(%Trim(@MsgDta)));
+
+e002         EndIf;
+e001      EndIf;
+
+      /End-free
+
+     PDeleteData       e
+
+      ************************************************************************
+      *‚BuildSelect - Build Select Statement
+      ************************************************************************
+
+     PBuildSelect      b                   Export
+
+     DBuildSelect      pi              n
+     D  @FromFileLib                 25a   Const
+     D  @KeyFld1                     +0    Const Like(purkeyfld1)
+     D  @KeyFld2                     +0    Const Like(purkeyfld2)
+     D  @KeyFld3                     +0    Const Like(purkeyfld3)
+     D  @KeyFld4                     +0    Const Like(purkeyfld4)
+     D  @AndOr2                      +0    Const Like(purandor2)
+     D  @AndOr3                      +0    Const Like(purandor3)
+     D  @AndOr4                      +0    Const Like(purandor4)
+     D  @KeyCnd1                     +0    Const Like(purkeycnd1)
+     D  @KeyCnd2                     +0    Const Like(purkeycnd2)
+     D  @KeyCnd3                     +0    Const Like(purkeycnd3)
+     D  @KeyCnd4                     +0    Const Like(purkeycnd4)
+     D  @AlwBlk1                       n   Const
+     D  @AlwBlk2                       n   Const
+     D  @AlwBlk3                       n   Const
+     D  @AlwBlk4                       n   Const
+     D  @RJust1                        n   Const
+     D  @RJust2                        n   Const
+     D  @RJust3                        n   Const
+     D  @RJust4                        n   Const
+     D  @ZrFill1                       n   Const
+     D  @ZrFill2                       n   Const
+     D  @ZrFill3                       n   Const
+     D  @ZrFill4                       n   Const
+     D  @FlSize1                     +0    Const Like(purflsize1)
+     D  @FlSize2                     +0    Const Like(purflsize2)
+     D  @FlSize3                     +0    Const Like(purflsize3)
+     D  @FlSize4                     +0    Const Like(purflsize4)
+     D  @Key1                        +0    Const Like(keykeyfld1)
+     D  @Key2                        +0    Const Like(keykeyfld2)
+     D  @Key3                        +0    Const Like(keykeyfld3)
+     D  @Key4                        +0    Const Like(keykeyfld4)
+     D  @SelectStmt                 256a
+
+     D  @Where         s            256a   Inz(*Blanks)
+
+      /Free
+
+          // Build Select statement
+          @SelectStmt = %Trim(@SelectStmt) +  ' select * from '
+                      + %Trim(@FromFileLib);
+
+b001      If BuildWhereClause(@KeyFld1: @KeyFld2: @KeyFld3: @KeyFld4:
+                                        @AndOr2:  @AndOr3:  @AndOr4:
+                              @KeyCnd1: @KeyCnd2: @KeyCnd3: @KeyCnd4:
+                              @AlwBlk1: @AlwBlk2: @AlwBlk3: @AlwBlk4:
+                              @RJust1:  @RJust2:  @RJust3:  @RJust4:
+                              @ZrFill1: @ZrFill2: @ZrFill3: @ZrFill4:
+                              @FlSize1: @FlSize2: @FlSize3: @FlSize4:
+                              @Key1:    @Key2:    @Key3:    @Key4:
+                              @Where);
+
+             @SelectStmt = %Trim(@SelectStmt) +  ' ' +  %Trim(@Where);
+
+             // Return Select statement
+             Return *On;
+
+x001      Else;
+
+             // Return Select statement
+             Return *Off;
+
+e001      EndIf;
+
+      /End-free
+
+     PBuildSelect      e
+
+      ************************************************************************
+      *‚BuildWhereClause - Build Where Clause
+      ************************************************************************
+
+     PBuildWhere...
+     PClause           b
+
+     DBuildWhere...
+     DClause           pi              n
+     D  @KeyFld1                     +0    Const Like(purkeyfld1)
+     D  @KeyFld2                     +0    Const Like(purkeyfld2)
+     D  @KeyFld3                     +0    Const Like(purkeyfld3)
+     D  @KeyFld4                     +0    Const Like(purkeyfld4)
+     D  @AndOr2                      +0    Const Like(purandor2)
+     D  @AndOr3                      +0    Const Like(purandor3)
+     D  @AndOr4                      +0    Const Like(purandor4)
+     D  @KeyCnd1                     +0    Const Like(purkeycnd1)
+     D  @KeyCnd2                     +0    Const Like(purkeycnd2)
+     D  @KeyCnd3                     +0    Const Like(purkeycnd3)
+     D  @KeyCnd4                     +0    Const Like(purkeycnd4)
+     D  @AlwBlk1                       n   Const
+     D  @AlwBlk2                       n   Const
+     D  @AlwBlk3                       n   Const
+     D  @AlwBlk4                       n   Const
+     D  @RJust1                        n   Const
+     D  @RJust2                        n   Const
+     D  @RJust3                        n   Const
+     D  @RJust4                        n   Const
+     D  @ZrFill1                       n   Const
+     D  @ZrFill2                       n   Const
+     D  @ZrFill3                       n   Const
+     D  @ZrFill4                       n   Const
+     D  @FlSize1                     +0    Const Like(purflsize1)
+     D  @FlSize2                     +0    Const Like(purflsize2)
+     D  @FlSize3                     +0    Const Like(purflsize3)
+     D  @FlSize4                     +0    Const Like(purflsize4)
+     D  @PKey1                       +0    Const Like(keykeyfld1)
+     D  @PKey2                       +0    Const Like(keykeyfld2)
+     D  @PKey3                       +0    Const Like(keykeyfld3)
+     D  @PKey4                       +0    Const Like(keykeyfld4)
+     D  @Where                      256a
+
+     D  @Key1          s                   Like(keykeyfld1)
+     D  @Key2          s                   Like(keykeyfld2)
+     D  @Key3          s                   Like(keykeyfld3)
+     D  @Key4          s                   Like(keykeyfld4)
+
+      /Free
+
+          // Set key fields
+          @Key1 = @PKey1;
+          @Key2 = @PKey2;
+          @Key3 = @PKey3;
+          @Key4 = @PKey4;
+
+          // Check for Comparing to blanks & blanks allowed
+b001      If  Not @AlwBlk1
+          And @Key1 =  '*BLANKS'
+          Or      @AlwBlk1
+          And @Key1 <> '*BLANKS';
+
+             // Return where clause
+             Return *Off;
+
+e001      EndIf;
+
+          // Check for Comparing to blanks
+b001      If  @KeyFld1 <> *Blanks
+          And @Key1    <> *Blanks;
+
+             // Check for Comparing to blanks
+b002         If @Key1 = '*BLANKS';
+                Clear @Key1;
+e002         EndIf;
+
+             // Check for key field entered
+b002         If @Key1 <> *Blanks
+             // Check for key field to be right justified
+             And @RJust1;
+
+                // Execute right justify for key field
+                @Key1 = RightJustify(@Key1: @FlSize1: @ZrFill1);
+
+                @Where = 'Where ' + %Trim(@KeyFld1) + ' ' + %Trim(@KeyCnd1)
+                       + ' ''' + %SubSt(@Key1:1:@FlSize1) + '''';
+
+b002         Else;
+
+                @Where = 'Where ' + %Trim(@KeyFld1) + ' ' + %Trim(@KeyCnd1)
+                       + ' ''' + %Trim(@Key1) + '''';
+
+e002         EndIf;
+
+             // Check for Comparing to blanks & blanks allowed
+b002         If  Not @AlwBlk2
+             And @Key2 =  '*BLANKS'
+             Or      @AlwBlk2
+             And @Key2 <> '*BLANKS';
+
+                // Return where clause
+                Return *Off;
+
+x002         Else;
+
+                // Check for From key and key are both filled
+b003            If  @KeyFld2 <> *Blanks
+                And @Key2    =  *Blanks
+                Or  @KeyFld2 =  *Blanks
+                And @Key2    <> *Blanks;
+
+                   // Return where clause
+                   Return *Off;
+
+e003            EndIf;
+e002         EndIf;
+
+             // Check for Comparing to blanks
+b002         If  @KeyFld2 <> *Blanks
+             And @Key2    <> *Blanks;
+
+                // Check for Comparing to blanks
+b003            If @Key2 = '*BLANKS';
+                   Clear @Key2;
+e003            EndIf;
+
+                // Check for key field entered
+b003            If @Key2 <> *Blanks
+                // Check for key field to be right justified
+                And @RJust2;
+
+                   // Execute right justify for key field
+                   @Key2 = RightJustify(@Key2: @FlSize2: @ZrFill2);
+
+                   @Where = %Trim(@Where) + ' ' + %Trim(@AndOr2)  + ' '
+                                                + %Trim(@KeyFld2) + ' '
+                                                + %Trim(@KeyCnd2) + ' '''
+                                                + %SubSt(@Key2:1:@FlSize2)
+                                                + '''';
+
+b003            Else;
+
+                   @Where = %Trim(@Where) + ' ' + %Trim(@AndOr2)  + ' '
+                                                + %Trim(@KeyFld2) + ' '
+                                                + %Trim(@KeyCnd2) + ' '''
+                                                + %Trim(@Key2)    + '''';
+
+e003            EndIf;
+
+                // Check for Comparing to blanks & blanks allowed
+b003            If  Not @AlwBlk3
+                And @Key3 =  '*BLANKS'
+                Or      @AlwBlk3
+                And @Key3 <> '*BLANKS';
+
+                   // Return where clause
+                   Return *Off;
+
+x003            Else;
+
+                   // Check for From key and key are both filled
+b004               If  @KeyFld3 <> *Blanks
+                   And @Key3    =  *Blanks
+                   Or  @KeyFld3 =  *Blanks
+                   And @Key3    <> *Blanks;
+
+                      // Return where clause
+                      Return *Off;
+
+e004               EndIf;
+e003            EndIf;
+
+                // Check for Comparing to blanks
+b003            If  @KeyFld3 <> *Blanks
+                And @Key3    <> *Blanks;
+
+                   // Check for Comparing to blanks
+b004               If @Key3 = '*BLANKS';
+                      Clear @Key3;
+e004               EndIf;
+
+                   // Check for key field entered
+b004               If @Key3 <> *Blanks
+                   // Check for key field to be right justified
+                   And @RJust3;
+
+                      // Execute right justify for key field
+                      @Key3 = RightJustify(@Key3: @FlSize3: @ZrFill3);
+
+                      @Where = %Trim(@Where) + ' ' + %Trim(@AndOr3)
+                                             + ' ' + %Trim(@KeyFld3)
+                                             + ' ' + %Trim(@KeyCnd3)
+                                             + ' '''
+                                             + %SubSt(@Key3:1:@FlSize3)
+                                             + '''';
+
+b004               Else;
+
+                      @Where = %Trim(@Where) + ' '   + %Trim(@AndOr3)
+                                             + ' '   + %Trim(@KeyFld3)
+                                             + ' '   + %Trim(@KeyCnd3)
+                                             + ' ''' + %Trim(@Key3)
+                                             + '''';
+
+e004               EndIf;
+
+                   // Check for Comparing to blanks & blanks allowed
+b004               If  Not @AlwBlk4
+                   And @Key4 =  '*BLANKS'
+                   Or      @AlwBlk4
+                   And @Key4 <> '*BLANKS';
+
+                      // Return where clause
+                      Return *Off;
+
+x004               Else;
+
+                      // Check for From key and key are both filled
+b005                  If  @KeyFld4 <> *Blanks
+                      And @Key4    =  *Blanks
+                      Or  @KeyFld4 =  *Blanks
+                      And @Key4    <> *Blanks;
+
+                         // Return where clause
+                         Return *Off;
+
+e005                  EndIf;
+e004               EndIf;
+
+                   // Check for Comparing to blanks
+b004               If  @KeyFld4 <> *Blanks
+                   And @Key4    <> *Blanks;
+
+                      // Check for Comparing to blanks
+b005                  If @Key4 = '*BLANKS';
+                         Clear @Key4;
+e005                  EndIf;
+
+                      // Check for key field entered
+b005                  If @Key4 <> *Blanks
+                      // Check for key field to be right justified
+                      And @RJust4;
+
+                         // Execute right justify for key field
+                         @Key3 = RightJustify(@Key4: @FlSize4: @ZrFill4);
+
+                         @Where = %Trim(@Where) + ' ' + %Trim(@AndOr4)
+                                                + ' ' + %Trim(@KeyFld4)
+                                                + ' ' + %Trim(@KeyCnd4)
+                                                + ' '''
+                                                + %SubSt(@Key4:1:@FlSize4)
+                                                + '''';
+
+x005                  Else;
+
+                         @Where = %Trim(@Where) + ' '   + %Trim(@AndOr4)
+                                                + ' '   + %Trim(@KeyFld4)
+                                                + ' '   + %Trim(@KeyCnd4)
+                                                + ' ''' + %Trim(@Key4)
+                                                + '''';
+
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          // Return where clause
+          Return *On;
+
+      /End-free
+
+     PBuildWhere...
+     PClause           e
+
+      ************************************************************************
+      *‚RetrieveObjectDescription  - Retrieve Object Description API
+      ************************************************************************
+
+     PRetrieveObject...
+     PDescription      b                   Export
+
+     DRetrieveObject...
+     DDescription      pi              n
+     D  @Object                      10a   Const
+     D  @ObjectLib                   10a   Options(*NoPass)
+     D  @ErrorMsgId                   7a   Options(*NoPass)
+     D  @MsgFilLib                   20a   Options(*NoPass)
+     D  @Text                        50a   Options(*NoPass)
+
+     D  @Library       s             10a   Inz(*Blanks)
+     D  @Type          s             10a   Inz('*FILE     ')
+     D  @Format        s             10a   Inz('OBJD0200')
+
+     DRtvObjD          pr                  ExtPgm('QUSROBJD')
+     D                            32767a   Options(*VarSize)
+     D                               10i 0 Const
+     D                                8a   Const
+     D                               20a   Const
+     D                               10a   Const
+     D                            32767a   Options(*VarSize)
+
+     D ApiErrorDs      Ds
+     D                               10i 0 Inz(%Size(ApiErrorDs))
+     D                               10i 0 Inz
+     D  AeMsgId                       7a
+     D                                1a
+     D                              128a
+
+     DObjd0200Ds       ds                  Qualified
+     D  @Bytes...
+     D  Returned                     10i 0
+     D  @Bytes...
+     D  Available                    10i 0
+     D  @ObjectName                  10a
+     D  @ObjectLibrary...
+     D  Name                         10a
+     D  @ObjectType                  10a
+     D  @Return...
+     D  Library                      10a
+     D  @AuxiliaryStorage...
+     D  Pool                         10i 0
+     D  @ObjectOwner                 10a
+     D  @ObjectDomain                 2a
+     D  @CreationDate...
+     D  AndTime                      13a
+     D  @ObjectChangeDate...
+     D  AndTime                      13a
+      *  Start Of Two
+     D  @ExtendedObject...
+     D  Attribute                    10a
+     D  @Text...
+     D  Description                  50a
+     D  @SourceFile...
+     D  Name                         10a
+     D  @SourceFile...
+     D  LibraryName                  10a
+     D  @SourceFile...
+     D  MemberName                   10a
+
+     D@FileLibDs       ds
+     D                               10a   Inz('TPSMSG    ')
+     D                               10a   Inz('*LIBL  ')
+
+      /free
+
+          // Check for object library name passed
+          @Library = @Libl;
+b002      If %Parms() >= 2;
+             @Library = @ObjectLib;
+e002      EndIf;
+
+          // Get file object info
+          RtvObjD(Objd0200Ds: %Size(Objd0200Ds): @Format:
+                  @Object + @Library: @Type: ApiErrorDs);
+
+          // Start edit select
+b001      Select;
+
+             // check for file exists
+x001         When AeMsgId = 'CPF9810';
+
+                // Object not found
+                Return *Off;
+
+x001         When AeMsgId = 'CPF9812';
+
+                // Object not found
+                Return *Off;
+
+             // check for dbg file
+x001         When Objd0200Ds.@ExtendedObjectAttribute <> 'PF'
+             And  Objd0200Ds.@ExtendedObjectAttribute <> 'LF';
+
+                // Check for message file name passed
+b002            If %Parms() >= 3;
+                   @ErrorMsgId = 'ERR9898';
+e002            EndIf;
+
+                // Check for message file name passed
+b002            If %Parms() >= 4;
+                   @MsgFilLib  = @FileLibDs;
+e002            EndIf;
+
+                // not a db object
+                Return *Off;
+
+x001         Other;
+
+                // Check for object library name passed
+b002            If  %Parms()   >= 2
+                And @ObjectLib =  @Libl;
+                   @ObjectLib = Objd0200Ds.@ReturnLibrary;
+e002            EndIf;
+
+                // Check for object text to retrieve field passed
+b002            If %Parms() >= 5;
+
+                   @Text = Objd0200Ds.@TextDescription;
+
+e002            EndIf;
+
+                // Object found
+                Return *On;
+
+e001      EndSl;
+
+      /end-free
+
+     PRetrieveObject...
+     PDescription      e
+
+      ************************************************************************
+      *‚RetrieveFieldDescription  - Retrieve Field Description API
+      ************************************************************************
+
+     PRetrieveField...
+     PDescription      b                   Export
+
+     DRetrieveField...
+     DDescription      pi              n
+     D  @File                        10a   Const
+     D  @Lib                         10a   Const
+     D  @Field                       10a   Const
+     D  @Character                     n
+     D  @Attribute                    1a
+     D  @Size                         5p 0
+
+     D/DEFINE ITPSHARE15
+     D/copy qcpysrc,itpshare
+
+     DDspffd1          c                   'DSPFFD FILE('
+     DDspffd2          c                   ') OUTPUT(*OUTFILE) -
+     D                                     OUTFILE(QTEMP/QADSPFFD)'
+     DOvrqadspffd      c                   'OVRDBF FILE(QADSPFFD) TOFILE(QTEMP/-
+     D                                     QADSPFFD)'
+
+      /free
+
+          // Set field size
+          @Character = *Off;
+          @Size      = *Zeros;
+          @Attribute = *Blanks;
+
+          @Command = Dspffd1 + %Trim(@Lib) + '/' + %Trim(@File) + Dspffd2;
+          @Length  = %Len(%Trim(@Command));
+          @RunCommand(@Command: @Length);
+
+          @Command = Ovrqadspffd;
+          @Length  = %Len(%Trim(@Command));
+          @RunCommand(@Command: @Length);
+
+          // Check for field description file open
+b001      If Not %Open(qadspffd);
+
+             // Open field description file
+             Open qadspffd;
+
+e001      EndIf;
+
+          // read through qadspffd for field name
+          Read qwhdrffd;
+b001      Dow Not %Eof(qadspffd);
+
+             // Check for field name match
+b002         If whfldi = @Field;
+
+                // Close field description file
+                Close qadspffd;
+
+                // Check for char field
+                @Attribute = whfldt;
+b003            If whfldt = 'A';
+
+                   // Set field size
+                   @Character = *On;
+                   @Size      = whfldb;
+
+e004            EndIf;
+
+                // return field found
+                Return *On;
+
+e002         EndIf;
+
+             // read next qadspffd record
+             Read qwhdrffd;
+
+e001      EndDo;
+
+          // Close field description file
+          Close qadspffd;
+
+          // return field not found
+          Return *Off;
+
+      /end-free
+
+     PRetrieveField...
+     PDescription      e
+
+      ************************************************************************
+      *‚RtvMsgD - Retrieve Message Description
+      ************************************************************************
+
+     PRtvMsgD          b                   Export
+
+     DRtvMsgD          pi            80a
+     D  @MsgId                        7a   Const
+     D  @MsgFName                    20a   Const Options(*NoPass)
+     D  @MsgDta                      78a   Const Options(*NoPass)
+     D  @MsgDtaOffSet                10u 0 Const Options(*NoPass)
+
+     DRetrieveMessage  pr                  ExtPgm('QMHRTVM ')
+     D                            32767a   Options(*VarSize)
+     D                               10u 0 Const
+     D                                8a   Const
+     D                                7a   Const
+     D                               20a   Const
+     D                            32767a   Const Options(*VarSize)
+     D                               10u 0 Const
+     D                               10a   Const
+     D                               10a   Const
+     D                            32767a   Options(*VarSize)
+
+     DRtvM0100Size     s             10u 0 Inz(%Len(RtvM0100Ds))
+     DRtvM0100Ds       ds                  Qualified
+     D  @Bytes...
+     D  Returned                     10u 0
+     D  @Bytes...
+     D  Available                    10u 0
+     D  @LengthOfMessage...
+     D  Returned                     10u 0
+     D  @LengthOfMessage...
+     D  Available                    10u 0
+     D  @LengthOfMessageHelp...
+     D  Returned                     10u 0
+     D  @LengthOfMessageHelp...
+     D  Available                    10u 0
+     D  @Message                  32767a
+
+     D ApiErrorDs      Ds
+     D                               10i 0 Inz(%Size(ApiErrorDs))
+     D                               10i 0 Inz
+     D  AeMsgId                       7a
+     D                                1a
+     D                              128a
+
+     D  P#Msg          s             80a   Inz(*Blanks)
+     D  @Message       s          32767a   Inz(*Blanks) Varying
+     D  @MessageLen    s             10u 0 Inz(%Len(@Message))
+     D  @ReplaceSub    s             10a   Inz('*YES')
+     D  @RtnFmtCon     s             10a   Inz('*NO')
+
+     D@FileLibDs       ds
+     D                               10a   Inz('HUBMSG    ')
+     D                               10a   Inz('*LIBL     ')
+
+      /free
+
+          // Check for message file name passed
+b001      If  %Parms()  >= 2
+          And @MsgFName <> *Blanks;
+             @FileLibDs = @MsgFName;
+e001      EndIf;
+
+          // Check for message file name passed
+b001      If %Parms() >= 3;
+             @Message = @MsgDta;
+e001      EndIf;
+
+          // Check for message file name passed
+b001      If %Parms() >= 4;
+             @MessageLen = @MsgDtaOffSet;
+e001      EndIf;
+
+          RetrieveMessage(RtvM0100Ds:
+                          RtvM0100Size:
+                          'RTVM0100':
+                          @MsgId:
+                          @FileLibDs:
+                          @Message:
+                          @MessageLen:
+                          @ReplaceSub:
+                          @RtnFmtCon:
+                          ApiErrorDs);
+
+b001      If %Trim(RtvM0100Ds.@Message) <> *Blanks;
+             Return %SubSt(%Trim(RtvM0100Ds.@Message): 1:
+                           RtvM0100Ds.@LengthOfMessageReturned);
+x001      Else;
+             Return @MsgId;
+e001      EndIf;
+
+      /end-free
+
+     PRtvMsgD          e
+
+      ************************************************************************
+      *‚SndPgmMsg - Send program message of status
+      ************************************************************************
+
+     PSndPgmMsg        b                   export
+
+     DSndPgmMsg        pi
+     D  @P_MsgId                      7a   Const
+     D  @P_MsgF                      20a   Const
+     D  @P_MsgType                   10a   Const
+     D  @P_MsgDta                 32767a   Const Options(*VarSize)
+     D  @P_MsgDta...
+     D  Length                       10i 0 Const
+
+     D  @MsgId         s              7a   Inz('CPF9898')
+     D  @MsgF          s             20a   Inz('QCPFMSG   QSYS      ')
+     D  @MsgType       s             10a   Inz('*INFO')
+
+     D  @CallStack...
+     D  Entry          s          32767a   Inz('*') Varying
+     D  @CallStack...
+     D  Counter        s             10i 0 Inz(*Zeros)
+     D  @MsgKey        s              4a   Inz(*Blanks)
+
+     D@ErrorCodeDs     ds            16
+     D  @BytesProv                   10i 0 Inz(16)
+     D  @BytesAvail                  10i 0
+     D  @ExceptionID                  7
+
+     DSndPgmMsgApi     pr                  ExtPgm('QMHSNDPM')
+     D                                7a   Const
+     D                               20a   Const
+     D                            32767a   Const Options(*VarSize)
+     D                               10i 0 Const
+     D                               10a   Const
+     D                            32767a   Const Options(*VarSize)
+     D                               10i 0 Const
+     D                                4a
+     D                               16a
+
+      /free
+
+          // Check for message id passed
+b001      If @P_MsgId   <> *Blanks;
+
+             // Set message id
+             @MsgId = @P_MsgId;
+
+e001      EndIf;
+
+          // Check for message file passed
+b001      If @P_MsgF    <> *Blanks;
+
+             // Set message file
+             @MsgF = @P_MsgF;
+
+e001      EndIf;
+
+          // Check for message type passed
+b001      If @P_MsgType <> *Blanks;
+
+             // Set message type
+             @MsgType = @P_MsgType;
+
+e001      EndIf;
+
+          // Send the program message
+          SndPgmMsgApi(@MsgId: @MsgF: @P_MsgDta: @P_MsgDtaLength:
+                       @MsgType: %Trim(@CallStackEntry): @CallStackCounter:
+                       @MsgKey: @ErrorCodeDs);
+
+      /end-free
+
+     PSndPgmMsg        e
+
+      ************************************************************************
+      *‚ValidateGroup - Validate Group entry
+      ************************************************************************
+
+     PValidateGroup    b                   Export
+
+     DValidateGroup    pi              n
+     D  @PGroup                      +0    Const Like(purgroup)
+
+     D @PurFileOpen    s               n   Inz(*Off)
+     D @KeyFileOpen    s               n   Inz(*Off)
+
+      /free
+
+          // Check for purge file open
+b001      If Not %Open(itppurgel1);
+
+             // Open purge file
+             Open itppurgel1;
+
+             @PurFileOpen = *On;
+
+e001      EndIf;
+
+          // Check for valid group entered
+          Setll @PGroup ritppurgl1;
+b001      If %Equal(itppurgel1);
+
+             // Check for file previously not open
+b002         If @PurFileOpen;
+
+                // Close purge file
+                Close itppurgel1;
+
+e002         EndIf;
+
+             // Return false for valid
+             Return *Off;
+
+e001      EndIf;
+
+          // Check for file previously not open
+b001      If @PurFileOpen;
+
+             // Close purge file
+             Close itppurgel1;
+
+e001      EndIf;
+
+          // Check for purge file open
+b001      If Not %Open(itppurkey1);
+
+             // Open purge file
+             Open itppurkey1;
+
+             @KeyFileOpen = *On;
+
+e001      EndIf;
+
+          // Check for valid group entered
+          Setll @PGroup ritppurkl1;
+b001      If %Equal(itppurkey1);
+
+             // Check for file previously not open
+b002         If @KeyFileOpen;
+
+                // Close purge file
+                Close itppurkey1;
+
+e002         EndIf;
+
+             // Return false for valid
+             Return *Off;
+
+e001      EndIf;
+
+          // Check for file previously not open
+b001      If @KeyFileOpen;
+
+             // Close purge file
+             Close itppurkey1;
+
+e001      EndIf;
+
+          // Return true for not valid
+          Return *On;
+
+      /end-free
+
+     PValidateGroup    e
+
+      ************************************************************************
+      *‚RightJustify  - Right Justify Key Field
+      ************************************************************************
+
+     PRightJustify     b
+
+     DRightJustify     pi            +0          Like(keykeyfld1)
+     D  @PField                      +0    Const Like(keykeyfld1)
+     D  @PLength                     +0    Const Like(purflsize1)
+     D  @PZrFill                       n   Const
+
+     D @Field          s             +0    Like(keykeyfld1) Inz(*Blanks)
+     D @Start          s             +0    Like(purflsize1) Inz(*Zeros)
+     D @Length         s             +0    Like(purflsize1) Inz(*Zeros)
+     D @Size           s             +0    Like(purflsize1) Inz(*Zeros)
+     D @LeadZ          s             +0    Like(purflsize1) Inz(*Zeros)
+
+      /free
+
+          // Monitor for any field error
+b001      Monitor;
+
+             // Right justify
+             @Length = %Len(%Trim(@PField));
+             @Size   = %Size(@PField);
+             @Start  = @Size - @PLength + 1;
+             @LeadZ  = @PLength - @Length;
+             Evalr @Field = %Trim(@PField);
+b002         If @PZrFill;
+                %SubSt(@Field:@Start:@LeadZ) = *Zeros;
+e002         EndIf;
+             Return %SubSt(@Field:@Start:@PLength);
+
+x001      On-Error;
+
+             Return %Trim(@PField);
+
+e001      EndMon;
+
+      /end-free
+
+     PRightJustify     e
+
+      ************************************************************************
+      *‚GetTimeStamp - Get Time Stamp
+      ************************************************************************
+
+     PGetTimeStamp     b                   Export
+
+     DGetTimeStamp     pi              z
+
+     D @TimeStamp      s               z   Inz(*Loval)
+
+     C/Free
+
+          Exec SQL Set :@TimeStamp = current_timestamp;
+
+          Return @TimeStamp;
+
+      /end-free
+
+     PGetTimeStamp     e
+
+      ************************************************************************
+      *‚@ToLower - Convert to Lower case
+      ************************************************************************
+
+     P@ToLower         b                   Export
+
+     D@ToLower         pi          3000a   Varying
+     D  @Input                     3000a   Varying Const
+
+     D  @Up            c                   'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+     D  @Lo            c                   'abcdefghijklmnopqrstuvwxyz'
+
+     C/Free
+
+          Return %Xlate(@Up:@Lo:%Trim(@Input));
+
+      /End-free
+
+     P@ToLower         e
+
+      ************************************************************************
+      *‚SetStatusForITPPURGEP = Update Status for ITPPURGEP
+      ************************************************************************
+
+     P SetStatusFor...
+     P ITPPURGEP       b                   Export
+
+     D SetStatusFor...
+     D ITPPURGEP       pi
+     D  @Group                       +0    Const Like(purgroup)
+     D  @Status                      +0    Const Like(purstatus)
+     D  @Seq                         +0    Const Like(purseq)
+     D                                     Options(*NoPass)
+
+     D @PurFileOpen1   s               n   Inz(*Off)
+     D @PurFileOpen2   s               n   Inz(*Off)
+
+      /Free
+
+          // Check for purge file open
+b001      If Not %Open(itppurgel1);
+
+             // Open purge file
+             Open itppurgel1;
+
+             @PurFileOpen1 = *On;
+
+e001      EndIf;
+
+          // Check for purge file open
+b001      If Not %Open(itppurgel2);
+
+             // Open purge file
+             Open itppurgel2;
+
+             @PurFileOpen2 = *On;
+
+e001      EndIf;
+
+          // Check for file name passed to program
+b001      If  %Parms() >= 3
+          And @Seq     <> *Zeros;
+
+             // Execute update itppurgep file routine
+             UpdateITPPURGEP(@Group: @Seq: @Status);
+
+x001      Else;
+
+             //‚get first purge record
+             Setll *Loval ritppurgl1;
+             Setll @Group ritppurgl1;
+             Reade @Group ritppurgl2;
+b002         Dow not %Eof(itppurgel2);
+
+                // Execute update itppurgep file routine
+                UpdateITPPURGEP(purgroup: purseq: @Status);
+
+                //‚get next purge record
+                Reade @Group ritppurgl2;
+
+e002         EndDo;
+e001      EndIf;
+
+          // Check for file previously not open
+b001      If @PurFileOpen1;
+
+             // Close purge file
+             Close itppurgel1;
+
+e001      EndIf;
+
+          // Check for file previously not open
+b001      If @PurFileOpen2;
+
+             // Close purge file
+             Close itppurgel2;
+
+e001      EndIf;
+
+      /End-free
+
+     P SetStatusFor...
+     P ITPPURGEP       e
+
+      ************************************************************************
+      *‚UpdateITPPURGEP = Update ITPPURGEP File
+      ************************************************************************
+
+     P Update...
+     P ITPPURGEP       b
+
+     D Update...
+     D ITPPURGEP       pi
+     D  @Group                       +0    Const Like(purgroup)
+     D  @Seq                         +0    Const Like(purseq)
+     D  @Status                      +0    Const Like(purstatus)
+
+     D Keyitppurgep    ds                  likerec(ritppurgl1 : *key)
+
+      /Free
+
+          // set keys
+          Keyitppurgep.purgroup   = @Group;
+          Keyitppurgep.purseq     = @Seq;
+
+          //‚get purge record
+          Chain %Kds(Keyitppurgep) ritppurgl1;
+b001      If %Found(itppurgel1);
+
+             // Update status
+             purstatus = @Status;
+
+             // update history fields
+             purlstusr = QUser;
+             purlstpgm = QProg;
+             purlstms  = GetTimeStamp();
+
+             // Update record
+             Update ritppurgl1 %Fields(purstatus: purlstusr:
+                                       purlstpgm: purlstms);
+
+             Reset @MsgDta;
+             @a = %LookUp(purstatus: @Sts);
+             @MsgDta = 'File ' + %Trim(purfrmfile) + ' in group ' +
+                       %Trim(purgroup) + ', Status changed to ' +
+                       @StsDesc(@a);
+             SndPgmMsg(*Blanks: *Blanks: *Blanks:
+                       @MsgDta: %Len(%Trim(@MsgDta)));
+
+e001      EndIf;
+
+      /End-free
+
+     P Update...
+     P ITPPURGEP       e
+
+      ************************************************************************
+      *‚SetStatusForITPPURKEY = Update Status for ITPPURKEY
+      ************************************************************************
+
+     P SetStatusFor...
+     P ITPPURKEY       b                   Export
+
+     D SetStatusFor...
+     D ITPPURKEY       pi
+     D  @Group                       +0    Const Like(keygroup)
+     D  @Status                      +0    Const Like(keystatus)
+     D  @Seq                         +0    Const Like(keyseq)
+     D                                     Options(*NoPass)
+
+     D @KeyFileOpen1   s               n   Inz(*Off)
+     D @KeyFileOpen2   s               n   Inz(*Off)
+
+      /Free
+
+          // Check for purge file open
+b001      If Not %Open(itppurkey1);
+
+             // Open purge file
+             Open itppurkey1;
+
+             @KeyFileOpen1 = *On;
+
+e001      EndIf;
+
+          // Check for purge file open
+b001      If Not %Open(itppurkey2);
+
+             // Open purge file
+             Open itppurkey2;
+
+             @KeyFileOpen2 = *On;
+
+e001      EndIf;
+
+          // Check for file name passed to program
+b001      If  %Parms() >= 3
+          And @Seq     <> *Zeros;
+
+             // Execute update itppurgep file routine
+             UpdateITPPURKEY(@Group: @Seq :@Status);
+
+x001      Else;
+
+             //‚get purge record
+             Setll *Loval ritppurkl2;
+             Setll @Group ritppurkl2;
+             Reade @Group ritppurkl2;
+b002         Dow Not %Eof(itppurkey2);
+
+                // Execute update itppurgep file routine
+                UpdateITPPURKEY(KeyGroup: KeySeq :@Status);
+
+                //‚get purge record
+                Reade @Group ritppurkl2;
+
+e002         EndDo;
+e001      EndIf;
+
+          // Check for file previously not open
+b001      If @KeyFileOpen1;
+
+             // Close purge file
+             Close itppurkey1;
+
+e001      EndIf;
+
+          // Check for file previously not open
+b001      If @KeyFileOpen2;
+
+             // Close purge file
+             Close itppurkey2;
+
+e001      EndIf;
+
+      /End-free
+
+     P SetStatusFor...
+     P ITPPURKEY       e
+
+      ************************************************************************
+      *‚UpdateITPPURKEY = Update ITPPURKEY File
+      ************************************************************************
+
+     P Update...
+     P ITPPURKEY       b
+
+     D Update...
+     D ITPPURKEY       pi
+     D  @Group                       +0    Const Like(keygroup)
+     D  @Seq                         +0    Const Like(keyseq)
+     D  @Status                      +0    Const Like(keystatus)
+
+     D Keyitppurkey    ds                  likerec(ritppurkl1 : *key)
+
+      /Free
+
+          // set keys
+          Keyitppurkey.keygroup = @Group;
+          Keyitppurkey.keyseq   = @Seq;
+
+          //‚get purge record
+          Chain %Kds(Keyitppurkey) ritppurkl1;
+b001      If %Found(itppurkey1);
+
+             // Update status
+             keystatus = @Status;
+
+             // update history fields
+             keylstusr = QUser;
+             keylstpgm = QProg;
+             keylstms  = GetTimeStamp();
+
+             // Update record
+             Update ritppurkl1 %Fields(keystatus: keylstusr:
+                                       keylstpgm: keylstms);
+
+             Reset @MsgDta;
+             @a = %LookUp(purstatus: @Sts);
+             @MsgDta = 'Key ' + %Trim(purkeyfld1) + ' in group ' +
+                       %Trim(purgroup) + ', Status changed to ' +
+                       @StsDesc(@a);
+             SndPgmMsg(*Blanks: *Blanks: *Blanks:
+                       @MsgDta: %Len(%Trim(@MsgDta)));
+
+e001      EndIf;
+
+      /End-free
+
+     P Update...
+     P ITPPURKEY       e
+
+**
+0Initialization
+1Create Output File Complete
+2Copy Records Complete
+3Delete Records Complete
+4Save Output File Complete
+5Delete Output File Complete
+9Run Complete

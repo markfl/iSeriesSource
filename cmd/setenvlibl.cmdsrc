@@ -1,0 +1,9 @@
+             CMD        PROMPT('Set Environment Library List')
+
+             PARM       KWD(ENV) TYPE(*NAME) DFT(*DFT) +
+                          SPCVAL((*DFT)) PROMPT('Environment name')
+
+             PARM       KWD(CURLIB) TYPE(*NAME) DFT(*CURRENT) +
+                          SPCVAL((*CURRENT) (*USRPRF) (*CRTDFT)) +
+                          CHOICE(*NONE) PROMPT('Current library')
+

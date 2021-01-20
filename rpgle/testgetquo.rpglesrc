@@ -1,0 +1,112 @@
+     h DftActGrp(*NO)
+
+     D @xmlParser      pr                  extpgm('RATEQUOTER')
+     D                               +0    Like(QUser)
+     D                             3000a   Varying
+
+     D @wXmlString     s           3000a   Varying
+     D @RateId         s             12a   Inz('Test 01')
+     D @Customer       s             12a   Inz('000000000978')
+     D @OrigCity       s             30a   Inz('DOWAGIAC')
+     D @OrigState      s              2a   Inz('MI')
+     D @OrigZip        s              9a   Inz('49047')
+     D @OrigCnt        s              2a   Inz('US')
+     D @DestCity       s             30a   Inz('COLUMBUS')
+     D @DestState      s              2a   Inz('OH')
+     D @DestZip        s              9a   Inz('43228')
+     D @DestCnt        s              2a   Inz('US')
+     D @ShipDate       s              7a   Inz('1140921')
+     D @Service        s              4a   Inz('*ANY')
+     D @Volume         s             11p 4 Inz(*Zeros)
+     D @Pieces         s              7p 0 Inz(1)
+     D @Pallet         s              7p 0 Inz(*Zeros)
+     D @Wgt1           s             11p 4 Inz(600)
+     D @Fcls1          s              4a   Inz(' 51 ')
+     D @Wgt2           s             11p 4 Inz(800.123)
+     D @Fcls2          s              4a   Inz(' 61 ')
+     D @Wgt3           s             11p 4 Inz(700.123)
+     D @Fcls3          s              4a   Inz(' 71 ')
+     D @Wgt4           s             11p 4 Inz(600.563)
+     D @Fcls4          s              4a   Inz(' 81 ')
+
+     D @Text           s             80    Dim(4) ctdata
+     D @FirstString    s           1000a   Varying
+
+     D                sds
+     D  QUser                254    263
+
+      /free
+
+          Clear @OrigCity;
+          Clear @OrigState;
+          Clear @OrigCnt;
+          @OrigZip = '08591';
+          Clear @DestCity;
+          Clear @DestState;
+          Clear @DestCnt;
+          @DestZip = '10532';
+          Clear @Volume;
+          Clear @Pieces;
+          Clear @Pallet;
+          @Wgt1 = 2000;
+          Clear @Fcls1;
+          Clear @Wgt2;
+          Clear @Fcls2;
+          Clear @Wgt3;
+          Clear @Fcls3;
+          Clear @Wgt4;
+          Clear @Fcls4;
+
+          @FirstString = %Trim(@Text(1)) + %Trim(@Text(2))
+                       + %Trim(@Text(3)) + %Trim(@Text(4));
+       // @FirstString = '<ul:RateRequest>';
+
+          @wXmlString = %Trim(@FirstString) +
+          '<ul:RateId>'   + %Trim(@RateId)  + '</ul:RateId>' +
+          '<ul:Customer>'  + %Trim(@Customer) + '</ul:Customer>' +
+          '<ul:OriginCity>'   + %Trim(@OrigCity)  + '</ul:OriginCity>' +
+          '<ul:OriginState>'  + %Trim(@OrigState) + '</ul:OriginState>' +
+          '<ul:OriginZip>'    + %Trim(@OrigZip)   + '</ul:OriginZip>' +
+          '<ul:OriginCnt>'    + %Trim(@OrigCnt)   + '</ul:OriginCnt>' +
+          '<ul:DestinationCity>'   + %Trim(@DestCity) +
+          '</ul:DestinationCity>' +
+          '<ul:DestinationState>' + %Trim(@DestState) +
+          '</ul:DestinationState>' +
+          '<ul:DestinationZip>' + %Trim(@DestZip) +
+          '</ul:DestinationZip>' +
+          '<ul:DestinationCnt>'    + %Trim(@DestCnt)   +
+          '</ul:DestinationCnt>' +
+          '<ul:ShipDate>'   + %Trim(@ShipDate)  + '</ul:ShipDate>' +
+          '<ul:Service>'    + %Trim(@Service)   + '</ul:Service>' +
+          '<ul:Volume>'     + %Char(@Volume)    + '</ul:Volume>' +
+          '<ul:Pieces>'     + %Char(@Pieces)    + '</ul:Pieces>' +
+          '<ul:Pallet>'     + %Char(@Pallet)    + '</ul:Pallet>' +
+          '<ul:Quantities>' +
+          '<ul:Quantity>'   +
+          '<ul:Weight>'     + %Char(@Wgt1)    + '</ul:Weight>' +
+          '<ul:FreightClass>' + %Trim(@Fcls1) + '</ul:FreightClass>' +
+          '<ul:/Quantity>'  +
+          '<ul:Quantity>'   +
+          '<ul:Weight>'     + %Char(@Wgt2)    + '</ul:Weight>' +
+          '<ul:FreightClass>' + %Trim(@Fcls2) + '</ul:FreightClass>' +
+          '<ul:/Quantity>'  +
+          '<ul:Quantity>'   +
+          '<ul:Weight>'     + %Char(@Wgt3)    + '</ul:Weight>' +
+          '<ul:FreightClass>' + %Trim(@Fcls3) + '</ul:FreightClass>' +
+          '<ul:/Quantity>'  +
+          '<ul:Quantity>'   +
+          '<ul:Weight>'     + %Char(@Wgt4)    + '</ul:Weight>' +
+          '<ul:FreightClass>' + %Trim(@Fcls4) + '</ul:FreightClass>' +
+          '</ul:/Quantity>' +
+          '</ul:Quantities></ul:RateRequest>';
+
+       @xmlParser(QUser: @wXmlString);
+
+       *inlr = *on;
+
+      /end-free
+**
+<?xml version="1.0"?>
+<ul:RateRequest xmlns:ul="http://www.unysonlogistics.com/services/rates/quote/v1"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.unysonlogistics.com/services/rates/quote/v1">

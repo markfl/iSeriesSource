@@ -1,0 +1,5 @@
+             PGM
+
+             RMVMSG     PGMQ(*PRV) CLEAR(*ALL)
+
+             ENDPGM

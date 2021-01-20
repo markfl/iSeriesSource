@@ -1,0 +1,15 @@
+
+             DCL        VAR(&@MSGID) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&@MSGF) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&@MSGFLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&@MSGDTA) TYPE(*CHAR) LEN(256)
+
+             DCL        VAR(&CURLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&USRLIBL) TYPE(*CHAR) LEN(2750)
+
+             DCL        VAR(&QCURLIB) TYPE(*LGL) VALUE('0')
+
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(DUMP))
+
+             INCLUDE    SRCMBR(RCVSETSRC) SRCFILE(QCPYSRC)
+

@@ -1,0 +1,9 @@
+             PGM
+
+             DBG        PGM(TESTSXMLR)
+
+             CALL       PGM(TESTSXMLR)
+
+             ENDDBG
+
+ END:        ENDPGM

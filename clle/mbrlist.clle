@@ -1,0 +1,23 @@
+             PGM        PARM(&FILE &OUTPUT &FILEATR)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OUTPUT) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&FILEATR) TYPE(*CHAR) LEN(4)
+
+             DCL        VAR(&TOFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(DIAG))
+
+             CHGVAR     VAR(&TOFILE) VALUE(%SST(&FILE 1 10))
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&FILE 11 10))
+
+             DSPFD      FILE(&LIBRARY/&TOFILE) TYPE(*MBRLIST) +
+                          OUTPUT(&OUTPUT) FILEATR(&FILEATR)
+             MONMSG     MSGID(CPF0000)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

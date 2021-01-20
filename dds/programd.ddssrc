@@ -1,0 +1,118 @@
+     A*%%TS  SD  20191231  121403  ISFLORESM   REL-V7R1M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(27 132 *DS4                 -
+     A                                             24 80 *DS3)
+     A                                      REF(*LIBL/QPGMFLDREF)
+     A                                      PRINT
+     A          R SFL01                     SFL
+     A*%%TS  SD  20191112  114857  ISFLORESM   REL-V7R1M0  5770-WDS
+     A            @1SPROGRAMR        O  8  2REFFLD(PROGRAM)
+     A                                      COLOR(WHT)
+     A            @1SLIBRARYR        O  8 13REFFLD(LIBRARY)
+     A                                      COLOR(BLU)
+     A            @1SSRCTYPER        O  8 24REFFLD(SRCTYPE)
+     A                                      COLOR(WHT)
+     A            @1SIFIELD R  -20   O  8 35REFFLD(INTFIELD)
+     A                                      COLOR(BLU)
+     A  11                                  DSPATR(RI)
+     A            @1STYPE   R        O  8 51REFFLD(TYPE)
+     A                                      COLOR(WHT)
+     A            @1SSIZE   R   -5   O  8 62REFFLD(SIZE)
+     A                                      COLOR(BLU)
+     A                                      EDTCDE(Z)
+     A            @1SDEC         2A  O  8 69COLOR(WHT)
+     A            @1SUSEDIN R        O  8 72REFFLD(USEDINPGM)
+     A                                      COLOR(BLU)
+     A            @1SINTEXT R        O  8 76REFFLD(INTEXT)
+     A                                      COLOR(WHT)
+     A            @1SEXTFILER        O  9  4REFFLD(EXTFILE)
+     A                                      COLOR(BLU)
+     A            @1SFUNCTN R        O  9 15REFFLD(FUNCTION)
+     A                                      COLOR(WHT)
+     A            @1SFIELDD R        O 10  3REFFLD(FIELDDESC)
+     A                                      COLOR(BLU)
+     A            @1MODULE  R        O 10 54REFFLD(MODULE QPGMFLDREF)
+     A                                      COLOR(WHT)
+     A          R CTL01                     SFLCTL(SFL01)
+     A*%%TS  SD  20180129  091145  FLORESM     REL-V7R1M0  5770-WDS
+     A  *DS4                                SFLSIZ(0006)
+     A  *DS3                                SFLSIZ(0006)
+     A  *DS4                                SFLPAG(0005)
+     A  *DS3                                SFLPAG(0005)
+     A                                      CA03
+     A                                      CA05
+     A                                      CA08
+     A                                      CA10
+     A N03                                  ROLLUP
+     A                                      BLINK
+     A                                      OVERLAY
+     A                                      SFLCSRRRN(&CURSOR)
+     A  01                                  SFLDSP
+     A  02                                  SFLDSPCTL
+     A N01                                  SFLCLR
+     A  03                                  SFLEND(*MORE)
+     A                                      SFLMODE(&SFLMODE)
+     A                                      SFLDROP(CA06)
+     A            SFLMODE        1A  H
+     A            CURSOR         5S 0H
+     A            SFLRCD         4S 0H      SFLRCDNBR
+     A            @_PROC        10A  O  1  2COLOR(BLU)
+     A                                  1 24'DISPLAY PROGRAM FIELD DEFINITION'
+     A                                      COLOR(WHT)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                      COLOR(BLU)
+     A            @_USER        10A  O  2  2COLOR(BLU)
+     A            CTLACT        20A  O  2 31COLOR(WHT)
+     A                                  2 73TIME
+     A                                      COLOR(BLU)
+     A                                  3  4'Program:'
+     A                                      COLOR(BLU)
+     A            @1PROGRAM     10A  B  3 13COLOR(WHT)
+     A                                      CHANGE(05)
+     A            ODOBTX    R        O  3 24REFFLD(ODOBTX QADSPOBJ)
+     A                                      COLOR(PNK)
+     A                                  4  4'Library:'
+     A                                      COLOR(BLU)
+     A            @1LIBRARY     10A  B  4 13COLOR(WHT)
+     A                                      CHANGE(05)
+     A                                  4 24'Source Type:'
+     A                                      COLOR(BLU)
+     A            @1SRCTYPE R        B  4 37REFFLD(SRCTYPE)
+     A                                      COLOR(WHT)
+     A                                      CHANGE(05)
+     A                                  5  4'Field..:'
+     A                                      COLOR(BLU)
+     A            @1INTFIELDR        B  5 13REFFLD(INTFIELD)
+     A                                      COLOR(WHT)
+     A                                      CHANGE(05)
+     A                                  5 70'Used'
+     A                                  5 75'Int'
+     A                                  6  2'Program'
+     A                                  6 13'Library'
+     A                                  6 24'Source Typ'
+     A                                  6 35'Field Name'
+     A                                  6 51'Field Type'
+     A                                  6 64'Size'
+     A                                  6 69'Dec'
+     A                                  6 75'Ext'
+     A                                  7  2'  File Name  Function  Name       -
+     A                                           Field Text                    -
+     A                                             '
+     A                                      DSPATR(UL)
+     A          R CMD01
+     A*%%TS  SD  20160922  123136  FLORESM     REL-V7R1M0  5770-WDS
+     A                                 26  6'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 26 18'F5=Refresh'
+     A                                      COLOR(BLU)
+     A                                 26 33'F6=Fold/Unfold'
+     A                                      COLOR(BLU)
+     A N10                             26 50'F8=Display Used Fields Only'
+     A                                      COLOR(BLU)
+     A  10                             26 50'F8=Display All Fields'
+     A                                      COLOR(BLU)
+     A N12                             27 50'F10=Omit Labels, Tags & Ind.'
+     A                                      COLOR(BLU)
+     A  12                             27 50'F10=Display Labels, Tags & Ind.'
+     A                                      COLOR(BLU)

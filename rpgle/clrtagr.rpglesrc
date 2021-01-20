@@ -1,0 +1,21 @@
+          Ctl-opt Option(*NoDebugIO) DftActGrp(*No);
+     Fqrpglesrc up   f  112        Disk
+
+          Dcl-Pi clrtagr;
+          End-Pi;
+
+     Iqrpglesrc ns
+     I                                 13   21  srctag
+
+b001      If  %SubSt(srctag:1:1) <> 'b'
+          And %SubSt(srctag:1:1) <> 'x'
+          And %SubSt(srctag:1:1) <> 'e'
+          And %SubSt(srctag:1:1) <> 'B'
+          And %SubSt(srctag:1:1) <> 'X'
+          And %SubSt(srctag:1:1) <> 'E';
+             %SubSt(srctag:1:5) = *Blanks;
+             Except updsrc;
+e001      EndIf;
+
+     Oqrpglesrc e            updsrc
+     O                       srctag              21

@@ -1,0 +1,11 @@
+          Ctl-opt Option(*NoDebugIO) DftActGrp(*No) BndDir('MFLORES');
+
+     Fqdspobjd  up   e             Disk
+
+      /define mflores060
+      /copy qcpysrc,mflores
+      /undefine mflores060
+
+b001      If Not CheckObsolete(odlbnm);
+             Delete qlidobjd;
+e001      EndIf;

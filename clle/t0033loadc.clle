@@ -1,0 +1,11 @@
+             PGM        PARM(&LOAD)
+
+             DCL        VAR(&LOAD) TYPE(*CHAR) LEN(8)
+
+             DBG        PGM(T0033LOAD)
+
+             CALL       PGM(T0033LOAD) PARM(&LOAD)
+
+             ENDDBG
+
+ END:        ENDPGM

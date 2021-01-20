@@ -1,0 +1,17 @@
+             PGM        PARM(&PMSTVND)
+
+             DCL        VAR(&PMSTVND) TYPE(*DEC) LEN(5 0)
+             DCL        VAR(&MSTVND) TYPE(*DEC) LEN(5 0)
+
+             CHGVAR     VAR(&MSTVND) VALUE(&PMSTVND)
+             MONMSG     MSGID(CPF0000) EXEC(DO)
+             CHGVAR     VAR(&MSTVND) VALUE(322)
+             ENDDO
+
+             DBG        PGM(VNDVNDARC)
+
+             CALL       PGM(VNDVNDARC) PARM(&MSTVND)
+
+             ENDDBG
+
+ END:        ENDPGM

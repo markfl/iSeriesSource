@@ -1,0 +1,68 @@
+          Ctl-opt DftActGrp(*No) Option(*NoDebugio);
+
+     Fspoolfile ip   f  198        Disk
+
+          Dcl-Pi cnljobsr;
+             @PJob  Char(10) Const;
+             @PUser Char(10) Const;
+             @PNbr  Char(6)  Const;
+             @P#ofJ Char(6)  Const;
+          End-Pi;
+
+      /define mflores059
+      /copy qcpysrc,mflores
+      /undefine mflores059
+
+          Dcl-c @Cmd Const('ENDJOB JOB(');
+
+          Dcl-s @splfnbr  Zoned(6:0)  Inz(*Zeros);
+          Dcl-s @idx      Packed(7:0) Inz(*Zeros);
+          Dcl-s @#jobs    Zoned(6:0)  Inz(*Zeros);
+
+     Ispoolfile ns
+     I                                  1  198  spoolfiledta
+     I                                  2   11  @Splf
+     I                                  4   13  @Job
+     I                                 17   26  @User
+     I                                 22   26  @End
+     I                                 30   35  @jobnbr
+     I                                122  125  @Page
+
+b001      If  @Splf <> *Blanks
+          And @Splf <> 'File      '
+          And @Splf <> '  (No spoo'
+          And @Splf <> 'Submitted '
+          And @Splf <> '  Job Name'
+          And @End  <> 'E N D'
+          And @Page <> 'Page';
+
+             @idx     += 1;
+
+b002         If  @P#ofJ <> '*NOMAX'
+             And @idx   <= @#jobs
+             Or  @P#ofJ =  '*NOMAX';
+
+                @Command = @Cmd + %Trim(@Jobnbr)   + '/'
+                                + %Trim(@User)     + '/'
+                                + %Trim(@Job)      + ')';
+
+                @Length = %Len(%Trim(@Command));
+b003            Monitor;
+                   @CallCmd(@Command: @Length);
+x003            On-Error;
+e003            EndMon;
+e002         EndIf;
+e001      EndIf;
+
+b001      If  @P#ofJ <> '*NOMAX'
+          And @idx   >  @#jobs;
+             *Inlr = *On;
+             Return;
+e001      EndIf;
+
+          BegSr *Inzsr;
+
+b001         If  @P#ofJ <> '*NOMAX';
+                @#jobs = %Dec(@P#ofJ:6:0);
+e001         EndIf;
+          EndSr;

@@ -1,0 +1,16 @@
+     A                                      UNIQUE
+     A          R RDSPPGMINF
+     A            LIBRARY       10A         COLHDG('Library')
+     A                                      TEXT('Library')
+     A            PROGRAM       10A         COLHDG('Program')
+     A                                      TEXT('Program')
+     A            ATTRIBUTE     10A         COLHDG('Program Attribute')
+     A                                      TEXT('Program Attribute')
+     A            MODSRVATR     10A         COLHDG('Module/Service' 'Attribute')
+     A                                      TEXT('Module/Service Attribute')
+     A            MODSRV        10A         COLHDG('Module/Service' 'Program')
+     A                                      TEXT('Module/Service Program')
+     A            MODSRVLIB     10A         COLHDG('Library')
+     A                                      TEXT('Library')
+     A          K LIBRARY
+     A          K PROGRAM

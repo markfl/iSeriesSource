@@ -1,0 +1,165 @@
+             PGM        PARM(&FILELIB &OBJLIB &DSPFD &DSPPGMREF +
+                          &FNDFILUSG &OUTMBR)
+
+             DCLPRCOPT  DFTACTGRP(*NO) ACTGRP(*NEW) BNDDIR(MFLORES)
+
+             DCLF       FILE(QAFDBASI)
+
+             DCL        VAR(&FILELIB) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OBJLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DSPFD) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&DSPPGMREF) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&FNDFILUSG) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OUTMBR) TYPE(*CHAR) LEN(20)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&DSPFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DSPLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&PGMREFFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGMREFLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&FILUSGFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FILUSGLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MBROPT) TYPE(*CHAR) LEN(8)
+
+             DCL        VAR(&SELECT) TYPE(*CHAR) LEN(256)
+
+             DCL        VAR(&DLTDSPFD) TYPE(*LGL) VALUE('0')
+             DCL        VAR(&OBSOLETE) TYPE(*LGL)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&FILE) VALUE(%SST(&FILELIB 1 10))
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&FILELIB 11 10))
+             IF         COND(&LIBRARY *EQ *CURLIB) THEN(CHGVAR +
+                          VAR(&LIBRARY) VALUE(&CURLIB))
+
+/* b01 */    IF         COND(&LIBRARY *EQ *USRLIBL) THEN(DO)
+             INCLUDE    SRCMBR(RCVCURLIBC) SRCFILE(QCPYSRC)
+/* e01 */    ENDDO
+
+             CHGVAR     VAR(&DSPFILE) VALUE(%SST(&DSPFD 1 10))
+             CHGVAR     VAR(&DSPLIB) VALUE(%SST(&DSPFD 11 10))
+             IF         COND(&DSPLIB *EQ *CURLIB) THEN(CHGVAR +
+                          VAR(&DSPLIB) VALUE(&CURLIB))
+
+             CHGVAR     VAR(&PGMREFFILE) VALUE(%SST(&DSPPGMREF 1 10))
+             CHGVAR     VAR(&PGMREFLIB) VALUE(%SST(&DSPPGMREF 11 10))
+             IF         COND(&PGMREFLIB *EQ *CURLIB) THEN(CHGVAR +
+                          VAR(&PGMREFLIB) VALUE(&CURLIB))
+
+             CHGVAR     VAR(&FILUSGFILE) VALUE(%SST(&FNDFILUSG 1 10))
+             CHGVAR     VAR(&FILUSGLIB) VALUE(%SST(&FNDFILUSG 11 10))
+             IF         COND(&FILUSGLIB *EQ *CURLIB) THEN(CHGVAR +
+                          VAR(&FILUSGLIB) VALUE(&CURLIB))
+
+             CHGVAR     VAR(&MEMBER) VALUE(%SST(&OUTMBR 3 10))
+             CHGVAR     VAR(&MBROPT) VALUE(%SST(&OUTMBR 13 8))
+
+/* b01 */    IF         COND(&MEMBER *EQ *FIRST) THEN(DO)
+             RTVMBRD    FILE(&FILUSGLIB/&FILUSGFILE) RTNMBR(&MEMBER)
+             MONMSG     MSGID(CPF0000)
+/* e01 */    ENDDO
+
+             DLTF       FILE(QTEMP/QAFDBASI)
+             MONMSG     MSGID(CPF0000)
+
+             CHKOBJ     OBJ(&DSPLIB/&DSPFILE) OBJTYPE(*FILE)
+/* b01 */    MONMSG     MSGID(CPF9801) EXEC(DO)
+
+             DSPFD      FILE(&LIBRARY/&FILE) TYPE(*BASATR) +
+                          OUTPUT(*OUTFILE) OUTFILE(&DSPLIB/&DSPFILE)
+
+             CHGVAR     VAR(&DLTDSPFD) VALUE('1')
+/* e01 */    ENDDO
+
+             RMVMSG     CLEAR(*ALL)
+
+             CHGVAR     VAR(&SELECT) VALUE('ATDTAT = "D" *AND ATFTYP +
+                          = "P"')
+
+/* b03 */    IF         COND(&LIBRARY *NE *USRLIBL) THEN(DO)
+/* b04 */    IF         COND(&LIBRARY *NE *ALLUSR) THEN(DO)
+             CHGVAR     VAR(&SELECT) VALUE(&SELECT |< ' *AND ATLIB = +
+                          ' || '"' || &LIBRARY |< '"')
+/* e04 */    ENDDO
+/* e03 */    ENDDO
+
+/* b03 */    IF         COND(&FILE *NE *ALL) THEN(DO)
+             CHGVAR     VAR(&SELECT) VALUE(&SELECT |< ' *AND ATFILE +
+                          = ' || '"' || &FILE |< '"')
+/* e03 */    ENDDO
+
+             OVRDBF     FILE(QAFDBASI) TOFILE(&DSPLIB/&DSPFILE) +
+                          SHARE(*YES)
+             OPNQRYF    FILE((&DSPLIB/&DSPFILE)) QRYSLT(&SELECT) +
+                          KEYFLD((ATLIB) (ATFILE))
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* b01 */    DOWHILE    COND(&@MSGID *NE CPF0864)
+
+             CALLPRC    PRC(CHECKOBSOLETE) PARM((&ATLIB)) +
+                          RTNVAL(&OBSOLETE)
+/* b02 */    IF         COND(&OBSOLETE) THEN(DO)
+
+             CALLPRC    PRC(CHECKOBSOLETE) PARM((&ATFILE) (&ATLIB)) +
+                          RTNVAL(&OBSOLETE)
+/* b03 */    IF         COND(&OBSOLETE) THEN(DO)
+
+/* b04 */    IF         COND(&LIBRARY *EQ *USRLIBL) THEN(DO)
+             CALLPRC    PRC(@CHECKLIBL) PARM((&ATLIB)) +
+                          RTNVAL(&OBSOLETE)
+             IF         COND(&OBSOLETE *EQ '0') THEN(GOTO +
+                          CMDLBL(AGAIN))
+/* e04 */    ENDDO
+
+             CHKOBJ     OBJ(&ATLIB/&ATFILE) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(GOTO CMDLBL(AGAIN))
+
+             FNDFILUSG  FILE(&ATLIB/&ATFILE) OBJLIB(&OBJLIB) +
+                          DSPPGMREF(&PGMREFLIB/&PGMREFFILE) +
+                          FNDFILUSG(&FILUSGLIB/&FILUSGFILE) +
+                          OUTMBR(&MEMBER)
+
+/* e03 */    ENDDO
+/* e02 */    ENDDO
+
+ AGAIN:      RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+/* e01 */    ENDDO
+
+             DLTOVR     FILE(*ALL)
+
+             DLTF       FILE(QTEMP/QAFDBASI)
+             MONMSG     MSGID(CPF0000)
+
+/* b01 */    IF         COND((&FILUSGFILE *EQ QFNDFILUSG) *AND +
+                          (&FILUSGLIB *EQ &CURLIB)) THEN(DO)
+             CHKOBJ     OBJ(&CURLIB/QFNDFILUL1) OBJTYPE(*FILE)
+/* b02 */    MONMSG     MSGID(CPF9801) EXEC(DO)
+             CRTLF      FILE(&CURLIB/QFNDFILUL1) +
+                          SRCFILE(&CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST)
+             MONMSG     MSGID(CPF0000)
+/* e02 */    ENDDO
+/* e01 */    ENDDO
+
+/* b01 */    IF         COND(&DLTDSPFD) THEN(DO)
+             DLTF       FILE(&DSPLIB/&DSPFILE)
+             MONMSG     MSGID(CPF0000)
+/* e01 */    ENDDO
+
+             RMVMSG     CLEAR(*ALL)
+test:
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

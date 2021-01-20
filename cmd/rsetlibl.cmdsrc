@@ -1,0 +1,6 @@
+             CMD        PROMPT('Reset Library List')
+
+             PARM       KWD(USRLIBL) TYPE(*CHAR) LEN(2750) +
+                          DFT(*NONE) SPCVAL((*NONE)) +
+                          PROMPT('Libraries for current thread')
+

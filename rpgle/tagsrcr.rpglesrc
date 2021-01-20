@@ -1,0 +1,29 @@
+     HOption(*NoDebugio) DftActGrp(*No)
+     Fqrpglesrc up   f  112        Disk
+     Dtagsrcr          pr
+     D                                6a
+     D                                9a
+     D                                5a
+     Dtagsrcr          pi
+     D  @InDate                       6a
+     D  @Tag                          9a
+     D  @Srctype                      5a
+     Iqrpglesrc ns
+     I                                  7   12  srcdat
+     I                                 13   21  srctag
+     C/free
+b001      If srcdat = @InDate;
+b002         Select;
+x002            When @Srctype = 'RPGLE'
+                Or   @Srctype = 'RPG';
+                   %SubSt(srctag:1:5) = %SubSt(@Tag:1:5);
+                   Except updsrc;
+x002            When @Srctype = 'CLLE'
+                Or   @Srctype = 'CLP';
+                   srctag = @Tag;
+                   Except updsrc;
+e002         EndSl;
+e002      EndIf;
+      /end-free
+     Oqrpglesrc e            updsrc
+     O                       srctag              21

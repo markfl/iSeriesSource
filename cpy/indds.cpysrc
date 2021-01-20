@@ -1,0 +1,324 @@
+b001  /If Defined(IndDs01)
+
+          Dcl-c @Command01a Const(X'31');                             // F01 Key
+          Dcl-c @Command02b Const(X'32');                             // F02 Key
+          Dcl-c @Command03c Const(X'33');                             // F03 Key
+          Dcl-c @Command04d Const(X'34');                             // F04 Key
+          Dcl-c @Command05e Const(X'35');                             // F05 Key
+          Dcl-c @Command06f Const(X'36');                             // F06 Key
+          Dcl-c @Command07g Const(X'37');                             // F07 Key
+          Dcl-c @Command08h Const(X'38');                             // F08 Key
+          Dcl-c @Command09i Const(X'39');                             // F09 Key
+          Dcl-c @Command10j Const(X'3A');                             // F10 Key
+          Dcl-c @Command11k Const(X'3B');                             // F11 Key
+          Dcl-c @Command12l Const(X'3C');                             // F12 Key
+
+          Dcl-c @Enter      Const(X'F1');                             // Enter
+
+b002      /If Defined(IndDs01_cmd13_24)
+
+              Dcl-c @Command13m Const(X'B1');                         // F13 Key
+              Dcl-c @Command14n Const(X'B2');                         // F14 Key
+              Dcl-c @Command15o Const(X'B3');                         // F15 Key
+              Dcl-c @Command16p Const(X'B4');                         // F16 Key
+              Dcl-c @Command17q Const(X'B5');                         // F17 Key
+              Dcl-c @Command18r Const(X'B6');                         // F18 Key
+              Dcl-c @Command19s Const(X'B7');                         // F19 Key
+              Dcl-c @Command20t Const(X'B8');                         // F20 Key
+              Dcl-c @Command21u Const(X'B9');                         // F21 Key
+              Dcl-c @Command22v Const(X'BA');                         // F22 Key
+              Dcl-c @Command23w Const(X'BB');                         // F23 Key
+              Dcl-c @Command24x Const(X'BC');                         // F24 Key
+
+e002      /ENDIF
+
+b002      /If Defined(IndDs01_SbfInd)
+
+              Dcl-c @RollDown Const(X'F4');                           // Roll Down
+              Dcl-c @RollUp   Const(X'F5');                           // Roll Up
+
+e002      /ENDIF
+e001  /ENDIF
+
+b001  /If Defined(IndDs02a)
+
+          Dcl-Ds @InfDs;
+              @FunctionKey Char(1)     Pos(369);
+              @Current     Bindec(2:0) Pos(378);
+          End-Ds;
+
+b001  /ENDIF
+
+b001  /If Defined(IndDs02b)
+
+          Dcl-s pIn Pointer Inz(%Addr(*In));
+
+          Dcl-Ds *N Based(pIn);
+             @IndicatorArray Char(99);
+
+b002      /If Defined(IndDs02_SbfInd1)
+
+             @SflDsp_01              Ind     Overlay(@IndicatorArray:1);
+             @SflDspCtl_02           Ind     Overlay(@IndicatorArray:2);
+             @SflEnd_03              Ind     Overlay(@IndicatorArray:3);
+             SubfileControlInd_01_03 Char(3) Overlay(@IndicatorArray:1);
+
+e002      /ENDIF
+
+b002      /If Defined(IndDs02_SbfInd2)
+
+             @SflDsp_04              Ind     Overlay(@IndicatorArray:4);
+             @SflDspCtl_05           Ind     Overlay(@IndicatorArray:5);
+             @SflEnd_06              Ind     Overlay(@IndicatorArray:6);
+             SubfileControlInd_04_06 Char(3) Overlay(@IndicatorArray:4);
+
+e002      /ENDIF
+
+b002      /If Defined(IndDS02_Ind01_09)
+
+             @Screen_01 Ind Overlay(@IndicatorArray:1);               // *In01
+             @Screen_02 Ind Overlay(@IndicatorArray:2);               // *In02
+             @Screen_03 Ind Overlay(@IndicatorArray:3);               // *In03
+             @Screen_04 Ind Overlay(@IndicatorArray:4);               // *In04
+             @Screen_05 Ind Overlay(@IndicatorArray:5);               // *In05
+             @Screen_06 Ind Overlay(@IndicatorArray:6);               // *In06
+             @Screen_07 Ind Overlay(@IndicatorArray:7);               // *In07
+             @Screen_08 Ind Overlay(@IndicatorArray:8);               // *In08
+             @Screen_09 Ind Overlay(@IndicatorArray:9);               // *In09
+
+e002      /ENDIF
+
+b002      /If Defined(IndDS02_Ind10_20)
+
+             @ScrResult_10 Ind Overlay(@IndicatorArray:10);           // *In10
+             @ScrResult_11 Ind Overlay(@IndicatorArray:11);           // *In11
+             @ScrResult_12 Ind Overlay(@IndicatorArray:12);           // *In12
+             @ScrResult_13 Ind Overlay(@IndicatorArray:13);           // *In13
+             @ScrResult_14 Ind Overlay(@IndicatorArray:14);           // *In14
+             @ScrResult_15 Ind Overlay(@IndicatorArray:15);           // *In15
+             @ScrResult_16 Ind Overlay(@IndicatorArray:16);           // *In16
+             @ScrResult_17 Ind Overlay(@IndicatorArray:17);           // *In17
+             @ScrResult_18 Ind Overlay(@IndicatorArray:18);           // *In18
+             @ScrResult_19 Ind Overlay(@IndicatorArray:19);           // *In19
+             @ScrError_20  Ind Overlay(@IndicatorArray:20);           // *In20
+
+e002      /ENDIF
+
+b002      /If Defined(IndDS02_Ind21_30)
+
+             @ScrError_21 Ind Overlay(@IndicatorArray:21);            // *In21
+             @ScrError_22 Ind Overlay(@IndicatorArray:22);            // *In22
+             @ScrError_23 Ind Overlay(@IndicatorArray:23);            // *In23
+             @ScrError_24 Ind Overlay(@IndicatorArray:24);            // *In24
+             @ScrError_25 Ind Overlay(@IndicatorArray:25);            // *In25
+             @ScrError_26 Ind Overlay(@IndicatorArray:26);            // *In26
+             @ScrError_27 Ind Overlay(@IndicatorArray:27);            // *In27
+             @ScrError_28 Ind Overlay(@IndicatorArray:28);            // *In28
+             @ScrError_29 Ind Overlay(@IndicatorArray:29);            // *In29
+             @ScrError_30 Ind Overlay(@IndicatorArray:30);            // *In30
+
+e002      /ENDIF
+
+b002      /If Defined(IndDS02_Ind31_40)
+
+             @ScrError_31 Ind Overlay(@IndicatorArray:31);            // *In31
+             @ScrError_32 Ind Overlay(@IndicatorArray:32);            // *In32
+             @ScrError_33 Ind Overlay(@IndicatorArray:33);            // *In33
+             @ScrError_34 Ind Overlay(@IndicatorArray:34);            // *In34
+             @ScrError_35 Ind Overlay(@IndicatorArray:35);            // *In35
+             @ScrError_36 Ind Overlay(@IndicatorArray:36);            // *In36
+             @ScrError_37 Ind Overlay(@IndicatorArray:37);            // *In37
+             @ScrError_38 Ind Overlay(@IndicatorArray:38);            // *In38
+             @ScrError_39 Ind Overlay(@IndicatorArray:39);            // *In39
+             @ScrError_40 Ind Overlay(@IndicatorArray:40);            // *In40
+
+e002      /ENDIF
+
+b002      /If Defined(IndDS02_Ind41_50)
+
+             @ScrError_41 Ind Overlay(@IndicatorArray:41);            // *In41
+             @ScrError_42 Ind Overlay(@IndicatorArray:42);            // *In42
+             @ScrError_43 Ind Overlay(@IndicatorArray:43);            // *In43
+             @ScrError_44 Ind Overlay(@IndicatorArray:44);            // *In44
+             @ScrError_45 Ind Overlay(@IndicatorArray:45);            // *In45
+             @ScrError_46 Ind Overlay(@IndicatorArray:46);            // *In46
+             @ScrError_47 Ind Overlay(@IndicatorArray:47);            // *In47
+             @ScrError_48 Ind Overlay(@IndicatorArray:48);            // *In48
+             @ScrError_49 Ind Overlay(@IndicatorArray:49);            // *In49
+             @ScrError_50 Ind Overlay(@IndicatorArray:50);            // *In50
+
+e002      /ENDIF
+
+b002      /If Defined(IndDS02_Ind51_60)
+
+             @ErrorInd_51 Ind Overlay(@IndicatorArray:51);            // *In51
+             @ErrorInd_52 Ind Overlay(@IndicatorArray:52);            // *In52
+             @ErrorInd_53 Ind Overlay(@IndicatorArray:53);            // *In53
+             @ErrorInd_54 Ind Overlay(@IndicatorArray:54);            // *In54
+             @ErrorInd_55 Ind Overlay(@IndicatorArray:55);            // *In55
+             @ErrorInd_56 Ind Overlay(@IndicatorArray:56);            // *In56
+             @ErrorInd_57 Ind Overlay(@IndicatorArray:57);            // *In57
+             @ErrorInd_58 Ind Overlay(@IndicatorArray:58);            // *In58
+             @ErrorInd_59 Ind Overlay(@IndicatorArray:59);            // *In59
+             @ErrorInd_60 Ind Overlay(@IndicatorArray:60);            // *In60
+
+e002      /ENDIF
+
+b002      /If Defined(IndDS02_Ind61_70)
+
+             @ErrorInd_61 Ind Overlay(@IndicatorArray:61);            // *In61
+             @ErrorInd_62 Ind Overlay(@IndicatorArray:62);            // *In62
+             @ErrorInd_63 Ind Overlay(@IndicatorArray:63);            // *In63
+             @ErrorInd_64 Ind Overlay(@IndicatorArray:64);            // *In64
+             @ErrorInd_65 Ind Overlay(@IndicatorArray:65);            // *In65
+             @ErrorInd_66 Ind Overlay(@IndicatorArray:66);            // *In66
+             @ErrorInd_67 Ind Overlay(@IndicatorArray:67);            // *In67
+             @ErrorInd_68 Ind Overlay(@IndicatorArray:68);            // *In68
+             @ErrorInd_69 Ind Overlay(@IndicatorArray:69);            // *In69
+             @ErrorInd_70 Ind Overlay(@IndicatorArray:70);            // *In70
+
+e002      /ENDIF
+
+b002      /If Defined(IndDS02_Ind71_80)
+
+             @ErrorInd_71 Ind Overlay(@IndicatorArray:71);            // *In71
+             @ErrorInd_72 Ind Overlay(@IndicatorArray:72);            // *In72
+             @ErrorInd_73 Ind Overlay(@IndicatorArray:73);            // *In73
+             @ErrorInd_74 Ind Overlay(@IndicatorArray:74);            // *In74
+             @ErrorInd_75 Ind Overlay(@IndicatorArray:75);            // *In75
+             @ErrorInd_76 Ind Overlay(@IndicatorArray:76);            // *In76
+             @ErrorInd_77 Ind Overlay(@IndicatorArray:77);            // *In77
+             @ErrorInd_78 Ind Overlay(@IndicatorArray:78);            // *In78
+             @ErrorInd_79 Ind Overlay(@IndicatorArray:79);            // *In79
+             @ErrorInd_80 Ind Overlay(@IndicatorArray:80);            // *In80
+
+e002      /ENDIF
+
+b002      /If Defined(IndDS02_Ind81_90)
+
+             @ErrorInd_81 Ind Overlay(@IndicatorArray:81);            // *In81
+             @ErrorInd_82 Ind Overlay(@IndicatorArray:82);            // *In82
+             @ErrorInd_83 Ind Overlay(@IndicatorArray:83);            // *In83
+             @ErrorInd_84 Ind Overlay(@IndicatorArray:84);            // *In84
+             @ErrorInd_85 Ind Overlay(@IndicatorArray:85);            // *In85
+             @ErrorInd_86 Ind Overlay(@IndicatorArray:86);            // *In86
+             @ErrorInd_87 Ind Overlay(@IndicatorArray:87);            // *In87
+             @ErrorInd_88 Ind Overlay(@IndicatorArray:88);            // *In88
+             @ErrorInd_89 Ind Overlay(@IndicatorArray:89);            // *In89
+             @ErrorInd_90 Ind Overlay(@IndicatorArray:90);            // *In90
+
+e002      /ENDIF
+
+b002      /If Defined(IndDS02_Ind91_99)
+
+             @ErrorInd_91 Ind Overlay(@IndicatorArray:91);            // *In91
+             @ErrorInd_92 Ind Overlay(@IndicatorArray:92);            // *In92
+             @ErrorInd_93 Ind Overlay(@IndicatorArray:93);            // *In93
+             @ErrorInd_94 Ind Overlay(@IndicatorArray:94);            // *In94
+             @ErrorInd_95 Ind Overlay(@IndicatorArray:95);            // *In95
+             @ErrorInd_96 Ind Overlay(@IndicatorArray:96);            // *In96
+             @ErrorInd_97 Ind Overlay(@IndicatorArray:97);            // *In97
+             @ErrorInd_98 Ind Overlay(@IndicatorArray:98);            // *In98
+             @ErrorInd_99 Ind Overlay(@IndicatorArray:99);            // *In99
+
+e002      /ENDIF
+
+b002      /If Defined(IndDS02_TestBit)
+
+             @BintInd_01_08 Char(8) Overlay(@IndicatorArray:1);
+
+e002      /ENDIF
+
+b002      /If Defined(IndDS02_AllInd)
+
+             @AllInd_01_99 Char(99) Overlay(@IndicatorArray:1);
+
+e002      /ENDIF
+e001  /ENDIF
+
+b001  /If Defined(IndDs02c)
+
+          End-Ds;
+
+e001  /ENDIF
+
+      /If Defined(IndDs_Exit)
+
+          Dcl-s @ExitKey Char(1) Inz(@Command03c);
+
+      /ENDIF
+
+      /If Defined(IndDs_Refresh)
+
+          Dcl-s @RefreshKey Char(1) Inz(@Command05e);
+
+      /ENDIF
+
+      /IF DEFINED(IndDs_ColorPallet)
+
+          Dcl-s @Green             Char(1) Inz(X'20');
+          Dcl-s @GreenRI           Char(1) Inz(X'21');
+          Dcl-s @White             Char(1) Inz(X'22');
+          Dcl-s @WhiteRI           Char(1) Inz(X'23');
+          Dcl-s @GreenUL           Char(1) Inz(X'24');
+          Dcl-s @GreenULRI         Char(1) Inz(X'25');
+          Dcl-s @WhiteUL           Char(1) Inz(X'26');
+          Dcl-s @ND                Char(1) Inz(X'27');
+          Dcl-s @Red               Char(1) Inz(X'28');
+          Dcl-s @RedRI             Char(1) Inz(X'29');
+          Dcl-s @RedHI             Char(1) Inz(X'2A');
+          Dcl-s @RedHIRI           Char(1) Inz(X'2B');
+          Dcl-s @RedUL             Char(1) Inz(X'2C');
+          Dcl-s @RedULRI           Char(1) Inz(X'2D');
+          Dcl-s @RedULBL           Char(1) Inz(X'2E');
+          Dcl-s @ND2               Char(1) Inz(X'2F');
+          Dcl-s @TurqouiseCS       Char(1) Inz(X'30');
+          Dcl-s @TurqouiseCSRI     Char(1) Inz(X'31');
+          Dcl-s @YellowCS          Char(1) Inz(X'32');
+          Dcl-s @YellowRICS        Char(1) Inz(X'33');
+          Dcl-s @TurqouiseULCS     Char(1) Inz(X'34');
+          Dcl-s @TurqouiseULRICS   Char(1) Inz(X'35');
+          Dcl-s @YellowULCS        Char(1) Inz(X'36');
+          Dcl-s @ND3               Char(1) Inz(X'37');
+          Dcl-s @Pink              Char(1) Inz(X'38');
+          Dcl-s @PinkRI            Char(1) Inz(X'39');
+          Dcl-s @Blue              Char(1) Inz(X'3A');
+          Dcl-s @BlueRI            Char(1) Inz(X'3B');
+          Dcl-s @PinkUL            Char(1) Inz(X'3C');
+          Dcl-s @PinkULRI          Char(1) Inz(X'3D');
+          Dcl-s @BlueUL            Char(1) Inz(X'3E');
+          Dcl-s @ND4               Char(1) Inz(X'3F');
+          Dcl-s @GreenRP           Char(1) Inz(X'A0');
+          Dcl-s @GreenPRRI         Char(1) Inz(X'A1');
+          Dcl-s @WhitePR           Char(1) Inz(X'A2');
+          Dcl-s @WhitePRRI         Char(1) Inz(X'A3');
+          Dcl-s @GreenPRUL         Char(1) Inz(X'A4');
+          Dcl-s @GreenPRULRI       Char(1) Inz(X'A5');
+          Dcl-s @WhitePRUL         Char(1) Inz(X'A6');
+          Dcl-s @NDPR              Char(1) Inz(X'A7');
+          Dcl-s @RedPR             Char(1) Inz(X'A8');
+          Dcl-s @RedPRRI           Char(1) Inz(X'A9');
+          Dcl-s @RedPRHI           Char(1) Inz(X'AA');
+          Dcl-s @RedPRHIRI         Char(1) Inz(X'AB');
+          Dcl-s @RedPRUL           Char(1) Inz(X'AC');
+          Dcl-s @RedPRULRI         Char(1) Inz(X'AD');
+          Dcl-s @RedPRULBL         Char(1) Inz(X'AE');
+          Dcl-s @NDPR2             Char(1) Inz(X'AF');
+          Dcl-s @TurqouisePRCS     Char(1) Inz(X'B0');
+          Dcl-s @TurqouisePRCSRI   Char(1) Inz(X'B1');
+          Dcl-s @YellowPRCS        Char(1) Inz(X'B2');
+          Dcl-s @YellowPRRICS      Char(1) Inz(X'B3');
+          Dcl-s @TurqouisePRULCS   Char(1) Inz(X'B4');
+          Dcl-s @TurqouisePRULRICS Char(1) Inz(X'B5');
+          Dcl-s @YellowPRULCS      Char(1) Inz(X'B6');
+          Dcl-s @NDPR3             Char(1) Inz(X'B7');
+          Dcl-s @PinkPR            Char(1) Inz(X'B8');
+          Dcl-s @PinkPRRI          Char(1) Inz(X'B9');
+          Dcl-s @BluePR            Char(1) Inz(X'BA');
+          Dcl-s @BluePRRI          Char(1) Inz(X'BB');
+          Dcl-s @PinkPRUL          Char(1) Inz(X'BC');
+          Dcl-s @PinkPRULRI        Char(1) Inz(X'BD');
+          Dcl-s @BluePRUL          Char(1) Inz(X'BE');
+          Dcl-s @NDPR4             Char(1) Inz(X'BF');
+
+      /ENDIF

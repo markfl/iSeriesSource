@@ -1,0 +1,22 @@
+
+          Dcl-f qxmlsrc Usage(*Input) Rename(qxmlsrc:rqxmlsrc);
+
+     D  @Xml           s          32740a   Varying
+     D  @XmlOut        s          32740a   Varying
+     D  @Xmlsts        s             10i 0
+
+     DRcvXmlOrdr       pr                  Extpgm('RCVXMLORDR')
+     D                            32740a   Varying
+
+          Read rqxmlsrc;
+b001      Dow Not %Eof(qxmlsrc);
+             @Xml += %Trim(srcdta);
+             Read rqxmlsrc;
+e001      EndDo;
+
+          Close qxmlsrc;
+
+          Exec SQL Call RCVXMLORDR(:@Xml,:@XmlOut,:@XmlSts);
+
+          *Inlr = *On;
+          Return;

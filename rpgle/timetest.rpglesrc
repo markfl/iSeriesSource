@@ -1,0 +1,16 @@
+     D  @Time          s               t
+     D  @Timec         s             10a   Inz('15:30     ')
+     D  @Time2c        s              8a   Inz(*Blanks)
+     D  @Time3         s              6s 0 Inz(*Zeros)
+     D  @Time4         s              6s 0 Inz(*Zeros)
+
+          @Time   = %Time(@Timec:*hms);
+          dsply @Timec;
+          @Time2c = %Char(@Time:*hms0);
+          dsply @Time2c;
+          @Time3  = %Int(@Time2c);
+          dsply @Time3;
+          @Time4  = %Int(%Char(%Time(@Timec:*hms):*hms0));
+          dsply @Time4;
+          *inlr = *On;
+

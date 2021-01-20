@@ -1,0 +1,26 @@
+             CMD        PROMPT('Start Service Job & Debug')
+
+             PARM       KWD(JOB) TYPE(JOB) PROMPT('Job name')
+ JOB:        QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) MIN(1) CHOICE(*NONE) PROMPT('User')
+             QUAL       TYPE(*CHAR) LEN(6) RANGE('000000' '999999') +
+                          MIN(1) CHOICE(*NONE) PROMPT('Number')
+
+             PARM       KWD(PGM) TYPE(PGM) MAX(10) PROMPT('Program')
+ PGM:        QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(DFTPGM) TYPE(*NAME) DFT(*PGM) +
+                          SPCVAL((*PGM) (*NONE)) PROMPT('Default +
+                          program')
+
+             PARM       KWD(UPDPROD) TYPE(*CHAR) LEN(4) RSTD(*YES) +
+                          DFT(*YES) VALUES(*YES *NO) PROMPT('Update +
+                          production files')
+
+             PARM       KWD(OPMSRC) TYPE(*CHAR) LEN(4) RSTD(*YES) +
+                          DFT(*YES) VALUES(*YES *NO) PROMPT('OPM +
+                          source level debug')
+

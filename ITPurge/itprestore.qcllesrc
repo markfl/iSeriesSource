@@ -1,0 +1,42 @@
+             PGM        PARM(&GROUP &SAVF &ARCLIB)
+
+             DCL        VAR(&GROUP) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SAVF) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&ARCLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&SAVFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SAVFLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&NEWLIB) TYPE(*LGL) VALUE('0')
+
+             CHGVAR     VAR(&SAVFILE) VALUE(%SST(&SAVF 1 10))
+             CHGVAR     VAR(&SAVFLIB) VALUE(%SST(&SAVF 11 10))
+
+             CHKOBJ     OBJ(QSYS/&ARCLIB) OBJTYPE(*LIB)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+
+             CRTLIB     LIB(&ARCLIB) TEXT('Archive Library')
+
+             CHGVAR     VAR(&NEWLIB) VALUE('1')
+
+             RSTOBJ     OBJ(*ALL) SAVLIB(&ARCLIB) DEV(*SAVF) +
+                          OBJTYPE(*FILE) SAVF(&SAVFLIB/&SAVFILE)
+             ENDDO
+
+             ADDLIBLE   LIB(&ARCLIB)
+             MONMSG     MSGID(CPF0000)
+
+             CALL       PGM(ITPRESTORR) PARM(&GROUP)
+
+             CALL       PGM(ITPSTSSET) PARM(ITPPURGEP &GROUP '0')
+
+             RMVLIBLE   LIB(&ARCLIB)
+
+             IF         COND(&NEWLIB) THEN(DO)
+
+             DLTLIB     LIB(&ARCLIB)
+             MONMSG     MSGID(CPF0000)
+
+             ENDDO
+
+ END:        ENDPGM

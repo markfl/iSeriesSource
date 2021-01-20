@@ -1,0 +1,134 @@
+             PGM
+
+             CLRPFM     FILE(*CURLIB/QPGMFLDREF)
+             MONMSG     MSGID(CPF0000)
+
+             /* Start of RPGLE Section  */
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(TPSTST50) +
+                          SRCFILE(TPSTST50/QRPGLESRC)) +
+                          JOB(TPSTST50) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(TPSOBJ50) +
+                          SRCFILE(TPSOBJ50/QRPGLESRC)) +
+                          JOB(TPSOBJ50) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(TPSOBJ50QA) +
+                          SRCFILE(TPSOBJ50QA/QRPGLESRC)) +
+                          JOB(TPSOBJ50QA) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(TPSOBJ50UA) +
+                          SRCFILE(TPSOBJ50UA/QRPGLESRC)) +
+                          JOB(TPSOBJ50UA) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2DP52) +
+                          SRCFILE(HGI2DP52/QRPGLESRC)) +
+                          JOB(HGI2DP52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2DS52) +
+                          SRCFILE(HGI2DS52/QRPGLESRC)) +
+                          JOB(HGI2DS52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2DV52) +
+                          SRCFILE(HGI2DV52/QRPGLESRC)) +
+                          JOB(HGI2DV52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2PC52) +
+                          SRCFILE(HGI2PC52/QRPGLESRC)) +
+                          JOB(HGI2PC52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2QA52) +
+                          SRCFILE(HGI2QA52/QRPGLESRC)) +
+                          JOB(HGI2QA52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2QA52QA) +
+                          SRCFILE(HGI2QA52QA/QRPGLESRC)) +
+                          JOB(HGI2PC52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2QP52) +
+                          SRCFILE(HGI2QP52/QRPGLESRC)) +
+                          JOB(HGI2QP52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2QS52) +
+                          SRCFILE(HGI2QS52/QRPGLESRC)) +
+                          JOB(HGI2QS52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2RL52) +
+                          SRCFILE(HGI2RL52/QRPGLESRC)) +
+                          JOB(HGI2RL52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2SP52) +
+                          SRCFILE(HGI2SP52/QRPGLESRC)) +
+                          JOB(HGI2SP52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGQSYS) +
+                          SRCFILE(HGQSYS/QRPGLESRC)) JOB(HGQSYS) +
+                          HOLD(*YES)
+
+             /* End of RPGLE Section  */
+
+             /* Start of CLLE Section  */
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(TPSTST50) +
+                          SRCFILE(TPSTST50/QCLLESRC)) JOB(TPSTST50) +
+                          HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(TPSOBJ50) +
+                          SRCFILE(TPSOBJ50/QCLLESRC)) JOB(TPSOBJ50) +
+                          HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(TPSOBJ50QA) +
+                          SRCFILE(TPSOBJ50QA/QCLLESRC)) +
+                          JOB(TPSOBJ50QA) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(TPSOBJ50UA) +
+                          SRCFILE(TPSOBJ50UA/QCLLESRC)) +
+                          JOB(TPSOBJ50UA) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2DP52) +
+                          SRCFILE(HGI2DP52/QCLLESRC)) JOB(HGI2DP52) +
+                          HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2DS52) +
+                          SRCFILE(HGI2DS52/QCLLESRC)) JOB(HGI2DS52) +
+                          HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2DV52) +
+                          SRCFILE(HGI2DV52/QCLLESRC)) JOB(HGI2DV52) +
+                          HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2PC52) +
+                          SRCFILE(HGI2PC52/QCLLESRC)) JOB(HGI2PC52) +
+                          HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2QA52) +
+                          SRCFILE(HGI2QA52/QCLLESRC)) JOB(HGI2QA52) +
+                          HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2QA52QA) +
+                          SRCFILE(HGI2QA52QA/QCLLESRC)) +
+                          JOB(HGI2PC52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2QP52) +
+                          SRCFILE(HGI2QP52/QCLLESRC)) JOB(HGI2QP52) +
+                          HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2QS52) +
+                          SRCFILE(HGI2QS52/QCLLESRC)) JOB(HGI2QS52) +
+                          HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2RL52) +
+                          SRCFILE(HGI2RL52/QCLLESRC)) JOB(HGI2RL52) +
+                          HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGI2SP52) +
+                          SRCFILE(HGI2SP52/QCLLESRC)) JOB(HGI2SP52) +
+                          HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(HGQSYS) +
+                          SRCFILE(HGQSYS/QCLLESRC)) JOB(HGQSYS) +
+                          HOLD(*YES)
+
+             /* End of CLLE Section  */
+
+             ENDPGM

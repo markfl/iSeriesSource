@@ -1,0 +1,8 @@
+     HOption(*NoDebugio)
+     Fqafdbasi  up   e             Disk
+     Fqfndfilul1if   e           k Disk
+
+          Chain atlib qwhdrppr;
+b001      If %Found(qfndfilul1);
+             Delete qwhfdbas;
+e001      EndIf;

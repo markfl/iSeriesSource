@@ -1,0 +1,19 @@
+             PGM        PARM(&FRMSRCFILE &TOSRCFILE &MBR &TOMBR)
+
+             DCL        VAR(&FRMSRCFILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&TOSRCFILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&MBR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TOMBR) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(256)
+
+/* b01 */    IF         COND((%SST(&TOSRCFILE 1 10) *EQ *FROMFILE) +
+                          *AND (&TOMBR *EQ *FROMMBR)) THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    *FROMMBR not valid +
+                          for from-file and to-file')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+/* e01 */    ENDDO
+
+ END:        ENDPGM

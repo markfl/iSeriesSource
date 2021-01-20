@@ -1,0 +1,13 @@
+             PGM        PARM(&PAYLOAD)
+
+             DCL        VAR(&PAYLOAD) TYPE(*CHAR) LEN(10)
+
+             DBG        PGM(TESTXML)
+
+             OVRDBF     FILE(QXMLSRC) MBR(&PAYLOAD)
+             CALL       PGM(TESTXML)
+             DLTOVR     FILE(QXMLSRC)
+
+             ENDDBG
+
+ END:        ENDPGM

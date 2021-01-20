@@ -1,0 +1,6 @@
+          Ctl-opt copyright('Copyright IBM Corp. 1998, 1999, 2000');
+          Ctl-opt optimize(*NONE);
+          Ctl-opt decedit(*JOBRUN);
+          Ctl-opt truncnbr(*NO);
+
+          Ctl-opt option(*srcstmt : *nodebugio);

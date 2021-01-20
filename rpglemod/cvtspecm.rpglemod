@@ -1,0 +1,3587 @@
+       // ******************************************************************************************
+
+       // Author.....: Mark Flores
+       // Date.......: 15-Nov-2016
+       // Description: Convert D Specs to RPG/Free
+
+       // ******************************************************************************************
+
+          Ctl-opt NoMain Option(*NoDebugio);
+
+          Dcl-f Output Disk(112) Usage(*Input:*Update:*Output) UsrOpn;
+
+          /define rpgstruct08
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct08
+
+          /define IndDs_ColorPallet
+          /copy qcpysrc,indds
+          /undefine IndDs_ColorPallet
+
+          Dcl-s @Written          Ind Inz(*Off);
+          Dcl-s @InDs             Ind Inz(*Off);
+          Dcl-s @InPr             Ind Inz(*Off);
+          Dcl-s @InPi             Ind Inz(*Off);
+          Dcl-s @InCm             Ind Inz(*Off);
+          Dcl-s @ContinueNextLine Ind Inz(*Off);
+          Dcl-s @InProcedure      Ind Inz(*Off);
+
+          Dcl-Proc ParseSpec Export;
+
+          Dcl-pi ParseSpec;
+             @Program Char(10)   Const Options(*NoPass);
+             @seq     Zoned(6:2) Const Options(*NoPass);
+             @dat     Zoned(6:0) Const Options(*NoPass);
+             @Input   Char(100)  Const Options(*NoPass);
+             @1Input  Char(100)  Const Options(*NoPass);
+          End-pi;
+
+          Dcl-ds @DspecDs      LikeDs(@DspecDsRPGILE);
+          Dcl-ds @DspecDs1     LikeDs(@DspecDsRPGILE);
+          Dcl-ds @DspecDsUpper LikeDs(@DspecDsRPGILE);
+          Dcl-ds @PspecDs      LikeDs(@PspecDsRPGILE);
+          Dcl-ds @PspecDs1     LikeDs(@PspecDsRPGILE);
+          Dcl-ds @PspecDsUpper LikeDs(@PspecDsRPGILE);
+
+          Dcl-s @a            Int(5)        Inz(*Zeros);
+          Dcl-s @b            Int(5)        Inz(*Zeros);
+          Dcl-s @PriorInput   Like(@Input)  Inz(*BLanks) Static;
+          Dcl-s @_Input       Like(@Input)  Inz(*BLanks);
+          Dcl-s @1_Input      Like(@1Input) Inz(*BLanks);
+          Dcl-s @ProcPrefix   Like(@DspecDsRPGILE.@DProcPrefix) Inz(*Blanks);
+          Dcl-s @InHSpec      Ind           Inz(*Off) Static;
+          Dcl-s @InFSpec      Ind           Inz(*Off) Static;
+          Dcl-s @InDSpec      Ind           Inz(*Off) Static;
+          Dcl-s @InISpec      Ind           Inz(*Off);
+          Dcl-s @InCSpec      Ind           Inz(*Off) Static;
+          Dcl-s @InOSpec      Ind           Inz(*Off);
+          Dcl-s @SkipNextLine Ind           Inz(*Off) Static;
+          Dcl-s @NoMoreSpecs  Ind           Inz(*Off) Static;
+
+          /define rpgstruct01
+          /define rpgstruct03
+          /define rpgstruct07
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct01
+          /undefine rpgstruct03
+          /undefine rpgstruct07
+
+          /define mflores003
+          /copy qcpysrc,mflores
+
+          @Written = *Off;
+
+b001      If %Parms > *Zeros;
+
+b002         If Not %Open(Output);
+                Open Output;
+e002         EndIf;
+
+b002         If  Not @SkipNextLine;
+b003            If  Not @NoMoreSpecs;
+
+                   @_Input  = @ToUpper(@Input);
+                   @1_Input = @ToUpper(@1Input);
+                   @_srcdat = *Zeros;
+                   @_srcseq = *Zeros;
+                   @_srcdta = *Blanks;
+
+b004               Select;
+
+x004                  When %Subst(@_Input:1:3) =  '** ';
+
+                         @NoMoreSpecs = *On;
+                         @InHSpec     = *Off;
+                         @InFSpec     = *Off;
+                         @InDSpec     = *Off;
+                         @InISpec     = *Off;
+                         @InCSpec     = *Off;
+                         @InOSpec     = *Off;
+
+x004                  When %Subst(@_Input:6:1) =  'H';
+
+                         @InHSpec = *On;
+                         @InFSpec = *Off;
+                         @InDSpec = *Off;
+                         @InISpec = *Off;
+                         @InCSpec = *Off;
+                         @InOSpec = *Off;
+
+x004                  When %Subst(@_Input:6:1) =  'F';
+
+                         @InHSpec = *Off;
+                         @InFSpec = *On;
+                         @InDSpec = *Off;
+                         @InISpec = *Off;
+                         @InCSpec = *Off;
+                         @InOSpec = *Off;
+
+x004                  When %Subst(@_Input:6:1) =  'D';
+
+                         @InHSpec = *Off;
+                         @InFSpec = *Off;
+                         @InDSpec = *On;
+                         @InISpec = *Off;
+                         @InCSpec = *Off;
+                         @InOSpec = *Off;
+
+x004                  When %Subst(@_Input:6:1) =  'I';
+
+                         @InHSpec = *Off;
+                         @InFSpec = *Off;
+                         @InDSpec = *Off;
+                         @InISpec = *On;
+                         @InCSpec = *Off;
+                         @InOSpec = *Off;
+
+x004                  When %Subst(@_Input:6:1) =  'C';
+
+                         @InHSpec = *Off;
+                         @InFSpec = *Off;
+                         @InDSpec = *Off;
+                         @InISpec = *Off;
+                         @InCSpec = *On;
+                         @InOSpec = *Off;
+
+x004                  When %Subst(@_Input:6:1) =  'O';
+
+                         @InHSpec = *Off;
+                         @InFSpec = *Off;
+                         @InDSpec = *Off;
+                         @InISpec = *Off;
+                         @InCSpec = *Off;
+                         @InOSpec = *On;
+
+e004               EndSl;
+e003            EndIf;
+
+b003            Select;
+
+x003               When @NoMoreSpecs;
+
+                      @InDs = *Off;
+                      @InPr = *Off;
+                      @InPi = *Off;
+                      @_srcdat = @dat;
+                      @_srcseq = @seq;
+                      @_srcdta = @Input;
+
+                      Write Output @SourceDs;
+                      @Written = *On;
+
+x003               When %Subst(@_Input:6:1) =  'H'
+                   And  %Subst(@_Input:7:1) <> '*'
+                   And  %Subst(@_Input:7:1) <> '/';
+
+                      @InDs = *Off;
+                      @InPr = *Off;
+                      @InPi = *Off;
+                      @_srcdat = @dat;
+                      @_srcseq = @seq;
+                      @_srcdta = ConvertHSpec(@Input);
+
+                      Write Output @SourceDs;
+                      @Written = *On;
+
+x003               When %Subst(@_Input:6:1)  =  'F'
+                   And  %Subst(@_Input:7:1)  <> '*'
+                   And  %Subst(@_Input:7:1)  <> '/'
+                   And  %Subst(@_Input:18:1) <> 'P';
+
+                      @InDs = *Off;
+                      @InPr = *Off;
+                      @InPi = *Off;
+                      @_srcdat = @dat;
+                      @_srcseq = @seq;
+                      @_srcdta = ConvertFSpec(@Input: @1Input);
+
+                      Write Output @SourceDs;
+                      @Written = *On;
+
+x003               When @_Input               = *Blanks
+                   And  %Subst(@1_Input:6:2)  = 'D/'
+                   Or   %Subst(@_Input:7)     =  *Blanks
+                   And  %Subst(@1_Input:24:1) <> *Blanks;
+
+b004                  If @InDs;
+                         WriteEndSpec(@seq: @dat: 'End-Ds;':
+                                      @Input: @1Input);
+                         @Written = *On;
+                         @InDs = *Off;
+e004                  EndIf;
+
+b004                  If @InPr;
+                         WriteEndSpec(@seq: @dat: 'End-Pr;':
+                                      @Input: @1Input);
+                         @Written = *On;
+                         @InPr = *Off;
+e004                  EndIf;
+
+b004                  If @InPi;
+                         WriteEndSpec(@seq: @dat: 'End-Pi;':
+                                      @Input: @1Input);
+                         @Written = *On;
+                         @InPi = *Off;
+e004                  EndIf;
+
+                      Clear @_srcdta;
+                      %Subst(@_srcdta:@Offset2) = %Subst(@_Input:7:73);
+                      Write Output @SourceDs;
+                      @InDs = *Off;
+                      @InPr = *Off;
+                      @InPi = *Off;
+                      @InCm = *Off;
+                      @Written = *On;
+
+x003               When %Subst(@_Input:6:2) = 'D/';
+
+                      @_srcdat = @dat;
+                      @_srcseq = @seq;
+
+                      Clear @_srcdta;
+                      %Subst(@_srcdta:@Offset2) = %Subst(@Input:7:73);
+                      Write Output @SourceDs;
+                      @InDs = *Off;
+                      @InPr = *Off;
+                      @InPi = *Off;
+                      @InCm = *Off;
+                      @Written = *On;
+
+x003               When %Subst(@_Input:6:1) =  'D'
+                   And  %Subst(@_Input:7:1) <> '*'
+                   And  %Subst(@_Input:7:1) <> '/';
+
+                      @_srcdat = @dat;
+                      @_srcseq = @seq;
+
+                      @DspecDs       = @Input;
+                      @DspecDs1      = @1Input;
+                      @DspecDsUpper  = @ToUpper(@Input);
+                      @a = %Scan('...': @DspecDs.@DProcPrefix);
+b004                  If @a > *Zeros;
+                         @ProcPrefix = %Subst(@DspecDs.@DProcPrefix:1:@a-1);
+                         @DspecDs       = @1Input;
+                         @DspecDsUpper  = @ToUpper(@1Input);
+e004                  EndIf;
+
+b004                  Select;
+
+x004                     When @DspecDsUpper.@DDsId = 'S ';
+
+b005                        If @InDs;
+
+                               WriteEndSpec(@seq: @dat: 'End-Ds;':
+                                            @Input: @1Input);
+                               @Written = *On;
+
+e005                        EndIf;
+
+b005                        If @InPr;
+
+                               WriteEndSpec(@seq: @dat: 'End-Pr;':
+                                            @Input: @1Input);
+                               @Written = *On;
+
+e005                        EndIf;
+
+b005                        If @InPi;
+
+                               WriteEndSpec(@seq: @dat: 'End-Pi;':
+                                            @Input: @1Input);
+                               @Written = *On;
+
+e005                        EndIf;
+
+                            @InDs = *Off;
+                            @InPr = *Off;
+                            @InPi = *Off;
+                            @InCm = *Off;
+                            @_srcdta = ConvertDeclareField(@ProcPrefix:
+                                                           @DspecDs);
+                            Write Output @SourceDs;
+                            @Written = *On;
+b005                        If @ProcPrefix <> *Blanks;
+                               @SkipNextLine  = *On;
+e005                        EndIf;
+
+x004                     When @DspecDsUpper.@DDsId = 'C ';
+
+b005                        If @InDs;
+
+                               WriteEndSpec(@seq: @dat: 'End-Ds;':
+                                            @Input: @1Input);
+
+e005                        EndIf;
+                            @InDs = *Off;
+                            @InPr = *Off;
+                            @InPi = *Off;
+                            @InCm = *Off;
+                            @_srcdta = ConvertConstant(@ProcPrefix:
+                                                       @DspecDs);
+                            Write Output @SourceDs;
+                            @Written = *On;
+
+x004                     When @InCm;
+
+                            @_srcdta = ConvertConstant(@ProcPrefix:
+                                                       @DspecDs);
+                            Write Output @SourceDs;
+                            @Written = *On;
+
+x004                     When @DspecDsUpper.@DDsId = 'DS';
+
+b005                        If @InDs;
+
+                               WriteEndSpec(@seq: @dat: 'End-Ds;':
+                                                  @Input: @1Input);
+
+e005                        EndIf;
+
+b005                        If @InPr;
+
+                               WriteEndSpec(@seq: @dat: 'End-Pr;':
+                                                  @Input: @1Input);
+
+e005                        EndIf;
+
+b005                        If @InPi;
+
+                               WriteEndSpec(@seq: @dat: 'End-Pi;':
+                                                  @Input: @1Input);
+
+e005                        EndIf;
+
+                            @InDs = *Off;
+                            @InPr = *Off;
+                            @InPi = *Off;
+                            @InCm = *Off;
+                            @_srcdta = ConvertDataStructure(@Program:
+                                                            @ProcPrefix:
+                                                            @DspecDs:
+                                                            @DspecDs1:
+                                                            @SkipNextLine);
+
+                            @a = %Scan('LIKEDS': @DspecDsUpper);
+b005                        If @a = *Zeros;
+                               @a = %Scan('LIKEREC': @DspecDsUpper);
+e005                        EndIf;
+b005                        If @a = *Zeros;
+                               @a = %Scan('End-Ds': @_srcdta);
+b006                           If @a = *Zeros;
+                                  @InDs = *On;
+e006                           EndIf;
+e005                        EndIf;
+                            Write Output @SourceDs;
+                            @Written = *On;
+b005                        If @ProcPrefix <> *Blanks;
+                               @SkipNextLine  = *On;
+e005                        EndIf;
+
+x004                     When @InDs;
+
+                            @_srcdta = ConvertDataStructure(@Program:
+                                                            @ProcPrefix:
+                                                            @DspecDs:
+                                                            @DspecDs1:
+                                                            @SkipNextLine);
+                            Write Output @SourceDs;
+                            @Written = *On;
+
+x004                     When @DspecDsUpper.@DDsId = 'PR';
+
+b005                        If @InDs;
+
+                               WriteEndSpec(@seq: @dat: 'End-Ds;':
+                                                  @Input: @1Input);
+
+e005                        EndIf;
+                            @InDs = *Off;
+                            @InPr = *On;
+                            @InPi = *Off;
+                            @InCm = *Off;
+                            ConvertProcedure(@ProcPrefix: @DspecDs: @seq: @dat);
+
+b005                        If @ProcPrefix <> *Blanks;
+                               @SkipNextLine  = *On;
+e005                        EndIf;
+
+x004                     When @InPr;
+
+                            ConvertProcedure(@ProcPrefix: @DspecDs: @seq: @dat);
+
+
+x004                     When @DspecDsUpper.@DDsId = 'PI';
+
+b005                        If @InDs;
+
+                               WriteEndSpec(@seq: @dat: 'End-Ds;':
+                                                  @Input: @1Input);
+
+e005                        EndIf;
+
+                            @InDs = *Off;
+                            @InPr = *Off;
+                            @InPi = *On;
+                            @InCm = *Off;
+                            @_srcdta = ConvertPrototype(@ProcPrefix:
+                                                        @DspecDs);
+                            Write Output @SourceDs;
+                            @Written = *On;
+b005                        If @ProcPrefix <> *Blanks;
+                               @SkipNextLine  = *On;
+e005                        EndIf;
+
+x004                     When @InPi;
+                            @_srcdta = ConvertPrototype(@ProcPrefix:
+                                                        @DspecDs);
+                            Write Output @SourceDs;
+                            @Written = *On;
+
+e004                  EndSl;
+
+b004                  If @InDs
+                      And @DspecDs.@DProcPrefix = *Blanks
+                      Or @InPi
+                      And @DspecDs.@DProcPrefix = *Blanks;
+                         Clear @_srcdta;
+                         Write Output @SourceDs;
+                         @Written = *On;
+e004                  EndIf;
+
+x003               When %Subst(@_Input:6:1) =  'C'
+                   And  %Subst(@_Input:7:1) <> '*'
+                   And  %Subst(@_Input:7:1) <> '/';
+
+                      @_srcdat = @dat;
+                      @_srcseq = @seq;
+                      @_srcdta = ConvertCSpec(@Program: @seq: @dat: @Input);
+
+                      @a = %Scan('AND;': @ToUpper(@_srcdta));
+b004                  If @a > *Zeros;
+                         @ContinueNextLine = *On;
+                         %Subst(@_srcdta:@a+3) = *Blanks;
+x004                  Else;
+                         @a = %Scan('ENDFOR;': @ToUpper(@_srcdta));
+b005                     If @a = *Zeros;
+                            @a = %Scan('OR;': @ToUpper(@_srcdta));
+b006                        If @a > *Zeros;
+                               @ContinueNextLine = *On;
+                               %Subst(@_srcdta:@a+2) = *Blanks;
+e006                        EndIf;
+e005                     EndIf;
+e004                  EndIf;
+
+                      Write Output @SourceDs;
+                      @Written = *On;
+
+x003               When %Subst(@_Input:6:1) =  'P'
+                   And  %Subst(@_Input:7:1) <> '*'
+                   And  %Subst(@_Input:7:1) <> '/';
+
+                      @_srcdat = @dat;
+                      @_srcseq = @seq;
+
+                      @PspecDs       = @Input;
+                      @PspecDs1      = @1Input;
+                      @PspecDsUpper  = @ToUpper(@Input);
+                      @a = %Scan('...': @PspecDs.@PProcPrefix);
+b004                  If @a > *Zeros;
+                         @ProcPrefix = %Subst(@PspecDs.@PProcPrefix:1:@a-1);
+                         @PspecDs       = @1Input;
+                         @PspecDsUpper  = @ToUpper(@1Input);
+                         @SkipNextLine  = *On;
+                         ConvertProcedure(@ProcPrefix: @DspecDs: @seq: @dat);
+
+x004                  Else;
+
+                         @InDs = *Off;
+                         @InPr = *Off;
+                         @InPi = *Off;
+                         @_srcdat = @dat;
+                         @_srcseq = @seq;
+                         ConvertPSpec(@Input: @seq: @dat);
+
+e004                  EndIf;
+
+x003               When @InDs
+                   And  %Subst(@Input:7:74) = *Blanks
+                   Or   @InPr
+                   And  %Subst(@Input:7:74) = *Blanks
+                   Or   @InPi
+                   And  %Subst(@Input:7:74) = *Blanks
+                   Or   @InDs
+                   And  %Subst(@Input:7:1) = '*'
+                   And  %Subst(@Input:8:73) = *Blanks
+                   Or   @InPr
+                   And  %Subst(@Input:7:1) = '*'
+                   And  %Subst(@Input:8:73) = *Blanks
+                   Or   @InPi
+                   And  %Subst(@Input:7:1) = '*'
+                   And  %Subst(@Input:8:73) = *Blanks;
+
+b004                  If @InDs;
+                         WriteEndSpec(@seq: @dat: 'End-Ds;':
+                                            @Input: @1Input);
+                         @InDs = *Off;
+e004                  EndIf;
+
+b004                  If @InPr;
+                         WriteEndSpec(@seq: @dat: 'End-Pr;':
+                                            @Input: @1Input);
+                         @InPr = *Off;
+e004                  EndIf;
+
+b004                  If @InPi;
+                         WriteEndSpec(@seq: @dat: 'End-Pi;':
+                                            @Input: @1Input);
+                         @InPi = *Off;
+e004                  EndIf;
+
+                      @Written = *On;
+
+x003               Other;
+
+b004                  If  %Subst(@Input:7:1) <> '*'
+                      And %Subst(@Input:7:1) <> '/';
+
+b005                     If @InDs;
+
+                            @InDs = *Off;
+                            @InPr = *Off;
+                            @InPi = *Off;
+                            @InCm = *Off;
+                            @_srcdat = @dat;
+                            @_srcseq = @seq;
+                            @_srcdta = ConvertDataStructure(@Program:
+                                                            @ProcPrefix:
+                                                            @DspecDs:
+                                                            @DspecDs1:
+                                                            @SkipNextLine);
+
+                            Write Output @SourceDs;
+                            @Written = *On;
+
+e005                     EndIf;
+
+b005                     If @InPr;
+
+                            @InDs = *Off;
+                            @InPr = *Off;
+                            @InPi = *Off;
+                            @InCm = *Off;
+                            @_srcdat = @dat;
+                            @_srcseq = @seq;
+                            ConvertProcedure(@ProcPrefix: @DspecDs: @seq: @dat);
+
+e005                     EndIf;
+
+b005                     If @InPi;
+
+                            @InDs = *Off;
+                            @InPr = *Off;
+                            @InPi = *Off;
+                            @InCm = *Off;
+                            @_srcdat = @dat;
+                            @_srcseq = @seq;
+                            @_srcdta = ConvertPrototype(@ProcPrefix: @DspecDs);
+
+
+                            Write Output @SourceDs;
+                            @Written = *On;
+
+e005                     EndIf;
+x004                  Else;
+
+b005                     If  %Subst(@Input:7:1) = '*';
+
+                            @_srcdat = @dat;
+                            @_srcseq = @seq;
+
+b006                        Select;
+
+x006                           When @InFSpec;
+
+b007                              If %Subst(@Input:8:92) <> *Blanks;
+                                     @_srcdta = SetComment(@Input: 'F':
+                                                           @Offset1);
+e007                              EndIf;
+
+x006                           When @InDSpec;
+
+b007                              If  @InDs
+                                  And %Subst(@1Input:6:2) = 'D ';
+                                     @DspecDs1 = @1Input;
+                                     Clear @a;
+b008                                 If @DspecDs1.@DDsid <> 'DS';
+                                        @a = %Scan('/COPY': @1_Input);
+e008                                 EndIf;
+b008                                 If @DspecDs1.@DDsid = 'DS'
+                                     Or @a > *Zeros;
+                                        WriteEndSpec(@seq: @dat: 'End-Ds;':
+                                                     @Input: @1Input);
+                                        @InDs = *Off;
+e008                                 EndIf;
+e007                              EndIf;
+
+b007                              If %Subst(@Input:8:92) <> *Blanks;
+b008                                 If  @InDs;
+                                        @_srcdta = SetComment(@Input: 'D':
+                                                              @Offset3);
+x008                                 Else;
+                                        @_srcdta = SetComment(@Input: 'D':
+                                                              @Offset2);
+e008                                 EndIf;
+e007                              EndIf;
+
+x006                           When @InISpec;
+
+b007                              If %Subst(@Input:8:92) <> *Blanks;
+                                     @_srcdta = SetComment(@Input: 'I':
+                                                           @Offset1);
+e007                              EndIf;
+
+x006                           When @InCSpec;
+
+b007                              If  %Subst(@Input:8:1)  = '*'
+                                  And %Subst(@Input:9:91) = *Blanks;
+x007                              Else;
+b008                                 If %Subst(@Input:8:92) <> *Blanks;
+                                        @_srcdta = SetComment(@Input: 'C':
+                                                              @Offset2);
+e008                                 EndIf;
+e007                              EndIf;
+
+x006                           When @InOSpec;
+
+b007                              If %Subst(@Input:8:92) <> *Blanks;
+                                     @_srcdta = SetComment(@Input: 'O':
+                                                           @Offset1);
+e007                              EndIf;
+
+x006                           Other;
+
+b006                              If @InDs;
+                                     WriteEndSpec(@seq: @dat: 'End-Ds;':
+                                                  @Input: @1Input);
+                                     @InDs = *Off;
+e006                              EndIf;
+
+b006                              If @InPr;
+                                     WriteEndSpec(@seq: @dat: 'End-Pr;':
+                                                  @Input: @1Input);
+                                     @InPr = *Off;
+e006                              EndIf;
+
+b006                              If @InPi;
+                                     WriteEndSpec(@seq: @dat: 'End-Pi;':
+                                                  @Input: @1Input);
+                                     @InPi = *Off;
+e004                              EndIf;
+
+                                  Clear @_srcdta;
+                                  @_srcdta = SetComment(@Input:
+                                                        %Subst(@Input:6:1):
+                                                        @Offset1);
+e006                        EndSl;
+
+                            Write Output @SourceDs;
+                            @Written = *On;
+
+e005                     EndIf;
+e004                  EndIf;
+
+b004                  If %Subst(@Input:7:1) = '/';
+
+b005                     If @InDs;
+
+                            WriteEndSpec(@seq: @dat: 'End-Ds;':
+                                               @Input: @1Input);
+                            @Written = *On;
+
+e005                     EndIf;
+
+                         @InDs = *Off;
+                         @InPr = *Off;
+                         @InPi = *Off;
+                         @InCm = *Off;
+e004                  EndIf;
+
+b004                  If  %Subst(@Input:7:1) <> '*';
+
+                         @_srcdat = @dat;
+                         @_srcseq = @seq;
+                         @_srcdta = @Input;
+
+                         @a = %Scan('DCL-PROC': @_Input);
+b005                     If @a = *Zeros;
+                            @a = %Scan('END-PROC': @_Input);
+e005                     EndIf;
+b005                     If @a > *Zeros;
+                            @b = %Scan('(': @_Input);
+b006                        If @b > *Zeros;
+                               Clear @a;
+                               Clear @b;
+e006                        EndIf;
+e005                     EndIf;
+b005                     If @a > *Zeros;
+                            %Subst(@_srcdta:1:1) = @Blue;
+e005                     EndIf;
+
+                         Write Output @SourceDs;
+                         @Written = *On;
+
+e004                  EndIf;
+e003            EndSl;
+
+b003            If Not @Written;
+
+                   @_srcdat = @dat;
+                   @_srcseq = @seq;
+                   @_srcdta = @Input;
+
+                   Write Output @SourceDs;
+                   @Written = *On;
+
+e003            EndIf;
+x002         Else;
+                @SkipNextLine  = *Off;
+e002         EndIf;
+
+             // Save Input Line
+             @PriorInput = @Input;
+x001      Else;
+
+b002         If @InDs;
+
+                WriteEndSpec(@seq: @dat: 'End-Ds;':
+                                   @Input: @1Input);
+                @Written = *On;
+
+e002         EndIf;
+
+             Close Output;
+
+             @InHSpec      = *Off;
+             @InFSpec      = *Off;
+             @InDSpec      = *Off;
+             @InCSpec      = *Off;
+             @SkipNextLine = *Off;
+             @NoMoreSpecs  = *Off;
+
+e001      EndIf;
+
+          End-Proc;
+
+          Dcl-Proc ConvertHSpec Export;
+
+          Dcl-pi ConvertHSpec char(100);
+            @Input char(100) Const;
+          End-pi;
+
+          Dcl-s @Output Like(@Input) Inz(*Blanks);
+
+          %Subst(@Output:@Offset2) = 'Ctl-opt ' + %Trim(%Subst(@Input:7:73));
+          @Output = %Trimr(@Output) + ';';
+
+          Return @Output;
+
+          End-Proc;
+
+          Dcl-Proc ConvertFSpec Export;
+
+          Dcl-pi ConvertFSpec char(100);
+            @Input char(100) Const;
+            @Input1 char(100) Const;
+          End-pi;
+
+          /define rpgstruct01
+          /define rpgstruct02
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct01
+          /undefine rpgstruct02
+
+          /copy qcpysrc,mflores
+
+          Dcl-ds @FspecDsILE     LikeDs(@FspecDsRPGILE);
+          Dcl-ds @FspecDsILE1    LikeDs(@FspecDsRPGILE);
+          Dcl-ds @FspecDsUpper   LikeDs(@FspecDsRPGILE);
+          Dcl-ds @FspecDsUpper1  LikeDs(@FspecDsRPGILE);
+
+          Dcl-s  @Output Like(@Input) Inz(*Blanks);
+          Dcl-s  @a      Int(5)       Inz(*Zeros);
+
+          @FspecDsILE    = @Input;
+          @FspecDsILE1   = @Input1;
+          @FspecDsUpper  = @ToUpper(@Input);
+          @FspecDsUpper1 = @ToUpper(@Input1);
+
+b001      If @FspecDsILE.@FFileName <> *Blanks;
+             %Subst(@Output:@Offset2) = 'Dcl-f '
+                                      + %Trim(@FspecDsILE.@FFileName);
+
+b002         If @FspecDsUpper.@FDevice = 'DISK';
+
+b003            If %Trim(@FspecDsUpper.@FWidth) <> *Blanks;
+
+                   @Output = %Trimr(@Output) + ' Disk('
+                           + %Trim(@FspecDsUpper.@FWidth) + ')';
+
+e003            EndIf;
+
+b003            Select;
+
+x003               When @FspecDsUpper.@FUsage = 'I';
+
+                      @Output = %Trimr(@Output) + ' Usage(*Input';
+b004                  If @FspecDsUpper.@FAdd = 'A';
+                         @Output = %Trimr(@Output) + ':*Output';
+e004                  EndIf;
+                      @Output = %Trimr(@Output) + ')';
+
+x003               When @FspecDsUpper.@FUsage = 'U';
+
+                      @Output = %Trimr(@Output) + ' Usage(*Update:*Delete';
+b004                  If @FspecDsUpper.@FAdd = 'A';
+                         @Output = %Trimr(@Output) + ':*Output';
+e004                  EndIf;
+                      @Output = %Trimr(@Output) + ')';
+
+x003               When @FspecDsUpper.@FUsage = 'O';
+
+                      @Output = %Trimr(@Output) + ' Usage(*Output)';
+
+e003            EndSl;
+
+b003            If @FspecDsUpper.@FKeyed = 'K';
+                   @Output = %Trimr(@Output) + ' Keyed';
+e003            EndIf;
+e002         EndIf;
+
+b002         If @FspecDsUpper.@FDevice = 'PRINTER';
+
+                @Output = %Trimr(@Output) + ' Printer';
+
+b003            If %Trim(@FspecDsUpper.@FWidth) <> *Blanks;
+                   @Output = %Trimr(@Output) + '('
+                           + %Trim(@FspecDsUpper.@FWidth) + ')';
+
+e003            EndIf;
+e002         EndIf;
+
+b002         If @FspecDsUpper.@FDevice = 'WORKSTN';
+
+                @Output = %Trimr(@Output) + ' Workstn';
+
+e002         EndIf;
+
+b002         If @FspecDsUpper.@FKeywords <> *Blanks;
+
+             // @a = %Scan('RENAME': @FspecDsUpper.@FKeywords);
+b003         // If @a > *Zeros;
+             //    @_srcdta = @Output;
+             //    Write Output @SourceDs;
+             //    Clear @Output;
+             //    %Subst(@Output:@Offset4) = %Trim(@FspecDsILE.@FKeywords);
+x003         // Else;
+                   @Output = %Trimr(@Output) + ' '
+                           + %Trim(@FspecDsILE.@FKeywords);
+e003         // EndIf;
+e002         EndIf;
+x001      Else;
+             %Subst(@Output:@Offset4) = %Trim(@FspecDsILE.@FKeywords);
+e001      EndIf;
+
+b001      If @FspecDsILE1.@FFileName               <> *Blanks
+          Or %Subst(@FspecDsUpper1.@FFileName:1:1) =  '*'
+          Or @FspecDsUpper1.@FOutSpecd             =  *Blanks
+          Or @FspecDsUpper1.@FOutSpecd             <> 'F';
+             @Output = %Trimr(@Output) + ';';
+e001      EndIf;
+
+          Return @Output;
+
+          End-Proc;
+
+          Dcl-Proc ConvertDataStructure Export;
+
+          Dcl-pi ConvertDataStructure char(100);
+            @Program    char(10) Const;
+            @ProcPrefix Like(@DspecDsRPGILE.@DProcPrefix);
+            @DspecDs    LikeDs(@DspecDsRPGILE);
+            @DspecDs1   LikeDs(@DspecDsRPGILE);
+            @SkipNext   Ind;
+          End-pi;
+
+          Dcl-ds @DspecDsUpper  LikeDs(@DspecDsRPGILE);
+          Dcl-ds @DspecDsUpper1 LikeDs(@DspecDsRPGILE);
+
+          Dcl-s @Output Char(100)      Inz(*Blanks);
+          Dcl-s @Length Int(5)         Inz(*Zeros);
+          Dcl-s @Dec    Int(5)         Inz(*Zeros);
+          Dcl-s @a      Int(5)         Inz(*Zeros);
+          Dcl-s @b      Int(5)         Inz(*Zeros);
+          Dcl-s @CurPos Int(10) Static Inz(*Zeros);
+          Dcl-s @_Field Like(ExtField) Inz(*Blanks);
+          Dcl-s @Type1  Like(Type)     Inz(*Blanks);
+          Dcl-s @Size1  Like(Size)     Inz(*Zeros);
+          Dcl-s @Dec1   Like(Dec)      Inz(*Zeros);
+
+          /define rpgstruct03
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct03
+
+          /copy qcpysrc,mflores
+
+          /define PGMFLDMOV02
+          /copy qcpysrc,pgmfldmov
+          /undefine PGMFLDMOV02
+
+b001      If @DspecDs <> *Blanks;
+
+             @SkipNext = *Off;
+             @DspecDsUpper  = @ToUpper(@DspecDs);
+             @DspecDsUpper1 = @ToUpper(@DspecDs1);
+
+b002         If %Trim(@DspecDsUpper.@DFieldName) <> *Blanks;
+                @_Field = %Trim(@DspecDsUpper.@DFieldName);
+b003            If GetAttributes(@Program: *BLanks: @_Field:
+                                 @Type1: @Size1: @Dec1);
+e003            EndIf;
+x002         Else;
+b003            If @InDs;
+b004               If ClearPriorRcd();
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+
+b002         Select;
+
+x002            When @DspecDsUpper.@DDsId =  'DS'
+                And  Not @InDs;
+
+b003               If @InProcedure;
+                      %Subst(@Output:@Offset2) = 'Dcl-Ds';
+x003               Else;
+                      %Subst(@Output:@Offset1) = 'Dcl-Ds';
+e003               EndIf;
+
+b003               If @ProcPrefix <> *Blanks;
+
+                      @Output = %Trimr(@Output) + ' '
+                              + %Trim(@ProcPrefix)
+                              + %Trim(@DspecDs.@DFieldName);
+
+x003               Else;
+
+b004                  If %Trim(@DspecDs.@DFieldName) <> *Blanks;
+
+                         @Output = %Trimr(@Output) + ' '
+                                 + %Trim(@DspecDs.@DFieldName);
+
+x004                  Else;
+
+                         @Output = %Trimr(@Output) + ' *N';
+
+e004                  EndIf;
+e003               EndIf;
+
+b003               If %Trim(@DspecDs.@DKeywords) <> *Blanks;
+
+                      @a = %Scan('EXTNAME': @DspecDsUpper.@DKeywords);
+b004                  If @a = *Zeros;
+                         @b = %Scan('EXTNAME': @DspecDsUpper1.@DKeywords);
+e004                  EndIf;
+b004                  If  @a = *Zeros
+                      And @b = *Zeros;
+b005                     If %Trim(@DspecDs.@DExternal) = 'E';
+                            @Output = %Trimr(@Output) + ' ExtName('''
+                                    + %Trim(@DspecDs.@DFieldName) + ''')';
+e005                     EndIf;
+
+                         @Output = %Trimr(@Output) + ' '
+                                 + %Trim(@DspecDs.@DKeywords);
+
+x004                  ElseIf @a <> *Zeros
+                      And    @b =  *Zeros;
+
+                         @b = %Scan(')': @DspecDsUpper.@DKeywords:@a);
+                         @Output = %Trimr(@Output) + ' '
+                                 + %Subst(@DspecDs.@DKeywords:@a:8)
+                                 + ''''
+                              + %Subst(@DspecDsUpper.@DKeywords:@a+8:@b-(@a+8))
+                                 + ''')';
+
+b005                     If @a = 1;
+
+                            @Output = %Trimr(@Output) + ' '
+                                 + %Trim(%Subst(@DspecDs.@DKeywords:@b+1));
+
+e005                     EndIf;
+
+b005                     If @a > 1;
+
+                            @Output = %Trimr(@Output) + ' '
+                                    + %Subst(@DspecDs.@DKeywords:1:@a-1);
+
+e005                     EndIf;
+
+x004                  ElseIf @a =  *Zeros
+                      And    @b <> *Zeros;
+
+                         @SkipNext = *On;
+
+                         @a = %Scan(')': @DspecDsUpper1.@DKeywords:@b);
+                         @Output = %Trimr(@Output) + ' '
+                                 + %Subst(@DspecDs1.@DKeywords:@b:8)
+                                 + ''''
+                              + %Subst(@DspecDsUpper1.@DKeywords:@b+8:@a-(@b+8))
+                                 + ''')';
+
+b005                     If @b = 1;
+
+                            @Output = %Trimr(@Output) + ' '
+                                 + %Trim(%Subst(@DspecDs1.@DKeywords:@a+1));
+
+e005                     EndIf;
+
+b005                     If @b > 1;
+
+                            @Output = %Trimr(@Output) + ' '
+                                    + %Subst(@DspecDs1.@DKeywords:1:@b-1);
+
+e005                     EndIf;
+
+                         @Output = %Trimr(@Output) + ' '
+                                 + %Trim(@DspecDs.@DKeywords);
+
+x004                  Else;
+
+                            @Output = %Trimr(@Output) + ' '
+                                    + %Trim(@DspecDs.@DKeywords);
+
+e004                  EndIf;
+x003               Else;
+b004                  If %Trim(@DspecDs.@DExternal) = 'E';
+                         @Output = %Trimr(@Output) + ' ExtName('''
+                                 + %Trim(@DspecDs.@DFieldName) + ''')';
+e004                  EndIf;
+e003               EndIf;
+
+b003               If %Trim(@DspecDs.@DTo) <> *Blanks;
+
+                         @Output = %Trimr(@Output) + ' Len('
+                                 + %Trim(@DspecDs.@DTo) + ')';
+
+e003               EndIf;
+
+b003               If @DspecDsUpper.@DSystem = 'S';
+
+                      @Output = %Trimr(@Output) + ' PsDs';
+
+e003               EndIf;
+
+                   @Output = %Trimr(@Output) + ';';
+
+x002            Other;
+
+b003               If @ProcPrefix <> *Blanks;
+
+                      %Subst(@Output:@Offset3) = %Trim(@ProcPrefix)
+                                               + %Trim(@DspecDs.@DFieldName);
+
+x003               Else;
+
+                      %Subst(@Output:@Offset3) = %Trim(@DspecDs.@DFieldName);
+
+e003               EndIf;
+
+b003               If %Trim(@DspecDs.@DFieldName) <> *Blanks;
+
+                      @Output = %Trimr(@Output) + ' '
+                              + %Trim(SetFieldDefinition(@DspecDs));
+
+x003               Else;
+
+                      %Subst(@Output:@Offset3) = SetFieldDefinition(@DspecDs);
+
+e003               EndIf;
+
+b003               If @DspecDs.@DFrom <> *Blanks;
+b004                  If @DspecDsUpper.@DFrom = '*PROC  '
+                      Or @DspecDsUpper.@DFrom = '*STATUS'
+                      Or @DspecDsUpper.@DFrom = '*ROUTIN'
+                      Or @DspecDsUpper.@DFrom = '*PARMS';
+                         @Output = %Trimr(@Output) + ' '
+                                 + %Trim(@DspecDs.@DFrom)
+                                 + %Trim(@DspecDs.@DTo);
+x004                  Else;
+                         @Output = %Trimr(@Output) + ' Pos('
+                                 + %Trim(@DspecDs.@DFrom) + ')';
+e004                  EndIf;
+e003               EndIf;
+
+                   @Output = %Trimr(@Output) + ';';
+
+b003               If %Trim(@DspecDs.@DComment) <> *Blanks;
+                      %Subst(@Output:71:30) = '// ' +
+                      %Trim(@DspecDs.@DComment);
+e003               EndIf;
+e002         EndSl;
+x001      Else;
+
+                   %Subst(@Output:@Offset2) = 'End-Ds;';
+
+e001      EndIf;
+
+          Return @Output;
+
+          End-Proc;
+
+          Dcl-Proc ConvertProcedure Export;
+
+          Dcl-pi ConvertProcedure;
+ˆˆ           @ProcPrefix Like(@DspecDsRPGILE.@DProcPrefix) Const;
+             @DspecDs    LikeDs(@DspecDsRPGILE);
+             @PSrcSeq    Zoned(6:2)                        Const;
+             @PSrcDat    Zoned(6)                          Const;
+          End-pi;
+
+          Dcl-ds @DspecDsUpper LikeDs(@DspecDsRPGILE);
+
+          Dcl-s @Output Char(100) Inz(*Blanks);
+          Dcl-s @Length Int(5)    Inz(*Zeros);
+          Dcl-s @Dec    Int(5)    Inz(*Zeros);
+          Dcl-s @a      Int(5)    Inz(*Zeros);
+
+          /define rpgstruct01
+          /define rpgstruct03
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct01
+          /undefine rpgstruct03
+
+          /copy qcpysrc,mflores
+
+          @DspecDsUpper  = @ToUpper(@DspecDs);
+
+b001      Select;
+
+x001         When @DspecDsUpper.@DDsId =  'PR';
+
+                %Subst(@Output:@Offset2) = 'Dcl-Pr';
+
+b002            If @ProcPrefix <> *Blanks;
+
+                   @Output = %Trimr(@Output) + ' '
+                           + %Trim(@ProcPrefix)
+                           + %Trim(@DspecDs.@DFieldName);
+
+x002            Else;
+
+                   @Output = %Trimr(@Output) + ' '
+                           + %Trim(@DspecDs.@DFieldName);
+
+e002            EndIf;
+
+                @Output = %Trimr(@Output) + ' '
+                        + %Trim(SetFieldDefinition(@DspecDs));
+
+                @a = %Scan('VARYING': @DspecDsUpper.@DKeywords);
+b002            If @a > *Zeros;
+                   %Subst(@DspecDs.@DKeywords:@a:7) = *Blanks;
+x002            Else;
+e002            EndIf;
+
+                @Output = %Trimr(@Output) + ';';
+
+x001         When @DspecDs = *Blanks;
+
+                %Subst(@Output:@Offset2) = 'End-Pr;';
+
+x001         When @DspecDsUpper.@DDsId =  'B ';
+
+                %Subst(@Output:@Offset2) = 'Dcl-Proc';
+
+                @Output = %Trimr(@Output) + ' '
+                        + %Trim(@ProcPrefix)
+                        + %Trim(@DspecDs.@DFieldName);
+                @Output = %Trimr(@Output) + ';';
+                %Subst(@Output:1:1) = @Blue;
+
+x001         When @DspecDsUpper.@DDsId =  'E ';
+
+                %Subst(@Output:@Offset2) = 'End-Proc';
+                %Subst(@Output:1:1) = @Blue;
+
+x001         Other;
+
+b002            If @ProcPrefix <> *Blanks;
+
+                   %Subst(@Output:@Offset3) = %Trim(@ProcPrefix)
+                                            + %Trim(@DspecDs.@DFieldName);
+
+x002            Else;
+
+                   %Subst(@Output:@Offset3) = %Trim(@DspecDs.@DFieldName);
+
+e002            EndIf;
+
+                @Output = %Trimr(@Output) + ' '
+                        + SetFieldDefinition(@DspecDs: *On);
+
+b002            If @DspecDs.@DFrom <> *Blanks;
+                   @Output = %Trimr(@Output) + ' Pos('
+                           + %Trim(@DspecDs.@DFrom) + ')';
+e002            EndIf;
+
+                @Output = %Trimr(@Output) + ';';
+
+b002            If %Trim(@DspecDs.@DComment) <> *Blanks;
+                   %Subst(@Output:71:30) = '// ' +
+                   %Trim(@DspecDs.@DComment);
+e002            EndIf;
+
+e001      EndSl;
+
+          @_srcdat = @PSrcSeq;
+          @_srcseq = @PSrcDat;
+          @_srcdta = @Output;
+          Write Output @SourceDs;
+          @Written = *On;
+
+          Return;
+
+          End-Proc;
+
+          Dcl-Proc ConvertPrototype Export;
+
+          Dcl-pi ConvertPrototype char(100);
+            @ProcPrefix Like(@DspecDsRPGILE.@DProcPrefix);
+            @DspecDs    LikeDs(@DspecDsRPGILE);
+          End-pi;
+
+          Dcl-ds @DspecDsUpper LikeDs(@DspecDsRPGILE);
+          Dcl-s  @Output       Char(100);
+          Dcl-s  @Length       Int(5) Inz(*Zeros);
+          Dcl-s  @Dec          Int(5) Inz(*Zeros);
+          Dcl-s  @a            Int(5) Inz(*Zeros);
+
+          /define rpgstruct03
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct03
+
+          /copy qcpysrc,mflores
+
+          @DspecDsUpper  = @ToUpper(@DspecDs);
+
+b001      Select;
+
+x001         When @DspecDsUpper.@DDsId =  'PI';
+
+                %Subst(@Output:@Offset2) = 'Dcl-Pi';
+
+b002            If @ProcPrefix <> *Blanks;
+
+                   @Output = %Trimr(@Output) + ' '
+                           + %Trim(@ProcPrefix)
+                           + %Trim(@DspecDs.@DFieldName);
+
+x002            Else;
+
+                   @Output = %Trimr(@Output) + ' '
+                           + %Trim(@DspecDs.@DFieldName);
+
+e002            EndIf;
+
+                @Output = %Trimr(@Output) + ' ' + SetFieldDefinition(@DspecDs);
+
+                @Output = %Trimr(@Output) + ';';
+
+x001         When @DspecDs = *Blanks;
+
+                %Subst(@Output:@Offset2) = 'End-Pi;';
+
+x001         Other;
+
+                %Subst(@Output:@Offset3) = %Trim(@ProcPrefix)
+                                         + %Trim(@DspecDs.@DFieldName);
+
+                @Output = %Trimr(@Output) + ' ' + SetFieldDefinition(@DspecDs);
+
+b002            If @DspecDs.@DFrom <> *Blanks;
+                   @Output = %Trimr(@Output) + ' Pos('
+                           + %Trim(@DspecDs.@DFrom) + ')';
+e002            EndIf;
+
+b002            If %Trim(@DspecDs.@DComment) <> *Blanks;
+                   %Subst(@Output:71:30) = '// ' +
+                   %Trim(@DspecDs.@DComment);
+e002            EndIf;
+
+                @Output = %Trimr(@Output) + ';';
+
+e001      EndSl;
+
+          Return @Output;
+
+          End-Proc;
+
+          Dcl-Proc ConvertDeclareField Export;
+
+          Dcl-pi ConvertDeclareField char(100);
+            @ProcPrefix Like(@DspecDsRPGILE.@DProcPrefix);
+            @DspecDs    LikeDs(@DspecDsRPGILE);
+          End-pi;
+
+          Dcl-ds @DspecDsUpper LikeDs(@DspecDsRPGILE);
+
+          Dcl-s @a          Int(5)        Inz(*Zeros);
+          Dcl-s @Output     Char(100)     Inz(*Blanks);
+          Dcl-s @OutputTemp Like(@Output) Inz(*Blanks);
+
+          /define rpgstruct03
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct03
+
+          /copy qcpysrc,mflores
+
+          @DspecDsUpper  = @ToUpper(@DspecDs);
+
+b001      If @DspecDsUpper.@DDsId =  'S ';
+
+b002         If @InProcedure;
+                %Subst(@Output:@Offset2) = 'Dcl-s ';
+x002         Else;
+                %Subst(@Output:@Offset1) = 'Dcl-s ';
+e002         EndIf;
+
+e001      EndIf;
+
+b001      If @ProcPrefix <> *Blanks;
+
+             @Output = %Trimr(@Output) + ' '
+                     + %Trim(@ProcPrefix)
+                     + %Trim(@DspecDs.@DFieldName);
+
+x001      Else;
+
+             @Output = %Trimr(@Output) + ' '
+                     + %Trim(@DspecDs.@DFieldName);
+
+e001      EndIf;
+
+          @Output = %Trimr(@Output) + ' '
+                  + %Trim(SetFieldDefinition(@DspecDs)) + ';';
+
+b001      If @DspecDsUpper.@DDsId <> 'S ';
+
+             %Subst(@OutputTemp:@Offset3) = %Trimr(@Output);
+             @Output = @OutputTemp;
+
+e001      EndIf;
+
+          Return @Output;
+
+          End-Proc;
+
+          Dcl-Proc ConvertConstant Export;
+
+          Dcl-pi ConvertConstant char(100);
+            @ProcPrefix Like(@DspecDsRPGILE.@DProcPrefix);
+            @DspecDs    LikeDs(@DspecDsRPGILE);
+          End-pi;
+
+          Dcl-ds @DspecDsUpper LikeDs(@DspecDsRPGILE);
+
+          Dcl-s @Output Char(100) Inz(*Blanks);
+          Dcl-s @a      Int(5)    Inz(*Zeros);
+
+          /define rpgstruct03
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct03
+
+          /copy qcpysrc,mflores
+
+          @DspecDsUpper  = @ToUpper(@DspecDs);
+
+b001      If Not @InCm;
+
+b002         If @DspecDsUpper.@DDsId =  'C ';
+
+b003            If @InProcedure;
+                   %Subst(@Output:@Offset2) = 'Dcl-c ';
+x003            Else;
+                   %Subst(@Output:@Offset1) = 'Dcl-c ';
+e003            EndIf;
+
+b003            If @ProcPrefix <> *Blanks;
+
+                   @Output = %Trimr(@Output) + ' '
+                           + %Trim(@ProcPrefix)
+                           + %Trim(@DspecDs.@DFieldName);
+
+x003            Else;
+
+                   @Output = %Trimr(@Output) + ' '
+                           + %Trim(@DspecDs.@DFieldName);
+e003            EndIf;
+
+                @DspecDs.@DKeywords = SetConstant(@DspecDs.@DKeywords);
+
+                @Output = %Trimr(@Output) + ' '
+                        + %Trim(@DspecDs.@DKeywords);
+
+b003            If %Trim(@DspecDs.@DComment) <> *Blanks;
+                   %Subst(@Output:71:30) = '// ' +
+                   %Trim(@DspecDs.@DComment);
+e003            EndIf;
+e002         EndIf;
+x001      Else;
+
+             @DspecDs.@DKeywords = SetConstant(@DspecDs.@DKeywords);
+
+             %Subst(@Output:@Offset4) = %Trim(@DspecDs.@DKeywords);
+             @InCm = *Off;
+
+e001      EndIf;
+
+          @a = %Scan('- ': @Output);
+b001      If @a = *Zeros;
+             @a = %Scan('+ ': @Output);
+e001      EndIf;
+b001      If @a <> *Zeros;
+             @InCm = *On;
+x001      Else;
+             @Output = %Trimr(@Output) + ';';
+e001      EndIf;
+
+          Return @Output;
+
+          End-Proc;
+
+          Dcl-Proc ConvertCSpec Export;
+
+          Dcl-pi ConvertCSpec char(100);
+             @Program Char(10)   Const;
+             @seq     Zoned(6:2) Const;
+             @dat     Zoned(6:0) Const;
+             @Input   Char(100)  Const;
+          End-pi;
+
+          /define rpgstruct01
+          /define rpgstruct05
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct01
+          /undefine rpgstruct05
+
+          Dcl-ds @CspecDs LikeDs(@CspecDsRPGILE);
+          Dcl-ds @CSUpper LikeDs(@CspecDsRPGILE);
+
+          Dcl-s @EvalInd    Ind            Inz(*Off)    Static;
+          Dcl-s @InSub      Ind            Inz(*Off)    Static;
+          Dcl-s @FirstCase  Ind            Inz(*Off)    Static;
+          Dcl-s @ModeInd    Ind            Inz(*Off);
+          Dcl-s @Found1     Ind            Inz(*Off);
+          Dcl-s @Found2     Ind            Inz(*Off);
+          Dcl-s @Found3     Ind            Inz(*Off);
+          Dcl-s @seq2       Zoned(6:2)     Inz(*Zeros);
+          Dcl-s @dat2       Zoned(6)       Inz(*Zeros);
+          Dcl-s @Ind        Packed(5)      Inz(*Zeros)  Static;
+          Dcl-s @a          Int(5)         Inz(*Zeros);
+          Dcl-s @b          Int(5)         Inz(*Zeros);
+          Dcl-s @SelectSave Int(5)         Inz(*Zeros)  Static;
+          Dcl-s @Index1     Char(10)       Inz(*Blanks);
+          Dcl-s @Index2     Char(10)       Inz(*Blanks);
+          Dcl-s @Mode       Char(4)        Inz(@rpg4)   Static;
+          Dcl-s @NestA      Char(30)       Inz(*Blanks) Static Dim(40);
+          Dcl-s @OptA       Char(10)       Inz(*Blanks) Static Dim(40);
+          Dcl-s @Sign       Char(2)        Inz(*Blanks);
+          Dcl-s @NewResult  Like(@Input)   Inz(*Blanks);
+          Dcl-s @SavResult  Like(@Input)   Inz(*Blanks);
+          Dcl-s @NewSeq     Like(@Seq)     Inz(*Zeros)  Static;
+          Dcl-s @_Field     Like(ExtField) Inz(*Blanks);
+          Dcl-s @Type1      Like(Type)     Inz(*Blanks);
+          Dcl-s @Size1      Like(Size)     Inz(*Zeros);
+          Dcl-s @Dec1       Like(Dec)      Inz(*Zeros);
+          Dcl-s @Type2      Like(Type)     Inz(*Blanks);
+          Dcl-s @Size2      Like(Size)     Inz(*Zeros);
+          Dcl-s @Dec2       Like(Dec)      Inz(*Zeros);
+          Dcl-s @Type3      Like(Type)     Inz(*Blanks);
+          Dcl-s @Size3      Like(Size)     Inz(*Zeros);
+          Dcl-s @Dec3       Like(Dec)      Inz(*Zeros);
+
+          Dcl-c @rpg4   Const('RPG4');
+          Dcl-c @On     Const('''1''');
+          Dcl-c @Off    Const('''0''');
+          Dcl-c @BegSr  Const('BEGSR');
+          Dcl-c @EndSr  Const('ENDSR');
+          Dcl-c @Select Const('SELECT');
+          Dcl-c @Cas    Const('CAS');
+          Dcl-c @CasEq  Const('CASEQ');
+          Dcl-c @CasNE  Const('CASNE');
+          Dcl-c @CasGE  Const('CASGE');
+          Dcl-c @CasLE  Const('CASLE');
+          Dcl-c @CasGT  Const('CASGT');
+          Dcl-c @CasLT  Const('CASLT');
+          Dcl-c @Other  Const('OTHER');
+          Dcl-c @Exsr   Const('EXSR');
+          Dcl-c @Move   Const('MOVE');
+          Dcl-c @Movel  Const('MOVEL');
+          Dcl-c @Movep  Const('MOVE(P)');
+          Dcl-c @Movelp Const('MOVEL(P)');
+          Dcl-c @Eval   Const('EVAL');
+          Dcl-c @ZAdd   Const('Z-ADD');
+          Dcl-c @In     Const('IN');
+          Dcl-c @Out    Const('OUT');
+          Dcl-c @Do     Const('DO');
+          Dcl-c @If     Const('IF');
+          Dcl-c @IfEq   Const('IFEQ');
+          Dcl-c @IfNE   Const('IFNE');
+          Dcl-c @IfGE   Const('IFGE');
+          Dcl-c @IfGT   Const('IFGT');
+          Dcl-c @IfLE   Const('IFLE');
+          Dcl-c @IfLT   Const('IFLT');
+          Dcl-c @OrEq   Const('OREQ');
+          Dcl-c @OrNE   Const('ORNE');
+          Dcl-c @OrGE   Const('ORGE');
+          Dcl-c @OrGT   Const('ORGT');
+          Dcl-c @OrLE   Const('ORLE');
+          Dcl-c @OrLT   Const('ORLT');
+          Dcl-c @AndEq  Const('ANDEQ');
+          Dcl-c @AndNE  Const('ANDNE');
+          Dcl-c @AndGE  Const('ANDGE');
+          Dcl-c @AndGT  Const('ANDGT');
+          Dcl-c @AndLE  Const('ANDLE');
+          Dcl-c @AndLT  Const('ANDLT');
+          Dcl-c @When   Const('WHEN');
+          Dcl-c @WhenEq Const('WHENEQ');
+          Dcl-c @WhenNE Const('WHENNE');
+          Dcl-c @WhenGE Const('WHENGE');
+          Dcl-c @WhenGT Const('WHENGT');
+          Dcl-c @WhenLE Const('WHENLE');
+          Dcl-c @WhenLT Const('WHENLT');
+          Dcl-c @Dow    Const('DOW');
+          Dcl-c @DowEq  Const('DOWEQ');
+          Dcl-c @DowNE  Const('DOWNE');
+          Dcl-c @DowGE  Const('DOWGE');
+          Dcl-c @DowGT  Const('DOWGT');
+          Dcl-c @DowLE  Const('DOWLE');
+          Dcl-c @DowLT  Const('DOWLT');
+          Dcl-c @Dou    Const('DOU');
+          Dcl-c @DouEq  Const('DOUEQ');
+          Dcl-c @DouNE  Const('DOUNE');
+          Dcl-c @DouGE  Const('DOUGE');
+          Dcl-c @DouGT  Const('DOUGT');
+          Dcl-c @DouLE  Const('DOULE');
+          Dcl-c @DouLT  Const('DOULT');
+          Dcl-c @For    Const('FOR');
+          Dcl-c @Readc  Const('READC');
+          Dcl-c @Reade  Const('READE');
+          Dcl-c @Readpe Const('READPE');
+          Dcl-c @Read   Const('READ');
+          Dcl-c @Readp  Const('READP');
+          Dcl-c @Chain  Const('CHAIN');
+          Dcl-c @Chaine Const('CHAIN(E)');
+          Dcl-c @Chainn Const('CHAIN(N)');
+          Dcl-c @Unlock Const('UNLOCK');
+          Dcl-c @Setll  Const('SETLL');
+          Dcl-c @Setgt  Const('SETGT');
+          Dcl-c @Write  Const('WRITE');
+          Dcl-c @Update Const('UPDATE');
+          Dcl-c @Delete Const('DELETE');
+          Dcl-c @Exfmt  Const('EXFMT');
+          Dcl-c @Else   Const('ELSE');
+          Dcl-c @EndDo  Const('ENDDO');
+          Dcl-c @EndCs  Const('ENDCS');
+          Dcl-c @EndIf  Const('ENDIF');
+          Dcl-c @EndFor Const('ENDFOR');
+          Dcl-c @End    Const('END');
+          Dcl-c @Add    Const('ADD');
+          Dcl-c @Sub    Const('SUB');
+          Dcl-c @Mult   Const('MULT');
+          Dcl-c @Div    Const('DIV');
+          Dcl-c @Leave  Const('LEAVE');
+          Dcl-c @Open   Const('OPEN');
+          Dcl-c @Close  Const('CLOSE');
+          Dcl-c @Except Const('EXCEPT');
+          Dcl-c @Seton  Const('SETON');
+          Dcl-c @SetOff Const('SETOFF');
+          Dcl-c @Clear  Const('CLEAR');
+          Dcl-c @Return Const('RETURN');
+          Dcl-c @Blank  Const('*BLANK');
+          Dcl-c @Blanks Const('*BLANKS');
+          Dcl-c @Zero   Const('*ZERO');
+          Dcl-c @Zeros  Const('*ZEROS');
+          Dcl-c @Like   Const('*LIKE');
+          Dcl-c @Define Const('DEFINE');
+          Dcl-c @Callp  Const('CALLP');
+          Dcl-c @Iter   Const('ITER');
+
+          /define mflores203
+          /copy qcpysrc,mflores
+          /undefine mflores203
+
+          /define PGMFLDMOV02
+          /copy qcpysrc,pgmfldmov
+          /undefine PGMFLDMOV02
+
+          @CspecDs       = @Input;
+          @CSUpper       = @ToUpper(@Input);
+          @seq2          = @seq;
+          @dat2          = @dat;
+          @_srcseq       = @seq;
+          @_srcdat       = @dat;
+
+b001      If @Ind < 1;
+             @Ind = 1;
+             Reset @SelectSave;
+e001      EndIf;
+
+          @_Field = %Trim(@CSUpper.@CField1);
+b001      If @_Field <> *Blanks;
+b002         If GetAttributes(@Program: *BLanks: @_Field:
+                              @Type1: @Size1: @Dec1);
+e002         EndIf;
+e001      EndIf;
+
+          @_Field = %Trim(@CSUpper.@CField2);
+b001      If @_Field <> *Blanks;
+b001         If GetAttributes(@Program: *BLanks: @_Field:
+                              @Type2: @Size2: @Dec2);
+e002         EndIf;
+e001      EndIf;
+
+          @_Field = %Trim(@CSUpper.@CResult);
+b001      If @_Field <> *Blanks;
+b001         If GetAttributes(@Program: *BLanks: @_Field:
+                              @Type3: @Size3: @Dec3);
+e002         EndIf;
+e001      EndIf;
+
+b001      If  @Type2  = 'CONST'
+          And @Type3 = 'P'
+          Or  @Type2  = 'CONST'
+          And @Type3 = 'S'
+          Or  @Type2  = 'CONST'
+          And @Type3 = 'B';
+                @_Field = %Trim(@CSUpper.@CField2);
+     C                   Testn                   @_Field              99
+e001      EndIf;
+
+          *In99 = *Off;
+b001      If  @Type2  = 'CONST'
+          And @Type3 = 'N'
+          And %Trim(@CSUpper.@CField2) = @On;
+             *In99 = *On;
+e001      EndIf;
+b001      If  @Type2  = 'CONST'
+          And @Type3 = 'N'
+          And %Trim(@CSUpper.@CField2) = @Off;
+             *In99 = *On;
+e001      EndIf;
+
+b001      If  @Type2  = 'CONST'
+          And @Type1 = 'N'
+          And %Trim(@CSUpper.@CField2) = @On;
+             *In99 = *On;
+e001      EndIf;
+b001      If  @Type2  = 'CONST'
+          And @Type1 = 'N'
+          And %Trim(@CSUpper.@CField2) = @Off;
+             *In99 = *On;
+e001      EndIf;
+
+b001      Select;
+
+x001         When %Trim(@CSUpper.@COption) = @Move
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 = @Type3
+             Or   %Trim(@CSUpper.@COption) = @Movep
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 = @Type3
+             Or   %Trim(@CSUpper.@COption) = @Move
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type2 =  *Blanks
+             Or   %Trim(@CSUpper.@COption) = @Move
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type3 =  *Blanks
+             Or   %Trim(@CSUpper.@COption) = @Move
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type2 =  'CONST'
+             And  *In99
+             Or   %Trim(@CSUpper.@COption) = @Move
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type2 =  'CONST'
+             And  @Type3 = 'A'
+             Or   %Trim(@CSUpper.@COption) = @Movep
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type2 =  *Blanks
+             Or   %Trim(@CSUpper.@COption) = @Movep
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type3 =  *Blanks
+             Or   %Trim(@CSUpper.@COption) = @Movep
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type2 =  'CONST'
+             And  *In99
+             Or   %Trim(@CSUpper.@COption) = @Movep
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type2 =  'CONST'
+             And  @Type3 = 'A';
+                @ContinueNextLine = *Off;
+                @EvalInd = *Off;
+                @ModeInd = *On;
+                Reset @NewResult;
+b002            If %Trim(@CSUpper.@COption) = @Movep;
+                   Reset @NewResult;
+                   @NewResult = 'Clear '
+                              + %Trimr(%Triml(@CspecDs.@CResult)) + ';';
+                   @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+                   Clear @CSUpper.@CComments;
+                   @SavResult = @Input;
+                   @_srcdta = @NewResult;
+                   Write Output @SourceDs;
+                   @_srcdta = @SavResult;
+                   @NewSeq += 1;
+e002            EndIf;
+b002            If  @CSUpper.@CField2 <> @Blank
+                And @CSUpper.@CField2 <> @Blanks
+                And @CSUpper.@CField2 <> @Zero
+                And @CSUpper.@CField2 <> @Zeros;
+b003               If  @Type2 =  'A'
+                   And @Size2 <> @Size3;
+                      @NewResult = 'Evalr ' + %Trimr(@CspecDs.@CResult) + ' = '
+                                 + %Trimr(%Triml(@CspecDs.@CField2)) + ';';
+x003               Else;
+                      @NewResult = %Trimr(@CspecDs.@CResult) + ' = '
+                                 + %Trimr(%Triml(@CspecDs.@CField2)) + ';';
+e003               EndIf;
+x002            Else;
+                   @NewResult = 'Clear '
+                                 + %Trimr(%Triml(@CspecDs.@CResult)) + ';';
+e002            EndIf;
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) =  @Move
+             And  @Type2                   =  'CONST'
+             And  @Type3                   <> 'A'
+             And  @Type3                   <> 'N'
+             Or   %Trim(@CSUpper.@COption) =  @Movel
+             And  @Type2                   =  'CONST'
+             And  @Type3                   <> 'A'
+             And  @Type3                   <> 'N';
+                @NewResult = 'Clear '
+                                 + %Trimr(%Triml(@CspecDs.@CResult)) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Movel
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 = @Type3
+             Or   %Trim(@CSUpper.@COption) = @Movelp
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 = @Type3
+             Or   %Trim(@CSUpper.@COption) = @Movel
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type2 =  *Blanks
+             Or   %Trim(@CSUpper.@COption) = @Movel
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type3 =  *Blanks
+             Or   %Trim(@CSUpper.@COption) = @Movel
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type2 =  'CONST'
+             And  *In99
+             Or   %Trim(@CSUpper.@COption) = @Movel
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type2 =  'CONST'
+             And  @Type3 = 'A'
+             Or   %Trim(@CSUpper.@COption) = @Movelp
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type2 =  *Blanks
+             Or   %Trim(@CSUpper.@COption) = @Movelp
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type3 =  *Blanks
+             Or   %Trim(@CSUpper.@COption) = @Movelp
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type2 =  'CONST'
+             And  *In99
+             Or   %Trim(@CSUpper.@COption) = @Movelp
+             And  %Trim(@CSUpper.@CSize)   = *Blanks
+             And  @Type2 <> @Type3
+             And  @Type2 =  'CONST'
+             And  @Type3 = 'A';
+                @ContinueNextLine = *Off;
+                @EvalInd = *Off;
+                @ModeInd = *On;
+                Reset @NewResult;
+b002            If %Trim(@CSUpper.@COption) = @Movelp;
+                   Reset @NewResult;
+                   @NewResult = 'Clear '
+                              + %Trimr(%Triml(@CspecDs.@CResult)) + ';';
+                   @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+                   Clear @CSUpper.@CComments;
+                   @SavResult = @Input;
+                   @_srcdta = @NewResult;
+                   Write Output @SourceDs;
+                   @_srcdta = @SavResult;
+                   @NewSeq += 1;
+e002            EndIf;
+b002            If  @CSUpper.@CField2 <> @Blank
+                And @CSUpper.@CField2 <> @Blanks
+                And @CSUpper.@CField2 <> @Zero
+                And @CSUpper.@CField2 <> @Zeros;
+                   @NewResult = %Trimr(@CspecDs.@CResult) + ' = '
+                              + %Trimr(%Triml(@CspecDs.@CField2)) + ';';
+x002            Else;
+                   @NewResult = 'Clear '
+                              + %Trimr(%Triml(@CspecDs.@CResult)) + ';';
+e002            EndIf;
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Eval;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+b002            If not @EvalInd;
+                   @NewResult =  %Trim(@CspecDs.@CExtFact2) + '\';
+                   @b = %Scan('\': @NewResult);
+b003               If %Subst(@NewResult: @b - 1: 1) = '+';
+                      @EvalInd = *On;
+                      @NewResult = %Trim(@CspecDs.@CExtFact2);
+x003               Else;
+                      @NewResult = %Trim(@CspecDs.@CExtFact2) + ';';
+e003               EndIf;
+e002            EndIf;
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @ZAdd
+             And  %Trim(@CSUpper.@CSize)   = *Blanks;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+b002            If @CSUpper.@CField2 = @Zero
+                Or @CSUpper.@CField2 = @Zeros
+                Or @CSUpper.@CField2 = '0         ';
+                   Reset @NewResult;
+                   @NewResult = 'Clear '
+                              + %Trimr(%Triml(@CspecDs.@CResult)) + ';';
+x002            Else;
+                   Reset @NewResult;
+                   @NewResult = 'Clear '
+                              + %Trimr(%Triml(@CspecDs.@CResult)) + ';';
+                   @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+                   Clear @CSUpper.@CComments;
+                   @SavResult = @_srcdta;
+                   @_srcdta = @NewResult;
+                   Write Output @SourceDs;
+                   @_srcdta = @SavResult;
+                   @NewSeq += 1;
+                   Reset @NewResult;
+                   @NewResult = %Trimr(@CspecDs.@CResult)   + ' = '
+                              + %Trimr(%Triml(@CspecDs.@CField2)) + ';';
+e002            EndIf;
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @SetOn;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+b002            If @CSUpper.@CRInd1 <> *Blanks;
+                   @NewResult = '*In' +  @CspecDs.@CRInd1 + ' = *On;';
+                   @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+b003               If @CSUpper.@CRInd2 <> *Blanks
+                   Or @CSUpper.@CRInd3 <> *Blanks;
+                      Clear @CSUpper.@CComments;
+                      @SavResult = @_srcdta;
+                      @_srcdta = @NewResult;
+                      Write Output @SourceDs;
+                      @_srcdta = @SavResult;
+                      @NewSeq += 1;
+e003               EndIf;
+e002            EndIf;
+b002            If @CSUpper.@CRInd2 <> *Blanks;
+                   @NewResult = '*In' +  @CspecDs.@CRInd2 + ' = *On;';
+                   @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+b003               If @CSUpper.@CRInd3 <> *Blanks;
+                      Clear @CSUpper.@CComments;
+                      @SavResult = @_srcdta;
+                      @_srcdta = @NewResult;
+                      Write Output @SourceDs;
+                      @_srcdta = @SavResult;
+                      @NewSeq += 1;
+e003               EndIf;
+e002            EndIf;
+b002            If @CSUpper.@CRInd3 <> *Blanks;
+                   @NewResult = '*In' +  @CspecDs.@CRInd3 + ' = *On;';
+                   @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+e002            EndIf;
+
+x001         When %Trim(@CSUpper.@COption) = @SetOff;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+b002            If @CSUpper.@CRInd1 <> *Blanks;
+                   @NewResult = '*In' +  @CspecDs.@CRInd1 + ' = *Off;';
+                   @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+b003               If @CSUpper.@CRInd2 <> *Blanks
+                   Or @CSUpper.@CRInd3 <> *Blanks;
+                      Clear @CSUpper.@CComments;
+                      @SavResult = @_srcdta;
+                      @_srcdta = @NewResult;
+                      Write Output @SourceDs;
+                      @_srcdta = @SavResult;
+                      @NewSeq += 1;
+e003               EndIf;
+e002            EndIf;
+b002            If @CSUpper.@CRInd2 <> *Blanks;
+                   @NewResult = '*In' +  @CspecDs.@CRInd2 + ' = *Off;';
+                   @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+b003               If @CSUpper.@CRInd3 <> *Blanks;
+                      Clear @CSUpper.@CComments;
+                      @SavResult = @_srcdta;
+                      @_srcdta = @NewResult;
+                      Write Output @SourceDs;
+                      @_srcdta = @SavResult;
+                      @NewSeq += 1;
+e003               EndIf;
+e002            EndIf;
+b002            If @CSUpper.@CRInd3 <> *Blanks;
+                   @NewResult = '*In' +  @CspecDs.@CRInd3 + ' = *Off;';
+                   @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+e002            EndIf;
+
+x001         When %Trim(@CSUpper.@COption) = @Select;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Select;';
+                @NestA(@Ind) = '// ' + %Trim(@NewResult);
+                @OptA(@Ind)  = %Trim(@CspecDs.@COption);
+                @NewResult = IndentLine(@NewResult: @Ind: 'b': @InSub);
+                @SelectSave = @Ind;
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COption) = @DO;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'For ' + %Trim(@CspecDs.@CResult) + ' = 1';
+b002            If %Trim(@CspecDs.@CField1) <> *Blanks;
+                   @NewResult = %Trim(@NewResult) + ' By '
+                              + %Trim(@CspecDs.@CField1);
+e002            EndIf;
+                @NewResult = %Trim(@NewResult) + ' To '
+                           + %Trim(@CspecDs.@CField2) + ';';
+                @NestA(@Ind) = '// ' + %Trim(@NewResult);
+                @OptA(@Ind)  = @For;
+                @NewResult = IndentLine(@NewResult: @Ind: 'b': @InSub);
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COption) = @If;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'If ' + %Trim(@CspecDs.@CExtFact2) + ';';
+                @NestA(@Ind) = '// ' + %Trim(@NewResult);
+                @OptA(@Ind)  = @If;
+                @NewResult = IndentLine(@NewResult: @Ind: 'b': @InSub);
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COptionIf) = @If;
+                @ContinueNextLine = *Off;
+                @EvalInd = *Off;
+b002            Select;
+x002               When %Trim(@CSUpper.@COption) = @IfEq;
+                      @Sign = '=';
+x002               When %Trim(@CSUpper.@COption) = @IfNE;
+                      @Sign = '<>';
+x002               When %Trim(@CSUpper.@COption) = @IfGE;
+                      @Sign = '>=';
+x002               When %Trim(@CSUpper.@COption) = @IfGT;
+                      @Sign = '>';
+x002               When %Trim(@CSUpper.@COption) = @IfLE;
+                      @Sign = '<=';
+x002               When %Trim(@CSUpper.@COption) = @IfLT;
+                      @Sign = '<';
+e002            EndSl;
+                @ModeInd = *On;
+                Reset @NewResult;
+                @NewResult = SetResult('If': @Input: @Sign:
+                                        @Type1: @Type2: @Type3);
+                @NestA(@Ind) = '// ' + %Trim(@NewResult);
+                @OptA(@Ind)  = @If;
+                @NewResult = IndentLine(@NewResult: @Ind: 'b': @InSub);
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COptionIf) = 'OR';
+                @ContinueNextLine = *Off;
+                @EvalInd = *Off;
+b002            Select;
+x002               When %Trim(@CSUpper.@COption) = @OrEq;
+                      @Sign = '=';
+x002               When %Trim(@CSUpper.@COption) = @OrNE;
+                      @Sign = '<>';
+x002               When %Trim(@CSUpper.@COption) = @OrGE;
+                      @Sign = '>=';
+x002               When %Trim(@CSUpper.@COption) = @OrGT;
+                      @Sign = '>';
+x002               When %Trim(@CSUpper.@COption) = @OrLE;
+                      @Sign = '<=';
+x002               When %Trim(@CSUpper.@COption) = @OrLT;
+                      @Sign = '<';
+e002            EndSl;
+b002            If ClearPriorRcd();
+e002            EndIf;
+                @ModeInd = *On;
+                Reset @NewResult;
+                @NewResult = SetResult('Or': @Input: @Sign:
+                                        @Type1: @Type2: @Type3);
+                @Ind -= 1;
+b002            If @Ind <= *Zeros;
+                   @Ind = 1;
+e002            EndIf;
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COptionDow) = 'AND';
+                @ContinueNextLine = *Off;
+                @EvalInd = *Off;
+b002            Select;
+x002               When %Trim(@CSUpper.@COption) = @AndEq;
+                      @Sign = '=';
+x002               When %Trim(@CSUpper.@COption) = @AndNE;
+                      @Sign = '<>';
+x002               When %Trim(@CSUpper.@COption) = @AndGE;
+                      @Sign = '>=';
+x002               When %Trim(@CSUpper.@COption) = @AndGT;
+                      @Sign = '>';
+x002               When %Trim(@CSUpper.@COption) = @AndLE;
+                      @Sign = '<=';
+x002               When %Trim(@CSUpper.@COption) = @AndLT;
+                      @Sign = '<';
+e002            EndSl;
+b002            If ClearPriorRcd();
+e002            EndIf;
+                @ModeInd = *On;
+                Reset @NewResult;
+                @NewResult = SetResult('And': @Input: @Sign:
+                                        @Type1: @Type2: @Type3);
+                @Ind -= 1;
+b002            If @Ind <= *Zeros;
+                   @Ind = 1;
+e002            EndIf;
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COption) = @Dow;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Dow ' + %Trim(@CspecDs.@CField2)
+                                    + %Trim(@CspecDs.@CResult) + ';';
+                @NestA(@Ind) = '// ' + %Trim(@NewResult);
+                @OptA(@Ind)  = @Dow;
+                @NewResult = IndentLine(@NewResult: @Ind: 'b': @InSub);
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COptionDow) = @Dow;
+                @EvalInd = *Off;
+b002            Select;
+x002               When %Trim(@CSUpper.@COption) = @DowEq;
+                      @Sign = '=';
+x002               When %Trim(@CSUpper.@COption) = @DowNE;
+                      @Sign = '<>';
+x002               When %Trim(@CSUpper.@COption) = @DowGE;
+                      @Sign = '>=';
+x002               When %Trim(@CSUpper.@COption) = @DowGT;
+                      @Sign = '>';
+x002               When %Trim(@CSUpper.@COption) = @DowLE;
+                      @Sign = '<=';
+x002               When %Trim(@CSUpper.@COption) = @DowLT;
+                      @Sign = '<';
+e002            EndSl;
+                @ModeInd = *On;
+                Reset @NewResult;
+                @NewResult = SetResult('Dow': @Input: @Sign:
+                                        @Type1: @Type2: @Type3);
+                @NestA(@Ind) = '// ' + %Trim(@NewResult);
+                @OptA(@Ind)  = @Dow;
+                @NewResult = IndentLine(@NewResult: @Ind: 'b': @InSub);
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COption) = @Dou;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Dou ' + %Trim(@CspecDs.@CField2)
+                                    + %Trim(@CspecDs.@CResult) + ';';
+                @NestA(@Ind) = '// ' + %Trim(@NewResult);
+                @OptA(@Ind)  = @Dou;
+                @NewResult = IndentLine(@NewResult: @Ind: 'b': @InSub);
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COptionDow) = @Dou;
+                @ContinueNextLine = *Off;
+                @EvalInd = *Off;
+b002            Select;
+x002               When %Trim(@CSUpper.@COption) = @DouEq;
+                      @Sign = '=';
+x002               When %Trim(@CSUpper.@COption) = @DouNE;
+                      @Sign = '<>';
+x002               When %Trim(@CSUpper.@COption) = @DouGE;
+                      @Sign = '>=';
+x002               When %Trim(@CSUpper.@COption) = @DouGT;
+                      @Sign = '>';
+x002               When %Trim(@CSUpper.@COption) = @DouLE;
+                      @Sign = '<=';
+x002               When %Trim(@CSUpper.@COption) = @DouLT;
+                      @Sign = '<';
+e002            EndSl;
+                @ModeInd = *On;
+                Reset @NewResult;
+                @NewResult = SetResult('Dou': @Input: @Sign:
+                                        @Type1: @Type2: @Type3);
+                @OptA(@Ind)  = @Dou;
+                @NewResult = IndentLine(@NewResult: @Ind: 'b': @InSub);
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COption) = @When;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'When ' + %Trim(@CspecDs.@CExtFact2) + ';';
+                @NestA(@Ind) = '// ' + %Trim(@NewResult);
+                @OptA(@Ind)  = @If;
+                @NewResult = IndentLine(@NewResult: @Ind: 'b': @InSub);
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COptionWhen) = @When;
+                @ContinueNextLine = *Off;
+                @EvalInd = *Off;
+b002            Select;
+x002               When %Trim(@CSUpper.@COption) = @WhenEq;
+                      @Sign = '=';
+x002               When %Trim(@CSUpper.@COption) = @WhenNE;
+                      @Sign = '<>';
+x002               When %Trim(@CSUpper.@COption) = @WhenGE;
+                      @Sign = '>=';
+x002               When %Trim(@CSUpper.@COption) = @WhenGT;
+                      @Sign = '>';
+x002               When %Trim(@CSUpper.@COption) = @WhenLE;
+                      @Sign = '<=';
+x002               When %Trim(@CSUpper.@COption) = @WhenLT;
+                      @Sign = '<';
+e002            EndSl;
+                @ModeInd = *On;
+                Reset @NewResult;
+                @Ind = @SelectSave + 1;
+                @NewResult = SetResult('When': @Input: @Sign:
+                                        @Type1: @Type2: @Type3);
+                @NewResult = IndentLine(@NewResult: @Ind: 'x': @InSub: @Ind-1);
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COptionDow) = @Cas;
+                @ContinueNextLine = *Off;
+                @EvalInd = *Off;
+b002            Select;
+x002               When %Trim(@CSUpper.@COption) = @CasEq;
+                      @Sign = '=';
+x002               When %Trim(@CSUpper.@COption) = @CasNE;
+                      @Sign = '<>';
+x002               When %Trim(@CSUpper.@COption) = @CasGE;
+                      @Sign = '>=';
+x002               When %Trim(@CSUpper.@COption) = @CasGT;
+                      @Sign = '>';
+x002               When %Trim(@CSUpper.@COption) = @CasLE;
+                      @Sign = '<=';
+x002               When %Trim(@CSUpper.@COption) = @CasLT;
+                      @Sign = '<';
+e002            EndSl;
+                @ModeInd = *On;
+                Reset @NewResult;
+b002            If Not @FirstCase;
+                   @NewResult = 'Select;';
+                   @NestA(@Ind) = '// ' + %Trim(@NewResult);
+                   @NewResult = IndentLine(@NewResult: @Ind: 'b': @InSub);
+                   @Ind += 1;
+                   @SavResult = @_srcdta;
+                   @_srcdta = @NewResult;
+                   Write Output @SourceDs;
+                   @_srcdta = @SavResult;
+                   @NewSeq += 1;
+                   @FirstCase = *On;
+e002            EndIf;
+                @NewResult = 'When ' + %Trim(@CspecDs.@CField1)
+                                     + ' ' + %Trimr(@Sign) + ' '
+                                     + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: 'x': @InSub);
+                @SavResult = @_srcdta;
+                @_srcdta = @NewResult;
+                Write Output @SourceDs;
+                @_srcdta = @SavResult;
+                @NewSeq += 1;
+                @NewResult = 'Exsr ' + %Trim(@CspecDs.@CResult) + '; ';
+                @Ind += 1;
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+                @Ind -= 1;
+
+x001         When %Trim(@CSUpper.@COption) = @Cas;
+                @ContinueNextLine = *Off;
+                @ModeInd   = *On;
+                @EvalInd = *Off;
+                @NewResult = 'Other;';
+                @NewResult = IndentLine(@NewResult: @Ind: 'x': @InSub);
+                @SavResult = @_srcdta;
+                @_srcdta = @NewResult;
+                Write Output @SourceDs;
+                @_srcdta = @SavResult;
+                @NewSeq += 1;
+                @NewResult = 'Exsr ' + %Trim(@CspecDs.@CResult) + '; ';
+                @Ind += 1;
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+                @Ind -= 1;
+
+x001         When %Trim(@CSUpper.@COption) = @Other;
+                @ContinueNextLine = *Off;
+                @ModeInd   = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @Ind -= 1;
+b002            If @Ind <= *Zeros;
+                   @Ind = 1;
+e002            EndIf;
+                @NewResult = 'Other;    ' + %Trim(@NestA(@Ind));
+                @NewResult = IndentLine(@NewResult: @Ind: 'e': @InSub);
+                Reset @NestA(@Ind);
+
+x001         When %Trim(@CSUpper.@COption) = @EndCS;
+                @ContinueNextLine = *Off;
+                @ModeInd   = *On;
+                @EvalInd = *Off;
+                @FirstCase = *Off;
+                Reset @NewResult;
+                @Ind -= 1;
+b002            If @Ind <= *Zeros;
+                   @Ind = 1;
+e002            EndIf;
+                @NewResult = 'EndSl;    ' + %Trim(@NestA(@Ind));
+                @NewResult = IndentLine(@NewResult: @Ind: 'e': @InSub);
+                Reset @NestA(@Ind);
+
+x001         When %Trim(@CSUpper.@COption) = @Readc
+             And  @CSUpper.@CRInd1         = *Blanks
+             And  @CSUpper.@CRInd2         = *Blanks
+             And  @CSUpper.@CRInd3         = *Blanks;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Readc ' + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Read
+             And  @CSUpper.@CRInd1         = *Blanks
+             And  @CSUpper.@CRInd2         = *Blanks
+             And  @CSUpper.@CRInd3         = *Blanks;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Read ' + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Readp
+             And  @CSUpper.@CRInd1         = *Blanks
+             And  @CSUpper.@CRInd2         = *Blanks
+             And  @CSUpper.@CRInd3         = *Blanks;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Readp ' + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Reade
+             And  @CSUpper.@CRInd1         = *Blanks
+             And  @CSUpper.@CRInd2         = *Blanks
+             And  @CSUpper.@CRInd3         = *Blanks;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Reade ' + %Trim(@CspecDs.@CField1) + ' '
+                                      + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Readpe
+             And  @CSUpper.@CRInd1         = *Blanks
+             And  @CSUpper.@CRInd2         = *Blanks
+             And  @CSUpper.@CRInd3         = *Blanks;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+
+                @NewResult = 'Readpe ' + %Trim(@CspecDs.@CField1) + ' '
+                           + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Chain
+             And  @CSUpper.@CRInd1         = *Blanks
+             And  @CSUpper.@CRInd2         = *Blanks
+             And  @CSUpper.@CRInd3         = *Blanks;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Chain ' + %Trim(@CspecDs.@CField1) + ' '
+                                      + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Chaine
+             And  @CSUpper.@CRInd1         = *Blanks
+             And  @CSUpper.@CRInd2         = *Blanks
+             And  @CSUpper.@CRInd3         = *Blanks;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Chain(e) '
+                           + %Trim(@CspecDs.@CField1) + ' '
+                           + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Chainn
+             And  @CSUpper.@CRInd1         = *Blanks
+             And  @CSUpper.@CRInd2         = *Blanks
+             And  @CSUpper.@CRInd3         = *Blanks;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Chain(n) '
+                           + %Trim(@CspecDs.@CField1) + ' '
+                           + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Unlock;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Unlock '
+                           +  %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Setll;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Setll ' + %Trim(@CspecDs.@CField1) + ' '
+                                      + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Setgt;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Setgt ' + %Trim(@CspecDs.@CField1) + ' '
+                                      + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Write;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Write ' + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Update;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Update '
+                           + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Delete;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Delete '
+                           + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+b001         When %Trim(@CSUpper.@COption) = @Exfmt;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Exfmt ' + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Else;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @Ind -= 1;
+b002            If @Ind <= *Zeros;
+                   @Ind = 1;
+e002            EndIf;
+                @NewResult = 'Else;     ' + %Trim(@NestA(@Ind));
+                @NewResult = IndentLine(@NewResult: @Ind: 'x': @InSub);
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COption) = @EndIf;
+                @ContinueNextLine = *Off;
+                @ModeInd   = *On;
+                @EvalInd = *Off;
+                @FirstCase = *Off;
+                Reset @NewResult;
+                @Ind -= 1;
+b002            If @Ind <= *Zeros;
+                   @Ind = 1;
+e002            EndIf;
+                @NewResult = 'EndIf;    ' + %Trim(@NestA(@Ind));
+                Reset @NestA(@Ind);
+                Reset @OptA(@Ind);
+                @NewResult = IndentLine(@NewResult: @Ind: 'e': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @EndFor;
+                @ContinueNextLine = *Off;
+                @ModeInd   = *On;
+                @EvalInd = *Off;
+                @FirstCase = *Off;
+                Reset @NewResult;
+                @Ind -= 1;
+b002            If @Ind <= *Zeros;
+                   @Ind = 1;
+e002            EndIf;
+                @NewResult = 'EndFor;   ' + %Trim(@NestA(@Ind));
+                Reset @NestA(@Ind);
+                Reset @OptA(@Ind);
+                @NewResult = IndentLine(@NewResult: @Ind: 'e': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @End;
+                @ContinueNextLine = *Off;
+                @ModeInd   = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+b002            If @FirstCase;
+                   @NewResult = 'EndCs;';
+                   @FirstCase = *Off;
+x002            Else;
+b002               If @Ind > 1;
+                      @Ind -= 1;
+x002               ElseIf @Ind < 1;
+                      @Ind = 1;
+e002               EndIf;
+b002               Dow @OptA(@Ind) = *Blanks;
+                      @Ind -= 1;
+b003                  If @Ind = *Zeros;
+                         Leave;
+e003                  EndIf;
+e002               EndDo;
+b002               If @Ind <= *Zeros;
+                      @Ind = 1;
+e002               EndIf;
+b002               Select;
+x002                  When @OptA(@Ind) = @If;
+                         @NewResult = 'EndIf;  ' + %Trim(@NestA(@Ind));
+x002                  When @OptA(@Ind) = @Do;
+                         @NewResult = 'EndDo;  ' + %Trim(@NestA(@Ind));
+x002                  When @OptA(@Ind) = @For;
+                         @NewResult = 'EndFor;  '
+                                    + %Trim(@NestA(@Ind));
+x002                  When @OptA(@Ind) = @Dow;
+                         @NewResult = 'EndDo;  ' + %Trim(@NestA(@Ind));
+x002                  When @OptA(@Ind) = @Dou;
+                         @NewResult = 'EndDo;  ' + %Trim(@NestA(@Ind));
+x002                  When @OptA(@Ind) = @Select;
+                         @NewResult = 'EndSl;  ' + %Trim(@NestA(@Ind));
+e002               EndSl;
+                   Reset @NestA(@Ind);
+                   Reset @OptA(@Ind);
+e002            EndIf;
+                @NewResult = IndentLine(@NewResult: @Ind: 'e': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @EndDo;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                @FirstCase = *Off;
+                Reset @NewResult;
+                @Ind -= 1;
+b002            If @Ind <= *Zeros;
+                   @Ind = 1;
+e002            EndIf;
+                @NewResult = 'EndDo;    ' + %Trim(@NestA(@Ind));
+                Reset @NestA(@Ind);
+                Reset @OptA(@Ind);
+                @NewResult = IndentLine(@NewResult: @Ind: 'e': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @BegSr;
+                @ContinueNextLine = *Off;
+                Reset @Ind;
+                Reset @NestA;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                @InSub   = *On;
+                Reset @NewResult;
+                @NewResult = 'BegSr ' + %Trim(@CspecDs.@CField1) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+                @Ind += 1;
+
+x001         When %Trim(@CSUpper.@COption) = @EndSr;
+                @ContinueNextLine = *Off;
+                Reset @Ind;
+                Reset @NestA;
+b002            If @CSUpper.@CField1 <> *Blanks;
+                   @ModeInd = *Off;
+                   @EvalInd = *Off;
+                   @SavResult = @_srcdta;
+                   @CSUpper.@COption = 'Tag   ';
+                   Write Output @SourceDs;
+                   @_srcdta = @SavResult;
+e002            EndIf;
+                @ModeInd = *On;
+                Reset @NewResult;
+                @NewResult = 'EndSr;';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+                @InSub   = *Off;
+
+x001         When %Trim(@CSUpper.@COption) = @Return;
+                @ContinueNextLine = *Off;
+                Reset @Ind;
+                Reset @NestA;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Return;';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Exsr;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Exsr ' + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Add
+             And  %Trim(@CSUpper.@CSize)   = *Blanks;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+b002            If @CSUpper.@CField1 = *Blanks;
+                   @NewResult = %Trim(@CspecDs.@CResult) + ' += '
+                              + %Trim(@CspecDs.@CField2) + ';';
+x002            Else;
+                   @NewResult = %Trim(@CspecDs.@CResult) + ' = '
+                              + %Trim(@CspecDs.@CField1) + ' + '
+                              + %Trim(@CspecDs.@CField2) + ';';
+e002            EndIf;
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Sub
+             And  %Trim(@CSUpper.@CSize)   = *Blanks;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+b002            If @CSUpper.@CField1 = *Blanks;
+                   @NewResult = %Trim(@CspecDs.@CResult) + ' -= '
+                               + %Trim(@CspecDs.@CField2) + ';';
+x002            Else;
+                   @NewResult = %Trim(@CspecDs.@CResult) + ' = '
+                              + %Trim(@CspecDs.@CField1) + ' - '
+                              + %Trim(@CspecDs.@CField2) + ';';
+e002            EndIf;
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Mult
+             And  %Trim(@CSUpper.@CSize)   = *Blanks;
+                @ContinueNextLine = *Off;
+                @EvalInd = *Off;
+                @NewResult = %Trim(@CspecDs.@CResult) + ' = '
+                           + %Trim(@CspecDs.@CField1) + ' * '
+                           + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Div
+             And  %Trim(@CSUpper.@CSize)   = *Blanks;
+                @ContinueNextLine = *Off;
+                @EvalInd = *Off;
+                @NewResult = %Trim(@CspecDs.@CResult) + ' = '
+                           + %Trim(@CspecDs.@CField1) + ' / '
+                           + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Leave;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Leave;';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Iter;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Iter;';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Open;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Open ' + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Close;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Close ' + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Except;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Except '
+                           + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Clear;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Clear ' + %Trim(@CspecDs.@CResult) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Callp;
+                @a = %Scan(')': %Trim(@CspecDs.@CExtFact2));
+b002            If @a > *Zeros;
+                   @ContinueNextLine = *Off;
+                   @ModeInd = *On;
+                   @EvalInd = *Off;
+                   Reset @NewResult;
+                   @NewResult = %Trim(@CspecDs.@CField2)
+                              + %Trimr(%Triml(@CspecDs.@CResult)) + ';';
+                   @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+x002            Else;
+                   @ContinueNextLine = *Off;
+                   @ModeInd = *On;
+                   @EvalInd = *Off;
+                   Reset @NewResult;
+                   @NewResult = %Trim(@CspecDs.@CField2)
+                              + %Trimr(%Triml(@CspecDs.@CResult)) + '();';
+                   @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+e002            EndIf;
+
+x001         When %Trim(@CSUpper.@COption) = @In;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'In ' + %Trim(@CspecDs.@CField1)
+                           + ' '   + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         When %Trim(@CSUpper.@COption) = @Out;
+                @ContinueNextLine = *Off;
+                @ModeInd = *On;
+                @EvalInd = *Off;
+                Reset @NewResult;
+                @NewResult = 'Out ' + %Trim(@CspecDs.@CField1)
+                           + ' '    + %Trim(@CspecDs.@CField2) + ';';
+                @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+
+x001         Other;
+
+                // Check for comment first
+b002            If %Subst(@_srcdta:8:3) = '// ';
+                   @ModeInd = *On;
+x002            Else;
+                   @ModeInd = *Off;
+e002            EndIf;
+                Reset @NewResult;
+b002            If @EvalInd;
+b003               If %Trim(@CSUpper.@CExtFact2) <> *Blanks;
+                      @NewResult =  %Trim(@CspecDs.@CExtFact2) + '\';
+                      @b = %Scan('\': @NewResult);
+b004                  If %Subst(@NewResult: @b - 1: 1) = '+';
+                         @EvalInd = *On;
+                         @NewResult = %Trim(@CspecDs.@CExtFact2);
+x004                  Else;
+                         @NewResult = %Trim(@CspecDs.@CExtFact2) + ';';
+e004                  EndIf;
+                      @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+e003               EndIf;
+x002            Else;
+
+b003               If @ContinueNextLine;
+                      @NewResult = %Trim(@CspecDs.@CExtFact2) + ';';
+                      @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+                      @ContinueNextLine = *Off;
+x003               Else;
+                      @a = %Scan('OR ': @CSUpper.@CExtFact2);
+b004                  If @a = *Zeros;
+                         @a = %Scan('AND ': @CSUpper.@CExtFact2);
+e004                  EndIf;
+b004                  If @a <> *Zeros;
+b005                     If ClearPriorRcd();
+e005                     EndIf;
+                         @NewResult = %Trim(@CspecDs.@CExtFact2) + ';';
+                         @Ind -= 1;
+b002                     If @Ind <= *Zeros;
+                            @Ind = 1;
+e002                     EndIf;
+                         @NewResult = IndentLine(@NewResult: @Ind: ' ': @InSub);
+                         @Ind += 1;
+x004                  Else;
+                         @NewResult = @Input;
+e004                  EndIf;
+e003               EndIf;
+e002            EndIf;
+e001      EndSl;
+
+b001      If @NewResult = *Blanks;
+             @NewResult = @Input;
+e001      EndIf;
+
+          Return @NewResult;
+
+          End-Proc;
+
+          Dcl-Proc ConvertPSpec Export;
+
+          Dcl-pi ConvertPSpec;
+             @Input   Char(100)  Const;
+             @PSrcSeq Zoned(6:2) Const;
+             @PSrcDat Zoned(6)   Const;
+          End-pi;
+
+          Dcl-ds @PspecDs      LikeDs(@PspecDsRPGILE);
+          Dcl-ds @PspecDsUpper LikeDs(@PspecDsRPGILE);
+
+          Dcl-s  @Output Like(@Input) Inz(*Blanks);
+
+          /define rpgstruct01
+          /define rpgstruct07
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct01
+          /undefine rpgstruct07
+
+          /define mflores55
+          /copy qcpysrc,mflores
+          /undefine mflores55
+
+          @PspecDs      = @Input;
+          @PspecDsUpper = @ToUpper(@Input);
+
+b001      If %Trim(@PspecDsUpper.@PBegEnd) = 'B';
+             @InProcedure = *On;
+             %Subst(@Output:@Offset2) = 'Dcl-Proc ' + %Trim(@PspecDs.@PName);
+b002         If %Trim(@PspecDs.@PKeyword) <> *Blanks;
+                @Output = %Trimr(@Output) + ' ' + %Trim(@PspecDs.@PKeyword);
+e002         EndIf;
+e001      ElseIf %Trim(@PspecDsUpper.@PBegEnd) = 'E';
+             @InProcedure = *Off;
+             %Subst(@Output:@Offset2) = 'End-Proc';
+e001      EndIf;
+          @Output = %Trimr(@Output) + ';';
+          %Subst(@Output:1:1) = @Blue;
+
+          @_srcdat = @PSrcSeq;
+          @_srcseq = @PSrcDat;
+          @_srcdta = %Trim(@Output);
+          Write Output @SourceDs;
+          @Written = *On;
+
+          Return;
+
+          End-Proc;
+
+          Dcl-Proc CalculateFieldLength Export;
+
+          Dcl-pi CalculateFieldLength;
+            @Dspec   LikeDs(@DspecDsRPGILE) Const;
+            @Length  Packed(5);
+            @Decimal Packed(5);
+            @DSpos   Int(10) Options(*NoPass);
+          End-pi;
+
+          Dcl-s @From      Packed(5) Inz(*Zeros);
+          Dcl-s @To        Packed(5) Inz(*Zeros);
+          Dcl-s @Remainder Int(5)    Inz(*Zeros);
+
+          /define rpgstruct03
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct03
+
+b001      If @Dspec.@DFrom <> *Blanks;
+b002         Monitor;
+                @From = %Dec(%Trim(@Dspec.@DFrom):5:0);
+x002         On-Error;
+                Clear @From;
+b002         EndMon;
+e001      EndIf;
+
+b001      If @Dspec.@DTo   <> *Blanks;
+b002         Monitor;
+                @To = %Dec(%Trim(@Dspec.@DTo):5:0);
+x002         On-Error;
+                Clear @To;
+b002         EndMon;
+e001      EndIf;
+
+b001      If  @From > *Zeros
+          And @To   > *Zeros;
+b002         If @Dspec.@DType = 'P'
+             Or @Dspec.@DType = 'p';
+                @Length = @To - @From;
+                @Remainder = %Rem(@Length:2);
+                @Length    = @Length * 2;
+b003            If @Remainder = *Zeros;
+                   @Length += 1;
+e003            EndIf;
+b002         ElseIf @Dspec.@DType = 'U'
+             Or     @Dspec.@DType = 'u';
+                @Length = (@To - @From) + 1;
+b003            If     @Length = 2;
+                   @Length = 5;
+x003            ElseIf @Length = 4;
+                   @Length = 10;
+e003            EndIf;
+x002         Else;
+                @Length = (@To - @From) + 1;
+e002         EndIf;
+x001      Else;
+             @Length = @To;
+e001      EndIf;
+
+b001      If @Dspec.@DDec <> *Blanks;
+             @Decimal = %Uns(%Trim(@Dspec.@DDec));
+e001      EndIf;
+
+b001      If  %Parms() >= 4;
+b002         If  @From > *Zeros
+             And @To  > *Zeros;
+                @DSpos =  @From;
+x001         Else;
+                @DSpos += @Length;
+e002         EndIf;
+e001      EndIf;
+
+          Return;
+
+          End-Proc;
+
+          Dcl-Proc SetFieldDefinition Export;
+
+          Dcl-pi SetFieldDefinition char(100);
+            @Input char(100) Const;
+            @Protofield Ind Const Options(*NoPass);
+          End-pi;
+
+          Dcl-s @Output        Like(@Input);
+          Dcl-s @Length        Packed(5) Inz(*Zeros);
+          Dcl-s @Dec           Packed(5) Inz(*Zeros);
+          Dcl-s @a             Int(5)    Inz(*Zeros);
+          Dcl-s @b             Int(5)    Inz(*Zeros);
+          Dcl-ds @DspecDs      LikeDs(@DspecDsRPGILE);
+          Dcl-ds @DspecDsUpper LikeDs(@DspecDsRPGILE);
+
+          /define rpgstruct03
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct03
+
+          /copy qcpysrc,mflores
+          /define mflores003
+
+          @DspecDs      = @Input;
+          @DspecDsUpper = @ToUpper(@Input);
+
+          CalculateFieldLength(@DspecDs: @Length: @Dec);
+
+          @b = %Scan('LIKE': @DspecDsUpper.@DKeywords);
+
+b001      If %Parms() > 1 And @Protofield;
+
+b002         Select;
+
+x002            When @DspecDsUpper.@DType = 'S';
+
+b003               If %Trim(@DspecDs.@DFieldName) = *Blanks;
+                      %Subst(@Output:@Offset3) = 'zoned1';
+e003               EndIf;
+
+b003               If @b = *Zeros;
+                   @Output = %Trimr(@Output) + ' Zoned(' + %Char(@Length)
+                           + ':' + %Char(@Dec) + ')';
+e003               EndIf;
+
+x002            When @DspecDsUpper.@DType = 'P';
+
+b003               If %Trim(@DspecDs.@DFieldName) = *Blanks;
+                      %Subst(@Output:@Offset3) = 'packed1';
+e003               EndIf;
+
+b003               If @b = *Zeros;
+                   @Output = %Trimr(@Output) + ' Packed(' + %Char(@Length)
+                           + ':' + %Char(@Dec) + ')';
+e003               EndIf;
+
+x002            When @DspecDsUpper.@DType = 'B';
+
+b003               If %Trim(@DspecDs.@DFieldName) = *Blanks;
+                      %Subst(@Output:@Offset3) = 'bindec1';
+e003               EndIf;
+
+b003               If @b = *Zeros;
+                   @Output = %Trimr(@Output) + ' Bindec(' + %Char(@Length)
+                           + ':' + %Char(@Dec) + ')';
+e003               EndIf;
+
+x002            When @DspecDsUpper .@DType = 'I';
+
+b003               If %Trim(@DspecDs.@DFieldName) = *Blanks;
+                      %Subst(@Output:@Offset3) = 'integer1';
+e003               EndIf;
+
+b003               If @b = *Zeros;
+b004                  If @Length = 4;
+                         @Output = %Trimr(@Output) + ' Int(10)';
+b004                  ElseIf @Length = 8;
+                         @Output = %Trimr(@Output) + ' Int(20)';
+b004                  Else;
+                         @Output = %Trimr(@Output) + ' Int(' + %Char(@Length)
+                                 + ')';
+e004                  EndIf;
+e003               EndIf;
+
+x002            When @DspecDsUpper.@DType = 'A'
+                Or   @DspecDsUpper.@DType = *Blanks;
+
+b003               If  %Trim(@DspecDs.@DFieldName) = *Blanks;
+                      %Subst(@Output:@Offset3) = 'char1';
+e003               EndIf;
+
+b003               If @b = *Zeros;
+                      @a = %Scan('VARYING': @DspecDsUpper.@DKeywords);
+b004                  If @a > *Zeros;
+                         %Subst(@DspecDs.@DKeywords:@a:7) = *Blanks;
+                         @Output = %Trimr(@Output) + ' VarChar(';
+x004                  Else;
+                         @Output = %Trimr(@Output) + ' Char(';
+e004                  EndIf;
+
+                      @Output = %Trimr(@Output) + %Char(@Length) + ')';
+e003               EndIf;
+
+x002            When @DspecDsUpper.@DType = 'N';
+
+b003               If %Trim(@DspecDs.@DFieldName) = *Blanks;
+                      %Subst(@Output:@Offset3) = 'ind1';
+e003               EndIf;
+
+                   @Output = %Trimr(@Output) + ' Ind';
+
+x002            When @DspecDsUpper.@DType = '*';
+
+b003               If %Trim(@DspecDs.@DFieldName) = *Blanks;
+                      %Subst(@Output:@Offset3) = 'pointer1';
+e003               EndIf;
+
+                   @Output = %Trimr(@Output) + ' Pointer';
+
+x002            Other;
+
+b003               If  %Trim(@DspecDs.@DTo)        = '+0'
+                   And %Trim(@DspecDs.@DFieldName) = *Blanks;
+                      %Subst(@Output:@Offset3) = 'field1';
+e003               EndIf;
+e002         EndSl;
+x001      Else;
+
+b002         Select;
+
+x002            When @DspecDsUpper.@DType = 'S';
+
+                   @Output = 'Zoned(' + %Char(@Length);
+b003               If @Dec > *Zeros;
+                      @Output = %Trim(@Output) + ':' + %Char(@Dec) + ')';
+x003               Else;
+                      @Output = %Trim(@Output) + ')';
+e003               EndIf;
+
+x002            When @DspecDsUpper.@DType = 'P';
+
+                   @Output = 'Packed(' + %Char(@Length);
+b003               If @Dec > *Zeros;
+                      @Output = %Trim(@Output) + ':' + %Char(@Dec) + ')';
+x003               Else;
+                      @Output = %Trim(@Output) + ')';
+e003               EndIf;
+
+x002            When @DspecDsUpper.@DType = 'U';
+
+                   @Output = 'Uns(' + %Char(@Length);
+b003               If @Dec > *Zeros;
+                      @Output = %Trim(@Output) + ':' + %Char(@Dec) + ')';
+x003               Else;
+                      @Output = %Trim(@Output) + ')';
+e003               EndIf;
+
+x002            When @DspecDsUpper.@DType = 'I';
+
+b003               If @Length = 2;
+                      @Output = 'Int(5)';
+b003               ElseIf @Length = 4;
+                      @Output = 'Int(10)';
+b003               ElseIf @Length = 8;
+                      @Output = 'Int(20)';
+b003               Else;
+                      @Output = 'Int(' + %Char(@Length) + ')';
+e003               EndIf;
+
+x002            When @DspecDsUpper.@DType = 'B';
+
+b003               If %Trim(@DspecDsUpper.@DFieldName) = *Blanks;
+                      %Subst(@Output:@Offset3) = 'bindec1';
+e003               EndIf;
+
+b003               If @b = *Zeros;
+                      @Output = %Trimr(@Output) + ' Bindec(' + %Char(@Length);
+b004                  If @Dec > *Zeros;
+                         @Output = %Trim(@Output) + ':' + %Char(@Dec) + ')';
+x004                  Else;
+                         @Output = %Trim(@Output) + ')';
+e004                  EndIf;
+e003               EndIf;
+
+x002            When @DspecDsUpper.@DType = 'A'
+                Or   @DspecDsUpper.@DType = *Blanks
+                And  @Length              > *Zeros
+                And  @DspecDsUpper.@DDec  = *Blanks;
+
+                   @a = %Scan('VARYING': @DspecDsUpper.@DKeywords);
+b003               If @a > *Zeros;
+                      %Subst(@DspecDs.@DKeywords:@a:7) = *Blanks;
+                      @Output = 'VarChar(';
+x003               Else;
+                      @Output = 'Char(';
+e003               EndIf;
+
+                   @Output = %Trimr(@Output) + %Char(@Length) + ')';
+
+x002            When @DspecDsUpper.@DType =  *Blanks
+                And  @DspecDsUpper.@DDec  <> *Blanks;
+
+                   @Output = 'Zoned(' + %Char(@Length) + ':'
+                           + %Char(@Dec) + ')';
+
+x002            When @DspecDsUpper.@DType = 'N';
+
+                   @Output = %Trimr(@Output) + ' Ind';
+
+x002            When @DspecDsUpper.@DType = 'D';
+
+                   @a = %Scan('DATFMT': @DspecDsUpper.@DKeywords);
+b003               If @a > *Zeros;
+                      @Output = %Trimr(@Output) + ' Date(';
+                      @Output = %Trimr(@Output)
+                              + %Subst(@DspecDsUpper.@DKeywords:@a+7:4);
+                      @Output = %Trimr(@Output) + ')';
+x003               Else;
+                      @Output = %Trimr(@Output) + ' Date';
+e003               EndIf;
+
+x002            When @DspecDsUpper.@DType = 'T';
+
+                   @a = %Scan('TIMFMT': @DspecDsUpper.@DKeywords);
+b003               If @a > *Zeros;
+                      @Output = %Trimr(@Output) + ' Time(';
+                      @Output = %Trimr(@Output)
+                              + %Subst(@DspecDsUpper.@DKeywords:@a+7:4);
+                      @Output = %Trimr(@Output) + ')';
+x003               Else;
+                      @Output = %Trimr(@Output) + ' Time';
+e003               EndIf;
+
+x002            When @DspecDsUpper.@DType = 'Z';
+
+                   @Output = %Trimr(@Output) + ' TimeStamp';
+
+x002            When @DspecDsUpper.@DType = '*';
+
+                   @Output = %Trimr(@Output) + ' Pointer';
+
+e002         EndSl;
+e001      EndIf;
+
+b001      If %Trim(@DspecDs.@DKeywords) <> *Blanks;
+             @DspecDs.@DKeywords = SetConstant(@DspecDs.@DKeywords);
+e001      EndIf;
+
+b001      If  @DspecDsUpper.@DType <> 'D'
+          And @DspecDsUpper.@DType <> 'T';
+b002         If %Trim(@DspecDs.@DKeywords) <> *Blanks;
+                @Output = %Trimr(@Output) + ' '
+                        + %Trim(@DspecDs.@DKeywords);
+e002         EndIf;
+e001      EndIf;
+
+          Return @Output;
+
+          End-Proc;
+
+          Dcl-Proc IndentLine;
+
+          Dcl-Pi IndentLine Char(100);
+             @PLine      Char(100)   Const;
+             @Level      Packed(5:0) Const;
+             @Action     Char(1)     Const;
+             @Subroutine Ind         Const;
+             @OverideLvl Packed(5:0) Const Options(*NoPass);
+          End-Pi;
+
+          Dcl-s @Levels Packed(5:0) Inz(*Zeros);
+          Dcl-s @a      Packed(3:0) Inz(*Zeros);
+          Dcl-s @b      Packed(3:0) Inz(*Zeros);
+          Dcl-s @c      Packed(3:0) Inz(*Zeros);
+
+          Dcl-Ds @NewLine Inz;
+             @NewA Char(1) Dim(100);
+          End-Ds;
+
+          Dcl-Ds @NewLineDs Inz;
+             @NewB Char(1) Dim(100);
+          End-Ds;
+
+          Dcl-Ds @Comments Inz;
+             @NewC Char(1) Dim(50);
+          End-Ds;
+
+          Dcl-Ds @BegEnd;
+             @BXorE       Char(1);
+             @Indentlevel Zoned(3:0);
+          End-Ds;
+
+          @Levels = @Level;
+
+b001      If @InProcedure;
+             @Levels += 1;
+e001      EndIf;
+
+b001      If @Action <> *Blanks;
+             @BXorE       = @Action;
+             @Indentlevel = @Levels;
+b002         If %Parms >= 5;
+                @Indentlevel = @OverideLvl;
+e002         EndIf;
+b002         If @Subroutine;
+b003            If @IndentLevel <= *Zeros;
+                   @IndentLevel = 1;
+e003            EndIf;
+e002         EndIf;
+
+             @NewLineDs   = @BegEnd;
+b002         If @BXorE = 'x'
+             Or @BXorE = 'e';
+                @a = %Scan('//': @Pline);
+b003            If @a > 1;
+                   @Comments = %Trim(%Subst(@Pline: @a));
+                   @a -= 1;
+                   @NewLine  = %Trim(%Subst(@Pline: 1: @a));
+x003            Else;
+                   @NewLine  = %Trim(@Pline);
+e003            EndIf;
+x002         Else;
+                @NewLine = %Trim(@Pline);
+e002         EndIf;
+x001      Else;
+             @NewLine = %Trim(@Pline);
+e001      EndIf;
+
+          @a = %Checkr(' ': @NewLine);
+          @c = (3 * @Levels) + 8;
+b001      If @c > 40;
+             @c = 40;
+e001      EndIf;
+b001      For @b = 1 by 1 to @a;
+             @NewB(@c) = @NewA(@b);
+             @c += 1;
+e001      EndFor;
+b001      If @BXorE = 'x'
+          Or @BXorE = 'e';
+             @a = %Checkr(' ': @Comments);
+             @c = 60;
+b002         For @b = 1 by 1 to @a;
+                @NewB(@c) = @NewC(@b);
+                @c += 1;
+e002         EndFor;
+e001      EndIf;
+
+          Return @NewLineDs;
+
+          End-Proc;
+
+          Dcl-Proc ClearPriorRcd;
+
+          Dcl-Pi ClearPriorRcd  Ind End-Pi;
+
+          /define rpgstruct01
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct01
+
+          Dcl-s @a Packed(3:0) Inz(*Zeros);
+
+          // get prior record
+          Close Output;
+          Open  Output;
+          SetGt *hival Output;
+          Readp Output @SourceDs;
+b001      Dow Not %Eof(Output);
+
+             @a = %Scan('//': @_srcdta);
+b002         If @a = *Zeros;
+                @a = %Scan(';': @_srcdta);
+b003            If @a > 1;
+                   %Subst(@_srcdta:@a:1) = *blanks;
+e003            EndIf;
+
+                // get prior record
+                Update Output @SourceDs;
+
+                @a = %Scan('DS': @_srcdta);
+b003            If @a > 1;
+                   Return *On;
+x003            Else;
+                   Return *Off;
+e003            EndIf;
+x002         Else;
+                Readp Output @SourceDs;
+e002         EndIf;
+e001      EndDo;
+
+          Return *Off;
+
+          End-Proc;
+
+          Dcl-Proc SetResult;
+
+          Dcl-Pi SetResult  Like(@Input);
+             @Function Char(10)   Const;
+             @Input    Char(100)  Const;
+             @Sign     Char(2)    Const;
+             @Type1    Like(type) Const;
+             @Type2    Like(type) Const;
+             @Type3    Like(type) Const;
+          End-Pi;
+
+          /define rpgstruct05
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct05
+
+          /define PGMFLDMOV02
+          /copy qcpysrc,pgmfldmov
+          /undefine PGMFLDMOV02
+
+          Dcl-c @On  Const('''1''');
+          Dcl-c @Off Const('''0''');
+
+          Dcl-s @NewResult Like(@Input) Inz(*Blanks);
+
+          Dcl-ds @CSpec LikeDs(@CspecDsRPGILE);
+
+          @CSpec = @Input;
+
+          @NewResult = %Trim(@Function);
+
+b001      If  @Type2  = 'CONST'
+          And @Type3 = 'N'
+          And %Trim(@CSpec.@CField2) = @On;
+             @CSpec.@CField2 = '*On';
+e001      EndIf;
+
+b001      If  @Type2  = 'CONST'
+          And @Type3 = 'N'
+          And %Trim(@CSpec.@CField2) = @Off;
+             @CSpec.@CField2 = '*Off';
+e001      EndIf;
+
+b001      If  @Type2  = 'CONST'
+          And @Type1 = 'N'
+          And %Trim(@CSpec.@CField2) = @On;
+             @CSpec.@CField2 = '*On';
+e001      EndIf;
+
+b001      If  @Type2  = 'CONST'
+          And @Type1 = 'N'
+          And %Trim(@CSpec.@CField2) = @Off;
+             @CSpec.@CField2 = '*Off';
+e001      EndIf;
+
+b001      If  @Type1 =  'N'
+          And @Type2 = 'CONST'
+          And %Trimr(@CSpec.@CField2) = @Off;
+
+             @NewResult = %Trim(@NewResult) + ' Not';
+
+e001      EndIf;
+
+          @NewResult = %Trim(@NewResult)  + ' '
+                     + %Trim(@CSpec.@CField1);
+
+b001      If  @Type1 =  'N'
+          And @Type2 = 'CONST'
+          And %Trimr(@CSpec.@CField2) = @Off;
+x001      Else;
+
+             @NewResult = %Trim(@NewResult) + ' ' + %Trimr(@Sign) + ' '
+                        + %Trim(@CSpec.@CField2);
+
+e001      EndIf;
+          @NewResult = %Trim(@NewResult) + ';';
+
+          Return @NewResult;
+
+          End-Proc;
+
+          Dcl-Proc SetComment;
+
+          Dcl-Pi SetComment Char(100);
+             @Input  Char(100) Const;
+             @Spec   Char(1)   Const;
+             @Offset Int(5)    Const;
+          End-Pi;
+
+          Dcl-s @a      Packed(3)    Inz(*Zeros);
+          Dcl-s @Output Like(@Input) Inz(*Blanks);
+
+          /define mflores55
+          /copy qcpysrc,mflores
+          /undefine mflores55
+
+b001      If @Spec = 'C';
+
+             @Output = %Subst(@Input:1:5);
+             %Subst(@Output:@Offset) = '//' + @White
+                                            + %Trim(%Subst(@Input:8:92));
+
+x001      Else;
+
+b002         If %Subst(@Input:8:92) <> *Blanks;
+
+                @a = %Scan(@White: @Input);
+b003            If @a = *Zeros;
+                   @a = %Scan(@Blue: @Input);
+e003            EndIf;
+
+b003            If @a = *Zeros;
+                   @a = %Scan(@Red: @Input);
+e003            EndIf;
+
+b003            If @a = *Zeros;
+b004               If %Subst(@Input:1:5) = *Blanks;
+
+                      %Subst(@Output:@Offset) = '//' + @White
+                                              + %Trim(%Subst(@Input:8:92));
+x004               Else;
+
+                      @Output = %Subst(@Input:1:5);
+                      %Subst(@Output:@Offset) = '//' + @White
+                                              + %Trim(%Subst(@Input:8:92));
+
+e004               EndIf;
+
+x003            Else;
+
+b004               If %Subst(@Input:1:5) = *Blanks;
+
+                      %Subst(@Output:@Offset) = '// '
+                                              + %Trim(%Subst(@Input:8:92));
+
+x004               Else;
+
+                      @Output = %Subst(@Input:1:5);
+                      %Subst(@Output:@Offset) = '// '
+                                              + %Trim(%Subst(@Input:8:92));
+
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          Return @Output;
+
+          End-Proc;
+
+          Dcl-Proc SetConstant;
+
+          Dcl-Pi SetConstant  Like(@KeyWord);
+             @KeyWord Char(100) Const;
+          End-Pi;
+
+          Dcl-s @Output Like(@KeyWord) Inz(*Blanks);
+
+          @Output = %ScanRpl('CONST(': 'Const(': @Keyword);
+          @Output = %ScanRpl('INZ(': 'Inz(': @Output);
+          @Output = %ScanRpl('*BLANKS': '*Blanks': @Output);
+          @Output = %ScanRpl('*ZEROS': '*Zeros': @Output);
+
+          Return @Output;
+
+          End-Proc;
+
+          Dcl-Proc CloseFiles export;
+
+          Dcl-Pi CloseFiles;
+          End-Pi;
+
+          Close Output;
+
+          End-Proc;
+
+          Dcl-Proc IndentSource Export;
+
+          /define rpgstruct08
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct08
+
+          Dcl-Pi IndentSource Char(58);
+             @SourceLine Char(58) Const;
+             @IndentChar Zoned(3) Const;
+          End-Pi;
+
+          Dcl-s @SourceTemp Like(@SourceLine) Inz(*Blanks);
+
+b001      Select;
+
+             When @IndentChar = 1;
+                %Subst(@SourceTemp:@Offset1) = %Trim(@SourceLine);
+
+             When @IndentChar = 2;
+                %Subst(@SourceTemp:@Offset2) = %Trim(@SourceLine);
+
+             When @IndentChar = 3;
+                %Subst(@SourceTemp:@Offset3) = %Trim(@SourceLine);
+
+             When @IndentChar = 4;
+                %Subst(@SourceTemp:@Offset4) = %Trim(@SourceLine);
+
+             When @IndentChar = 5;
+                %Subst(@SourceTemp:@Offset5) = %Trim(@SourceLine);
+
+             When @IndentChar = 6;
+                %Subst(@SourceTemp:@Offset6) = %Trim(@SourceLine);
+
+             When @IndentChar = 7;
+                %Subst(@SourceTemp:@Offset7) = %Trim(@SourceLine);
+
+             When @IndentChar = 8;
+                %Subst(@SourceTemp:@Offset8) = %Trim(@SourceLine);
+
+             When @IndentChar = 9;
+                %Subst(@SourceTemp:@Offset9) = %Trim(@SourceLine);
+
+             When @IndentChar = 10;
+                %Subst(@SourceTemp:@Offset10) = %Trim(@SourceLine);
+
+             When @IndentChar = 11;
+                %Subst(@SourceTemp:@Offset11) = %Trim(@SourceLine);
+
+             When @IndentChar = 12;
+                %Subst(@SourceTemp:@Offset12) = %Trim(@SourceLine);
+
+             When @IndentChar = 13;
+                %Subst(@SourceTemp:@Offset13) = %Trim(@SourceLine);
+
+             When @IndentChar = 14;
+                %Subst(@SourceTemp:@Offset14) = %Trim(@SourceLine);
+
+             When @IndentChar = 15;
+                %Subst(@SourceTemp:@Offset15) = %Trim(@SourceLine);
+
+             When @IndentChar = 16;
+                %Subst(@SourceTemp:@Offset16) = %Trim(@SourceLine);
+
+             When @IndentChar = 17;
+                %Subst(@SourceTemp:@Offset17) = %Trim(@SourceLine);
+
+             When @IndentChar = 18;
+                %Subst(@SourceTemp:@Offset18) = %Trim(@SourceLine);
+
+             When @IndentChar = 19;
+                %Subst(@SourceTemp:@Offset19) = %Trim(@SourceLine);
+
+e001      EndSl;
+
+          Return @SourceTemp;
+
+          End-Proc;
+
+          Dcl-Proc WriteEndSpec Export;
+
+          Dcl-Pi WriteEndSpec;
+             @PSrcSeq    Zoned(6:2) Const;
+             @PSrcDat    Zoned(6)   Const;
+             @PSrcDta    Char(58)   Const;
+             @PSource1   Char(100)  Const;
+             @PSource2   Char(100)  Const;
+          End-Pi;
+
+          /define rpgstruct01
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct01
+
+          @_srcdat = @PSrcSeq;
+          @_srcseq = @PSrcDat;
+          %Subst(@_srcdta:@Offset2) = %Trim(@PSrcDta);
+          Write Output @SourceDs;
+
+b001      If  %Subst(@PSource1:7) <> *Blanks
+          And %Subst(@PSource2:7) <> *Blanks;
+   ˆ         Clear @_srcdta;
+             Write Output @SourceDs;
+e001      EndIf;
+
+          End-Proc;
+

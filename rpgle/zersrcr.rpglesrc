@@ -1,0 +1,24 @@
+          Ctl-opt Option(*NoDebugIO) DftActGrp(*No);
+
+     Fqrpglesrc up   f  112        Disk
+
+          Dcl-pi zersrcr;
+             @TagInd Ind;
+          End-Pi;
+
+     Iqrpglesrc ns
+     I                                  7   12 0srcdat
+     I                                 13   17  @Tag
+
+b001      Select;
+x001         When @TagInd
+             And  @Tag = *Blanks;
+                Clear  srcdat;
+x001         When Not @TagInd;
+                Clear  srcdat;
+e001      EndSl;
+
+          Except updsrc;
+
+     Oqrpglesrc e            updsrc
+     O                       srcdat              12

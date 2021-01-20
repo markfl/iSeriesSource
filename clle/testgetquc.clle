@@ -1,0 +1,22 @@
+             PGM        PARM(&PROGRAM)
+
+             DCL        VAR(&PROGRAM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&CALLPGM) TYPE(*CHAR) LEN(10)
+
+             CHGVAR     VAR(&CALLPGM) VALUE(&PROGRAM)
+             MONMSG     MSGID(CPF0000) EXEC(DO)
+             CHGVAR     VAR(&CALLPGM) VALUE(TESTGETQU5)
+             ENDDO
+
+             CLRPFM     FILE(SMPRATIP)
+             CLRPFM     FILE(BOLXMLP)
+
+             DBG        PGM(RATEQUOTER)
+
+             CALL       PGM(&CALLPGM)
+
+             ENDDBG
+
+             DBU        FILE(SMPRATIP)
+
+ END:        ENDPGM

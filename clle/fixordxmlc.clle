@@ -1,0 +1,28 @@
+             PGM        PARM(&MEMBER)
+
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+
+             DLTF       FILE(QTEMP/QXMLSRC)
+             MONMSG     MSGID(CPF0000)
+
+             CRTSRCPF   FILE(QTEMP/QXMLSRC) RCDLEN(200)
+             MONMSG     MSGID(CPF0000)
+
+             ADDPFM     FILE(QTEMP/QXMLSRC) MBR(&MEMBER)
+
+             OVRDBF     FILE(QXMLSRC) TOFILE(*CURLIB/QXMLSRC) +
+                          MBR(&MEMBER)
+             OVRDBF     FILE(QXMLSRCO) TOFILE(QTEMP/QXMLSRC) +
+                          MBR(&MEMBER)
+
+             CALL       PGM(FIXORDXMLR)
+
+             DLTOVR     FILE(*ALL)
+
+             CPYSRCF    FROMFILE(QTEMP/QXMLSRC) +
+                          TOFILE(*CURLIB/QXMLSRC) FROMMBR(&MEMBER)
+
+             DLTF       FILE(QTEMP/QXMLSRC)
+             MONMSG     MSGID(CPF0000)
+
+ END:        ENDPGM

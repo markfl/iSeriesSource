@@ -1,0 +1,118 @@
+
+      /IF DEFINED(CVTSPEC01)
+
+          Dcl-Pr ParseSpec;
+             *n Char(10)   Const Options(*NoPass);
+             *n Zoned(6:2) Const Options(*NoPass);
+             *n Zoned(6:0) Const Options(*NoPass);
+             *n Char(100)  Const Options(*NoPass);
+             *n Char(100)  Const Options(*NoPass);
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(CVTSPEC02)
+
+          Dcl-Pr ConvertDataStructure Char(100);
+             char1 Char(100) Const;
+             char1 Char(100) Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(CVTSPEC03)
+
+          Dcl-Pr ConvertProcedure Char(100);
+             char1 Char(100) Const;
+             char1 Char(100) Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(CVTSPEC04)
+
+          Dcl-Pr ConvertDeclareField Char(100);
+             char1 Char(100) Const;
+             char1 Char(100) Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(CVTSPEC05)
+
+          Dcl-Pr ConvertConstant Char(100);
+             char1 Char(100) Const;
+             char1 Char(100) Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(CVTSPEC06)
+
+          /define JOBCTL03
+          /copy qcpysrc,jobctlshrd
+          /undefine JOBCTL03
+
+          Dcl-Pr CalculateFieldLength;
+             char1    LikeDs(@DspecDsRPGILE) Const;
+             integer1 Int(5);
+             integer1 Int(5);
+          End-Pr;
+
+      /ENDIF
+
+
+      /IF DEFINED(CVTSPEC07)
+
+          Dcl-Pr CVTToFree;
+             char1 Char(112) Const;
+             ind1  Ind       Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(CVTSPEC08)
+
+          Dcl-Pr IndentLine Char(100);
+             char1   Char(100)   Const;
+             packed1 Packed(3:0) Const;
+             char1   Char(1)     Const;
+             ind1    Ind         Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(CVTSPEC09)
+
+          Dcl-Pr ClearPriorRcd;
+              zoned1 Zoned(6:0) Const;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(CVTSPEC10)
+
+          Dcl-Pr CheckChgMode;
+              ind1   Ind Const;
+              char1  Char(4);
+              zoned1 Zoned(6:2);
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(CVTSPEC11)
+
+          Dcl-Pr CloseFiles;
+          End-Pr;
+
+      /ENDIF
+
+      /IF DEFINED(CVTSPEC12)
+
+          Dcl-Pr IndentSource Char(58);
+             char1  Char(58) Const;
+             zoned1 Zoned(3) Const;
+          End-Pr;
+
+      /ENDIF
+

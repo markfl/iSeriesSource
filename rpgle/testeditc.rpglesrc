@@ -1,0 +1,22 @@
+     D  @testdata      s             15s 5 Inz(0000123456.12000)
+     D  @testdatac     s             20a
+     C/free
+          @testdatac = %Editc(@testdata:'A') + ' ' + 'A';
+          dsply @testdatac;
+          @testdatac = %Editc(@testdata:'B') + ' ' + 'B';
+          dsply @testdatac;
+          @testdatac = %Editc(@testdata:'C') + ' ' + 'C';
+          dsply @testdatac;
+          @testdatac = %Editc(@testdata:'D') + ' ' + 'D';
+          dsply @testdatac;
+          @testdatac = %Editc(@testdata:'1') + ' ' + '1';
+          dsply @testdatac;
+          @testdatac = %Editc(@testdata:'2') + ' ' + '2';
+          dsply @testdatac;
+          @testdatac = %Editc(@testdata:'3') + ' ' + '3';
+          dsply @testdatac;
+          @testdatac = %Editc(@testdata:'4') + ' ' + '4';
+          dsply @testdatac;
+          @testdatac = %Editc(@testdata:'Z') + ' ' + 'Z';
+          dsply @testdatac;
+          *inlr = *On;

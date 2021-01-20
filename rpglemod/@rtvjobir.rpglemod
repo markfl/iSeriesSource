@@ -1,0 +1,418 @@
+          Ctl-opt NoMain Option(*NoDebugio);
+     H/Title Retrieve Job Information
+
+      /define mflores007
+      /define mflores008
+      /define mflores009
+      /define mflores010
+      /define mflores011
+      /define mflores014
+      /define mflores015
+      /define mflores016
+      /define mflores018
+      /define mflores019
+      /define mflores020
+      /copy qcpysrc,mflores
+      /undefine mflores007
+      /undefine mflores008
+      /undefine mflores009
+      /undefine mflores010
+      /undefine mflores011
+      /undefine mflores014
+      /undefine mflores015
+      /undefine mflores016
+      /undefine mflores018
+      /undefine mflores019
+      /undefine mflores020
+
+     DRtvJobI          pr                  ExtPgm('QUSRJOBI')
+     D                            32767a   Options(*VarSize)
+     D                               10i 0 Const
+     D                                8a   Const
+     D                               26a   Const
+     D                               16a   Const
+     D                            32767a   Options(*VarSize)
+
+     DGetJOBI0700Info  pr
+     D                               10a   Const
+     D                               10a   Const
+     D                               10a   Const
+     D                                6a   Const
+     D                               +0    LikeDs(Jobi0700Ds)
+     D                               11a   Dim(25)
+     D                               11a   Dim(10)
+     D                               11a
+     D                               11a   Dim(250)
+
+     DGetJOBI0750Info  pr
+     D                               10a   Const
+     D                               10a   Const
+     D                               10a   Const
+     D                                6a   Const
+     D                               +0    LikeDs(Jobi0750Ds)
+     D                               +0    LikeDs(LibraryInfoDs) Dim(25)
+     D                               +0    LikeDs(LibraryInfoDs) Dim(10)
+     D                               +0    LikeDs(LibraryInfoDs)
+     D                               +0    LikeDs(LibraryInfoDs) Dim(250)
+
+     DGetJOBI0800Info  pr
+     D                               10a   Const
+     D                               10a   Const
+     D                               10a   Const
+     D                                6a   Const
+     D                               +0    LikeDs(Jobi0800Ds)
+     D                               +0    LikeDs(SignalDataDs) Dim(1000)
+
+     P RetrieveJob...
+     P Information     b                   export
+
+     D RetrieveJob...
+     D Information     pi              n
+     D  @PJob                        10a   Const
+     D  @PUser                       10a   Const Options(*NoPass)
+     D  @PJobNumber                   6a   Const Options(*NoPass)
+     D  @PFormat                     10a   Const Options(*NoPass)
+
+     D  @Format0100    c                   Const('JOBI0100')
+     D  @Format0150    c                   Const('JOBI0150')
+     D  @Format0200    c                   Const('JOBI0200')
+     D  @Format0300    c                   Const('JOBI0300')
+     D  @Format0400    c                   Const('JOBI0400')
+     D  @Format0500    c                   Const('JOBI0500')
+     D  @Format0600    c                   Const('JOBI0600')
+     D  @Format0700    c                   Const('JOBI0700')
+     D  @Format0750    c                   Const('JOBI0750')
+     D  @Format0800    c                   Const('JOBI0800')
+     D  @Format0900    c                   Const('JOBI0900')
+     D  @Format1000    c                   Const('JOBI1000')
+
+     D  @Job           s             10a   Inz(*Blanks)
+     D  @User          s             10a   Inz(*Blanks)
+     D  @JobNumber     s              6a   Inz(*Blanks)
+     D  @Format        s             10a   Inz(@Format0100)
+
+     D  @SysLibl       s             11a   Inz(*Blanks) Dim(25)
+     D  @PrdLibl       s             11a   Inz(*Blanks) Dim(10)
+     D  @CurLibl       s             11a   Inz(*Blanks)
+     D  @UsrLibl       s             11a   Inz(*Blanks) Dim(250)
+     D  @SysLiblDs     ds                  LikeDs(LibraryInfoDs) Dim(25)
+     D  @PrdLiblDs     ds                  LikeDs(LibraryInfoDs) Dim(10)
+     D  @CurLiblDs     ds                  LikeDs(LibraryInfoDs)
+     D  @UsrLiblDs     ds                  LikeDs(LibraryInfoDs) Dim(250)
+     D  @SignalDs      ds                  LikeDs(SignalDataDs)  Dim(1000)
+     D  @Length        s              5p 0 Inz(*Zeros)
+     D  @Job0100Ds     ds                  LikeDs(Jobi0100Ds)
+     D  @Job0150Ds     ds                  LikeDs(Jobi0150Ds)
+     D  @Job0200Ds     ds                  LikeDs(Jobi0200Ds)
+     D  @Job0300Ds     ds                  LikeDs(Jobi0300Ds)
+     D  @Job0400Ds     ds                  LikeDs(Jobi0400Ds)
+     D  @Job0500Ds     ds                  LikeDs(Jobi0500Ds)
+     D  @Job0600Ds     ds                  LikeDs(Jobi0600Ds)
+     D  @Job0700Ds     ds                  LikeDs(Jobi0700Ds)
+     D  @Job0750Ds     ds                  LikeDs(Jobi0750Ds)
+     D  @Job0800Ds     ds                  LikeDs(Jobi0800Ds)
+     D  @Job0900Ds     ds                  LikeDs(Jobi0900Ds)
+     D  @Job1000Ds     ds                  LikeDs(Jobi1000Ds)
+
+      /define mflores012
+      /define mflores013
+      /define mflores014
+      /define mflores015
+      /define mflores016
+      /define mflores017
+      /define mflores018
+      /define mflores019
+      /define mflores020
+      /define mflores036
+      /define mflores21
+      /copy qcpysrc,mflores
+      /undefine mflores012
+      /undefine mflores013
+      /undefine mflores014
+      /undefine mflores015
+      /undefine mflores016
+      /undefine mflores017
+      /undefine mflores018
+      /undefine mflores019
+      /undefine mflores020
+      /undefine mflores036
+
+b001      If %Parms() = 4;
+             @Format = @PFormat;
+e001      EndIf;
+
+          @Job       = @PJob;
+          @User      = @PUser;
+          @JobNumber = @PJobNumber;
+
+b001      Select;
+
+x001         When @Format = 'JOBI0100';
+
+                RtvJobI(@Job0100Ds: %Size(@Job0100Ds): @Format:
+                        @Job + @User + @JobNumber: *Blanks: ApiErrorDs);
+
+x001         When @Format = 'JOBI0150';
+
+                RtvJobI(@Job0150Ds: %Size(@Job0150Ds): @Format:
+                        @Job + @User + @JobNumber: *Blanks: ApiErrorDs);
+
+x001         When @Format = 'JOBI0200';
+
+                RtvJobI(@Job0200Ds: %Size(@Job0200Ds): @Format:
+                        @Job + @User + @JobNumber: *Blanks: ApiErrorDs);
+
+x001         When @Format = 'JOBI0300';
+
+                RtvJobI(@Job0300Ds: %Size(@Job0300Ds): @Format:
+                        @Job + @User + @JobNumber: *Blanks: ApiErrorDs);
+
+x001         When @Format = 'JOBI0400';
+
+                RtvJobI(@Job0400Ds: %Size(@Job0400Ds): @Format:
+                        @Job + @User + @JobNumber: *Blanks: ApiErrorDs);
+
+x001         When @Format = 'JOBI0500';
+
+                RtvJobI(@Job0500Ds: %Size(@Job0500Ds): @Format:
+                        @Job + @User + @JobNumber: *Blanks: ApiErrorDs);
+
+x001         When @Format = 'JOBI0600';
+
+                RtvJobI(@Job0600Ds: %Size(@Job0600Ds): @Format:
+                        @Job + @User + @JobNumber: *Blanks: ApiErrorDs);
+
+x001         When @Format = 'JOBI0700';
+
+                GetJOBI0700Info(@Format: @Job: @User: @JobNumber: @Job0700Ds:
+                                @SysLibl: @PrdLibl: @CurLibl: @UsrLibl);
+
+x001         When @Format = 'JOBI0750';
+
+                GetJOBI0750Info(@Format: @Job: @User: @JobNumber: @Job0750Ds:
+                                @SysLiblDs: @PrdLiblDs: @CurLiblDs: @UsrLiblDs);
+
+x001         When @Format = 'JOBI0800';
+
+                GetJOBI0800Info(@Format: @Job: @User: @JobNumber:
+                                @Job0800Ds: @SignalDs);
+
+x001         When @Format = 'JOBI0900';
+
+                RtvJobI(@Job0900Ds: %Size(@Job0900Ds): @Format:
+                        @Job + @User + @JobNumber: *Blanks: ApiErrorDs);
+
+x001         When @Format = 'JOBI1000';
+
+                RtvJobI(@Job1000Ds: %Size(@Job1000Ds): @Format:
+                        @Job + @User + @JobNumber: *Blanks: ApiErrorDs);
+
+e001      EndSl;
+
+b001      If  AeMsgId <> 'CPF9810';
+
+             // Object found
+             Return *On;
+
+x001      Else;
+
+             // Object not found
+             Return *Off;
+
+e001      EndIf;
+
+     P RetrieveJob...
+     P Information     e
+
+     PGetJOBI0700Info  b
+
+     DGetJOBI0700Info  pi
+     D  @_Format                     10a   Const
+     D  @_Job                        10a   Const
+     D  @_User                       10a   Const
+     D  @_JobNumber                   6a   Const
+     D  @_Jobi0700Ds                       LikeDs(Jobi0700Ds)
+     D  @_SysLibl                    11a   Dim(25)
+     D  @_PrdLibl                    11a   Dim(10)
+     D  @_CurLibl                    11a
+     D  @_UsrLibl                    11a   Dim(250)
+
+     D  @i             s              5p 0 Inz(*Zeros)
+     D  @OffSet        s              5p 0 Inz(*Zeros)
+
+      /define mflores014
+      /define mflores036
+      /copy qcpysrc,mflores
+      /undefine mflores014
+      /undefine mflores036
+
+          RtvJobI(@_Jobi0700Ds: %Size(@_Jobi0700Ds): @_Format:
+                  @_Job + @_User + @_JobNumber: *Blanks: ApiErrorDs);
+
+b001      If @_Jobi0700Ds.@NumberOfLibrariesInSYSLIBL > *Zeros;
+
+             @OffSet = 1;
+
+b002         For @i = 1 to @_Jobi0700Ds.@NumberOfLibrariesInSYSLIBL;
+                @_SysLibl(@i) = %Subst(@_Jobi0700Ds.@Libraries:@OffSet:11);
+                @OffSet += 11;
+e002         EndFor;
+
+e001      EndIF;
+
+b001      If @_Jobi0700Ds.@NumberOfProductLibraries > *Zeros;
+
+b002         For @i = 1 to @_Jobi0700Ds.@NumberOfProductLibraries;
+                @_PrdLibl(@i) = %Subst(@_Jobi0700Ds.@Libraries:@OffSet:11);
+                @OffSet += 11;
+e002         EndFor;
+
+e001      EndIF;
+
+b001      If @_Jobi0700Ds.@CurrentLibraryExistence > *Zeros;
+
+             @_CurLibl = %Subst(@_Jobi0700Ds.@Libraries:@OffSet:11);
+             @OffSet += 11;
+
+e001      EndIF;
+
+b001      If @_Jobi0700Ds.@NumberOfLibrariesInUSRLIBL > *Zeros;
+
+b002         For @i = 1 to @_Jobi0700Ds.@NumberOfLibrariesInUSRLIBL;
+                @_UsrLibl(@i) = %Subst(@_Jobi0700Ds.@Libraries:@OffSet:11);
+                @OffSet += 11;
+e002         EndFor;
+
+e001      EndIF;
+
+     PGetJOBI0700Info  e
+
+     PGetJOBI0750Info  b
+
+     DGetJOBI0750Info  pi
+     D  @_Format                     10a   Const
+     D  @_Job                        10a   Const
+     D  @_User                       10a   Const
+     D  @_JobNumber                   6a   Const
+     D  @_Jobi0750Ds                       LikeDs(Jobi0750Ds)
+     D  @_SysLiblDs                        LikeDs(LibraryInfoDs) Dim(25)
+     D  @_PrdLiblDs                        LikeDs(LibraryInfoDs) Dim(10)
+     D  @_CurLiblDs                        LikeDs(LibraryInfoDs)
+     D  @_UsrLiblDs                        LikeDs(LibraryInfoDs) Dim(250)
+
+     D  @i             s              5p 0 Inz(*Zeros)
+     D  @OffSet        s              5p 0 Inz(*Zeros)
+     D  @Length        s              5p 0 Inz(*Zeros)
+
+      /define mflores015
+      /define mflores018
+      /define mflores019
+      /define mflores036
+      /copy qcpysrc,mflores
+      /undefine mflores015
+      /undefine mflores018
+      /undefine mflores019
+      /undefine mflores036
+
+          RtvJobI(@_Jobi0750Ds: %Size(@_Jobi0750Ds): @_Format:
+                  @_Job + @_User + @_JobNumber: *Blanks: ApiErrorDs);
+
+          @Length =  @_Jobi0750Ds.@LengthOfOneLibraryArrayEntry;
+
+b001      If @_Jobi0750Ds.@NumberOfLibrariesInSystemLibraryList > *Zeros;
+             @OffSet =  @_Jobi0750Ds.@OffsetToLibrariesInSystemLibraryList;
+             @OffSet += 1;
+
+b002         For @i = 1 to
+
+                @_Jobi0750Ds.@NumberOfLibrariesInSystemLibraryList;
+
+                @_SysLiblDs(@i) =  %Subst(@_Jobi0750Ds:@OffSet:@Length);
+                @OffSet         += @Length;
+
+e002         EndFor;
+e001      EndIF;
+
+b001      If @_Jobi0750Ds.@NumberOfProductLibraries > *Zeros;
+
+             @OffSet =  @_Jobi0750Ds.@OffsetToProductLibraries;
+             @OffSet += 1;
+
+b002         For @i = 1 to
+
+                @_Jobi0750Ds.@NumberOfProductLibraries;
+
+                @_PrdLiblDs(@i) =  %Subst(@_Jobi0750Ds:@OffSet:@Length);
+                @OffSet         += @Length;
+
+e002         EndFor;
+e001      EndIF;
+
+b001      If @_Jobi0750Ds.@NumberOfCurrentLibraries > *Zeros;
+
+             @_CurLiblDs =  %Subst(@_Jobi0750Ds:@OffSet:@Length);
+             @OffSet     += @Length;
+
+e001      EndIF;
+
+b001      If @_Jobi0750Ds.@NumberOfLibrariesInUserLibraryList > *Zeros;
+
+             @OffSet =  @_Jobi0750Ds.@OffsetToLibrariesInUserLibraryList;
+             @OffSet += 1;
+
+b002         For @i = 1 to
+
+                @_Jobi0750Ds.@NumberOfLibrariesInUserLibraryList;
+
+                @_UsrLiblDs(@i) =  %Subst(@_Jobi0750Ds:@OffSet:@Length);
+                @OffSet         += @Length;
+
+e002         EndFor;
+e001      EndIF;
+
+     PGetJOBI0750Info  e
+
+     PGetJOBI0800Info  b
+
+     DGetJOBI0800Info  pi
+     D  @_Format                     10a   Const
+     D  @_Job                        10a   Const
+     D  @_User                       10a   Const
+     D  @_JobNumber                   6a   Const
+     D  @_Jobi0800Ds                       LikeDs(Jobi0800Ds)
+     D  @_SignalDs                         LikeDs(SignalDataDs) Dim(1000)
+
+     D  @i             s              5p 0 Inz(*Zeros)
+     D  @OffSet        s              5p 0 Inz(*Zeros)
+     D  @Length        s              5p 0 Inz(*Zeros)
+
+      /define mflores016
+      /define mflores020
+      /define mflores036
+      /copy qcpysrc,mflores
+      /undefine mflores016
+      /undefine mflores020
+      /undefine mflores036
+
+          RtvJobI(@_Jobi0800Ds: %Size(@_Jobi0800Ds): @_Format:
+                  @_Job + @_User + @_JobNumber: *Blanks: ApiErrorDs);
+
+          @Length =  32;
+
+b001      If @_Jobi0800Ds.@NumberOfSignalMonitors > *Zeros;
+
+             @OffSet =  @_Jobi0800Ds.@OffsetToSignalMonitorData;
+             @OffSet += 1;
+
+b002         For @i = 1 to
+
+                @_Jobi0800Ds.@NumberOfSignalMonitors;
+
+                @_SignalDs(@i) =  %Subst(@_Jobi0800Ds:@OffSet:@Length);
+                @OffSet        += @Length;
+
+e002         EndFor;
+e001      EndIF;
+
+     PGetJOBI0800Info  e
+

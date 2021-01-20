@@ -1,0 +1,5 @@
+     A          R RPGMFLDMOV                PFILE(QPGMFLDMOV)
+     A*         R RPGMFLDMOV                PFILE(QTEMP/QPGMFLDMOV)
+     A          K PROGRAM
+     A          K LIBRARY
+     A          K SRCSEQ

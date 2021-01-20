@@ -1,0 +1,29 @@
+             PGM        PARM(&FFDFILE &FFDLIBRARY)
+
+             DCLF       FILE(QAFDBASI)
+
+             DCL        VAR(&FFDFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FFDLIBRARY) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+             DOWHILE    COND(&MSGID *NE CPF0864)
+
+             DSPFFD     FILE(&ATLIB/&ATFILE) OUTPUT(*OUTFILE) +
+                          OUTFILE(&FFDLIBRARY/&FFDFILE) +
+                          OUTMBR(*FIRST *ADD)
+             MONMSG     MSGID(CPF0000)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+             ENDDO
+
+             RMVMSG     CLEAR(*ALL)
+
+ END:        ENDPGM

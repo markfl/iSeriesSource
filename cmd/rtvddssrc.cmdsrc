@@ -1,0 +1,22 @@
+             CMD        PROMPT('Retrieve DDS Source')
+
+             PARM       KWD(FILE) TYPE(FILE) PROMPT('File')
+ FILE:       QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(SRCFILE) TYPE(SRCFILE) PROMPT('To Source +
+                          File')
+ SRCFILE:    QUAL       TYPE(*NAME) DFT(QDDSSRC)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(MEMBER) TYPE(*NAME) DFT(*FILE) +
+                          SPCVAL((*FILE) (*FIRST)) PROMPT('Member')
+
+             PARM       KWD(REFERENCE) TYPE(*CHAR) RSTD(*YES) +
+                          DFT(*YES) SPCVAL((*NO '0') (*YES '1')) +
+                          PROMPT('Fields defined by reference')
+

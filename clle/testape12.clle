@@ -1,0 +1,81 @@
+             PGM        PARM(&PSHPNBR &PSHPLEG &PPRMTYPE &PDIVISION +
+                          &PWAREHOUSE &PREFERENCE &PRTYPE &PERCD +
+                          &PLODNBR)
+
+             DCL        VAR(&PSHPNBR) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&PSHPLEG) TYPE(*DEC) LEN(5 2)
+             DCL        VAR(&PPRMTYPE) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&PDIVISION) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&PWAREHOUSE) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&PREFERENCE) TYPE(*CHAR) LEN(25)
+             DCL        VAR(&PRTYPE) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&PERCD) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&PLODNBR) TYPE(*CHAR) LEN(8)
+
+             DCL        VAR(&SHPNBR) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&SHPLEG) TYPE(*DEC) LEN(5 2)
+             DCL        VAR(&PRMTYPE) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&DIVISION) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&WAREHOUSE) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&REFERENCE) TYPE(*CHAR) LEN(25)
+             DCL        VAR(&RTYPE) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&ERCD) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&LODNBR) TYPE(*CHAR) LEN(8)
+
+             CHGVAR     VAR(&PRMTYPE) VALUE(&PPRMTYPE)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&PRMTYPE) VALUE(AP)
+             ENDDO
+
+             CHGVAR     VAR(&DIVISION) VALUE(&PDIVISION)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&DIVISION) VALUE(HUBG)
+             ENDDO
+
+             CHGVAR     VAR(&WAREHOUSE) VALUE(&PWAREHOUSE)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&WAREHOUSE) VALUE(HCMO)
+             ENDDO
+
+             CHGVAR     VAR(&REFERENCE) VALUE(&PREFERENCE)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&REFERENCE) VALUE('00368656      ')
+             ENDDO
+
+             CHGVAR     VAR(&RTYPE) VALUE(&PRTYPE)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&RTYPE) VALUE('1')
+             ENDDO
+
+             CHGVAR     VAR(&ERCD) VALUE(&PERCD)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&ERCD) VALUE(APE0011)
+             ENDDO
+
+             CHGVAR     VAR(&SHPNBR) VALUE(&PSHPNBR)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&SHPNBR) VALUE(TRU06067606)
+             CHGVAR     VAR(&SHPLEG) VALUE(&PSHPLEG)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&SHPLEG) VALUE(3.0)
+             ENDDO
+             ENDDO
+
+             IF         COND(&SHPLEG = 0) THEN(CHGVAR VAR(&SHPLEG) +
+                          VALUE(1.0))
+
+
+             CHGVAR     VAR(&LODNBR) VALUE(&PLODNBR)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&LODNBR) VALUE('        ')
+             ENDDO
+
+             DBG        PGM(APE0012AR)
+
+             CALL       PGM(APE0012AR) PARM(&PRMTYPE &DIVISION +
+                          &WAREHOUSE &REFERENCE &RTYPE &ERCD +
+                          &SHPNBR &SHPLEG &LODNBR)
+
+             ENDDBG
+
+ END:        ENDPGM

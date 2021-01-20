@@ -1,0 +1,33 @@
+             CMD        PROMPT('Build Source Member List')
+
+             PARM       KWD(FILE) TYPE(FILE) PROMPT('File')
+ FILE:       QUAL       TYPE(*GENERIC) DFT(*ALL) SPCVAL((*ALL))
+             QUAL       TYPE(*NAME) DFT(*ALLUSR) SPCVAL((*CURLIB) +
+                          (*USRLIBL) (*ALLUSR)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(DSPFD) TYPE(DSPFD) DFT(*DFT) +
+                          SNGVAL((*DFT 'QDSPFDBAS *CURLIB')) +
+                          PROMPT('Display Program Reference File')
+ DSPFD:      QUAL       TYPE(*NAME)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(OUTFILE) TYPE(OUTFILE) DFT(*DFT) +
+                          SNGVAL((*DFT 'QSRCMBRLST*CURLIB')) +
+                          PROMPT('File')
+ OUTFILE:    QUAL       TYPE(*NAME)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(OUTMBR) TYPE(OUTMBR) CHOICE(*NONE) +
+                          PROMPT('Output member options')
+ OUTMBR:     ELEM       TYPE(*NAME) DFT(*FIRST) SPCVAL((*FIRST) +
+                          (*FILE)) PROMPT('Member to receive output')
+             ELEM       TYPE(*CHAR) LEN(8) RSTD(*YES) DFT(*ADD) +
+                          VALUES(*REPLACE *ADD) SPCVAL((*FIRST) +
+                          (*SRCFILE)) CHOICE(*NONE) PROMPT('Replace +
+                          or add records')
+

@@ -1,0 +1,115 @@
+     A*%%TS  SD  20161205  153023  FLORESM     REL-V7R1M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(27 132 *DS4)
+     A                                      REF(*LIBL/QPGMFLDMOV)
+     A                                      PRINT
+     A          R SFL01                     SFL
+     A*%%TS  SD  20161101  144925  FLORESM     REL-V7R1M0  5770-WDS
+     A            @1SSEQ    R        O  6  2REFFLD(SRCSEQ)
+     A                                      COLOR(WHT)
+     A                                      EDTCDE(4)
+     A            @1SDATALINR        O  6 11REFFLD(DATALINE)
+     A  11
+     AO 12                                  DSPATR(RI)
+     A  11N12N13
+     AON11N12N13                            COLOR(BLU)
+     A  11 12                               COLOR(RED)
+     A N11 12                               COLOR(YLW)
+     A  13N11N12                            COLOR(PNK)
+     A            @1SFULLLINR        O  7 11REFFLD(FULLLINE)
+     A                                      COLOR(PNK)
+     A          R CTL01                     SFLCTL(SFL01)
+     A*%%TS  SD  20161102  140925  FLORESM     REL-V7R1M0  5770-WDS
+     A                                      SFLSIZ(0011)
+     A                                      SFLPAG(0010)
+     A                                      CA03
+     A                                      CA05
+     A                                      CA10
+     A                                      CA12
+     A N03                                  ROLLUP
+     A                                      BLINK
+     A                                      OVERLAY
+     A                                      SFLCSRRRN(&CURSOR)
+     A                                      SFLMODE(&SFLMODE)
+     A  01                                  SFLDSP
+     A  02                                  SFLDSPCTL
+     A N01                                  SFLCLR
+     A  03                                  SFLEND(*MORE)
+     A                                      SFLDROP(CA06)
+     A            SFLMODE        1A  H
+     A            CURSOR         5S 0H
+     A            SFLRCD         4S 0H      SFLRCDNBR(CURSOR)
+     A            @_PROC        10A  O  1  2COLOR(BLU)
+     A                                  1 26'Display Program Field Movement'
+     A                                      COLOR(WHT)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                      COLOR(BLU)
+     A                                  1 84'_'
+     A                                      COLOR(BLU)
+     A                                  1 86'=Normal Line'
+     A                                  1108'_'
+     A                                      COLOR(PNK)
+     A                                  1110'=Normal RPG/Free'
+     A            @_USER        10A  O  2  2COLOR(BLU)
+     A            CTLACT        20A  O  2 31COLOR(WHT)
+     A                                  2 73TIME
+     A                                      COLOR(BLU)
+     A                                  2 84' '
+     A                                      COLOR(BLU)
+     A                                      DSPATR(RI)
+     A                                  2 86'=Field Of Interest'
+     A                                  3  4'Program:'
+     A                                      COLOR(BLU)
+     A            @1PROGRAM R        B  3 13REFFLD(PROGRAM)
+     A                                      COLOR(WHT)
+     A                                      CHANGE(05)
+     A            ODOBTX    R        O  3 24REFFLD(ODOBTX QADSPOBJ)
+     A                                      COLOR(PNK)
+     A                                  3 84' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(YLW)
+     A                                  3 86'=Field Size Mismatch'
+     A                                  4  4'Library:'
+     A                                      COLOR(BLU)
+     A            @1LIBRARY R        B  4 13REFFLD(LIBRARY)
+     A                                      COLOR(WHT)
+     A                                      CHANGE(05)
+     A                                  4 24'Sequence:'
+     A                                      COLOR(BLU)
+     A            @1SRCSEQ  R        B  4 34REFFLD(SRCSEQ)
+     A                                      EDTCDE(4)
+     A                                      COLOR(WHT)
+     A                                      CHANGE(06)
+     A                                  4 42'Specs:'
+     A                                      COLOR(BLU)
+     A            @1SPECS        1A  B  4 49COLOR(WHT)
+     A                                      CHANGE(06)
+     A                                  4 84' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(RED)
+     A                                  4 86'=Field Size Mismatch W/ Field Of I-
+     A                                      nterest'
+     A                                  5  2'Sequence Line/Original Line       -
+     A                                                                         -
+     A                                                                         -
+     A                                           '
+     A                                      DSPATR(UL)
+     A          R CMD01
+     A*%%TS  SD  20160922  123136  FLORESM     REL-V7R1M0  5770-WDS
+     A                                      ROLLUP
+     A                                      ROLLDOWN
+     A                                 27  6'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 27 18'F5=Refresh'
+     A                                      COLOR(BLU)
+     A                                 27 33'F6=Fold/Unfold'
+     A                                      COLOR(BLU)
+     A N14                             27 50'F10=Omit Labels, Tags & Ind.'
+     A                                      COLOR(BLU)
+     A  14                             27 50'F10=Display Labels, Tags & Ind.'
+     A                                      COLOR(BLU)
+     A  15                             27 84'F12=Display All Lines'
+     A                                      COLOR(BLU)
+     A N15                             27 84'F12=Display Highlighted Lines Only'
+     A                                      COLOR(BLU)

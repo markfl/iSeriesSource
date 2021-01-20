@@ -1,0 +1,104 @@
+             PGM        PARM(&GROUP &SAVF &ARCLIB &DLTARCHIVE +
+                          &KEYFOPTION &KEY1 &KEY2 &KEY3 &KEY4)
+
+             DCLF       FILE(ITPPURGEP)
+
+             DCL        VAR(&GROUP) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SAVF) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&ARCLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DLTARCHIVE) TYPE(*LGL)
+             DCL        VAR(&KEYFOPTION) TYPE(*LGL)
+             DCL        VAR(&KEY1) TYPE(*CHAR) LEN(50)
+             DCL        VAR(&KEY2) TYPE(*CHAR) LEN(50)
+             DCL        VAR(&KEY3) TYPE(*CHAR) LEN(50)
+             DCL        VAR(&KEY4) TYPE(*CHAR) LEN(50)
+
+             DCL        VAR(&SAVFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SAVLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+
+             CHGVAR     VAR(&SAVFILE) VALUE(%SST(&SAVF 1 10))
+             CHGVAR     VAR(&SAVLIB) VALUE(%SST(&SAVF 11 10))
+
+             CHKOBJ     OBJ(QSYS/&ARCLIB) OBJTYPE(*LIB)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             CRTLIB     LIB(&ARCLIB) TYPE(*TEST) TEXT('Archive +
+                          Library')
+             ENDDO
+
+             ADDLIBLE   LIB(&ARCLIB)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QAFDRFMT)
+             MONMSG     MSGID(CPF0000)
+
+             CALL       PGM(ITPSTSSET) PARM(ITPPURGEP &GROUP '0')
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+             DOWHILE    COND(&MSGID *NE CPF0864)
+
+             IF         COND(&PURGROUP *EQ &GROUP) THEN(DO)
+
+             DSPFD      FILE(&PURFRMLIB/&PURFRMFILE) TYPE(*RCDFMT) +
+                          OUTPUT(*OUTFILE) FILEATR(*PF) +
+                          OUTFILE(QTEMP/QAFDRFMT) OUTMBR(*FIRST *ADD)
+
+             ENDDO
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+             ENDDO
+
+             OVRDBF     FILE(QAFDRFMT) TOFILE(QTEMP/QAFDRFMT) +
+                          SHARE(*YES)
+             OPNQRYF    FILE((QTEMP/QAFDRFMT)) OPTION(*ALL) +
+                          KEYFLD((RFFILE))
+
+             CALL       PGM(ITPCREATE) PARM(&GROUP &ARCLIB)
+
+             CLOF       OPNID(QAFDRFMT)
+
+             DLTOVR     FILE(*ALL)
+
+             DLTF       FILE(QTEMP/QAFDRFMT)
+             MONMSG     MSGID(CPF0000)
+
+             CALL       PGM(ITPPURGER) PARM(&GROUP &KEYFOPTION &KEY1 +
+                          &KEY2 &KEY3 &KEY4)
+
+             CRTSAVF    FILE(&SAVLIB/&SAVFILE)
+             MONMSG     MSGID(CPF0000)
+
+             CLRSAVF    FILE(&SAVLIB/&SAVFILE)
+             MONMSG     MSGID(CPF0000)
+
+             SAVOBJ     OBJ(*ALL) LIB(&ARCLIB) DEV(*SAVF) +
+                          OBJTYPE(*FILE) SAVF(&SAVLIB/&SAVFILE)
+
+             CALL       PGM(ITPSTSSET) PARM(ITPPURGEP &GROUP '4')
+
+             RMVLIBLE   LIB(&ARCLIB)
+
+             IF         COND(&DLTARCHIVE) THEN(DO)
+
+             CALL       PGM(ITPDELETE) PARM(&GROUP &ARCLIB)
+
+             IF         COND(&ARCLIB *NE &SAVLIB) THEN(DO)
+
+             DLTLIB     LIB(&ARCLIB)
+
+             ENDDO
+             ENDDO
+
+             CALL       PGM(ITPSTSSET) PARM(ITPPURGEP &GROUP '9')
+             IF         COND(&KEYFOPTION) THEN(DO)
+             CALL       PGM(ITPSTSSET) PARM(ITPPURKEY &GROUP '9')
+             ENDDO
+
+ END:        ENDPGM

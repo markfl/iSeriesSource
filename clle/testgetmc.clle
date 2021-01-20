@@ -1,0 +1,25 @@
+             PGM        PARM(&PFORMAT &PMESSAGEID)
+
+             DCL        VAR(&PFORMAT) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&PMESSAGEID) TYPE(*CHAR) LEN(7)
+
+             DCL        VAR(&FORMAT) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&MESSAGEID) TYPE(*CHAR) LEN(7)
+
+             CHGVAR     VAR(&FORMAT) VALUE(&PFORMAT)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&FORMAT) VALUE(RTVM0400)
+             ENDDO
+
+             CHGVAR     VAR(&MESSAGEID) VALUE(&PMESSAGEID)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&MESSAGEID) VALUE(CAE9060)
+             ENDDO
+
+             DBG        PGM(TESTGETMSG)
+
+             CALL       PGM(TESTGETMSG) PARM(&FORMAT &MESSAGEID)
+
+             ENDDBG
+
+ END:        ENDPGM

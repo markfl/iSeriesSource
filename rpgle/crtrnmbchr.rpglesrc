@@ -1,0 +1,39 @@
+          Ctl-opt Option(*NoDebugio) DftActGrp(*No) BndDir('MFLORES');
+
+     Fqafdmbrl  ip   e             Disk
+          Dcl-f qtxtsrc Disk(112) Usage(*Output);
+
+          Dcl-Pi CrtRnmBchr;
+             @P_Prefix    Char(15) Const;
+             @P_Extension Char(10) Const;
+          End-Pi;
+
+          Dcl-s @FileName  Inz(*Blanks) Like(mlname);
+          Dcl-s @Prefix    Inz(*Blanks) Like(@P_Prefix);
+          Dcl-s @Extension Inz(*Blanks) Like(@P_Extension);
+
+          /define rpgstruct01_TXT
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct01_TXT
+
+          /define mflores004
+          /copy qcpysrc,mflores
+          /undefine mflores004
+
+          @FileName = @ToLower(mlname);
+          @Prefix   = @ToLower(@P_Prefix);
+
+          @_srcseq += .01;
+          @_srcdat =  %Dec(%Date():*ymd);
+          Clear @_srcdta;
+          @_srcdta =  'ren ' + %Trim(@Prefix)   + '.' + %Trim(@FileName) + ' '
+                             + %Trim(@FileName) + '.' + %Trim(@Extension);
+
+          Write qtxtsrc @SourceDs;
+
+          BegSr *InzSr;
+
+             Clear @_srcseq;
+             @Extension = @ToLower(@P_Extension);
+
+          EndSr;

@@ -1,0 +1,9 @@
+             PGM        PARM(&PARM1 &PARM2)
+
+             DCL        VAR(&PARM1) TYPE(*CHAR) LEN(51)
+             DCL        VAR(&PARM2) TYPE(*CHAR) LEN(51)
+
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&PARM1)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&PARM2)
+
+ END:        ENDPGM

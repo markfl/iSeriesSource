@@ -1,0 +1,48 @@
+             PGM
+
+             CLRPFM     FILE(*CURLIB/QPGMMODREF)
+             MONMSG     MSGID(CPF0000)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(TPSTST50/*ALL)) +
+                          JOB(TPSTST50) HOLD(*YES)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(TPSOBJ50/*ALL)) +
+                          JOB(TPSOBJ50) HOLD(*YES)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(TPSOBJ50QA/*ALL)) +
+                          JOB(TPSOBJ50QA) HOLD(*YES)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(TPSOBJ50UA/*ALL)) +
+                          JOB(TPSOBJ50UA) HOLD(*YES)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(HGI2DP52/*ALL)) +
+                          JOB(HGI2DP52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(HGI2DS52/*ALL)) +
+                          JOB(HGI2DS52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(HGI2DV52/*ALL)) +
+                          JOB(HGI2DV52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(HGI2PC52/*ALL)) +
+                          JOB(HGI2PC52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(HGI2QA52/*ALL)) +
+                          JOB(HGI2QA52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(HGI2QP52/*ALL)) +
+                          JOB(HGI2QP52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(HGI2QS52/*ALL)) +
+                          JOB(HGI2QS52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(HGI2RL52/*ALL)) +
+                          JOB(HGI2RL52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(HGI2SP52/*ALL)) +
+                          JOB(HGI2SP52) HOLD(*YES)
+
+             SBMJOB     CMD(PGMMODREF OBJECT(HGQSYS/*ALL)) +
+                          JOB(HGQSYS) HOLD(*YES)
+
+             ENDPGM

@@ -1,0 +1,122 @@
+     H/title    Restore Files
+     H Option(*NoDebugio)
+     H copyright ('(C) Copyright Hub Group, Inc. 2015')
+      **************************************************************************
+      *                                                                        *
+      *   H U B   G R O U P ,   I N C .                                        *
+      *                                                                        *
+      **************************************************************************
+      *                                                                        *
+      *  Program Title: Restore Files                                          *
+      *                                                                        *
+      *  Date Written:  08/28/2015                                             *
+      *                                                                        *
+      *  Input:                                                                *
+      *                                                                        *
+      *  Output:                                                               *
+      *                                                                        *
+      **************************************************************************
+      *            Design                                                      *
+      * Date       Request Mod Pgmr Description                                *
+      * ---------- ------- --- ---- ------------------------------------------ *
+      * 08-28-15   42268       MF   Initial Creation                           *
+      *                                                                        *
+      **************************************************************************
+
+     ‚* Purge File Driver
+     Fitppurgel1if   e           k Disk
+
+      * Program Status Data Structure
+     D                sds
+     D QProg             *Proc
+     D QParms            *Parms
+     D QErrorMessage          91    170
+     D QUser                 254    263
+
+     Ditprestorr       pr
+     D                               10a   Const
+
+     Ditprestorr       pi
+     D  @PGroup                      10a   Const
+
+     D ReadPurgeFile   pr
+     D                               +0    Const Like(purgroup)
+
+     D/DEFINE ITPSHARE01
+     D/DEFINE ITPSHARE02
+     D/DEFINE ITPSHARE03
+     D/DEFINE ITPSHARE19
+     D/DEFINE ITPSHARE21
+     D/DEFINE ITPSHARE25
+     D/copy qcpysrc,itpshare
+
+      /free
+
+          // Create Source File
+          ReadPurgeFile(@PGroup);
+
+          *Inlr = *On;
+          Return;
+
+          // ************************************************************************
+          // *‚Program Initialization Subroutine
+          // ************************************************************************
+
+          BegSr *InzSr;
+
+
+          EndSr;
+
+      /end-free
+
+      ************************************************************************
+      *‚ReadPurgeFile = Read Purge File and Process
+      ************************************************************************
+
+     P ReadPurgeFile   b
+
+     D ReadPurgeFile   pi
+     D  @Group                       +0    Const Like(purgroup)
+
+     D  @FileLib       s             25a   Inz(*Blanks)
+
+     D@MsgDta          ds           256
+     D  @MsgDta1       s            131a
+     D  @MsgDta2       s            125a
+
+      /free
+
+          //‚get first purge record
+          Setll *Loval  ritppurgep;
+          Setll @Group ritppurgep;
+          Reade @Group ritppurgep;
+b001      Dow not %Eof(itppurgel1);
+
+b002         If purfrmlib <> @Libl;
+                @FileLib = %Trim(purfrmlib) + '/' + %Trim(purfrmfile);
+x002         Else;
+                @FileLib = %Trim(purfrmfile);
+e002         EndIf;
+
+             // Copy records from input file to output file
+b002         If CopyData(@MsgDta: purtofile:  @FileLib:
+                         purkeyfld1: purkeyfld2: purkeyfld3: purkeyfld4);
+
+                // Set status to copy complete
+                SetStatusForITPPURGEP(@Group: @InitStatus: purseq);
+
+                // Update member source
+                DeleteData(@MsgDta: purtofile:
+                           purkeyfld1: purkeyfld2: purkeyfld3: purkeyfld4);
+
+e002         EndIf;
+
+             //‚get next purge record
+             Reade @Group ritppurgep;
+
+e001      EndDo;
+
+      /end-free
+
+     P ReadPurgeFile   e
+

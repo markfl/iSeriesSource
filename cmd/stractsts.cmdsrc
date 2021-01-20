@@ -1,0 +1,8 @@
+             CMD        PROMPT('Start CNVACTSTS Job')
+
+             PARM       KWD(JOBQ) TYPE(*NAME) DFT(*DEFAULT) +
+                          SPCVAL((*DEFAULT)) PROMPT('Job Queue')
+
+             PARM       KWD(JOBD) TYPE(*NAME) DFT(*DEFAULT) +
+                          SPCVAL((*DEFAULT)) PROMPT('Job Description')
+

@@ -1,0 +1,137 @@
+      //‚*******************************************************************************************
+
+      //‚Author.....: Mark Flores
+      //‚Date.......: 02-May-2016
+      //‚Description: API To Check For Numberic Check For Character
+
+      //‚*******************************************************************************************
+      //‚Change Control Information
+      //‚-------------------------------------------------------------------------------------------
+      //‚Date     Task #  Description of Changes                     Pgmr ID
+      //‚-------- ------- ------------------------------------------ ----------
+      //‚05/02/15         Program Creation                           Flores M
+      //‚*******************************************************************************************
+
+          Ctl-opt NoMain Option(*NoDebugio);
+
+          Dcl-f qobsolete Usage(*Input) Keyed UsrOpn;
+          Dcl-f qafdbasi  Usage(*Input)       UsrOpn;
+
+š         Dcl-Proc @Check# Export;
+
+          Dcl-pi @Check# Ind;
+             @Input Varchar(32767) Const;
+          End-pi;
+
+b001      If %Check('0123456789':%Trim(@Input)) = *Zeros;
+
+             Return *On;
+
+x001      Else;
+
+             Return *Off;
+
+e001      EndIf;
+
+ š        End-Proc;
+
+š         Dcl-Proc @CheckAlpha Export;
+
+          Dcl-pi @CheckAlpha Ind;
+             @P_Input Varchar(32767) Const;
+          End-pi;
+
+          Dcl-s @Input VarChar(32767) Inz(*Blanks);
+
+         /define mflores003
+         /define mflores072
+         /copy qcpysrc,mflores
+         /undefine mflores003
+         /undefine mflores072
+
+          @Input = @ToUpper(%Trim(@P_Input));
+b001      If %Check(@Up:%Trim(@Input)) = *Zeros;
+
+             Return *On;
+
+x001      Else;
+
+             Return *Off;
+
+e001      EndIf;
+
+ š        End-Proc;
+
+š         Dcl-Proc CheckObsolete Export;
+
+          Dcl-Pi CheckObsolete Ind;
+             @Object  Like(odobnm) Const;
+             @Library Like(odlbnm) Const Options(*NoPass);
+             @ObjTyp  Like(odobtp) Const Options(*NoPass);
+          End-Pi;
+
+          Dcl-Ds @KeyDs likerec(rqobsolete : *key);
+
+          @KeyDs.odobnm = @Object;
+
+b001      If Not %Open(qobsolete);
+             Open qobsolete;
+e001      EndIf;
+
+b001      Select;
+
+x001         When %Parms() = 3;
+
+                @KeyDs.odlbnm = @Library;
+                @KeyDs.odobtp = @ObjTyp;
+                Setll %Kds(@KeyDs) rqobsolete;
+b002            If %Equal(qobsolete);
+                   Close qobsolete;
+                   Return *Off;
+e002            EndIf;
+
+x001         When %Parms() = 2;
+
+                @KeyDs.odlbnm = @Library;
+                Setll %Kds(@KeyDs:2) rqobsolete;
+b002            If %Equal(qobsolete);
+                   Close qobsolete;
+                   Return *Off;
+e002            EndIf;
+
+x001         When %Parms() = 1;
+
+                Setll %Kds(@KeyDs:1) rqobsolete;
+b002            If %Equal(qobsolete);
+                   Close qobsolete;
+                   Return *Off;
+e002            EndIf;
+
+e001      EndSl;
+
+          Close qobsolete;
+          Return *On;
+
+ š        End-Proc;
+
+š         Dcl-Proc CheckPhysical Export;
+
+          Dcl-Pi CheckPhysical Ind;
+          End-Pi;
+
+b001      If Not %Open(qafdbasi);
+             Open qafdbasi;
+e001      EndIf;
+
+          Read qwhfdbas;
+b002      If  Not %Eof(qafdbasi)
+b002      And atdtat = 'S';
+             Close qafdbasi;
+             Return *On;
+e001      EndIf;
+
+          Close qafdbasi;
+          Return *Off;
+
+ š        End-Proc;
+

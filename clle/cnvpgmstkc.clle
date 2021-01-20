@@ -1,0 +1,37 @@
+             PGM        PARM(&JOB &USER &NBR &TIMESTAMP &LOCKJOB +
+                          &LOCKUSER &LOCKNBR)
+
+             DCL        VAR(&JOB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&USER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&NBR) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&TIMESTAMP) TYPE(*CHAR) LEN(26)
+             DCL        VAR(&LOCKJOB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LOCKUSER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LOCKNBR) TYPE(*CHAR) LEN(6)
+
+             DLTF       FILE(QTEMP/CNVPGMSTK)
+             MONMSG     MSGID(CPF0000)
+
+             CRTPF      FILE(QTEMP/CNVPGMSTK) RCDLEN(132) SIZE(*NOMAX)
+             MONMSG     MSGID(CPF0000)
+
+             CLRPFM     FILE(QTEMP/CNVPGMSTK)
+             MONMSG     MSGID(CPF0000)
+
+             DSPJOB     JOB(&LOCKNBR/&LOCKUSER/&LOCKJOB) +
+                          OUTPUT(*PRINT) OPTION(*PGMSTK)
+
+             CPYSPLF    FILE(QPDSPJOB) TOFILE(QTEMP/CNVPGMSTK)
+             DLTSPLF    FILE(QPDSPJOB) SPLNBR(*LAST)
+
+             OVRDBF     FILE(INPUT) TOFILE(QTEMP/CNVPGMSTK)
+
+             CALL       PGM(CNVPGMSTK) PARM(&JOB &USER &NBR +
+                          &TIMESTAMP &LOCKJOB &LOCKUSER &LOCKNBR)
+
+             DLTOVR     FILE(INPUT)
+
+             DLTF       FILE(QTEMP/CNVPGMSTK)
+             MONMSG     MSGID(CPF0000)
+
+ END:        ENDPGM

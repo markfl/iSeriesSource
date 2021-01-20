@@ -1,0 +1,77 @@
+     H/Title Retrieve Save File From System
+
+          Ctl-opt Option(*NoDebugio) DftActGrp(*No);
+
+          Dcl-f rtvsavf Usage(*Input) Keyed;
+          Dcl-f input Disk(100) Usage(*Output);
+
+          Dcl-Pi rtvsavfr;
+             @System     Char(10);
+             @Savf       Char(10);
+             @Savflib    Char(10);
+             @ToSavf     Char(10);
+             @ToSavflib  Char(10);
+             @User       Char(10);
+             @Password   Char(10);
+             @IPAddress  Char(15);
+          End-Pi;
+
+          Dcl-Ds @inputds;
+             @dataout Char(100) Pos(1);
+          End-Ds;
+
+          Dcl-Ds *N PsDs;
+             Quser Char(10) Pos(254);
+          End-Ds;
+
+          Chain @System rrtvsavf;
+b001      If %Found(rtvsavf);
+
+             @IPAddress = IPAddress;
+
+             @dataout = 'REIN';
+             Write input @inputds;
+
+b002         If @User = '*CURRENT';
+                @User = QUser;
+e002         EndIf;
+
+b002         If @Password = '*NONE';
+                Clear @Password;
+e002         EndIf;
+
+             @dataout = 'USER ' + @User + ' ' + @Password;
+             Write input @inputds;
+             @dataout = 'BINARY';
+             Write input @inputds;
+             @dataout = 'GET';
+
+b002         If %Trim(@Savflib) <> *Blanks;
+
+                @dataout = %Trim(@dataout) + ' ' + %Trim(@Savflib) + '/'
+                                                 + %Trim(@Savf);
+x002         Else;
+                @dataout = %Trim(@dataout) + ' ' + %Trim(@Savf);
+e002         EndIf;
+
+b002         If %Trim(@ToSavf) <> '*SAVF';
+b003            If %Trim(@ToSavflib) <> *Blanks;
+                   @dataout = %Trim(@dataout) + ' ' + %Trim(@ToSavflib) + '/'
+                                                    + %Trim(@ToSavf);
+x003            Else;
+
+                   @dataout = %Trim(@dataout) + ' ' + %Trim(@ToSavf);
+
+e003            EndIf;
+e002         EndIf;
+
+             @dataout = %Trim(@dataout) + ' (replace';
+             Write input @inputds;
+             @dataout = 'QUIT';
+
+             Write input @inputds;
+
+e001      EndIf;
+
+          *Inlr = *On;
+          Return;

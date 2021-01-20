@@ -1,0 +1,34 @@
+             PGM        PARM(&MSG &DLVRY)
+
+             DCL        VAR(&MSG) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&DLVRY) TYPE(*CHAR) LEN(7)
+
+             DCL        VAR(&MSGQ) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MSGQLIB) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&MSGQ) VALUE(%SST(&MSG 1 10))
+             CHGVAR     VAR(&MSGQLIB) VALUE(%SST(&MSG 11 10))
+
+             SELECT
+
+             WHEN       COND(&MSGQ = '*USRPRF') THEN(DO)
+             CHGMSGQ    MSGQ(*USRPRF) DLVRY(&DLVRY)
+             ENDDO
+
+             WHEN       COND(&MSGQ = '*WRKSTN') THEN(DO)
+             CHGMSGQ    MSGQ(*WRKSTN) DLVRY(&DLVRY)
+             ENDDO
+
+             WHEN       COND(&MSGQLIB = '*LIBL') THEN(DO)
+             CHGMSGQ    MSGQ(&MSGQ) DLVRY(&DLVRY)
+             ENDDO
+
+             OTHERWISE  CMD(CHGMSGQ MSGQ(&MSGQLIB/&MSGQ) DLVRY(&DLVRY))
+
+             ENDSELECT
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

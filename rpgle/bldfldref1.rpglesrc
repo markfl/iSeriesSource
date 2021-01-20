@@ -1,0 +1,60 @@
+          Ctl-opt Option(*NoDebugio);
+
+          Dcl-f qafdmbrl   Usage(*Input:*Output:*Delete) Keyed Prefix(@);
+          Dcl-f qpgmmodrl2 Usage(*Input) Keyed;
+
+          Dcl-Pi bldfldref1;
+             @PLibrary Like(mlname);
+             @PProgram Like(mlname);
+          End-Pi;
+
+          Dcl-Ds @qafdmbrlCur ExtName('QAFDMBRL') Prefix(@) End-Ds;
+          Dcl-Ds @qafdmbrlSav ExtName('QAFDMBRL') End-Ds;
+
+          Dcl-s @Found   Ind       Inz(*Off);
+          Dcl-s @Generic Ind       Inz(*Off);
+
+          Dcl-s @a       Packed(3) Inz(*Zeros);
+
+          Dcl-s @Chk1    Char(10)  Inz(*Blanks);
+          Dcl-s @Chk2    Char(10)  Inz(*Blanks);
+
+          Read qwhfdml;
+b001      Dow Not %Eof(qafdmbrl);
+b002         If @Generic;
+                @Chk2 = %Subst(@mlname:1:@a-1);
+b003            If @Chk1 <> @Chk2;
+                   Delete qwhfdml;
+e003            EndIf;
+x002         Else;
+b003            If @mlname <> @PProgram;
+                   Setll (@PProgram:@PLibrary:@mlname) rpgmmodref;
+b004               If Not %Equal(qpgmmodrl2);
+                      Delete qwhfdml;
+e004               EndIf;
+x003            Else;
+                   @qafdmbrlSav = @qafdmbrlCur;
+                   Delete qwhfdml;
+                   @Found = *On;
+e003            EndIf;
+e002         EndIf;
+             Read qwhfdml;
+e001      EndDo;
+
+b001      If @Found;
+             @qafdmbrlCur = @qafdmbrlSav;
+             Write qwhfdml;
+e001      EndIf;
+
+          *Inlr = *On;
+          Return;
+
+          BegSr *Inzsr;
+
+             @a = %Scan('*':@PProgram);
+b001         If @a > *Zeros;
+                @Generic = *On;
+                @Chk1 = %Subst(@PProgram:1:@a-1);
+e001         EndIf;
+
+          EndSr;

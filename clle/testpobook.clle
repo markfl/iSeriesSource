@@ -1,0 +1,12 @@
+             PGM        PARM(&PGM)
+
+             DCL        VAR(&PGM) TYPE(*CHAR) LEN(10)
+
+             DBG        PGM(&PGM)
+
+             CALL       PGM(ECTPMPDBC) PARM(*NONE *SECONLY ECOMPDGIS +
+                          '     ' *PRIONLY ECOMPDSI '    ')
+
+             ENDDBG
+
+ END:        ENDPGM

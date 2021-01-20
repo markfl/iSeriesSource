@@ -1,0 +1,9 @@
+             CMD        PROMPT('Build QDSPFD File *MBRLIST')
+
+             PARM       KWD(DSPFD) TYPE(DSPFD) DFT(*DFT) +
+                          SNGVAL((*DFT 'QDSPFDMBR *CURLIB')) +
+                          PROMPT('Display File Description')
+ DSPFD:      QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')

@@ -1,0 +1,33 @@
+     A                                      REF(QSYS/QADSPOBJ)
+     A          R RPGMMODREF
+     A            OBJECT        10A         COLHDG('Object' 'Name')
+     A                                      TEXT('Object Name')
+     A            LIBRARY       10A         COLHDG('Library' 'Name')
+     A                                      TEXT('Library Name')
+     A            PGMATTR       10A         COLHDG('Program' 'Attribute')
+     A                                      TEXT('Program Attribute')
+     A            OBJATTR        7A         COLHDG('Object' 'Attribute')
+     A                                      TEXT('Object Attribute')
+     A            MODULE        10A         COLHDG('Module' 'Name')
+     A                                      TEXT('Module Name')
+     A            MODLIB        10A         COLHDG('Library' 'Name')
+     A                                      TEXT('Library Name')
+     A            MODATTR        7A         COLHDG('Module' 'Attribute')
+     A                                      TEXT('Module Attribute')
+     A            EXPORTPROC    50A         COLHDG('Export' 'Procedure')
+     A                                      TEXT('Export Procedure')
+     A            SIGNATURE     35A         COLHDG('Signature')
+     A                                      TEXT('Signature')
+     A            CRTDATE         L         COLHDG('Creation' 'Date')
+     A                                      TEXT('Creation Date')
+     A            ODOBTX    R
+     A            ODUDAT    R
+     A            ODUCNT    R
+     A            ODSRCF    R
+     A            ODSRCL    R
+     A            ODSRCM    R
+     A            SYSUSAGE       3P 0       COLHDG('Sustem''s' 'Used')
+     A                                      TEXT('Sustem''s Used')
+     A            PROCESSED      1A
+     A            PGMPROC       10          COLHDG('Program' 'To Process')
+     A                                      TEXT('Program To Process')

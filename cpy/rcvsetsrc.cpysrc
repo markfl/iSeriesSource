@@ -1,0 +1,11 @@
+
+             RTVJOBA    CURLIB(&CURLIB) USRLIBL(&USRLIBL)
+
+             CHGCURLIB  CURLIB(*CRTDFT)
+             RMVLIBLE   LIB(QTEMP)
+             MONMSG     MSGID(CPF0000)
+             ADDLIBLE   LIB(QTEMP)
+             MONMSG     MSGID(CPF0000)
+             ADDLIBLE   LIB(&CURLIB) POSITION(*LAST)
+             MONMSG     MSGID(CPF0000)
+

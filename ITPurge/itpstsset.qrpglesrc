@@ -1,0 +1,88 @@
+     H/title    Set Status Code
+     H Option(*NoDebugio)
+     H copyright ('(C) Copyright Hub Group, Inc. 2015')
+      **************************************************************************
+      *                                                                        *
+      *   H U B   G R O U P ,   I N C .                                        *
+      *                                                                        *
+      **************************************************************************
+      *                                                                        *
+      *  Program Title: Set Status Code                                        *
+      *                                                                        *
+      *  Date Written:  08/28/2015                                             *
+      *                                                                        *
+      *  Input:                                                                *
+      *                                                                        *
+      *  Output:                                                               *
+      *                                                                        *
+      **************************************************************************
+      *            Design                                                      *
+      * Date       Request Mod Pgmr Description                                *
+      * ---------- ------- --- ---- ------------------------------------------ *
+      * 08-28-15   42268       MF   Initial Creation                           *
+      *                                                                        *
+      **************************************************************************
+
+     D/DEFINE ITPSHARE01
+     D/DEFINE ITPSHARE06
+     D/DEFINE ITPSHARE21
+     D/DEFINE ITPSHARE23
+     D/copy qcpysrc,itpshare
+
+‚     * Procedure Interface
+     Ditpstsset        pr
+     D                               +0    Const Like(purfrmfile)
+     D                               +0    Const Like(purgroup)
+     D                               +0    Const Like(purstatus)
+     D                               +0    Const Like(purseq)
+     D                                     Options(*NoPass)
+
+‚     * Procedure Interface
+     Ditpstsset        pi
+     D  @PFile                       +0    Const Like(purfrmfile)
+     D  @PGroup                      +0    Const Like(purgroup)
+     D  @PStatus                     +0    Const Like(purstatus)
+     D  @PSeq                        +0    Const Like(purseq)
+     D                                     Options(*NoPass)
+
+      /free
+
+          // Check for file use
+b001      If @PFile = @PurgeFile;
+
+             // Check for file name passed to program
+b002         If  %Parms() >= 4
+             And @PSeq    <> *Zeros;
+
+                // Execute update itppurgep file routine
+                SetStatusForITPPURGEP(@PGroup: @PStatus: @PSeq);
+
+x002         Else;
+
+                // Execute update itppurgep file routine
+                SetStatusForITPPURGEP(@PGroup: @PStatus);
+
+e002         EndIf;
+
+x001      Else;
+
+             // Check for file name passed to program
+b002         If  %Parms() >= 4
+             And @PSeq    <> *Zeros;
+
+                // Execute update itppurgep file routine
+                SetStatusForITPPURKEY(@PGroup: @PStatus: @PSeq);
+
+x002         Else;
+
+                // Execute update itppurgep file routine
+                SetStatusForITPPURKEY(@PGroup: @PStatus);
+
+e002         EndIf;
+e001      EndIf;
+
+          *Inlr = *On;
+          Return;
+
+      /end-free
+

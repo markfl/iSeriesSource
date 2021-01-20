@@ -1,0 +1,11 @@
+          Ctl-opt Option(*NoDebugIO) DftActGrp(*No) BndDir('MFLORES');
+
+     Fqdspfdbas up   e             Disk
+
+      /define mflores060
+      /copy qcpysrc,mflores
+      /undefine mflores060
+
+b001      If Not CheckObsolete(atlib);
+             Delete qwhfdbas;
+e001      EndIf;

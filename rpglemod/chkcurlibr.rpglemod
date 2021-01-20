@@ -1,0 +1,19 @@
+          Ctl-opt NoMain Option(*NoDebugio);
+
+          Dcl-f qcurlibl2 Usage(*Input) Keyed;
+
+          Dcl-Proc @CheckUserLibraryList Export;
+
+          Dcl-Pi @CheckUserLibraryList Ind;
+             @library Like(library) Const;
+          End-Pi;
+
+          Chain @library rcurlibl;
+b001      If %Found(qcurlibl2);
+             Return *On;
+x001      Else;
+             Return *Off;
+x001      EndIf;
+
+          End-Proc;
+

@@ -1,0 +1,18 @@
+             PGM
+
+             DCLF       FILE(QADSPDBR)
+
+ AGAIN:      RCVF
+             MONMSG     MSGID(CPF0864) EXEC(GOTO CMDLBL(END))
+
+             IF         COND(&WHREFI *NE ' ') THEN(DO)
+
+             CRTDUPOBJ  OBJ(&WHREFI) FROMLIB(*LIBL) OBJTYPE(*FILE) +
+                          TOLIB(*CURLIB) CST(*NO) TRG(*NO)
+             MONMSG     MSGID(CPF0000)
+
+             ENDDO
+
+             GOTO       CMDLBL(AGAIN)
+
+ END:        ENDPGM

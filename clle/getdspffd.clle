@@ -1,0 +1,59 @@
+             PGM        PARM(&FILELIB &DSPFFD &OUTMBR)
+
+             DCL        VAR(&FILELIB) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&DSPFFD) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OUTMBR) TYPE(*CHAR) LEN(20)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&FFDFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FFDLIBRARY) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MBROPT) TYPE(*CHAR) LEN(8)
+
+             CHGVAR     VAR(&FILE) VALUE(%SST(&FILELIB 1 10))
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&FILELIB 11 10))
+
+             CHGVAR     VAR(&FFDFILE) VALUE(%SST(&DSPFFD 1 10))
+             CHGVAR     VAR(&FFDLIBRARY) VALUE(%SST(&DSPFFD 11 10))
+
+             CHGVAR     VAR(&MEMBER) VALUE(%SST(&OUTMBR 3 10))
+             CHGVAR     VAR(&MBROPT) VALUE(%SST(&OUTMBR 13 8))
+
+             DLTF       FILE(QTEMP/DSPFD)
+             MONMSG     MSGID(CPF0000)
+
+             IF         COND(&MBROPT *EQ *REPLACE) THEN(DO)
+             IF         COND(&MEMBER *EQ *FIRST) THEN(DO)
+             CLRPFM     FILE(&FFDLIBRARY/&FFDFILE)
+             MONMSG     MSGID(CPF0000)
+             ENDDO
+             ELSE       CMD(DO)
+             CLRPFM     FILE(&FFDLIBRARY/&FFDFILE) MBR(&MEMBER)
+             MONMSG     MSGID(CPF0000)
+             ENDDO
+             ENDDO
+
+             DSPFD      FILE(&LIBRARY/&FILE) TYPE(*BASATR) +
+                          OUTPUT(*OUTFILE) FILEATR(*PF) +
+                          OUTFILE(QTEMP/QAFDBASI)
+             DSPFD      FILE(&LIBRARY/&FILE) TYPE(*BASATR) +
+                          OUTPUT(*OUTFILE) FILEATR(*LF) +
+                          OUTFILE(QTEMP/QAFDBASI) OUTMBR(*FIRST *ADD)
+
+             RMVMSG     CLEAR(*ALL)
+
+             OVRDBF     FILE(QAFDBASI) TOFILE(QTEMP/QAFDBASI)
+
+             CALL       PGM(GETDSPFFDC) PARM(&FFDFILE &FFDLIBRARY)
+
+             DLTOVR     FILE(*ALL)
+
+             DLTF       FILE(QTEMP/DSPFD)
+             MONMSG     MSGID(CPF0000)
+
+             RMVMSG     CLEAR(*ALL)
+
+ END:        ENDPGM

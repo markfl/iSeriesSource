@@ -1,0 +1,27 @@
+          Ctl-opt Option(*NoDebugio) DftActGrp(*No);
+
+          Dcl-f xmlmsgtemp Usage(*Input) Rename(xmlmsgwebq:rxmlmsgweb);
+
+     DCreateCarrier    Pr                  ExtPgm('TPSCARCRT')
+     D                            32500a   Varying
+     D                            32500a   Varying
+     D                                3i 0
+
+     D @InDoc          s          32500a   Varying
+     D @OutDoc         s          32500a   Varying
+
+          Dcl-s @Status       Int(3:0)   Inz(*Zeros);
+
+          Clear @InDoc;
+
+          Read rxmlmsgweb;
+b001      If Not %Eof(xmlmsgtemp);
+b002         If XmlPgm = 'TPSCARCRT ';
+                @InDoc = %Trim(xmlmsg);
+                CreateCarrier(@InDoc:@OutDoc:@Status);
+e002         EndIf;
+e001      EndIf;
+
+          *Inlr = *On;
+          Return;
+

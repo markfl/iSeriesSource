@@ -1,0 +1,11 @@
+             CMD        PROMPT('Display Source Member')
+
+             PARM       KWD(OBJ) TYPE(OBJ) PROMPT('Object')
+ OBJ:        QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*CURLIB)) CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(OBJTYPE) TYPE(*CHAR) LEN(6) RSTD(*YES) +
+                          DFT(*FIRST) VALUES(*FIRST *PGM *FILE +
+                          *CMD) SPCVAL((*FIRST) (*PGM) (*FILE) +
+                          (*CMD)) CHOICE(*NONE) PROMPT('Object')

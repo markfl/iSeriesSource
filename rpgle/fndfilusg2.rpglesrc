@@ -1,0 +1,33 @@
+          Ctl-opt Option(*NoDebugio);
+
+     Fqafdbasi  ip   e           k Disk
+
+          Dcl-f qdsppgmrl3 Disk Usage(*Input)  Keyed;
+          Dcl-f qobsolete  Disk Usage(*Input)  Keyed;
+          Dcl-f qadsppgm   Disk Usage(*Output) Rename(qwhdrppr:rqwhdrppr);
+
+          Dcl-pi fndfilusg2;
+             @objlib Like(whlib);
+          End-pi;
+
+          Dcl-s @whfnam Like(whfnam) Inz(*Blanks);
+
+          @whfnam = atfile;
+
+          Setll *Loval qwhdrppr;
+          Setll @whfnam qwhdrppr;
+          Reade @whfnam qwhdrppr;
+b001      Dow Not %Eof(qdsppgmrl3);
+             Setll whlib rqobsolete;
+b002         If Not %Equal(qObsolete);
+b003            If  @objlib <> '*ALL';
+b004               If @objlib = whlib;
+                      Write rqwhdrppr;
+e004               EndIf;
+x003            Else;
+                   Write rqwhdrppr;
+e003            EndIf;
+e002         EndIf;
+             Reade @whfnam qwhdrppr;
+e001      EndDo;
+

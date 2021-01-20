@@ -1,0 +1,7 @@
+     A                                      UNIQUE
+     A          R RRTVSAVF
+     A            SYSTEM        10          COLHDG('From System')
+     A                                      TEXT('From System')
+     A            IPADDRESS     15A         COLHDG('IP Address')
+     A                                      TEXT('IP Address')
+     A          K SYSTEM

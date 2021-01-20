@@ -1,0 +1,27 @@
+             PGM
+
+             SBMJOB     CMD(CALL PGM(TESTCARCR4) PARM('00088')) +
+                          JOB(TESTCARC88)
+
+             SBMJOB     CMD(CALL PGM(TESTCARCR4) PARM('00089')) +
+                          JOB(TESTCARC89) HOLD(*YES)
+
+             SBMJOB     CMD(CALL PGM(TESTCARCR4) PARM('00090')) +
+                          JOB(TESTCARC90) HOLD(*YES)
+
+             SBMJOB     CMD(CALL PGM(TESTCARCR4) PARM('00091')) +
+                          JOB(TESTCARC91) HOLD(*YES)
+
+             SBMJOB     CMD(CALL PGM(TESTCARCR4) PARM('00092')) +
+                          JOB(TESTCARC92) HOLD(*YES)
+
+             SBMJOB     CMD(CALL PGM(TESTCARCR4) PARM('00093')) +
+                          JOB(TESTCARC93) HOLD(*YES)
+
+             SBMJOB     CMD(CALL PGM(TESTCARCR4) PARM('00094')) +
+                          JOB(TESTCARC94) HOLD(*YES)
+
+             SBMJOB     CMD(CALL PGM(TESTCARCR4) PARM('00095')) +
+                          JOB(TESTCARC95) HOLD(*YES)
+
+ END:        ENDPGM

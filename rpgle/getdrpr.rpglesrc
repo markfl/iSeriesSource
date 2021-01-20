@@ -1,0 +1,100 @@
+          Ctl-opt BndDir('MFLORES') DftActGrp(*No) Option(*NoDebugio);
+
+     Fspoolfile ip   f  198        Disk
+     Fqsysprt   o    f  198        Printer oflind(*InOA)
+
+          Dcl-s @_srcdta  Like(srcdta) Inz(*Blanks);
+          Dcl-s @Prog     Char(10)     Inz(*Blanks);
+          Dcl-s @a        Packed(5:0)  Inz(*Zeros);
+          Dcl-s @b        Packed(5:0)  Inz(*Zeros);
+          Dcl-s @c        Packed(5:0)  Inz(*Zeros);
+          Dcl-s @Line     Packed(5:0)  Inz(*Zeros);
+
+     D@SeqDs           ds
+     D  @Sequence                     6s 2
+     D  @Value                 1      4s 0
+     D   @dec                  5      6s 0
+
+      /define mflores003
+      /copy qcpysrc,mflores
+      /undefine mflores003
+
+     Ispoolfile ns
+     I                                 11  132  srcdta
+     I                                  1   10  @CheckMember
+     I                                  5   10  @Seq
+     I                                 27   36  @Member
+     I                                 18   19  @Comment
+
+          @Line += 1;
+
+b001      If @CheckMember = 'Member  .';
+             @Prog = @Member;
+x001      Else;
+
+             @_srcdta = @ToUpper(srcdta);
+             @a = %Scan('DRP': @_srcdta);
+b002         If  @a <> *Zeros;
+                @b = %Scan('=': @_srcdta);
+b003            If  @b <> *Zeros
+                And @b <  @a;
+
+b004               If @Comment <> 'C*';
+
+                      @c = %Scan('IF': @_srcdta);
+b005                  If @c = *Zeros;
+                         @c = %Scan('AND': @_srcdta);
+e005                  EndIf;
+b005                  If @c = *Zeros;
+                         @c = %Scan('OR': @_srcdta);
+e005                  EndIf;
+b005                  If @c = *Zeros;
+                         @c = %Scan('WHEN': @_srcdta);
+e005                  EndIf;
+b005                  If @c = *Zeros;
+                         @c = %Scan('(': @_srcdta);
+e005                  EndIf;
+b005                  If @c = *Zeros;
+                         @c = %Scan(')': @_srcdta);
+e005                  EndIf;
+b005                  If @c = *Zeros;
+                         @c = %Scan('+': @_srcdta);
+e005                  EndIf;
+b005                  If @c = *Zeros;
+                         @c = %Scan('//': @_srcdta);
+b006                     If  @c <> *Zeros
+                         And @c > @a;
+                            Reset @c;
+e006                     EndIf;
+e005                  EndIf;
+
+b005                  If @c = *Zeros;
+b006                     If *InOa;
+                            Except heading;
+e006                     EndIf;
+                         @Value = %Dec(%SubSt(@Seq:1:4):4:0);
+                         @dec   = %Dec(%SubSt(@Seq:5:2):2:0);
+                         Except detail;
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          BegSr *InzSr;
+             Except heading;
+          EndSr;
+
+     Oqsysprt   e            heading        2  1
+     O                                           +1 'Page:'
+     O                       page                +1
+     O          e            heading        1
+     O                                              'Line #'
+     O                                           +4 'Seq #'
+     O                                           +2 'Program'
+     O                                           +7 'Source Line'
+     O          e            detail         1
+     O                       @Line         z     +1
+     O                       @Sequence           +2 '   0.  '
+     O                       @Prog               +2
+     O                       @_srcdta            +2

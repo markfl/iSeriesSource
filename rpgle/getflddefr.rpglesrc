@@ -1,0 +1,152 @@
+          Ctl-opt BndDir('MFLORES') DftActGrp(*No) Option(*NoDebugio);
+
+     FInput     ip   f  112        Disk
+     Fqadspffdt uf   f 1066        Disk    Usropn
+
+          Dcl-Pi GetFldDefr;
+             @P_SrcType Char(5) Const;
+          End-Pi;
+          Dcl-Ds @Qadspffd Len(1066);
+             @whfile Char(10) Pos(1);
+          End-Ds;
+
+      /define mflores003
+      /define mflores059
+      /copy qcpysrc,mflores
+      /undefine mflores003
+
+      /define rpgstruct01
+      /define rpgstruct03
+      /define rpgstruct04_36
+      /copy qcpysrc,rpgilestrc
+      /undefine rpgstruct01
+      /undefine rpgstruct03
+      /undefine rpgstruct04_36
+
+          Dcl-s @a Packed(5:0) Inz(*Zeros);
+          Dcl-s @b Packed(5:0) Inz(*Zeros);
+          Dcl-s @ExtFile Char(15) Inz(*Blanks);
+          Dcl-s @DsName  Char(10) Inz(*Blanks);
+
+     IInput     ns
+     I                             s    1    6 2srcseq
+     I                             s    7   12 0srcdat
+     I                                 13   92  srcdta_36
+     I                                 13  112  srcdta
+     Iqadspffdt ns
+     I                                  1   10  whfile
+
+          @_srcseq = srcseq;
+          @_srcdat = srcdat;
+          @_srcdta = @ToUpper(srcdta);
+          Reset @a;
+          Reset @b;
+          Reset @ExtFile;
+
+b001      If @P_SrcType = 'RPGLE';
+             @DspecDsRPGILE = @_srcdta;
+x001      ElseIf @P_SrcType = 'RPG  ';
+             @IspecDsRPGIII = srcdta_36;
+e001      EndIf;
+
+b001      Select;
+
+x001         When @P_SrcType = 'RPGLE';
+b002            If  %Subst(@_srcdta:6:1) =  'D'
+                And %Subst(@_srcdta:7:1) <> '*';
+
+                   @a = %Scan('EXTNAME': @_srcdta);
+b003               If  @a <> *Zeros;
+                      @b = %Scan(')': @_srcdta:@a);
+b004                  If  @b <> *Zeros;
+
+                         @DsName = %Trim(@DspecDsRPGILE.@DFieldName);
+
+                         @ExtFile = %Subst(@_srcdta:@a+8:@b-(@a+8));
+                         DoCommand(@ExtFile: @DsName);
+
+e004                  EndIf;
+e003               EndIf;
+e002            EndIf;
+
+x001         When @P_SrcType = 'RPG  ';
+b002            If  %Subst(@_srcdta:6:1) =  'I'
+                And %Subst(@_srcdta:7:1) <> '*'
+                And @IspecDsRPGIII.@IExternal = 'E';
+
+                   @a = %Scan('EXTNAME': @_srcdta);
+b003               If  @a <> *Zeros;
+                      @b = %Scan(')': @_srcdta:@a);
+b004                  If  @b <> *Zeros;
+
+                         @DsName = @IspecDsRPGIII.@IRcdfmt;
+
+                         @ExtFile = %Subst(@_srcdta:@a+8:@b-(@a+8));
+                         DoCommand(@ExtFile: @DsName);
+
+e004                  EndIf;
+x003               Else;
+
+                      @DsName = @IspecDsRPGIII.@IRcdfmt;
+
+                      @ExtFile = %Trim(@IspecDsRPGIII.@IInField);
+                      DoCommand(@ExtFile: @DsName);
+
+e003               EndIf;
+e002            EndIf;
+e001      EndSl;
+
+          Dcl-Proc DoCommand;
+
+          Dcl-Pi DoCommand;
+             @P_ExtFile  Const Like(@ExtFile);
+             @P_RnmFile  Const Like(@ExtFile);
+          End-Pi;
+
+          Dcl-s @SelectStmt Char(256) Inz(*Blanks);
+          Dcl-c @Dspffd1 Const('DSPFFD FILE(');
+          Dcl-c @Dspffd2 Const(') OUTPUT(*OUTFILE) -
+                     OUTFILE(QTEMP/QADSPFFDT) -
+                     OUTMBR(*FIRST *REPLACE)');
+          Dcl-c @Dspffd3 Const('CPYF QTEMP/QADSPFFDT -
+                     QTEMP/QADSPFFD MBROPT(*ADD)');
+          Dcl-c @Dspffd4 Const('CLRPFM QTEMP/QADSPFFDT');
+
+          /copy qcpysrc,mflores
+          /undefine mflores059
+
+b001      Monitor;
+
+             @Command = @Dspffd1 + %Trim(@P_ExtFile) + @Dspffd2;
+
+             @Length  = %Len(%Trim(@Command));
+
+             @CallCmd(@Command:@Length);
+
+             Open qadspffdt;
+
+             Read qadspffdt @Qadspffd;
+b001         Dow Not %Eof(qadspffdt);
+                @whfile = @P_RnmFile;
+                Update qadspffdt @Qadspffd;
+                Read qadspffdt @Qadspffd;
+e001         EndDo;
+
+             Close qadspffdt;
+
+             @Command = @Dspffd3;
+
+             @Length  = %Len(%Trim(@Command));
+
+             @CallCmd(@Command:@Length);
+
+             @Command = @Dspffd4;
+
+             @Length  = %Len(%Trim(@Command));
+
+             @CallCmd(@Command:@Length);
+
+x001      On-Error;
+e001      EndMon;
+
+          End-Proc;

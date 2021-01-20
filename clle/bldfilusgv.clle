@@ -1,0 +1,48 @@
+             PGM        PARM(&FILELIB &OBJLIB &DSPFD &DSPPGMREF +
+                          &FNDFILUSG &OUTMBR)
+
+             DCL        VAR(&FILELIB) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OBJLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DSPFD) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&DSPPGMREF) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&FNDFILUSG) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OUTMBR) TYPE(*CHAR) LEN(20)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&REFFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&REFLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(256)
+
+             CHGVAR     VAR(&FILE) VALUE(%SST(&FILELIB 1 10))
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&FILELIB 11 10))
+
+             CHGVAR     VAR(&REFFILE) VALUE(%SST(&DSPPGMREF 1 10))
+             CHGVAR     VAR(&REFLIB) VALUE(%SST(&DSPPGMREF 11 10))
+
+             IF         COND(&REFFILE *NE *NEW) THEN(DO)
+
+             CHKOBJ     OBJ(&REFLIB/&REFFILE) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    File' |> &REFFILE |> +
+                          'in library' |> &REFLIB |> 'not found')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             MONMSG     MSGID(CPF9810) EXEC(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    Library' |> &REFLIB +
+                          |> 'not found')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             ENDDO
+
+             RMVMSG     CLEAR(*ALL)
+
+             ENDPGM

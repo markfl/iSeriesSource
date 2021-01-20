@@ -1,0 +1,145 @@
+     H DftActGrp(*NO)
+
+     D XMLParse2       pi
+     D  @XmlMsg                   20000a   Const
+
+     D   @wXmlString   s          20000a   Inz(*Blanks)
+
+     D @dOutData       ds                  occurs(1)
+     D  w_xmlmsg                   1000a   Varying
+
+      * XML tags data structure (field names equate to tag names)
+     D  FileName       s             10a   Inz(*Blanks)
+     D BolPage         ds                  Qualified
+     D  LoadNum                      10a   Inz(*Blanks)
+     D  ShipNbr                      30a   Inz(*Blanks)
+     D  CustId                       12a   Inz(*Blanks)
+     D  CustName                     35a   Inz(*Blanks)
+     D  MstBol                        1a   Inz(*Blanks)
+     D  OrigNam                      35a   Inz(*Blanks)
+     D  OrigNam2                     35a   Inz(*Blanks)
+     D  OrigAd1                      35a   Inz(*Blanks)
+     D  OrigAd2                      35a   Inz(*Blanks)
+     D  OrigCty                      15a   Inz(*Blanks)
+     D  OrigSta                       2a   Inz(*Blanks)
+     D  OrigPst                      10a   Inz(*Blanks)
+     D  OrigCnt                      10a   Inz(*Blanks)
+     D  DestName                     35a   Inz(*Blanks)
+     D  DestName2                    35a   Inz(*Blanks)
+     D  DestAd1                      35a   Inz(*Blanks)
+     D  DestAd2                      35a   Inz(*Blanks)
+     D  DestCty                      10a   Inz(*Blanks)
+     D  DestSta                       2a   Inz(*Blanks)
+     D  DestPst                      10a   Inz(*Blanks)
+     D  DestCnt                      10a   Inz(*Blanks)
+     D  BillName                     35a   Inz(*Blanks)
+     D  BillAd1                      35a   Inz(*Blanks)
+     D  BillCty                      10a   Inz(*Blanks)
+     D  BillSta                       2a   Inz(*Blanks)
+     D  BillPst                      10a   Inz(*Blanks)
+     D  BillPhn                      12a   Inz(*Blanks)
+     D  CarrierScac                   4a   Inz(*Blanks)
+     D  CarrierName                  35a   Inz(*Blanks)
+     D  TrailerNbr                   15a   Inz(*Blanks)
+     D  SealNbr                      15a   Inz(*Blanks)
+
+     D Ref             ds                  Qualified Dim(10)
+     D  RefQual                       4a   Inz(*Blanks)
+     D  RefDscr                      30a   Inz(*Blanks)
+     D  RefData                      30a   Inz(*Blanks)
+
+     D Order           ds                  Qualified Dim(10)
+     D  OrdNbr                        5a   Inz(*Blanks)
+     D  OrdWgt                        5a   Inz(*Blanks)
+     D  OrdCub                        5a   Inz(*Blanks)
+     D  OrdPcs                        5a   Inz(*Blanks)
+     D  OrdPlt                        5a   Inz(*Blanks)
+
+     D Commodity       ds                  Qualified
+     D  CommHndlType                  4a   Inz(*Blanks)
+     D  CommHndlUnit                  7a   Inz(*Blanks)
+     D  CommPackQty                   7a   Inz(*Blanks)
+     D  CommPackType                  7a   Inz(*Blanks)
+     D  CommWgt                       7a   Inz(*Blanks)
+     D  CommHzmt                      4a   Inz(*Blanks)
+     D  CommDscr                     35a   Inz(*Blanks)
+     D  CommNmfc                      4a   Inz(*Blanks)
+     D  CommFcls                      5a   Inz(*Blanks)
+
+     D @statusDs      sds
+     D  @_proc           *Proc
+     D  @_status         *Status
+     D  @_prevstat            16     20s 0                                      Previous status code
+     D  @_rptsrcln            21     28a                                        RPG src line number
+     D  @_routine        *Routine
+     D  @_parms          *Parms
+     D  @_excptype            40     42a                                        Except type CPF,MCH
+     D  @_excpnbr             43     46a                                        Msg number
+     D  @_reserved            47     50a                                        Reserved
+     D  @_wrkamsg             51     80a                                        Wrk area for msg
+     D  @_pgmlib              81     90a                                        Program library
+     D  @_excpdata            91    170a                                        Exception data
+     D  @_excpid             171    174a                                        Exception id
+     D  @_unused1            175    190a                                        Unused
+     D  @_jobdate            191    198a                                        Date job entered sys
+     D  @_year               199    200s 0                                      1st digits 4 digit y
+     D  @_lstf               201    208a                                        Last file used
+     D  @_lstfsts            209    243a                                        Status on last file
+     D  @_jobname            244    253a                                        Job name
+     D  @_userpname          254    263a                                        User name
+     D  @_jobnbr             264    269s 0                                      Job number
+     D  @_rundate            270    275s 0                                      Date job started
+     D  @_sysdate            276    281s 0                                      System date
+     D  @_runtime            282    287s 0                                      Time hhmmss
+     D  @_cmpdate            288    293a                                        Date pgm compiled
+     D  @_cmptime            294    299a                                        Time pgm compiled
+     D  @_cmplvl             300    303a                                        Level of compiler
+     D  @_srcf               304    313a                                        Pgm source file
+     D  @_srcl               314    323a                                        Pgm source library
+     D  @_srcm               324    333a                                        Pgm source member
+     D  @_program            334    343a                                        Pgm containing proc
+     D  @_module             344    353a                                        Mod containing proc
+     D  @_unused2            354    357a                                        Unused
+     D  @_userprf            358    367a                                        User profile
+     D  @_error              368    371i 0                                      XML Error Code
+     D  @_elements           372    379i 0                                      XML Array Elements
+     D  @_unused3            380    429a                                        Unused
+
+      ****************
+      * Work fields:
+      ****************
+     d @wXmlMsg        s          20000a   varying
+     d @wOptions       s            100a   varying
+
+        @wXmlMsg = @XmlMsg;
+
+        //* Get XML Input and parse it into the input data structure
+        monitor;
+
+           @wOptions = 'path=BOLS/BOL/FileName case=any ' +
+                        'allowextra=yes allowmissing=yes';
+           xml-into FileName %xml(@wXmlmsg: @wOptions);
+
+           @wOptions = 'path=BOLS/BOL/BolPage case=any ' +
+                        'allowextra=yes allowmissing=yes';
+           xml-into BolPage %xml(@wXmlmsg: @wOptions);
+
+           @wOptions = 'path=BOLS/BOL/BolPage/Refs/Ref case=any ' +
+                        'allowextra=yes allowmissing=yes';
+           xml-into Ref  %xml(@wXmlmsg: @wOptions);
+
+           @wOptions = 'path=BOLS/BOL/BolPage/Orders/Order case=any ' +
+                        'allowextra=yes allowmissing=yes';
+           xml-into Order %xml(@wXmlmsg: @wOptions);
+
+           @wOptions = 'path=BOLS/BOL/BolPage/Commoditys/Commodity case=any ' +
+                        'allowextra=yes allowmissing=yes';
+           xml-into Commodity %xml(@wXmlmsg: @wOptions);
+
+        on-error;
+           w_xmlmsg = 'XML Data Error';
+        endmon;
+
+       *inlr = *on;
+
+      /end-free

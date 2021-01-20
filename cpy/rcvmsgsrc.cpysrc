@@ -1,0 +1,30 @@
+
+             INCLUDE    SRCMBR(RCVRSTSRC) SRCFILE(QCPYSRC)
+
+             INCLUDE    SRCMBR(RCVCURLIBD) SRCFILE(QCPYSRC)
+
+             GOTO       CMDLBL(AROUND)
+
+ DUMP:       DMPCLPGM
+
+             INCLUDE    SRCMBR(RCVRSTSRC) SRCFILE(QCPYSRC)
+
+             INCLUDE    SRCMBR(RCVCURLIBD) SRCFILE(QCPYSRC)
+
+ DIAG:       RCVMSG     MSGTYPE(*DIAG) MSGDTA(&@MSGDTA) +
+                          MSGID(&@MSGID) MSGF(&@MSGF) +
+                          MSGFLIB(&@MSGFLIB)
+             IF         COND(&@MSGID *NE ' ') THEN(DO)
+             SNDPGMMSG  MSGID(&@MSGID) MSGF(&@MSGFLIB/&@MSGF) +
+                          MSGDTA(&@MSGDTA) MSGTYPE(*DIAG)
+             GOTO       CMDLBL(DIAG)
+             ENDDO
+
+             RCVMSG     MSGTYPE(*EXCP) MSGDTA(&@MSGDTA) +
+                          MSGID(&@MSGID) MSGF(&@MSGF) +
+                          MSGFLIB(&@MSGFLIB)
+             IF         COND(&@MSGID *NE ' ') THEN(SNDPGMMSG +
+                          MSGID(&@MSGID) MSGF(&@MSGFLIB/&@MSGF) +
+                          MSGDTA(&@MSGDTA) MSGTYPE(*ESCAPE))
+
+ AROUND:

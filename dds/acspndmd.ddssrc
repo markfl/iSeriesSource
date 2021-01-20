@@ -1,0 +1,356 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/HREF)
+     A                                      PRINT
+     A                                      ALTHELP(CA01)
+     A                                      HELP
+     A                                      CF02
+     A                                      CF03
+     A                                      CF04
+     A                                      CF05
+     A                                      CF06
+     A                                      CF07
+     A                                      CF08
+     A                                      CF09
+     A                                      CF10
+     A                                      CF11
+     A                                      CF12
+     A                                      CF13
+     A                                      CF14
+     A                                      CF15
+     A                                      CF16
+     A                                      CF17
+     A                                      CF18
+     A                                      CF19
+     A                                      CF20
+     A                                      CF21
+     A                                      CF22
+     A                                      CF23
+     A                                      CF24
+     A                                      PAGEUP
+     A                                      PAGEDOWN
+     A                                      VLDCMDKEY(25)
+     A                                      INDTXT(25 'VLDCMDKEY - File level')
+     A          R STOPSFL                   SFL
+     A*%%TS  SD  20020531  103646  CAHNH       REL-V4R4M0  5769-PW1
+     A                                      TEXT('Stops subfile')
+     A            #OSTPTYPH R        H      REFFLD(STPTYP)
+     A                                      TEXT('Origin stop type')
+     A            #OSTPSEQH R        H      REFFLD(STPSEQ)
+     A                                      TEXT('Origin stop sequence')
+     A            #DSTPTYPH R        H      REFFLD(STPTYP)
+     A                                      TEXT('Destination stop type')
+     A            #DSTPSEQH R        H      REFFLD(STPSEQ)
+     A                                      TEXT('Destination stop sequence')
+     A            #ORIGIN1      38A  O 10  2COLOR(BLU)
+     A                                      TEXT('Origin stop line one')
+     A            #DEST1        38A  O 10 42COLOR(PNK)
+     A                                      TEXT('Destination stop line one')
+     A            #TABO          1A  I 11  2DSPATR(ND)
+     A                                      TEXT('Origin stop tab position')
+     A            #ORIGIN2      34A  O 11  6COLOR(BLU)
+     A                                      TEXT('Origin stop line two')
+     A            #TABD          1A  I 11 42DSPATR(ND)
+     A                                      TEXT('Destination stop tab position-
+     A                                      ')
+     A            #DEST2        34A  O 11 46COLOR(PNK)
+     A                                      TEXT('Destination stop line two')
+     A            #ORIGIN3      34A  O 12  6COLOR(BLU)
+     A                                      TEXT('Origin stop line three')
+     A            #DEST3        34A  O 12 46COLOR(PNK)
+     A                                      TEXT('Destination stop line three')
+     A          R STOPSFLCTL                SFLCTL(STOPSFL)
+     A*%%TS  SD  20020531  103646  CAHNH       REL-V4R4M0  5769-PW1
+     A                                      SFLSIZ(0001)
+     A                                      SFLPAG(0001)
+     A                                      TEXT('Stop subfile control')
+     A                                      INDTXT(32 'SFLDLT')
+     A                                      INDTXT(30 'SFLDSP')
+     A                                      INDTXT(31 'SFLDSPCTL')
+     A                                      RTNCSRLOC(&#RCD &#FLD &#POS)
+     A                                      OVERLAY
+     A                                      PUTOVR
+     A                                      OVRDTA
+     A                                      OVRATR
+     A                                      SFLCSRRRN(&#RRNCSRSTP)
+     A  30                                  SFLDSP
+     A  31                                  SFLDSPCTL
+     A  32                                  SFLDLT
+     A            #RCD          10A  H      TEXT('Cursor record')
+     A            #FLD          10A  H      TEXT('Cursor field')
+     A            #POS           4S 0H      TEXT('Cursor field position')
+     A            #RRNCSRSTP     5S 0H      TEXT('Cursor RRN STOPSFLCTL')
+     A            #ORDNBR   R        H      REFFLD(ORDNBR)
+     A            #PGMNAME      10A  O  1  2TEXT('Program name')
+     A                                  1 29'Accessorial Maintenance'
+     A                                      DSPATR(HI)
+     A                                  1 61DATE
+     A                                      EDTCDE(Y)
+     A                                  1 71TIME
+     A            #MODE         14A  O  2 34DSPATR(HI)
+     A                                  2 60USER
+     A                                  2 71SYSNAME
+     A                                  3  2'Customer'
+     A                                      DSPATR(HI)
+     A            #ORDCSTC  R        O  3 11REFFLD(ORDCST)
+     A            #LN1NAMC  R        O  3 17REFFLD(LN1NAM)
+     A                                  3 52'Order number'
+     A                                      DSPATR(HI)
+     A            #ORDNBRC       9A  O  3 65TEXT('Order number - character')
+     A            #ORDSTSC  R        O  3 75REFFLD(ORDSTS)
+     A                                  4  2'Bill to'
+     A                                      DSPATR(HI)
+     A            #BILTO1C  R        O  4 11REFFLD(BILADR)
+     A                                  4 52'SH'
+     A                                      DSPATR(HI)
+     A            #SELHUBC  R        O  4 55REFFLD(SELHUB)
+     A                                  4 59'OH'
+     A                                      DSPATR(HI)
+     A            #ORGHUBC  R        O  4 62REFFLD(ORGHUB)
+     A                                  4 66'DH'
+     A                                      DSPATR(HI)
+     A            #DESHUBC  R        O  4 69REFFLD(DESHUB)
+     A            #BILTO2C  R        O  5 11REFFLD(BILADR)
+     A                                  5 52'Source code'
+     A                                      DSPATR(HI)
+     A            #SRCCDEC  R        O  5 64REFFLD(SRCCDE)
+     A                                  6  2'Commodity'
+     A                                      DSPATR(HI)
+     A            #PCMCDEC  R        O  6 12REFFLD(PCMCDE)
+     A            #PCMDSCC      30A  O  6 20TEXT('Commodity code description')
+     A                                  6 52'Trans mode'
+     A                                      DSPATR(HI)
+     A            #TRPMODC  R        O  6 64REFFLD(TRPMOD)
+     A                                  6 69'Sub mode'
+     A                                      DSPATR(HI)
+     A            #TSBMODC  R        O  6 78REFFLD(TSBMOD)
+     A                                  7  2'Hazmat'
+     A                                      DSPATR(HI)
+     A            #HAZFLGC  R        O  7  9REFFLD(HAZFLG)
+     A                                  7 20'Route'
+     A                                      DSPATR(HI)
+     A            #PRRSCAC  R        O  7 27REFFLD(PRRSCA)
+     A                                  7 34'Service'
+     A                                      DSPATR(HI)
+     A            #SRVTYPC  R        O  7 42REFFLD(SRVTYP)
+     A                                  7 52'Expected price'
+     A                                      DSPATR(HI)
+     A            #EPRAMTC  R        O  7 67REFFLD(EPRAMT)
+     A                                      EDTCDE(2)
+     A                                  8  2'Equipment type'
+     A                                      DSPATR(HI)
+     A            #EQPTYPC  R        O  8 17REFFLD(EQPTYP)
+     A                                  8 20'Length'
+     A                                      DSPATR(HI)
+     A            #EQPLENC  R        O  8 27REFFLD(EQPLEN)
+     A                                      EDTCDE(4)
+     A                                  8 34'Width'
+     A                                      DSPATR(HI)
+     A            #EQPWIDC  R        O  8 40REFFLD(EQPWID)
+     A                                      EDTCDE(4)
+     A                                  8 44'Height'
+     A                                      DSPATR(HI)
+     A            #EQPHGTC  R        O  8 51REFFLD(EQPHGT)
+     A                                      EDTCDE(4)
+     A                                  8 55'Id'
+     A                                      DSPATR(HI)
+     A            #EQPIDNC  R        O  8 58REFFLD(EQPIDN)
+     A            #OHEADER      38A  O  9  2DSPATR(HI)
+     A                                      TEXT('Origin stop heading')
+     A            #DHEADER      38A  O  9 42DSPATR(HI)
+     A                                      TEXT('Destination stop heading')
+     A                                  4 73'OP'
+     A                                      DSPATR(HI)
+     A            #OPRHUBC  R        B  4 76REFFLD(COPHUB)
+     A N70N73                               DSPATR(UL)
+     A  70
+     AO 73                                  DSPATR(PR)
+     A  84                                  DSPATR(RI)
+     A  84                                  DSPATR(PC)
+     A          R ACSSFL                    SFL
+     A*%%TS  SD  20020930  153353  CAHNH       REL-V5R1M0  5722-WDS
+     A                                      TEXT('Accessorial subfile')
+     A                                      CHANGE(45)
+     A                                      INDTXT(45 'Change ACSSFL')
+     A                                      INDTXT(35 'SFLNXTCHG')
+     A  35                                  SFLNXTCHG
+     A            #ACSCMTH  R        H      REFFLD(ACSCMT)
+     A            #RCDSEQH  R        H      REFFLD(RCDSEQ)
+     A            #ACSCMT   R        B 19  7REFFLD(ACSCMT)
+     A N70                                  DSPATR(UL)
+     A  70                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A          R ACSSFLCTL                 SFLCTL(ACSSFL)
+     A*%%TS  SD  20070816  165735  URBANN      REL-V5R4M0  5722-WDS
+     A                                      SFLSIZ(0004)
+     A                                      SFLPAG(0003)
+     A                                      TEXT('Accessorial subfile control')
+     A                                      CHANGE(45)
+     A                                      INDTXT(45 'Change ACSSFLCTL')
+     A                                      INDTXT(40 'SFLDSP')
+     A                                      INDTXT(41 'SFLDSPCTL')
+     A                                      INDTXT(42 'SFLDLT')
+     A                                      INDTXT(43 'SFLEND')
+     A                                      INDTXT(70 'Protect fields')
+     A                                      RTNCSRLOC(&#RCD &#FLD &#POS)
+     A                                      CSRLOC(#ROW       #COL)
+     A                                      OVERLAY
+     A                                      PUTOVR
+     A                                      OVRDTA
+     A                                      OVRATR
+     A                                      SFLCSRRRN(&#RRNCSRACS)
+     A  40                                  SFLDSP
+     A  41                                  SFLDSPCTL
+     A  42                                  SFLDLT
+     A  43                                  SFLEND(*MORE)
+     A            #SFLRCDNBR     4S 0H      TEXT('Subfile RRN ACSSFLCTL')
+     A            #ROW           3S 0H      TEXT('Row')
+     A            #COL           3S 0H      TEXT('Column')
+     A            #RRNCSRACS     5S 0H      TEXT('Cursor RRN')
+     A            #RCD          10A  H      TEXT('Cursor record')
+     A            #FLD          10A  H      TEXT('Cursor field')
+     A            #POS           4S 0H      TEXT('Cursor field position')
+     A            #CACSNBR  R        H      REFFLD(ACSNBR)
+     A            #CORDNBR  R        H      REFFLD(ORDNBR)
+     A            #CCHGCDE  R        H      REFFLD(CHGCDE)
+     A            #CCHGVND  R        H      REFFLD(CHGVND)
+     A            #CVNDNAM  R        H      REFFLD(VNDNAM)
+     A            #CACSSTS  R        H      REFFLD(ACSSTS)
+     A            #CTRPMOD  R        H      REFFLD(TRPMOD)
+     A            #CTSBMOD  R        H      REFFLD(TSBMOD)
+     A            #CACRCHG  R        H      REFFLD(ACRCHG)
+     A            #CURTCHG  R        H      REFFLD(URTCHG)
+     A            #CURTUOM  R        H      REFFLD(URTUOM)
+     A            #CCHGAMT  R        H      REFFLD(CHGAMT)
+     A            #CADRLOC  R        H      REFFLD(ADRLOC)
+     A            #CORGHUB  R        H      REFFLD(ORGHUB)
+     A            #CDESHUB  R        H      REFFLD(DESHUB)
+     A            #CLKGSEQ  R        H      REFFLD(LKGSEQ)
+     A            #CRCDRMK  R        H      REFFLD(RCDRMK)
+     A            #CCRTPRF  R        H      REFFLD(CRTPRF)
+     A            #CCRTDTM  R        H      REFFLD(CRTDTM)
+     A            #CLSTPRF  R        H      REFFLD(LSTPRF)
+     A            #CLSTPGM  R        H      REFFLD(LSTPGM)
+     A            #CLSTDTM  R        H      REFFLD(LSTDTM)
+     A            #BACSNBR  R        H      REFFLD(ACSNBR)
+     A            #BORDNBR  R        H      REFFLD(ORDNBR)
+     A            #BCHGCDE  R        H      REFFLD(CHGCDE)
+     A            #BORDCST  R        H      REFFLD(ORDCST)
+     A            #BCSTNAM  R        H      REFFLD(CSTNAM)
+     A            #BACSSTS  R        H      REFFLD(ACSSTS)
+     A            #BTRPMOD  R        H      REFFLD(TRPMOD)
+     A            #BTSBMOD  R        H      REFFLD(TSBMOD)
+     A            #BACRCHG  R        H      REFFLD(ACRCHG)
+     A            #BURTCHG  R        H      REFFLD(URTCHG)
+     A            #BURTUOM  R        H      REFFLD(URTUOM)
+     A            #BBILAMT  R        H      REFFLD(BILAMT)
+     A            #BADRLOC  R        H      REFFLD(ADRLOC)
+     A            #BSELHUB  R        H      REFFLD(SELHUB)
+     A            #BRCDRMK  R        H      REFFLD(RCDRMK)
+     A            #BCRTPRF  R        H      REFFLD(CRTPRF)
+     A            #BCRTDTM  R        H      REFFLD(CRTDTM)
+     A            #BLSTPRF  R        H      REFFLD(LSTPRF)
+     A            #BLSTPGM  R        H      REFFLD(LSTPGM)
+     A            #BLSTDTM  R        H      REFFLD(LSTDTM)
+     A N91                             13 33'More...'
+     A                                      DSPATR(HI)
+     A                                      COLOR(BLU)
+     A  91                             13 33'Bottom'
+     A                                      DSPATR(HI)
+     A                                      COLOR(BLU)
+     A                                      INDTXT(91 'More... ACSSFLCTL !91=Bo-
+     A                                      ttom - Origin')
+     A N92                             13 74'More...'
+     A                                      DSPATR(HI)
+     A                                      COLOR(PNK)
+     A  92                             13 74'Bottom'
+     A                                      DSPATR(HI)
+     A                                      COLOR(PNK)
+     A                                      INDTXT(92 'More... ACSSFLCTL !92=Bo-
+     A                                      ttom - Destination')
+     A            #SEGTYP   R        O 14 15REFFLD(SEGTYP)
+     A                                 14  2'Segment type'
+     A                                      DSPATR(HI)
+     A            #SEGDSC       11A  O 14 19
+     A                                 14 33'Stop No'
+     A                                      DSPATR(HI)
+     A            #STOPNO   R        O 14 41REFFLD(STPNBR)
+     A                                 15 52'Amount'
+     A                                      DSPATR(HI)
+     A                                 15 59'Charge Code/Desc'
+     A                                      DSPATR(HI)
+     A                                 16  2'Vendor'
+     A                                      DSPATR(HI)
+HMC  A***         #TABV          1A  B 15 10DSPATR(ND)
+     A            #CHGVND   R     Y  B 16 13REFFLD(CHGVND)
+     A  80                                  DSPATR(RI)
+     A  80                                  DSPATR(PC)
+     A                                      INDTXT(51 'PC-RI #CHGVND')
+     A N70N71                               DSPATR(UL)
+     A  70
+     AO 71
+     AO 74                                  DSPATR(PR)
+     A            #VNDNAM       23A  O 16 19TEXT('Vendor name')
+     A            #CHGAMT   R        O 16 43REFFLD(CHGAMT)
+     A                                      INDTXT(53 'PC-RI #CHGAMT')
+     A            #CHGCDE   R        B 16 59REFFLD(CHGCDE)
+     A N70N71                               DSPATR(UL)
+     A  70
+     AO 71                                  DSPATR(PR)
+     A  81                                  DSPATR(RI)
+     A  81
+     AO 85                                  DSPATR(PC)
+     A                                      INDTXT(54 'PC-RI #CHGCDE')
+     A            #CHGDSC       18A  O 16 63TEXT('Charge description')
+     A                                 17  2'Customer'
+     A                                      DSPATR(HI)
+     A            #TABC          1A  B 16 13DSPATR(ND)
+     A            #ORDCST   R     Y  B 17 13REFFLD(ORDCST)
+     A N70N72                               DSPATR(UL)
+     A  70
+     AO 72
+     AO 74                                  DSPATR(PR)
+     A  82                                  DSPATR(RI)
+     A  82                                  DSPATR(PC)
+     A                                      INDTXT(71 'Protect #ORDCST')
+     A                                      INDTXT(52 'PC-RI #ORDCST')
+     A            #CSTNAM       23A  O 17 19TEXT('Customer name')
+     A            #BILAMT   R        O 17 43REFFLD(BILAMT)
+     A                                      INDTXT(55 'PC-RI #BILAMT')
+     A            #CHGCDE2  R        B 17 59REFFLD(CHGCDE)
+     A N70N72                               DSPATR(UL)
+     A  70
+     AO 72                                  DSPATR(PR)
+     A  83                                  DSPATR(RI)
+     A  83
+     AO 86                                  DSPATR(PC)
+     A                                      INDTXT(56 'PC-RI #CHGCDE2')
+     A            #CHGDSC2      18A  O 17 63TEXT('Charge description')
+     A                                 18  2'Comment'
+     A                                      DSPATR(HI)
+     A                                 15  2'Accessorial Schedule #'
+     A                                      DSPATR(HI)
+     A            #ESCNBR        9A  O 15 25
+     A          R FOOTER
+     A*%%TS  SD  20020514  173956  CAHNH       REL-V4R2M0  5769-PW1
+     A                                      TEXT('Function key')
+     A                                      OVERLAY
+     A            #FNCKEY       78A  O 23  2COLOR(BLU)
+     A                                      TEXT('Function key line')
+     A          R MSGSFL                    SFL
+     A*%%TS  SD  20020514  173956  CAHNH       REL-V4R2M0  5769-PW1
+     A                                      TEXT('Subfile message')
+     A                                      SFLMSGRCD(24)
+     A            #MSGKEY                   SFLMSGKEY
+     A            #PGMQ                     SFLPGMQ(276)
+     A          R MSGCTL                    SFLCTL(MSGSFL)
+     A*%%TS  SD  20020514  173956  CAHNH       REL-V4R2M0  5769-PW1
+     A                                      TEXT('Subfile message control')
+     A                                      INDTXT(99 'Message SFL SFLEND')
+     A                                      SFLDSP
+     A                                      SFLDSPCTL
+     A                                      SFLINZ
+     A  99
+     AON99                                  SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)
+     A            #PGMQ                     SFLPGMQ(276)

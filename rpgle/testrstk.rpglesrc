@@ -1,0 +1,18 @@
+
+          // Entry parameters
+          Dcl-Pr RetrieveCallStack ExtPgm('RTVCLLSTK');
+             *n Char(100);
+             *n Packed(3:0);
+             *n Packed(3:0);
+          End-Pr;
+
+          Dcl-Ds DSStack;
+             @Stack Char(10) Dim(10);
+          End-Ds;
+
+          Dcl-s #PCounter Packed(3:0);
+          Dcl-s #PWait    Packed(3:0);
+
+          RetrieveCallStack(DsStack:#PCounter:#PWait);
+
+          *Inlr= *On;

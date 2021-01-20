@@ -1,0 +1,25 @@
+             PGM
+
+             DCL        VAR(&SKIP) TYPE(*CHAR) LEN(9)
+             DCL        VAR(&SKIPD) TYPE(*DEC) LEN(9 0)
+
+             RTVDTAARA  DTAARA(TESTCARCC1 (1 9)) RTNVAR(&SKIP)
+             MONMSG     MSGID(CPF1015) EXEC(DO)
+             CRTDTAARA  DTAARA(TESTCARCC1) TYPE(*CHAR) LEN(9) +
+                          VALUE('000000000')
+             RTVDTAARA  DTAARA(TESTCARCC1 (1 9)) RTNVAR(&SKIP)
+             ENDDO
+
+             CHGVAR     VAR(&SKIPD) VALUE(&SKIP)
+             CHGVAR     VAR(&SKIPD) VALUE(&SKIPD + 1)
+             CHGVAR     VAR(&SKIP) VALUE(&SKIPD)
+             CHGDTAARA  DTAARA(TESTCARCC1 (1 9)) VALUE(&SKIP)
+
+/*           DBG        PGM(TPSCARCRT)    */
+             DBG        PGM(TESTCARCR1)
+
+             CALL       PGM(TESTCARCR1)
+
+             ENDDBG
+
+ END:        ENDPGM

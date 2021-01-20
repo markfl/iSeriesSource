@@ -1,0 +1,9 @@
+             PGM
+
+             DBG        PGM(XMLPARSE)
+
+             CALL       PGM(TESTXMLR)
+
+             ENDDBG
+
+ END:        ENDPGM

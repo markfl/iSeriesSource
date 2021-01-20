@@ -1,0 +1,201 @@
+     H/title    Purge File Resequencer
+     H Option(*NoDebugio)
+     H copyright ('(C) Copyright Hub Group, Inc. 2015')
+      **************************************************************************
+      *                                                                        *
+      *   H U B   G R O U P ,   I N C .                                        *
+      *                                                                        *
+      **************************************************************************
+      *                                                                        *
+      *  Program Title: Purge File Resequencer                                 *
+      *                                                                        *
+      *  Date Written:  08/28/2015                                             *
+      *                                                                        *
+      *  Input:                                                                *
+      *                                                                        *
+      *  Output:                                                               *
+      *                                                                        *
+      **************************************************************************
+      *            Design                                                      *
+      * Date       Request Mod Pgmr Description                                *
+      * ---------- ------- --- ---- ------------------------------------------ *
+      * 08-28-15   42268       MF   Initial Creation                           *
+      *                                                                        *
+      **************************************************************************
+
+     ‚* Purge File Temp
+     Fitppurgepiif   f  221        Disk    UsrOpn
+
+     ‚* Purge File Temp
+     Fitppurkeyiif   f  326        Disk    UsrOpn
+
+     ‚* Purge Driver File
+     Fitppurgel1uf a e           k Disk    UsrOpn
+
+     ‚* Purge Driver File
+     Fitppurkey1uf a e           k Disk    UsrOpn
+
+‚     * Procedure Prototype
+     Ditpreseqr        pr
+     D                               +0    Like(purgroup)
+     D                               +0    Like(purgroup)
+
+‚     * Procedure Interface
+     Ditpreseqr        pi
+     D  @PFile                       +0    Like(purgroup)
+     D  @PGroup                      +0    Like(purgroup)
+
+     D Resequence...
+     D ITPPurgep       pr
+     D                               +0    Const Like(purgroup)
+
+     D Resequence...
+     D ITPPurkey       pr
+     D                               +0    Const Like(keygroup)
+
+      * Program Status Data Structure
+     D                sds
+     D QProg             *Proc
+     D QUser                 254    263
+
+     D @Sequence       s                   Like(Purseq) Inz(*Zeros)
+     D @itpurgepDs   e ds                  ExtName(itppurgep)
+     D @itpurkeyDs   e ds                  ExtName(itppurkey)
+
+     D/DEFINE ITPSHARE16
+     D/copy qcpysrc,itpshare
+
+      /free
+
+          //‚check file to resequence
+b001      If @PFile = 'ITPPURGEPI';
+
+             // ResequenceITPPurgep
+             ResequenceITPPurgep(@PGroup);
+
+x001      Else;
+
+             // ResequenceITPPurkey
+             ResequenceITPPurkey(@PGroup);
+
+e001      EndIf;
+
+          *Inlr = *On;
+          Return;
+
+      /end-free
+
+      ************************************************************************
+      *‚ResequenceITPPurgep - Resequence ITPPURGEP
+      ************************************************************************
+
+     P Resequence...
+     P ITPPurgep       b
+
+     D Resequence...
+     D ITPPurgep       pi
+     D  @Group                       +0    Const Like(purgroup)
+
+      /free
+
+          //‚Open files
+          Open itppurgepi;
+          Open itppurgel1;
+
+          //‚get first purge record
+          Setll *Loval  ritppurgep;
+          Setll @Group ritppurgep;
+          Reade @Group ritppurgep;
+b001      Dow not %Eof(itppurgel1);
+
+             //‚delete purge record
+             Delete ritppurgep;
+
+             //‚get next purge record
+             Reade @Group ritppurgep;
+
+e001      EndDo;
+
+          //‚get first purge temp record
+          Read itppurgepi @itpurgepds;
+b001      Dow not %Eof(itppurgepi);
+
+             // Incriment sequence #
+             @Sequence += 10;
+             purseq = @Sequence;
+
+             // update history fields
+             purlstusr = QUser;
+             purlstpgm = QProg;
+             purlstms  = GetTimeStamp();
+
+             // write to purge driver file
+             Write ritppurgep;
+
+             //‚get next purge temp record
+             Read itppurgepi @itpurgepds;
+
+e001      EndDo;
+
+      /end-free
+
+     P Resequence...
+     P ITPPurgep       e
+
+      ************************************************************************
+      *‚ResequenceITPPurkey - Resequence ITPPURKEY
+      ************************************************************************
+
+     P Resequence...
+     P ITPPurkey       b
+
+     D Resequence...
+     D ITPPurkey       pi
+     D  @Group                       +0    Const Like(keygroup)
+
+      /free
+
+          //‚Open files
+          Open itppurkeyi;
+          Open itppurkey1;
+
+          //‚get first purge record
+          Setll *Loval  ritppurkey;
+          Setll @Group ritppurkey;
+          Reade @Group ritppurkey;
+b001      Dow not %Eof(itppurkey1);
+
+             //‚delete purge record
+             Delete ritppurkey;
+
+             //‚get next purge record
+             Reade @Group ritppurkey;
+
+e001      EndDo;
+
+          //‚get first purge temp record
+          Read itppurkeyi @itpurkeyds;
+b001      Dow not %Eof(itppurkeyi);
+
+             // Incriment sequence #
+             @Sequence += 10;
+             keyseq = @Sequence;
+
+             // update history fields
+             keylstusr = QUser;
+             keylstpgm = QProg;
+             keylstms  = GetTimeStamp();
+
+             // write to purge driver file
+             Write ritppurkey;
+
+             //‚get next purge temp record
+             Read itppurkeyi @itpurkeyds;
+
+e001      EndDo;
+
+      /end-free
+
+     P Resequence...
+     P ITPPurkey       e
+

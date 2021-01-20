@@ -1,0 +1,17 @@
+     FconcaLdp  uf   e             Disk
+     Fvndvndml00if   e           k Disk
+
+          Read         concaldpf;
+b001      Dow Not %Eof(concaldp);
+b002         If calmstvnd <> *Zeros;
+                Chain calmstvnd vndvndmpf;
+b003            If Not %Found(vndvndml00);
+                   Delete concaldpf;
+e003            EndIf;
+e002         EndIf;
+             Read concaldpf;
+e001      EndDo;
+
+          *Inlr = *On;
+          Return;
+

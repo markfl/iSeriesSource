@@ -1,0 +1,652 @@
+          Ctl-opt Option(*NoDebugio) DftActGrp(*No) BndDir('MFLORES');
+
+          Dcl-f qadspffd           Usage(*Input);
+          Dcl-f qafdaccp           Usage(*Input) ExtInd(*Inu1);
+
+          Dcl-Pi CrtJavaNew;
+             @DBType Char(7)  Const;
+             @DBName Char(15) Const;
+          End-Pi;
+
+          /define mflores065
+          /copy qcpysrc,mflores
+          /undefine mflores065
+
+          Dcl-Pr OpenSrcFiles;
+          End-Pr;
+
+          Dcl-Pr CloseSrcFiles;
+          End-Pr;
+
+          Dcl-Pr Getter;
+             *n Char(20) Const;
+             *n Char(10) Const;
+             *n Char(20) Const;
+          End-Pr;
+
+          Dcl-Pr Setter;
+             *n Char(20) Const;
+             *n Char(10) Const;
+             *n Char(20) Const;
+             *n Packed(5:0) Const;
+             *n Zoned(2:0) Const;
+             *n Ind Const;
+          End-Pr;
+
+          Dcl-Pr SetterSav;
+             *n Char(20) Const;
+             *n Char(20) Const;
+             *n Char(20) Const;
+          End-Pr;
+
+          Dcl-Pr SetKeyFields;
+          End-Pr;
+
+          Dcl-Pr Connect;
+             *n Char(15) Const;
+          End-Pr;
+
+          Dcl-Pr CloseConnection;
+          End-Pr;
+
+          Dcl-Pr GetRecord;
+             *n Char(15) Const;
+          End-Pr;
+
+          Dcl-Pr Exists;
+          End-Pr;
+
+          Dcl-Pr AddRecord;
+          End-Pr;
+
+          Dcl-Pr UpdateRecord;
+          End-Pr;
+
+          Dcl-Pr DeleteRecord;
+          End-Pr;
+
+          Dcl-Pr ReadFirst;
+          End-Pr;
+
+          Dcl-Pr ReadNext;
+          End-Pr;
+
+          Dcl-Pr ReadLast;
+          End-Pr;
+
+          Dcl-Pr ReadPrevious;
+          End-Pr;
+
+          Dcl-Pr ReadEqualFirst;
+          End-Pr;
+
+          Dcl-Pr ReadEqualNext;
+          End-Pr;
+
+          Dcl-Pr ReadEqualLast;
+          End-Pr;
+
+          Dcl-Pr ReadEqualPrevious;
+          End-Pr;
+
+          Dcl-Pr UpdateAllFromResults;
+          End-Pr;
+
+          Dcl-Pr ToString;
+          End-Pr;
+
+          Dcl-Pr ToStringKeys;
+          End-Pr;
+
+          Dcl-Pr CheckFields;
+          End-Pr;
+
+          Dcl-Pr SetSelectFields;
+             *n VarChar(32000);
+          End-Pr;
+
+          Dcl-Pr SetWhereFields;
+          End-Pr;
+
+          Dcl-Pr SetSelectKeyFields;
+          End-Pr;
+
+          Dcl-Pr SetSelectStatementKeys;
+          End-Pr;
+
+          Dcl-Pr SetCheckKeyFields;
+          End-Pr;
+
+          Dcl-Pr SetOffAllInd;
+             *n Packed(1:0) Const;
+          End-Pr;
+
+          Dcl-Pr CloseClass;
+          End-Pr;
+
+          Dcl-Pr WriteJavaSourceLine;
+             *n VarChar(32000) Const;
+          End-Pr;
+
+          Dcl-Pr WriteBlankLine;
+          End-Pr;
+
+          Dcl-s @O       Packed(5:0) Inz(*Zeros);
+          Dcl-s @Ocur    Packed(5:0) Inz(*Zeros);
+          Dcl-s @FieldA  Char(15)    Dim(9999);
+          Dcl-Ds @Fields Occurs(9999);
+             @SysFldName Char(15);
+             @FieldName  Char(15);
+             @SavFldName Char(15);
+             @Type       Char(10);
+             @Length     Packed(5:0);
+             @Decimal    Zoned(2:0);
+             @GetterName Char(20);
+             @SetterName Char(20);
+          End-Ds;
+
+          Dcl-s @K     Packed(5:0) Inz(*Zeros);
+          Dcl-s @KOcur Packed(5:0) Inz(*Zeros);
+          Dcl-Ds @KeyFields Occurs(9999);
+             @SysKeyName  Char(15);
+             @KeyName     Char(15);
+             @KeyfldName  Char(15);
+             @KeyType     Char(10);
+             @KLength     Packed(5:0);
+             @KDecimal    Zoned(2:0);
+             @KGetterName Char(20);
+             @KSetterName Char(20);
+             @Initializer Char(20);
+          End-Ds;
+
+          Dcl-s @Work Char(10);
+
+          Dcl-c @Fr '#';
+          Dcl-c @To '_';
+
+          Dcl-s @space  Char(3)  Inz(*Blanks);
+          Dcl-s @space2 Char(6)  Inz(*Blanks);
+          Dcl-s @space3 Char(9)  Inz(*Blanks);
+          Dcl-s @space4 Char(12) Inz(*Blanks);
+
+          Dcl-s @a            Packed(5:0) Inz(*Zeros);
+          Dcl-s @KeyFieldsInd Ind         Inz(*Off);
+
+          Dcl-c @Msg2 Const('"Some fields were not -
+                     updated properly."');
+          Dcl-c @Msg3 Const('"Record not retrieved."');
+          Dcl-c @Msg4 Const(' to long for field size."');
+          Dcl-c @Msg5 Const('Key fields must be set.');
+
+          OpenSrcFiles();
+
+          GetFileInfo();
+
+          PrivateSection();
+
+          Constructor();
+
+          GetterSetter();
+
+b001      If @KeyFieldsInd;
+             SetKeyFields();
+e001      EndIf;
+
+          Connect(@DBName);
+
+          CloseConnection();
+
+b001      If @KeyFieldsInd;
+             GetRecord(whfile);
+             Exists();
+e001      EndIf;
+
+          AddRecord();
+
+b001      If @KeyFieldsInd;
+             UpdateRecord();
+             DeleteRecord();
+e001      EndIf;
+
+          ReadFirst();
+
+          ReadNext();
+
+          ReadLast();
+
+          ReadPrevious();
+
+b001      If @KeyFieldsInd;
+             ReadEqualFirst();
+
+             ReadEqualNext();
+
+             ReadEqualLast();
+
+             ReadEqualPrevious();
+e001      EndIf;
+
+          UpdateAllFromResults();
+
+          ToString();
+
+          ToStringKeys();
+
+          CheckFields();
+
+          CloseClass();
+
+          CloseSrcFiles();
+
+          *inlr = *On;
+
+š         Dcl-Proc GetFileInfo;
+
+          Dcl-Pi GetFileInfo;
+          End-Pi;
+
+          Dcl-s @Free VarChar(32000) Inz(*Blanks);
+
+          /define mflores004
+          /define mflores065
+          /copy qcpysrc,mflores
+          /undefine mflores004
+          /undefine mflores065
+
+          Read qwhdrffd;
+b001      Dow not %Eof(qadspffd);
+
+             @Ocur += 1;
+             %occur(@Fields) = @Ocur;
+             @SysFldName     = whflde;
+             whflde          = %Xlate(@Fr:@To:whflde);
+             @Work           = @ToLower(whflde:2);
+             whflde          = @ToLower(whflde);
+             whfile          = @ToLower(whfile);
+             whflde          = @ToLower(whflde);
+             @Work           = @ToLower(@Work:2);
+             // Check for Iseries server
+b002         If @DBType <> '*DB2  ';
+                whflde = ConvertFieldName(whflde: @DBType: 'FIELDNAME');
+                @Work  = ConvertFieldName(@Work: @DBType: 'FIELDNAME');
+                @SysFldName = whflde;
+e002         EndIf;
+             @FieldName  = whflde;
+             @SavFldName = %Trimr(@FieldName) + 'Sav';
+             @GetterName = 'get' + @Work;
+             @SetterName = 'set' + @Work;
+             Clear @Length;
+             Clear @Decimal;
+b002         If whfldt = 'A'
+             Or whfldt = 'L'
+             Or whfldt = 'T'
+             Or whfldt = 'Z';
+                @Type   = 'String';
+                @Length = whfldb;
+x002         Else;
+b003            If whfldp > *Zeros;
+                   @Type = 'double';
+x003            Else;
+                   @Type = 'int';
+e003            EndIf;
+                @Length  = whfldd;
+                @Decimal = whfldp;
+e002         EndIf;
+             @FieldA(@Ocur) = @SysFldName;
+             Read qwhdrffd;
+e001      EndDo;
+
+b001      If *Inu1;
+             Read qwhfdacp;
+b002         Dow not %Eof(qafdaccp);
+
+                // Check for key fields
+b003            If apnkyf > *Zeros;
+
+                   // Set key field ind
+                   @KeyFieldsInd = *On;
+
+                   @KOcur += 1;
+                   %occur(@KeyFields) = @KOcur;
+                   @SysKeyName = apkeyf;
+                   @Work  = @ToLower(apkeyf:2);
+                   @Work  = %Xlate(@Fr:@To:@Work:2);
+                   apkeyf = @ToLower(apkeyf);
+                   apkeyf = %Xlate(@Fr:@To:apkeyf);
+b004               If @DBType <> '*DB2  ';
+                      apkeyf = ConvertFieldName(apkeyf: @DBType: 'FIELDNAME');
+                      @Work  = ConvertFieldName(@Work: @DBType: 'FIELDNAME');
+                      @SysKeyName = apkeyf;
+e004               EndIf;
+                   @KeyName = apkeyf;
+                   @KeyFldName = 'Key' + apkeyf;
+                   @a = %Lookup(@SysKeyName: @FieldA);
+b004               If @a > *Zeros;
+                      %occur(@Fields) = @a;
+                      @KeyType = @Type;
+                      @KGetterName = 'getKey' + @Work;
+                      @KSetterName = 'setKey' + @Work;
+                      @KLength     = @Length;
+                      @KDecimal    = @Decimal;
+                      @Initializer = @GetterName;
+e004               EndIf;
+e003            EndIf;
+
+                // Check for Iseries server
+                Read qwhfdacp;
+e002         EndDo;
+
+e001      EndIf;
+
+          WriteBlankLine();
+
+          // write class heading
+          @Free = 'import java.sql.Connection;';
+          WriteJavaSourceLine(@Free);
+          @Free = 'import java.sql.DriverManager;';
+          WriteJavaSourceLine(@Free);
+          @Free = 'import java.sql.Statement;';
+          WriteJavaSourceLine(@Free);
+          @Free = 'import java.sql.PreparedStatement;';
+          WriteJavaSourceLine(@Free);
+          @Free = 'import java.sql.ResultSet;';
+          WriteJavaSourceLine(@Free);
+          @Free = 'import java.sql.SQLException;';
+          WriteJavaSourceLine(@Free);
+          @Free = 'import java.sql.SQLWarning;';
+          WriteJavaSourceLine(@Free);
+
+          WriteBlankLine();
+
+          // write class heading
+          @Free = 'public class ' + %Trimr(Whfile) + ' {';
+          WriteJavaSourceLine(@Free);
+
+          WriteBlankLine();
+
+š         End-Proc;
+
+š         Dcl-Proc PrivateSection;
+
+          Dcl-Pi PrivateSection;
+          End-Pi;
+
+          Dcl-s @Free VarChar(32000) Inz(*Blanks);
+
+          // read through occurance data structure to create all fields
+b001      For @o = 1 to @Ocur;
+             %occur(@Fields) = @o;
+             @Free = @space + 'private ' + %Trimr( @Type) + ' '
+                   + %Trimr(@FieldName) + ';';
+             WriteJavaSourceLine(@Free);
+e001      EndFor;
+
+          WriteBlankLine();
+
+          // read through occurance data structure to create all save fields
+b001      For @o = 1 to @Ocur;
+             %occur(@Fields) = @o;
+             @Free = @space + 'private ' + %Trimr( @Type) + ' '
+                   + %Trimr(@SavFldName) + ';';
+             WriteJavaSourceLine(@Free);
+e001      EndFor;
+
+          WriteBlankLine();
+
+          // check for index file included
+b001      If *Inu1;
+
+             // read through occurance data structure to create all key fields
+b002         For @K = 1 to @KOcur;
+                %occur(@KeyFields) = @K;
+                @Free = @space + 'private ' + %Trimr(@KeyType) + ' '
+                      + %Trimr(@KeyFldName) + ';';
+                WriteJavaSourceLine(@Free);
+e002         EndFor;
+
+             WriteBlankLine();
+e001      EndIf;
+
+          // write connection variable line
+          @Free = @space + 'private Connection conn;';
+          WriteJavaSourceLine(@Free);
+
+          // write select
+          @Free = @space + 'private ResultSet results;';
+          WriteJavaSourceLine(@Free);
+
+          // write select
+          @Free = @space + 'private PreparedStatement checkStmt;';
+          WriteJavaSourceLine(@Free);
+
+          WriteBlankLine();
+
+          // write record found/not found ind.
+          @Free = @space + 'private boolean recordFound;';
+          WriteJavaSourceLine(@Free);
+
+          // write ok to update/add ind.
+          @Free = @space + 'private boolean updateOK;';
+          WriteJavaSourceLine(@Free);
+
+          // write ok to use read equal next ind
+          @Free = @space + 'private boolean readeOK;';
+          WriteJavaSourceLine(@Free);
+
+          WriteBlankLine();
+
+š         End-Proc;
+
+š         Dcl-Proc Constructor;
+
+          Dcl-Pi Constructor;
+          End-Pi;
+
+          Dcl-s @Cnt      Packed(3:0) Inz(*Zeros);
+          Dcl-s @spacebig Char(19)    Inz(*Blanks);
+          Dcl-s @First    Ind         Inz(*Off);
+
+          Dcl-s @Free VarChar(32000) Inz(*Blanks);
+
+          // write class heading
+          @Free = @space + 'public ' + %Trimr(Whfile) +'() {';
+          WriteJavaSourceLine(@Free);
+
+          WriteBlankLine();
+
+          @Free = @space2 + 'super();';
+          WriteJavaSourceLine(@Free);
+
+          WriteBlankLine();
+
+          // read through occurance data structure
+b001      For @o = 1 to @Ocur;
+             %occur(@Fields) = @o;
+             @Free = @space2 + %Trimr(@SetterName) + '(';
+             // Start type selection
+b002         Select;
+x002            When @Type = 'String';
+                   @Free = %Trimr(@Free) + '"");';
+x002            When @Type = 'double';
+                   @Free = @space2 + %Trimr(@SetterName) + '(0.0);';
+x002            When @Type = 'int';
+                   @Free = @space2 + %Trimr(@SetterName) + '(0);';
+e002         EndSl;
+             WriteJavaSourceLine(@Free);
+e001      EndFor;
+
+          WriteBlankLine();
+
+          // read through occurance data structure
+b001      For @o = 1 to @Ocur;
+             %occur(@Fields) = @o;
+             @Free = @space2  + %Trimr(@SetterName) + 'Sav();';
+             WriteJavaSourceLine(@Free);
+e001      EndFor;
+
+          WriteBlankLine();
+
+          // check for index file included
+b001      If *Inu1;
+             // read through occurance data structure to create all key fields
+b002         For @K = 1 to @KOcur;
+                %occur(@KeyFields) = @K;
+                @Free = @space2 + %trim(@KSetterName) + '('
+                                + %Trimr(@Initializer) + '());';
+                WriteJavaSourceLine(@Free);
+e002         EndFor;
+
+             WriteBlankLine();
+e001      EndIf;
+
+          SetOffAllInd(2);
+
+          // Close bracket
+          @Free = @space + '}';
+          WriteJavaSourceLine(@Free);
+
+          WriteBlankLine();
+
+          // write contructor heading
+          @Free = @space + 'public ' + %Trimr(Whfile) +'(';
+
+          // read through occurance data structure
+b001      For @o = 1 to @Ocur;
+             %occur(@Fields) = @o;
+             @Cnt += 1;
+b002         If @Cnt = 1;
+b003            If not @First;
+                   @Free = %Trimr(@Free) + %Trimr(@Type) + ' '
+                         + %Trimr(@FieldName) + ', ';
+                   @First = *On;
+x003            Else;
+b004               If @o < @Ocur;
+                      @Free = @spacebig + %Trimr(@Type) + ' '
+                            + %Trimr(@FieldName) + ', ';
+x004               Else;
+                      @Free = @spacebig + %Trimr(@Type) + ' '
+                            + %Trimr(@FieldName);
+e004               EndIf;
+e003            EndIf;
+x002         Else;
+b003            If @o < @Ocur;
+                   @Free = %Trimr(@Free) + ' ' + %Trimr(@Type) + ' '
+                         + %Trimr(@FieldName) + ',';
+x003            Else;
+                   @Free = %Trimr(@Free) + ' ' + %Trimr(@Type) + ' '
+                         + %Trimr(@FieldName);
+e003            EndIf;
+e002         EndIf;
+b002         If @Cnt = 3 and @o <> @Ocur;
+                WriteJavaSourceLine(@Free);
+                Clear @Free;
+                Clear @Cnt;
+e002         EndIf;
+e001      EndFor;
+
+          @Free = %Trimr(@Free) + ') {';
+          WriteJavaSourceLine(@Free);
+
+          WriteBlankLine();
+
+          @Free = @space2 + 'super();';
+          WriteJavaSourceLine(@Free);
+
+          WriteBlankLine();
+
+          // read through occurance data structure
+b001      For @o = 1 to @Ocur;
+             %occur(@Fields) = @o;
+             @Free = @space2  + %Trimr(@SetterName) + '('
+                   + %Trimr(@FieldName) + ');';
+             WriteJavaSourceLine(@Free);
+e001      EndFor;
+
+          WriteBlankLine();
+
+          // read through occurance data structure
+b001      For @o = 1 to @Ocur;
+             %occur(@Fields) = @o;
+             @Free = @space2  + %Trimr(@SetterName) + 'Sav();';
+             WriteJavaSourceLine(@Free);
+e001      EndFor;
+
+          WriteBlankLine();
+
+          // check for index file included
+b001      If *Inu1;
+
+             // read through occurance data structure to create all key fields
+b002         For @K = 1 to @KOcur;
+                %occur(@KeyFields) = @K;
+                @Free = @space2 + %trim(@KSetterName) + '('
+                                + %Trimr(@Initializer) + '());';
+                WriteJavaSourceLine(@Free);
+e002         EndFor;
+
+             WriteBlankLine();
+e001      EndIf;
+
+          SetOffAllInd(2);
+
+          // write class heading
+          @Free = @space + '}';
+          WriteJavaSourceLine(@Free);
+
+          WriteBlankLine();
+
+š         End-Proc;
+
+š         Dcl-Proc GetterSetter;
+
+          Dcl-Pi GetterSetter;
+          End-Pi;
+
+          // read through occurance data structure original fields
+b001      For @o = 1 to @Ocur;
+             %occur(@Fields) = @o;
+             Getter(@FieldName: @Type: @GetterName);
+             Setter(@FieldName: @Type: @SetterName: @Length: @Decimal: *Off);
+e001      EndFor;
+
+          WriteBlankLine();
+
+          // read through occurance data structure for save fields
+b001      For @o = 1 to @Ocur;
+             %occur(@Fields) = @o;
+             Getter(%Trimr(@FieldName) + 'Sav':
+             @Type: %Trimr(@GetterName) + 'Sav');
+             SetterSav(%Trimr(@FieldName): %Trimr(@GetterName):
+                       %Trimr(@SetterName) + 'Sav');
+e001      EndFor;
+
+          WriteBlankLine();
+
+          // check for index file included
+b001      If *Inu1;
+
+             // read through occurance data structure to create all key fields
+b002         For @K = 1 to @KOcur;
+                %occur(@KeyFields) = @K;
+                Getter(@KeyFldName: @KeyType: @KGetterName);
+                Setter(@KeyFldName: @KeyType: @KSetterName:
+                       @KLength: @KDecimal: *On);
+e002         EndFor;
+
+             WriteBlankLine();
+e001      EndIf;
+
+          Getter('recordFound': 'boolean': 'getRecordFound');
+          Setter('recordFound': 'boolean': 'setRecordFound':
+                 *Zeros: *Zeros: *Off);
+
+          Getter('updateOK': 'boolean': 'getUpdateOK');
+          Setter('updateOK': 'boolean': 'setUpdateOK': *Zeros: *Zeros: *Off);
+
+          Getter('readeOK': 'boolean': 'getReadeOK');
+          Setter('readeOK': 'boolean': 'setReadeOK': *Zeros: *Zeros: *Off);
+
+          WriteBlankLine();
+
+š         End-Proc;
+

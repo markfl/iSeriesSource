@@ -1,0 +1,14 @@
+     Fqadspobj  up   e           k Disk
+
+          Dcl-s @a Packed(3:0) Inz(*Zeros);
+
+          Reset @a;
+          @a = %Scan('MF':odobnm:7);
+b001      If @a = *Zeros;
+             Delete qlidobjd;
+e001      Else;
+             Clear odobow;
+             odobow = %Subst(odobnm:1:@a-1);
+             Update qlidobjd %Fields(odobow);
+e001      EndIf;
+

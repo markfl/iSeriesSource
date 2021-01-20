@@ -1,0 +1,8 @@
+             CMD        PROMPT('Work with Submitted Jobs')
+
+             PARM       KWD(SBMFROM) TYPE(*CHAR) LEN(7) RSTD(*YES) +
+                          DFT(*USER) VALUES(*USER *WRKSTN *JOB) +
+                          PROMPT('Jobs submitted from')
+
+             PARM       KWD(OUTPUT) TYPE(*CHAR) LEN(6) RSTD(*YES) +
+                          DFT(*) VALUES(* *PRINT) PROMPT('Output')

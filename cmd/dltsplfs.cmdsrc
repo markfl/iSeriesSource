@@ -1,0 +1,13 @@
+             CMD        PROMPT('Delete Spooled File(s)')
+
+             PARM       KWD(FILE) TYPE(*GENERIC) SPCVAL((*ALL)) +
+                          MIN(1) PROMPT('Spooled file')
+
+             PARM       KWD(JOB) TYPE(JOB) DFT(*) SNGVAL((*)) +
+                          PROMPT('Job name')
+ JOB:        QUAL       TYPE(*NAME) SPCVAL((*ALL)) MIN(1)
+             QUAL       TYPE(*NAME) SPCVAL((*ALL)) CHOICE(*NONE) +
+                          PROMPT('User')
+             QUAL       TYPE(*CHAR) LEN(6) RANGE(000000 999999) +
+                          SPCVAL((*ALL)) CHOICE(*NONE) PROMPT('Number')
+

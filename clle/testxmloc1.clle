@@ -1,0 +1,17 @@
+             PGM        PARM(&LOADP)
+
+             DCL        VAR(&LOADP) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&LOAD) TYPE(*CHAR) LEN(2)
+
+             CHGVAR     VAR(&LOAD) VALUE(&LOADP)
+             MONMSG     MSGID(CPF0000) EXEC(DO)
+             CHGVAR     VAR(&LOAD) VALUE('01')
+             ENDDO
+
+             DBG        PGM(XMLPARSE1)
+
+             CALL       PGM(TESTXMLR1) PARM(&LOAD)
+
+             ENDDBG
+
+ END:        ENDPGM

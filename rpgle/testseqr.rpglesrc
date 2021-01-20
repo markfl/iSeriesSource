@@ -1,0 +1,82 @@
+     HOption(*NoDebugIo)  DftActGrp(*NO)
+     Fcpoxrftl01if   e           k disk
+     Fworkfile  o    f  128        disk
+     Dtestseqr         pr
+     D                                9a
+     Dtestseqr         pi
+     D  @order                        9a
+
+     D@WorkFileDs      ds           128
+     D  POrder                        9s 0
+     D  spc1                          1a
+     D  PPOrder                      22a
+     D  spc2                          1a
+     D  Pwkseq1                       5s 0
+     D  spc3                          1a
+     D  Pwkseq2                       5s 0
+     D  spc4                          1a
+
+     D  #Order         s                   Like(xrfordnbr) Inz(*Zeros)
+     D  @POSave        s                   Like(xrfpurord) Inz(*Blanks)
+     D  wkseq1         s              5p 0 Inz(*Zeros)
+     D  wkseq2         s                   Inz(*Zeros) Like(wkseq1)
+     D  @savwkseq1     s                   Inz(*Zeros) Like(wkseq1)
+
+     C/free
+
+          #Order = %Uns(@Order);
+
+          Setll #Order cpoxrftpf;
+          Reade #Order cpoxrftpf;
+b001      Dow not %Eof(cpoxrftl01);
+             // Check for First P.O.
+b002         If @POSave = *Blanks;
+
+                wkseq1 = 3;
+                wkseq2 = 2;
+                POrder  = xrfordnbr;
+                PPOrder = xrfpurord;
+                PWkseq1 = wkseq1;
+                PWkseq2 = wkseq2;
+                Write WorkFile @WorkFileDs;
+e002         EndIf;
+
+             // Check for P.O. Change
+b002         If @POSave  <> xrfpurord
+             And @POSave <> *Blanks;
+
+                wkseq1 += 1;
+                wkseq2 = 2;
+                POrder  = xrfordnbr;
+                PPOrder = xrfpurord;
+                PWkseq1 = wkseq1;
+                PWkseq2 = wkseq2;
+                Write WorkFile @WorkFileDs;
+e002         EndIf;
+
+             // Check for First P.O.
+b002         If @POSave = *Blanks;
+                wkseq2 = wkseq1;
+e002         EndIf;
+
+             // Check for First P.O.
+b002         If @POSave <> *Blanks
+             // Check for P.O. Change
+             And @POSave <> xrfpurord;
+                wkseq2 = wkseq1;
+e002         EndIf;
+
+             wkseq1 += 1;
+
+             @savwkseq1 = wkseq1;
+             POrder  = xrfordnbr;
+             PPOrder = xrfpurord;
+             PWkseq1 = wkseq1;
+             PWkseq2 = wkseq2;
+             Write WorkFile @WorkFileDs;
+             @POSave = xrfpurord;
+
+             Reade #Order cpoxrftpf;
+e001      EndDo;
+
+          *Inlr= *On;

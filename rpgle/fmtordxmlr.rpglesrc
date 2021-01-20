@@ -1,0 +1,28 @@
+     Fqxmlsrc   ip   e             Disk    Rename(qxmlsrc:rqxmlsrc)
+     Fqxmlsrco  o    f  200        Disk
+     D@xmlds         e ds                  ExtName(qxmlsrc) Prefix(X_)
+     D@a               s              3p 0 Inz(*Zeros)
+     D@b               s              3p 0 Inz(*Zeros)
+     D@c               s              3p 0 Inz(*Zeros)
+     D@d               s              3p 0 Inz(*Zeros)
+
+          x_srcseq = srcseq;
+          x_srcdat = srcdat;
+          Clear x_srcdta;
+          Reset @a;
+          Reset @b;
+          Reset @c;
+          Reset @d;
+          @a = %Scan('<': srcdta);
+          @b = %Scan('</': srcdta);
+          @c = %Scan('>': srcdta);
+          @d = %Scan('/>': srcdta);
+b001      If @a <> @b;
+b002         If @d = *Zeros;
+                %Subst(x_srcdta: @a+15: @c-@a) = %Subst(srcdta: @a+1: @c-@a-1);
+x002         Else;
+                %Subst(x_srcdta: @a+15: @c-@a) = %Subst(srcdta: @a+1: @c-@a-2);
+e002         EndIf;
+             Write qxmlsrco @xmlds;
+e001      EndIf;
+

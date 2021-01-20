@@ -1,0 +1,92 @@
+             PGM        PARM(&PLIBRARY &PFILEATR)
+
+             DCLF       FILE(QAFDBASI)
+
+             DCL        VAR(&PLIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PFILEATR) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FILEATR) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&FILECREATE) TYPE(*CHAR) LEN(10) +
+                          VALUE(CREATETMOR)
+             DCL        VAR(&FILEVIEW) TYPE(*CHAR) LEN(10) +
+                          VALUE(VIEWTMOR)
+             DCL        VAR(&FILEINDEX) TYPE(*CHAR) LEN(10) +
+                          VALUE(INDEXTMOR)
+             DCL        VAR(&FILEDROP) TYPE(*CHAR) LEN(10) +
+                          VALUE(DROPTMOR)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&LIBRARY) VALUE(&PLIBRARY)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             RTVJOBA    CURLIB(&LIBRARY)
+             ENDDO
+
+             CHGVAR     VAR(&FILEATR) VALUE(&PFILEATR)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&FILEATR) VALUE(*PF)
+             ENDDO
+
+             DLTF       FILE(QTEMP/QAFDBASI)
+             MONMSG     MSGID(CPF0000)
+
+             IF         COND(&FILEATR = *PF) THEN(DO)
+             DSPFD      FILE(&LIBRARY/*ALL) TYPE(*BASATR) +
+                          OUTPUT(*OUTFILE) FILEATR(*PF) +
+                          OUTFILE(QTEMP/QAFDBASI)
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(DIAG))
+             ENDDO
+
+             IF         COND(&FILEATR = *LF) THEN(DO)
+             DSPFD      FILE(&LIBRARY/*ALL) TYPE(*BASATR) +
+                          OUTPUT(*OUTFILE) FILEATR(*LF) +
+                          OUTFILE(QTEMP/QAFDBASI) OUTMBR(*FIRST *ADD)
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(DIAG))
+             ENDDO
+
+             OVRDBF     FILE(QAFDBASI) TOFILE(QTEMP/QAFDBASI) +
+                          SECURE(*YES)
+
+             RMVMSG     CLEAR(*ALL)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+             DOWHILE    COND(&@MSGID *NE CPF0864)
+
+             IF         COND(&ATFILE *NE ' ') THEN(DO)
+
+             IF         COND(&FILEATR = *PF) THEN(DO)
+             CRTSQLSRC  FILE(&ATLIB/&ATFILE) TODATABASE(*ORACLE) +
+                          SRCMBR(&FILECREATE *ADD) +
+                          DROPMBR(&FILEDROP *ADD)
+             ENDDO
+
+             CRTSQLSRC  FILE(&ATLIB/&ATFILE) TODATABASE(*ORACLE) +
+                          ACTION(*INDEX) SRCMBR(&FILEINDEX *ADD)
+
+             IF         COND(&FILEATR = *LF) THEN(DO)
+             CRTSQLSRC  FILE(&ATLIB/&ATFILE) TODATABASE(*ORACLE) +
+                          ACTION(*VIEW) SRCMBR(&FILEVIEW *ADD) +
+                          DROPMBR(&FILEDROP *ADD)
+             ENDDO
+
+             ENDDO
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+             ENDDO
+
+             DLTOVR     FILE(*ALL)
+
+             DLTF       FILE(QTEMP/QAFDBASI)
+             MONMSG     MSGID(CPF0000)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

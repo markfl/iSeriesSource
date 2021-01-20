@@ -1,0 +1,27 @@
+          Ctl-opt Option(*NoDebugio) DftActGrp(*No);
+
+          Dcl-f qpgmfldrl1 Usage(*Input:*Delete) Keyed;
+
+          Dcl-Pi pgmflddltr;
+             @PProgram  Like(program);
+             @PLibrary  Like(library);
+          End-Pi;
+
+          Dcl-Ds @KeyDs likerec(rpgmfldref : *key);
+
+          @KeyDs.program  = @PProgram;
+          @KeyDs.library  = @PLibrary;
+
+          Setll *Loval         rpgmfldref;
+          Setll %Kds(@KeyDs:2) rpgmfldref;
+          Reade %Kds(@KeyDs:2) rpgmfldref;
+b001      Dow Not %Eof(qpgmfldrl1);
+
+             Delete rpgmfldref;
+
+             Reade %Kds(@KeyDs:2) rpgmfldref;
+
+e001      EndDo;
+
+          *InLr = *On;
+          Return;

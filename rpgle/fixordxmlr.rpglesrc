@@ -1,0 +1,10 @@
+     Fqxmlsrc   ip   e             Disk    Rename(qxmlsrc:rqxmlsrc)
+     Fqxmlsrco  o    f  200        Disk
+     D@xmlds         e ds                  ExtName(qxmlsrc) Prefix(X_)
+
+          x_srcseq = srcseq;
+          x_srcdat = srcdat;
+          x_srcdta = %trim(srcdta);
+
+          Write qxmlsrco @xmlds;
+

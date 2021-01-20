@@ -1,0 +1,245 @@
+          Ctl-opt DftActGrp(*No) Option(*NoDebugio);
+
+          Dcl-f DspStrPrcD WorkStn InfDs(info) SFile(sfl1:rrn1);
+
+          Dcl-pi DspStrPrc;
+             Proc Like(SpecName);
+             Lib  Like(SpecSchema);
+          End-Pi;
+
+          Dcl-Ds info;
+             cfkey Char(1) pos(369);
+          End-Ds;
+
+      * Constants for attention indicator byte
+          Dcl-c ProcFilter  Const('SPECNAME');
+          Dcl-c LibFilter   Const('SPECSCHEMA');
+          Dcl-c Quote       Const('''');
+          Dcl-c SubfilePage Const(16);
+          Dcl-c Exit        Const(X'33');
+          Dcl-c Prompt      Const(X'34');
+          Dcl-c Cancel      Const(X'3C');
+          Dcl-c Enter       Const(X'F1');
+          Dcl-c PageDown    Const(X'F5');
+
+          Dcl-s SelectOne   Char(500)  Inz('SELECT specschema, specname +
+                                            FROM sysprocs');
+          Dcl-s SelectTwo   Char(1000) Inz(*Blanks);
+          Dcl-s Lastrrn     Like(rrn1);
+          Dcl-s WhereClause Char(200)  Inz(*Blanks);
+          Dcl-s OrderBy     Char(50)   Inz(*Blanks);
+          Dcl-s SpecName    Char(128);
+          Dcl-s SpecSchema  Char(128);
+
+      * Establish the connection to the remote machine. The -842 return
+      * code indicates that the connection is already established. If
+      * you want to connect to the local machine, use CONNECT RESET.
+
+          Exec SQL CONNECT RESET;
+
+          // Filter data, build and display subfile.
+          Filter();
+          Sort();
+          Clean();
+          Prep();
+          SflBld();
+          PrcSfl();
+          Clean();
+
+          // Disconnect the current connection.
+          Exec SQL DISCONNECT CURRENT;
+
+          *InLR = *on;
+
+      *****************************************************************
+      * Process the Subfile
+      *****************************************************************
+
+          Dcl-Proc PrcSfl;
+
+          Dcl-Pi PrcSfl;
+          End-Pi;
+
+b001      DoU (CFKey = Exit);
+
+             Write FKey1;
+             ExFmt Sf1Ctl;
+
+b002         Select;
+
+                // prompt for sorting criteria.
+x002            When CFKey = Prompt;
+
+                   Sort();
+                   Clean();
+                   Prep();
+                   SflBld();
+
+x002            When CFKey = Cancel;
+                   Leave;
+
+x002            When CFKey = PageDown;
+                   SflBld();
+
+e002         EndSl;
+
+e001      EndDo;
+
+          End-Proc;
+
+      *****************************************************************
+      * Prepare SQL cursor
+      *****************************************************************
+
+          Dcl-Proc Prep;
+
+          Dcl-Pi Prep;
+          End-Pi;
+
+          // Clear the subfile
+
+          *In31 = *On;
+          Write Sf1Ctl;
+          *In31 = *Off;
+          *In32 = *Off;
+          RRN1 = *Zeros;
+          LastRRN = *Zeros;
+          *In90 = *Off;
+
+          // Prepare the SQL statement for validation, since the program was
+          // compiled with DLYPRP (*YES), it will wait until it is used before
+          // it prepares th cursor.
+
+          SelectTwo = %TRIMR(SelectOne) + ' ' + %TrimR(WhereClause) + ' '
+                                        + OrderBy;
+
+          Exec SQL PREPARE sel FROM :SelectTwo;
+
+          // Declare the SQL cursor to hold the data retrieved from the SELECT
+
+          Exec SQL DECLARE MYCSR SCROLL CURSOR FOR SEL;
+
+          // Open the SQL cursor.
+
+          Exec SQL OPEN MYCSR;
+
+          End-Proc;
+
+      *****************************************************************
+      * Clean up before exiting
+      *****************************************************************
+
+          Dcl-Proc Clean;
+
+          Dcl-Pi Clean;
+          End-Pi;
+
+          // Close the SQL cursor after all processing is complete.
+
+          Exec SQL CLOSE mycsr;
+
+          End-Proc;
+
+      *****************************************************************
+      * Build the subfile
+      *****************************************************************
+
+          Dcl-Proc SflBld;
+
+          Dcl-Pi SflBld;
+          End-Pi;
+
+          Dcl-s @i Packed(5:0) Inz(*Zeros);
+
+          RRN1 = LastRRN;
+
+          // Process the records in the SQL cursor until the return not = 0
+
+          For @i = 1 To SubfilePage;
+
+             // Get the next row from the SQL cursor.
+
+             Exec SQL FETCH NEXT FROM mycsr INTO :specschema, :specname;
+
+b002         If SqlCod = *Zeros;
+             RRN1 += 1;
+             Procedure = %TrimR(specname);
+             Library   = %TrimR(specschema);
+             Write Sfl1;
+x002         Else;
+             Leave;
+e002         EndIf;
+
+e001      EndFor;
+
+b001      If RRN1 = *Zeros;
+             *In32 = *On;
+x001      Else;
+             LastRRN = RRN1;
+e001      EndIf;
+
+          // A code of 100 means end of file.
+
+b001      If SqlCod = 100;
+             *In90 = *On;
+e001      EndIf;
+
+          End-Proc;
+
+      *****************************************************************
+      * SORT - prompt to select sort criteria
+      *****************************************************************
+
+          Dcl-Proc Sort;
+
+          Dcl-Pi Sort;
+          End-Pi;
+
+          ExFmt Window1;
+
+b001      Select;
+
+x001         When tab1 <> *blanks;
+                OrderBy = 'ORDER BY SPECNAME, SPECSCHEMA';
+                tab1 = *blanks;
+
+x001         When tab2 <> *blanks;
+                OrderBy = 'ORDER BY SPECSCHEMA, SPECNAME';
+                tab2 = *blanks;
+
+e001      EndSl;
+
+          End-Proc;
+
+      *****************************************************************
+      * FILTER - Filter out USER and/Or Date Range
+      *****************************************************************
+
+          Dcl-Proc Filter;
+
+          Dcl-Pi Filter;
+          End-Pi;
+
+          Clear WhereClause;
+
+b001      If %TrimR(Lib) <> '*ALL'
+          Or %TrimR(Proc) <> '*ALL';
+b002         If Lib > *Blanks And %TrimR(Lib) <> '*ALL';
+                WhereClause = 'WHERE ' + %TrimR(WhereClause) + ' ' + LibFilter
+                            + ' = ' + Quote + %TrimR(Lib) + Quote;
+e002         EndIf;
+
+b002         If  Proc <> '*ALL'
+             And Lib   > *Blanks
+             And Lib  <> '*ALL';
+                WhereClause = %TrimR(WhereClause) + ' And ' +  ProcFilter
+                            + ' = ' + Quote + %TrimR(Proc) + Quote;
+x002         ElseIf (Proc <> '*ALL' And Lib = *Blanks)
+                 Or (Proc <> '*ALL' And Lib = '*ALL');
+                WhereClause = 'WHERE ' + %TrimR(WhereClause) + ProcFilter
+                            + ' = ' + Quote + %TrimR(Proc) + Quote;
+e002         EndIf;
+e001      EndIf;
+
+          End-Proc;
+

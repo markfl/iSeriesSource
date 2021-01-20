@@ -1,0 +1,5 @@
+     A          R QLIDOBJD                  PFILE(QDSPOBJD)
+     A          K ODLBNM
+     A          K ODOBNM
+     A          S ODOBTP                    COMP(EQ '*FILE')
+     A            ODOBAT                    VALUES('PF   ' 'LF   ')

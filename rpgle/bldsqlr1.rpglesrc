@@ -1,0 +1,24 @@
+          Ctl-opt Option(*NoDebugIO) DftActGrp(*No);
+
+          Dcl-f bldsql Usage(*Input:*Output) Keyed;
+
+          Dcl-Pi bldsqlr1;
+             @FileName Like(odobnm) Const;
+             @Inc      Ind;
+          End-Pi;
+
+          @Inc = *Off;
+
+          Chain @FileName rbldsql;
+b001      If Not %Found(bldsql);
+
+             @Inc   = *On;
+             odobnm = @FileName;
+
+             Write rbldsql;
+
+e001      EndIf;
+
+          *Inlr = *On;
+          Return;
+

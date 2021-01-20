@@ -1,0 +1,24 @@
+             PGM        PARM(&FILE &LFILE &GROUP)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&GROUP) TYPE(*CHAR) LEN(10)
+
+             DLTF       FILE(QTEMP/&FILE)
+             MONMSG     MSGID(CPF0000)
+
+             CPYF       FROMFILE(&LFILE) TOFILE(QTEMP/&FILE) +
+                          MBROPT(*REPLACE) CRTFILE(*YES) +
+                          FROMKEY(*BLDKEY (&GROUP)) TOKEY(*BLDKEY +
+                          (&GROUP))
+
+             OVRDBF     FILE(&FILE) TOFILE(QTEMP/&FILE)
+
+             CALL       PGM(ITPRESEQR) PARM(&FILE &GROUP)
+
+             DLTOVR     FILE(*ALL)
+
+             DLTF       FILE(QTEMP/&FILE)
+             MONMSG     MSGID(CPF0000)
+
+ END:        ENDPGM

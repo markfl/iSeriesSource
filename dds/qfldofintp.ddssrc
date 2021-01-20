@@ -1,0 +1,8 @@
+     A                                      UNIQUE
+     A          R RFLDOFINT
+     A            PROGRAM       10A         COLHDG('Program' 'Name')
+     A                                      TEXT('Program Name')
+     A            FIELDNAME     15A         COLHDG('Field' 'Name')
+     A                                      TEXT('Field Name')
+     A          K PROGRAM
+     A          K FIELDNAME

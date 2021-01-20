@@ -1,0 +1,13 @@
+     H Option(*Nodebugio) BndDir('MFLORES') DftActGrp(*No)
+     H/Title Send Program Message
+
+      /define mflores005
+      /copy qcpysrc,mflores
+
+     D  @P_MsgDta      s            256a   Inz('This Is A Test')
+
+          // Send the program message
+          SndPgmMsg(%Trim(@P_MsgDta): %Len(%Trim(@P_MsgDta)));
+
+          *Inlr = *On;
+

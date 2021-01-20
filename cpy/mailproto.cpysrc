@@ -1,0 +1,531 @@
+      *=====================================================================
+      * Subprocedure prototypes for service program MMAIL/SENDMAIL
+      *=====================================================================
+      *==================================================================
+      *  "UpdMimeRcd" subprocedure
+      *  Purpose: update a record of the MIME database file
+      *  Inputs:  full name of MIME file
+      *           Subject
+      *           Author
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  D  Fmimsubj       s             70a
+      *  D  Fmimauth       s             30a
+      *  C                   callp     UpdMimeRcd(MimeFName:Fmimsubj:
+      *  C                             Fmimauth)
+      *
+     D UpdMimeRcd      pr
+     D MimeFName                    512a
+     D Fmimsubj                      70a
+     D Fmimauth                      30a
+      *=====================================================================
+      *  "ChkIfs" subprocedure
+      *  Purpose: check whether an IFS file exists
+      *  Inputs:  the object-path-name of the IFS file
+      *  Outputs: existence flag: 0 if found,-1 if not found
+      *           file size in byte (if found, otherwise 0)
+      *           file creation time stamp (if found, otherwise 0001-01-01)
+      *  Example:
+      *  D  IfsFileNam     s           1024a
+      *  D  IfsFileSiz     s             10i 0
+      *  D  IfsCrtStamp    s               z
+      *  D  rc             s             10i 0
+      *  C                   eval      IfsFilename = '/cgidev/blue.gif'
+      *  C                   eval      rc = ChkIfs(IfsFileNam:IfsFileSiz:
+      *  C                                  IfsCrtStamp)
+      *
+     D ChkIfs          pr            10i 0
+     D IfsFileNam                  1024a
+     D IfsFileSiz                    10i 0
+     D IfsCrtStamp                     z
+      *==================================================================
+      *  "MimeCrtF" subprocedure
+      *  Purpose: create an IFS file to be used as MIME file
+      *  Inputs:  file name of the MIME file
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  C                   callp     MimeCrtF(MimeFName)
+      *
+     D MimeCrtF        pr
+     D MimeFName                    512a
+      *==================================================================
+      *  "TempCrtF" subprocedure
+      *  Purpose: create an IFS temporary file
+      *           in order to later send a MIME file
+      *  Inputs:  none
+      *  Outputs: Name of the IFS temporary file
+      *  Example:
+      *  D  TempFName      s            512a
+      *  C                   eval      TempFName=TempCrtF
+      *
+     D TempCrtF        pr           512a
+      *==================================================================
+      *  "MimeSender" subprocedure
+      *  Purpose: write the "Sender:" header to the MIME file
+      *  Inputs:  Name of the MIME file
+      *           Sender's name
+      *           Sender's e-mail
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  D  MimeSName      s             50a
+      *  D  MimeSEmail     s             50a
+      *  C                   callp     MimeSender(MimeFName:
+      *  C                             MimeSName:MimeSEmail)
+      *
+     D MimeSender      pr
+     D MimeFName                    512a
+     D MimeSName                     50a
+     D MimeSEmail                    50a
+      *==================================================================
+      *  "MimeDistr" subprocedure
+      *  Purpose: write to the MIME file the following headers:
+      *           To
+      *           cc
+      *           bcc
+      *  Inputs:  Name of the MIME file
+      *           Array of addressee names (1000 entries, 50 char each)
+      *           Array of addressee emails(1000 entries,256 char each)
+      *           Array of addressee distribution codes
+      *                                           0=to, 1=cc, 2=bcc
+      *  Outputs: none
+      *  Example:
+      *  D TempFName       s            512a
+      *  D ToNameArr       s             50a   dim(1000)
+      *  D ToAddrArr       s            256a   dim(1000)
+      *  D ToDistArr       s             10i 0 dim(1000)
+      *  C                   callp     MimeDistr(TempFName:ToNameArr:
+      *  C                             ToAddrArr:ToDistArr)
+      *
+     D MimeDistr       pr
+     D TempFName                    512a
+     D ToNameArr                     50a   dim(1000)
+     D ToAddrArr                    256a   dim(1000)
+     D ToDistArr                     10i 0 dim(1000)
+      *==================================================================
+      *  "MimeSubj"   subprocedure
+      *  Purpose: write the "Subject:" header to the MIME file
+      *  Inputs:  file name of the MIME file
+      *           Subject of the MIME file
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  D  MimeFSubj      s             70a
+      *  C                   callp     MimeSubj(MimeFName:MimeFSubj)
+      *
+     D MimeSubj        pr
+     D MimeFName                    512a
+     D MimeFSubj                     70a
+      *==================================================================
+      *  "MimeImpo"   subprocedure
+      *  Purpose: write the "Importance:" header to the MIME file
+      *  Inputs:  Name of the MIME file
+      *           Importance:
+      *                0=low, 1=medium, 2=high
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  D  MimeFImpo      s             10i 0
+      *  C                   callp     MimeImpo(MimeFName:MimeFImpo)
+      *
+     D MimeImpo        pr
+     D MimeFName                    512a
+     D MimeFImpo                     10i 0
+      *==================================================================
+      *  "MimePrio"   subprocedure
+      *  Purpose: write the "Priority:" header to the MIME file
+      *  Inputs:  Name of the MIME file
+      *           Priority:
+      *                0=non-urgent, 1=normal, 2=urgent
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  D  MimeFPrio      s             10i 0
+      *  C                   callp     MimePrio(MimeFName:MimeFPrio)
+      *
+     D MimePrio        pr
+     D MimeFName                    512a
+     D MimeFPrio                     10i 0
+      *==================================================================
+      *  "MimeSens"   subprocedure
+      *  Purpose: write the "Sensitivity:" header to the MIME file
+      *  Inputs:  Name of the MIME file
+      *           Sensitivity:
+      *              0=normal, 1=personal, 2=private, 3=Company-Confidential
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  D  MimeFSens      s             10i 0
+      *  C                   callp     MimeSens(MimeFName:MimeFSens)
+      *
+     D MimeSens        pr
+     D MimeFName                    512a
+     D MimeFSens                     10i 0
+      *==================================================================
+      *  "MimeNotif" subprocedure
+      *  Purpose: write to the MIME file the following header:
+      *           Disposition-Notification-To
+      *  Inputs:  Name of the MIME file
+      *           Sender's name
+      *           Sender's e-mail
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  D  MimeSName      s             50a
+      *  D  MimeSEmail     s             50a
+      *  C                   callp     MimeNotif(MimeFName:
+      *  C                             MimeSName:MimeSEmail)
+      *
+     D MimeNotif       pr
+     D MimeFName                    512a
+     D MimeSName                     50a
+     D MimeSEmail                    50a
+      *==================================================================
+      *  "MimeMultiP"   subprocedure
+      *  Purpose: write to the MIME file the header
+      *           - Content-Type: MULTIPART/MIXED;
+      *             with the BOUNDARY="..." parameter
+      *           - followed by the first BOUNDARY record
+      *  Input:   Name of the MIME file
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  C                   callp     MimeMultiP(MimeFName)
+      *
+      *  "MimeMultiP" subprocedure definition
+     D MimeMultiP      pr
+     D MimeFName                    512a
+      *==================================================================
+      *  "MimeImbAtt" subprocedure
+      *  Purpose: Imbed or Attach an IFS file to the MIME file
+      *  Inputs:  Name of the MIME file
+      *           Name of the file to imbed/attach
+      *           Content/type
+      *           Binary flag:
+      *                        Y=Binary
+      *           Imbed/Attach:
+      *                        1=Imbed, 2=Attach
+      *           Content-ID number (optional)
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  D  FromFName      s            512a
+      *  D  ContType       s             21a
+      *  D  BinFlag        s              1a
+      *  D  ImbAdd         s             10i 0
+      *  D  ImbAttCid      s             10i 0
+      *  C                   callp     MimeImbAtt(MimeFName:FromFName:
+      *  C                             ContType:BinFlag:ImbAtt:ImbAttCid)
+      *
+     D MimeImbAtt      pr
+     D MimeFName                    512a
+     D FromFName                    512a
+     D ContType                      21a
+     D BinFlag                        1a
+     D ImbAdd                        10i 0
+     D ImbAttCid                     10i 0 value options(*nopass)
+      *==================================================================
+      *  "MimeImbSpl" subprocedure
+      *  Purpose: Imbed or Attach a spool file to the MIME file
+      *  Inputs:  Name of the MIME file
+      *           Spool file name
+      *           Spool file number
+      *           Job name
+      *           Job user
+      *           Job log number
+      *           Imbed/Attach:
+      *                        1=Imbed, 2=Attach
+      *           Content-ID number (optional)
+      *  Outputs: integer  values: 0= operation performed
+      *                           -1= copy to physical file member failed
+      *                           -2= copy to stream file failed
+      *  Example:
+      *  D  rc             s             10i 0
+      *  D  MimeFName      s            512a
+      *  D  SplName        s             10a
+      *  D  SplNbr         s              6a
+      *  D  SplJobName     s             10a
+      *  D  SplJobUser     s             10a
+      *  D  SplJobNbr      s              6a
+      *  D  ImbAtt         s             10i 0
+      *  D  ImbAttCid      s             10i 0
+      *  C                   eval      rc = MimeImbSpl(MimeFName:
+      *  C                             SplName:SplNbr:
+      *  C                             SplJobName:SplJobUser:SplJobNbr:
+      *  C                             ImbAtt:ImbAttCid)
+      *
+      *================
+      *  "MimeImbSpl"  subprocedure
+     D MimeImbSpl      pr            10i 0
+     D MimeFName                    512a
+     D SplName                       10a
+     D SplNbr                         6a
+     D SplJobName                    10a
+     D SplJobUser                    10a
+     D SplJobNbr                      6a
+     D ImbAtt                        10i 0
+     D ImbAttCid                     10i 0 value options(*nopass)
+      *==================================================================
+      *  "MimeSplPdf" subprocedure
+      *  Purpose: Convert a spool file to PDF and attach it to the MIME file
+      *  Inputs:  Name of the MIME file
+      *           Spool file name
+      *           Spool file number
+      *           Job name
+      *           Job user
+      *           Job log number
+      *           Content-ID number (optional)
+      *  Outputs: integer  values: 0= operation performed
+      *                           -1= copy to physical file member failed
+      *                           -2= copy to stream file failed
+      *  Example:
+      *  D  rc             s             10i 0
+      *  D  MimeFName      s            512a
+      *  D  SplName        s             10a
+      *  D  SplNbr         s              6a
+      *  D  SplJobName     s             10a
+      *  D  SplJobUser     s             10a
+      *  D  SplJobNbr      s              6a
+      *  D  ImbAttCid      s             10i 0
+      *  C                   eval      rc = MimeSplPdf(MimeFName:
+      *  C                             SplName:SplNbr:
+      *  C                             SplJobName:SplJobUser:SplJobNbr:
+      *  C                             ImbAttCid)
+      *
+      *================
+      *  "MimeSplPdf"  subprocedure
+     D MimeSplPdf      pr            10i 0
+     D MimeFName                    512a
+     D SplName                       10a
+     D SplNbr                         6a
+     D SplJobName                    10a
+     D SplJobUser                    10a
+     D SplJobNbr                      6a
+     D ImbAttCid                     10i 0 value options(*nopass)
+      *==================================================================
+      *  "MimeImbSrc" subprocedure
+      *  Purpose: Imbed or Attach a source member to the MIME file
+      *  Inputs:  Name of the MIME file
+      *           Source library name
+      *           Source file name
+      *           Source member name
+      *           Imbed/Attach:
+      *                        1=Imbed, 2=Attach
+      *           Content-ID number (optional)
+      *  Outputs: integer  values: 0= operation performed
+      *                           -1= copy to stream file failed
+      *  Example:
+      *  D  rc             s             10i 0
+      *  D  MimeFName      s            512a
+      *  D  SrcLib         s             10a
+      *  D  SrcFile        s             10a
+      *  D  SrcMbr         s             10a
+      *  D  ImbAtt         s             10i 0
+      *  D  ImbAttCid      s             10i 0
+      *  C                   eval      rc = MimeImbSrc(MimeFName:
+      *  C                             SrcLib:SrcFile:SrcMbr:
+      *  C                             ImbAtt:ImbAttCid)
+      *
+      *================
+      *  "MimeImbSrc"  subprocedure definition
+     D MimeImbSrc      pr            10i 0
+     D MimeFName                    512a
+     D SrcLib                        10a
+     D SrcFile                       10a
+     D SrcMbr                        10a
+     D ImbAtt                        10i 0
+     D ImbAttCid                     10i 0 value options(*nopass)
+      *==================================================================
+      *  "MimeImbDBF" subprocedure
+      *  Purpose: Imbed or Attach a physical / logical file to the MIME file
+      *  Inputs:  Name of the MIME file
+      *           File library name
+      *           File name
+      *           Member name
+      *           Imbed/Attach:
+      *                        1=Imbed, 2=Attach
+      *           Content-ID number (optional)
+      *  Outputs: integer  values: 0= operation performed
+      *                           -1= copy to stream file failed
+      *  Example:
+      *  D  rc             s             10i 0
+      *  D  MimeFName      s            512a
+      *  D  FileLib        s             10a
+      *  D  FileName       s             10a
+      *  D  FileMbr        s             10a
+      *  D  ImbAtt         s             10i 0
+      *  D  ImbAttCid      s             10i 0
+      *  C                   eval      rc = MimeImbDBF(MimeFName:
+      *  C                             FileLib:FileName:FileMbr:
+      *  C                             ImbAtt:ImbAttCid)
+      *
+      *================
+      *  "MimeImbDBF"  subprocedure definition
+     D MimeImbDBF      pr            10i 0
+     D MimeFName                    512a
+     D FileLib                       10a
+     D FileName                      10a
+     D FileMbr                       10a
+     D ImbAtt                        10i 0
+     D ImbAttCid                     10i 0 value options(*nopass)
+      *==================================================================
+      *  "MimeWrtB"   subprocedure
+      *  Purpose: add a "boundary record" to the MIME  file
+      *  Inputs:  Name of the MIME file
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  C                   callp     MimeWrtB(MimeFName)
+      *
+     D MimeWrtB        pr
+     D MimeFName                    512a
+      *==================================================================
+      *  "MimeCpyB64" subprocedure
+      *  Purpose: Copy a binary file to the MIME file using BASE64 conversion
+      *  Inputs:  Name of the MIME file
+      *           Name of the file to be copied
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  D  FromFName      s            512a
+      *  C                   callp     MimeCpyB64(MimeFName:FromFName)
+      *
+     D MimeCpyB64      pr
+     D MimeFName                    512a
+     D FromFName                    512a
+      *==================================================================
+      *  "MimeEdtF" subprocedure
+      *  Purpose: Edits a mime file
+      *  Inputs:  File name of the MIME file
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  C                   callp     MimeEdtF(MimeFName)
+      *
+      *
+     D MimeEdtF        pr
+     D MimeFName                    512a
+      *==================================================================
+      *  "MimeDspF" subprocedure
+      *  Purpose: Displays a mime file
+      *  Inputs:  Name of the MIME file
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  C                   callp     MimeDspF(MimeFName)
+      *
+     D MimeDspF        pr
+     D MimeFName                    512a
+      *==================================================================
+      *  "MimeCpyTxt" subprocedure
+      *  Purpose: Append an ASCII text file to the MIME file
+      *  Inputs:  Name of the MIME file
+      *           Name of the file to be copied
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  D  FromFName      s            512a
+      *  C                   callp     MimeCpyTxt(MimeFName:FromFName)
+      *
+     D MimeCpyTxt      pr
+     D MimeFName                    512a
+     D FromFName                    512a
+      *==================================================================
+      *  "MimeUpdTxt" subprocedure
+      *  Purpose: Append an ASCII text file to the MIME file
+      *           replacing text variables with substitution values
+      *  Inputs:  Name of the MIME file
+      *           Name of the file to be copied
+      *           Name of "variables" array  (up to 500  10-char entries)
+      *           Name of the "values" array (up to 500 500-char entries)
+      *  Outputs: none
+      *  Example:
+      *  D  MimeFName      s            512a
+      *  D  FromFName      s            512a
+      *  D  TxtVarArr      s             10a   dim(500)
+      *  D  TxtValArr      s            500a   dim(500)
+      *  C                   callp     MimeUpdTxt(MimeFName:FromFName:
+      *  C                             TxtVarArr:TxtValArr)
+      *
+     D MimeUpdTxt      pr
+     D MimeFName                    512a
+     D FromFName                    512a
+     D TxtVarArr                     10a   dim(500)
+     D TxtValArr                    500a   dim(500)
+      *==================================================================
+      * "SendMail" subprocedure
+      *  Purpose: send a mime file to a number of recipients
+      *  Output:  CPF message ID (char 7)
+      *                          blank if no errors
+      *  Inputs:  Mime file name (char 512)
+      *           Sender's email (char 255)
+      *           Recipients' emails (array, 1000 entries, char 256 each)
+      *           Recipients' distribution types
+      *                              (array, 1000 entries, integer 10 each,
+      *                               values: 0 = To
+      *                                       1 = cc
+      *                                       2 = bc  )
+      *  Example:
+      *  D  CpfID          s              7a
+      *  D MimeFile        s            512a
+      *  D FromAddr        s            255a
+      *  D ToAddrArr       s            256a   dim(1000)
+      *  D ToDistArr       s             10i 0 dim(1000)
+      *  C                   eval      CpfID = SendMail(MimeFile:
+      *  C                             FromAddr:ToAddrArr:ToDistArr)
+      *
+     D SendMail        pr             7a
+     D MimeFile                     512a
+     D FromAddr                     255a
+     D ToAddrArr                    256a   dim(1000)
+     D ToDistArr                     10i 0 dim(1000)
+      *=====================================================================
+      * "RtvSysNam" subprocedure
+      *  Purpose: retrieve the system name
+      *  Output:  system name (char 8)
+      *  Example:
+      *  D  System         s              8a
+      *  C                   eval      System = RtvSysNam
+      *
+     D RtvSysNam       pr             8a
+      *=====================================================================****
+      * Date822 subprocedure
+      *=====================================================================****
+      * Returns the current date and time in the RFC822 format:
+      *   day, dd month yy hh:mm:ss GMT
+      *
+      *  Inputs:  none
+      *  Outputs: Date string (char 29)
+      *
+      *  Example
+      *  D GMTstamp        s             29a
+      *  C                   eval      GMTstamp = Date822
+
+     D Date822         pr            29a
+      *==================================================================
+      *  "ChgJobCSID" subprocedure
+      *  Purpose: if job ccsid 65535, change it to 37
+      *  Inputs:  None
+      *  Outputs: original job CCSID(5) + current job CCSID(5)
+      *  Example:
+      *  D  JobCCSIDs      s             10a
+      *  C                   eval      JobCCSIDs = ChgJobCCSID
+      *
+      *================
+      *  "ChgJobCSID"  subprocedure definition
+     D ChgJobCSID      pr            10a
+      *==================================================================
+      *  "RstJobCSID" subprocedure
+      *  Purpose: Restore job CCSID
+      *  Input:   original job CCSID(5) + current job CCSID(5)
+      *  Outputs: None
+      *  Example:
+      *  D  JobCCSIDs      s             10a
+      *  C                   callp     RstJobCSID(JobCCSIDs)
+      *
+      *================
+      *  "RstJobCSID"  subprocedure definition
+     D RstJobCSID      pr
+     D  JobCCSIDs                    10a

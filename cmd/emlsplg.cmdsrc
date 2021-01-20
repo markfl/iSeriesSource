@@ -1,0 +1,71 @@
+/********************************************************************/
+/*      OBJECT ID:‚EMLSPLG   €                                      */
+/********************************************************************/
+/*      Modifications:                                              */
+/*------------------------------------------------------------------*/
+/*  DR#  MOD  SCN    DATE   Modification Summary                    */
+/*------------------------------------------------------------------*/
+/*                                                                  */
+/********************************************************************/
+
+             CMD        PROMPT('E-mail spool file to Group')
+
+             PARM       KWD(SUBJECT) TYPE(*CHAR) LEN(70) MIN(1) +
+                          PROMPT('Subject')
+
+             PARM       KWD(FROMNAME) TYPE(*CHAR) LEN(30) MIN(1) +
+                          PROMPT('Sender''s name')
+
+             PARM       KWD(FROMADDR) TYPE(*CHAR) LEN(64) MIN(1) +
+                          PROMPT('Sender''s e-mail address') /* /M01*/
+
+             PARM       KWD(TONAME) TYPE(*CHAR) LEN(30) MIN(1) +
+                          PROMPT('Recipient''s name')
+             PARM       KWD(TOADDR) TYPE(*CHAR) LEN(64) MIN(1) +
+                          PROMPT('Recipient''s e-mail address')
+
+             PARM       KWD(FILE) TYPE(*NAME) LEN(10) MIN(1) +
+                          PROMPT('Spooled file')
+
+             PARM       KWD(JOB) TYPE(JOB) PROMPT('Job name')
+ JOB:        QUAL       TYPE(*NAME) LEN(10) DFT(*CURRENT) +
+                          SPCVAL((*CURRENT *))
+             QUAL       TYPE(*NAME) LEN(10) PROMPT('User')
+             QUAL       TYPE(*CHAR) LEN(6) RANGE(000000 999999) +
+                          PROMPT('Number')
+
+             PARM       KWD(SPLNBR) TYPE(*CHAR) LEN(6) RANGE(1 +
+                          999999) SPCVAL((*ONLY) (*LAST)) +
+                          PROMPT('Spooled file number')
+
+             PARM       KWD(CVTPDF) TYPE(*CHAR) LEN(4) RSTD(*YES) +
+                          DFT(*NO) VALUES(*NO *YES) PROMPT('Convert +
+                          spool file to PDF')
+
+             PARM       KWD(TXTF) TYPE(TXTF) PROMPT('Text source file')
+ TXTF:       QUAL       TYPE(*NAME) LEN(10) DFT(*DFT) SPCVAL((*DFT +
+                          *DFT) (*NONE *NONE))
+             QUAL       TYPE(*NAME) LEN(10) DFT(*LIBL) +
+                          SPCVAL((*LIBL) (*CURLIB)) PROMPT('Library')
+
+             PARM       KWD(TXTMBR) TYPE(*NAME) LEN(10) PROMPT('Text +
+                          source member')
+
+             PARM       KWD(RECEIPT) TYPE(*CHAR) LEN(4) RSTD(*YES) +
+                          DFT(*NO) VALUES(*NO *YES) PROMPT('Return +
+                          receipt')
+
+             PARM       KWD(DISP) TYPE(*CHAR) LEN(7) RSTD(*YES) +
+                          DFT(*IMBED) VALUES(*IMBED *ATTACH) +
+                          PROMPT('MIME message disposition . . .')
+
+             PARM       KWD(EMAL2NM) TYPE(*CHAR) LEN(30) RSTD(*NO) +
+                          PROMPT('Enter Name for second  email')
+
+             PARM       KWD(EMAILCC) TYPE(*CHAR) LEN(30) RSTD(*NO) +
+                          PROMPT('Enter Additional Email address')
+
+             PARM       KWD(SENSITVTY) TYPE(*CHAR) LEN(1) RSTD(*YES) +
+                          DFT(' ') VALUES(' ' '0' '1' '2' '3') +
+                          MIN(0) PROMPT('Sensitivity  ') /* /M02 */
+

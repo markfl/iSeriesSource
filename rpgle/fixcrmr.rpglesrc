@@ -1,0 +1,10 @@
+     Fctrcrmtp  up   e           k Disk
+     D  @Count         s              3p 0 Inz(*Zeros)
+
+           @Count += 1;
+b001       If @Count = 3;
+              Clear crmctltyp;
+              Update ctrcrmtpf %Fields(crmctltyp);
+              Reset @Count;
+e001       EndIf;
+

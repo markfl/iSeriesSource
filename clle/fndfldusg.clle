@@ -1,0 +1,229 @@
+             PGM        PARM(&REFFIELD &DSPFFD &DSPOBJD &DSPPGMREF +
+                          &FNDFLDUSG &OUTMBR &PRTREPORT)
+
+             DCL        VAR(&REFFIELD) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DSPFFD) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&DSPOBJD) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&DSPPGMREF) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&FNDFLDUSG) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OUTMBR) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&PRTREPORT) TYPE(*CHAR) LEN(4)
+
+             DCL        VAR(&FFDFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FFDLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&OBJDFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OBJDLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&PGMREFFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGMREFLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&FNDFLDFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FNDFLDLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MBROPT) TYPE(*CHAR) LEN(8)
+
+             DCL        VAR(&DSPFFD) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&DSPOBJD) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&DSPPGMREF) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&FNDFLDUSG) TYPE(*CHAR) LEN(20)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&FFDFILE) VALUE(%SST(&DSPFFD 1 10))
+             CHGVAR     VAR(&FFDLIB) VALUE(%SST(&DSPFFD 11 10))
+
+             CHGVAR     VAR(&OBJDFILE) VALUE(%SST(&DSPOBJD 1 10))
+             CHGVAR     VAR(&OBJDLIB) VALUE(%SST(&DSPOBJD 11 10))
+
+             CHGVAR     VAR(&PGMREFFILE) VALUE(%SST(&DSPPGMREF 1 10))
+             CHGVAR     VAR(&PGMREFLIB) VALUE(%SST(&DSPPGMREF 11 10))
+
+             CHGVAR     VAR(&FNDFLDFILE) VALUE(%SST(&FNDFLDUSG 1 10))
+             CHGVAR     VAR(&FNDFLDLIB) VALUE(%SST(&FNDFLDUSG 11 10))
+
+             CHGVAR     VAR(&MEMBER) VALUE(%SST(&OUTMBR 3 10))
+             CHGVAR     VAR(&MBROPT) VALUE(%SST(&OUTMBR 13 8))
+
+             DLTF       FILE(QTEMP/DSPPGMREF)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/QADSPFFD)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/QADSPFFDO)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/DSPPGMREF)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/QADSPPGM)
+             MONMSG     MSGID(CPF0000)
+
+             DSPFFD     FILE(&FFDLIB/&FFDFILE) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QADSPFFD)
+             MONMSG     MSGID(CPF0000)
+
+             CLRPFM     FILE(QTEMP/QADSPFFD)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(QDBASELIL2) TOFILE(&FFDLIB/QDBASELIL2)
+             OVRDBF     FILE(QDBASELIL4) TOFILE(&FFDLIB/QDBASELIL4)
+             OVRDBF     FILE(QADSPFFDO) TOFILE(QTEMP/QADSPFFD)
+
+             CALL       PGM(FNDFLDUSG1) PARM(&REFFIELD)
+
+             DLTOVR     FILE(*ALL)
+
+             DSPFFD     FILE(&FFDLIB/&FFDFILE) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QADSPFFDO)
+             MONMSG     MSGID(CPF0000)
+
+             CLRPFM     FILE(QTEMP/QADSPFFDO)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(QADSPFFD) TOFILE(QTEMP/QADSPFFD)
+             OVRDBF     FILE(QDBASELIL2) TOFILE(&FFDLIB/QDBASELIL2)
+             OVRDBF     FILE(QADSPFFDO) TOFILE(QTEMP/QADSPFFDO)
+
+             CALL       PGM(FNDFLDUSG2) PARM(&REFFIELD)
+
+             DLTOVR     FILE(*ALL)
+
+             OVRDBF     FILE(QADSPFFD) TOFILE(QTEMP/QADSPFFD)
+             OVRDBF     FILE(QDBASELIL4) TOFILE(&FFDLIB/QDBASELIL4)
+             OVRDBF     FILE(QADSPFFDO) TOFILE(QTEMP/QADSPFFDO)
+
+             CALL       PGM(FNDFLDUSG3) PARM(&REFFIELD)
+
+             DLTOVR     FILE(*ALL)
+
+             CPYF       FROMFILE(QTEMP/QADSPFFDO) +
+                          TOFILE(QTEMP/QADSPFFD) MBROPT(*ADD)
+
+             CHKOBJ     OBJ(&FNDFLDLIB/&FNDFLDFILE) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+
+             CRTDUPOBJ  OBJ(QADSPFFD) FROMLIB(QSYS) OBJTYPE(*FILE) +
+                          TOLIB(&FNDFLDLIB) NEWOBJ(&FNDFLDFILE) +
+                          CST(*NO) TRG(*NO)
+
+             IF         COND(&MEMBER *NE *FIRST) THEN(DO)
+             ADDPFM     FILE(&FNDFLDLIB/&FNDFLDFILE) MBR(&MEMBER)
+             ENDDO
+             ELSE       CMD(DO)
+             ADDPFM     FILE(&FNDFLDLIB/&FNDFLDFILE) MBR(&FNDFLDFILE)
+             CHGVAR     VAR(&MEMBER) VALUE(&FNDFLDFILE)
+             ENDDO
+
+             CHGPF      FILE(&FNDFLDLIB/&FNDFLDFILE) SIZE(*NOMAX)
+
+             ENDDO
+
+             IF         COND(&MBROPT = *REPLACE) THEN(DO)
+             CLRPFM     FILE(&FNDFLDLIB/&FNDFLDFILE) MBR(&MEMBER)
+             ENDDO
+
+             OVRDBF     FILE(QADSPFFD) TOFILE(&FFDLIB/&FFDFILE) +
+                          SHARE(*YES)
+             OPNQRYF    FILE((&FFDLIB/&FFDFILE)) QRYSLT('WHRFLD *EQ +
+                          "' || &REFFIELD || '"') KEYFLD((WHFILE))
+
+             OVRDBF     FILE(QADSPFFDO) TOFILE(&FNDFLDLIB/&FNDFLDFILE)
+
+             CALL       PGM(FNDFLDUSG2) PARM(&REFFIELD)
+
+             CLOF       OPNID(&FFDFILE)
+
+             DLTOVR     FILE(*ALL)
+
+             OVRDBF     FILE(QADSPFFD) +
+                          TOFILE(&FNDFLDLIB/&FNDFLDFILE) SHARE(*YES)
+             OPNQRYF    FILE((&FNDFLDLIB/&FNDFLDFILE)) OPTION(*ALL) +
+                          KEYFLD((WHFILE) (WHFLDE))
+
+             CALL       PGM(FNDFLDUSG3)
+
+             CLOF       OPNID(&FNDFLDFILE)
+
+             DLTOVR     FILE(*ALL)
+
+             IF         COND(&PRTREPORT = *YES) THEN(DO)
+
+             CRTDUPOBJ  OBJ(QADSPOBJ) FROMLIB(QSYS) OBJTYPE(*FILE) +
+                          TOLIB(QTEMP) CST(*NO) TRG(*NO)
+             MONMSG     MSGID(CPF0000)
+             ADDPFM     FILE(QTEMP/QADSPOBJ) MBR(QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+             CLRPFM     FILE(QTEMP/QADSPOBJ) MBR(QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+             CHGPF      FILE(QTEMP/QADSPOBJ) SIZE(*NOMAX)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(QADSPPGMI) +
+                          TOFILE(&PGMREFLIB/&PGMREFFILE) SHARE(*YES)
+             OPNQRYF    FILE((&PGMREFLIB/&PGMREFFILE)) KEYFLD((WHPNAM))
+
+             CALL       PGM(FNDFLDUSG4)
+
+             CLOF       OPNID(&PGMREFFILE)
+
+             DLTOVR     FILE(*ALL)
+
+             OVRDBF     FILE(QADSPOBJ) TOFILE(QTEMP/QADSPOBJ) +
+                          SECURE(*YES) SHARE(*YES)
+             OPNQRYF    FILE((QTEMP/QADSPOBJ)) OPTION(*ALL) +
+                          KEYFLD((ODOBNM) (ODLBNM) (ODOBTP))
+
+             CALL       PGM(FNDFLDUSG5)
+
+             CLOF       OPNID(QADSPOBJ)
+
+             DLTOVR     FILE(*ALL)
+
+             OVRDBF     FILE(QADSPFFD) +
+                          TOFILE(&FNDFLDLIB/&FNDFLDFILE) +
+                          SECURE(*YES) SHARE(*YES)
+             OPNQRYF    FILE((&FNDFLDLIB/&FNDFLDFILE)) KEYFLD((WHFILE))
+
+             OVRDBF     FILE(QADSPPGMI) TOFILE(QTEMP/DSPPGMREF) +
+                          SHARE(*YES)
+             OPNQRYF    FILE((QTEMP/DSPPGMREF)) KEYFLD((WHPNAM))
+
+             OVRDBF     FILE(QADSPOBJ) TOFILE(QTEMP/QADSPOBJ) +
+                          SECURE(*YES) SHARE(*YES)
+             OPNQRYF    FILE((QTEMP/QADSPOBJ)) KEYFLD((ODOBNM))
+
+             OVRPRTF    FILE(QSYSPRT) PAGESIZE(66 198)
+
+             CALL       PGM(FNDFLDUSG6)
+
+             CLOF       OPNID(&FNDFLDFILE)
+             CLOF       OPNID(&PGMREFFILE)
+             CLOF       OPNID(QADSPOBJ)
+
+             DLTOVR     FILE(*ALL)
+
+             ENDDO
+
+             DLTF       FILE(QTEMP/DSPPGMREF)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/QADSPFFD)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/QADSPFFDO)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/DSPPGMREF)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/QADSPPGM)
+             MONMSG     MSGID(CPF0000)
+
+             RMVMSG     CLEAR(*ALL)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

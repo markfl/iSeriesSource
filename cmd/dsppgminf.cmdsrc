@@ -1,0 +1,25 @@
+             CMD        PROMPT('Display Program Information')
+
+             PARM       KWD(PROGRAM) TYPE(PROGRAM) PROMPT('Program')
+ PROGRAM:    QUAL       TYPE(*GENERIC) SPCVAL((*ALL))
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*CURLIB) (*USRLIBL) (*ALLUSR) (*ALL)) +
+                          CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(DSPPGMINF) TYPE(DSPPGMINF) DFT(*DFT) +
+                          SNGVAL((*DFT 'QDSPPGMINF*CURLIB') (*NEW)) +
+                          PROMPT('Display Program Information')
+ DSPPGMINF:  QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('LIBRARY')
+
+             PARM       KWD(OUTMBR) TYPE(OUTMBR) CHOICE(*NONE) +
+                          PROMPT('Output member options')
+ OUTMBR:     ELEM       TYPE(*NAME) DFT(*FIRST) SPCVAL((*FIRST) +
+                          (*FILE)) PROMPT('Member to receive output')
+             ELEM       TYPE(*CHAR) LEN(8) RSTD(*YES) DFT(*ADD) +
+                          VALUES(*REPLACE *ADD) SPCVAL((*FIRST) +
+                          (*SRCFILE)) CHOICE(*NONE) PROMPT('Replace +
+                          or add records')
+

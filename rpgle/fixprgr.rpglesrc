@@ -1,0 +1,12 @@
+     Fitppurgel2up   e           k Disk
+     Iritppurgep
+     I                                          purgroup      l1
+     I                                          purfrmfile    l1
+     I                                          purkeyfld1    l1
+     I                                          purkeyfld2    l1
+     I                                          purkeyfld3    l1
+     I                                          purkeyfld4    l1
+
+b001      If not *Inl1;
+             Delete ritppurgep;
+e001      EndIF;

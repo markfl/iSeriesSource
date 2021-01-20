@@ -1,0 +1,213 @@
+             PGM        PARM(&PLIBRARY &PACTION &PMEMBER &PDROPMBR +
+                          &DATABASEIN)
+
+             DCLF       FILE(QAFDBASI)
+
+             DCL        VAR(&PLIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PACTION) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&PMEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PDROPMBR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DATABASEIN) TYPE(*CHAR) LEN(7)
+
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&ACTION) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DROPMBR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DATABASE) TYPE(*CHAR) LEN(7)
+
+             DCL        VAR(&FILEMY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FILEDB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FILEOR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DROPMY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DROPDB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DROPOR) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&INCLUDE) TYPE(*LGL)
+             DCL        VAR(&CHECK) TYPE(*CHAR) +
+                          VALUE('ABCDEFGHIJKLMNOPQRSTUVWXYZ#012345678+
+                          90 ')
+             DCL        VAR(&NBRCURRCD) TYPE(*DEC) LEN(10 0) VALUE(0)
+             DCL        VAR(&QSQLSRC) TYPE(*CHAR) LEN(10) +
+                          VALUE(QSQLSRC)
+             DCL        VAR(&CURLIB) TYPE(*CHAR) LEN(10)
+
+             RTVJOBA    CURLIB(&CURLIB)
+
+             CHGVAR     VAR(&LIBRARY) VALUE(&PLIBRARY)
+/* b01 */    MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&LIBRARY) VALUE(&CURLIB)
+/* e01 */    ENDDO
+
+             CHGVAR     VAR(&ACTION) VALUE(&PACTION)
+/* b01 */    MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&ACTION) VALUE(*CREATE)
+/* e01 */    ENDDO
+
+             CHGVAR     VAR(&MEMBER) VALUE(&PMEMBER)
+/* b01 */    MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&MEMBER) VALUE(*FILE)
+/* e01 */    ENDDO
+
+             CHGVAR     VAR(&DROPMBR) VALUE(&PDROPMBR)
+
+             CHGVAR     VAR(&DATABASE) VALUE(&DATABASEIN)
+/* b01 */    MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&DATABASE) VALUE(*ALL)
+/* e01 */    ENDDO
+
+             DLTF       FILE(QTEMP/QAFDBASI)
+             MONMSG     MSGID(CPF0000)
+
+/* b01 */    SELECT
+
+/* b02 */    WHEN       COND(&ACTION *EQ *CREATE) THEN(DO)
+             DSPFD      FILE(&LIBRARY/*ALL) TYPE(*BASATR) +
+                          OUTPUT(*OUTFILE) FILEATR(*PF) +
+                          OUTFILE(QTEMP/QAFDBASI)
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(END))
+/* e02 */    ENDDO
+
+/* b02 */    WHEN       COND(&ACTION *EQ *INDEX) THEN(DO)
+             DSPFD      FILE(&LIBRARY/*ALL) TYPE(*BASATR) +
+                          OUTPUT(*OUTFILE) FILEATR(*PF *LF) +
+                          OUTFILE(QTEMP/QAFDBASI)
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(END))
+/* e02 */    ENDDO
+
+/* b02 */    WHEN       COND(&ACTION *EQ *VIEW) THEN(DO)
+             DSPFD      FILE(&LIBRARY/*ALL) TYPE(*BASATR) +
+                          OUTPUT(*OUTFILE) FILEATR(*LF) +
+                          OUTFILE(QTEMP/QAFDBASI)
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(END))
+/* e02 */    ENDDO
+/* e01 */    ENDSELECT
+
+             CLRPFM     FILE(BLDSQL)
+             MONMSG     MSGID(CPF0000)
+
+             CLRPFM     FILE(CRTSQLP)
+             MONMSG     MSGID(CPF0000)
+
+/* b01 */    IF         COND(&MEMBER *NE *FILE) THEN(DO)
+             CHGVAR     VAR(&FILEMY) VALUE(&MEMBER |< 'MY')
+             CHGVAR     VAR(&FILEDB) VALUE(&MEMBER |< 'DB')
+             CHGVAR     VAR(&FILEOR) VALUE(&MEMBER |< 'OR')
+             CHGVAR     VAR(&DROPMY) VALUE(&DROPMBR |< 'MY')
+             CHGVAR     VAR(&DROPDB) VALUE(&DROPMBR |< 'DB')
+             CHGVAR     VAR(&DROPOR) VALUE(&DROPMBR |< 'OR')
+/* e01 */    ENDDO
+
+             OVRDBF     FILE(QAFDBASI) TOFILE(QTEMP/QAFDBASI) +
+                          SECURE(*YES)
+
+             RMVMSG     CLEAR(*ALL)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+/* b01 */    DOWHILE    COND(&MSGID *NE CPF0864)
+
+/* b02 */    IF         COND(&ATFILE *NE ' ') THEN(DO)
+
+/* b03 */    IF         COND(%CHECK(&CHECK &ATFILE) *EQ 0) THEN(DO)
+
+             CALL       PGM(BLDSQLR1) PARM(&ATFILE &INCLUDE)
+/* b04 */    IF         COND(&INCLUDE) THEN(DO)
+
+/* b05 */    IF         COND(&MEMBER *EQ *FILE) THEN(DO)
+             CHGVAR     VAR(&FILEMY) VALUE(&ATFILE |< 'MY')
+             CHGVAR     VAR(&FILEDB) VALUE(&ATFILE |< 'DB')
+             CHGVAR     VAR(&FILEOR) VALUE(&ATFILE |< 'OR')
+             CHGVAR     VAR(&DROPMY) VALUE(&ATFILE |< 'MY')
+             CHGVAR     VAR(&DROPDB) VALUE(&ATFILE |< 'DB')
+             CHGVAR     VAR(&DROPOR) VALUE(&ATFILE |< 'OR')
+/* e05 */    ENDDO
+
+/* b05 */    IF         COND((&DATABASE = *ALL) *OR (&DATABASE = +
+                          *MSSQL)) THEN(DO)
+             CRTSQLSRC  FILE(&ATLIB/&ATFILE) ACTION(&ACTION) +
+                          SRCFILE(&CURLIB/&QSQLSRC) SRCMBR(&MEMBER +
+                          *ADD) DROPMBR(&DROPMBR *ADD)
+             MONMSG     MSGID(CPF0000)
+/* e05 */    ENDDO
+
+/* b05 */    IF         COND((&DATABASE = *ALL) *OR (&DATABASE = +
+                          *MYSQL)) THEN(DO)
+             CRTSQLSRC  FILE(&ATLIB/&ATFILE) TODATABASE(*MYSQL) +
+                          ACTION(&ACTION) SRCFILE(&CURLIB/&QSQLSRC) +
+                          SRCMBR(&FILEMY *ADD) DROPMBR(&DROPMY *ADD)
+             MONMSG     MSGID(CPF0000)
+/* e05 */    ENDDO
+
+/* b05 */    IF         COND((&DATABASE = *ALL) *OR (&DATABASE = +
+                          *DB2)) THEN(DO)
+             CRTSQLSRC  FILE(&ATLIB/&ATFILE) TODATABASE(*DB2) +
+                          ACTION(&ACTION) SRCFILE(&CURLIB/&QSQLSRC) +
+                          SRCMBR(&FILEDB *ADD) DROPMBR(&DROPDB *ADD)
+             MONMSG     MSGID(CPF0000)
+/* e05 */    ENDDO
+
+/* b05 */    IF         COND((&DATABASE = *ALL) *OR (&DATABASE = +
+                          *ORACLE)) THEN(DO)
+             CRTSQLSRC  FILE(&ATLIB/&ATFILE) TODATABASE(*ORACLE) +
+                          ACTION(&ACTION) SRCFILE(&CURLIB/&QSQLSRC) +
+                          SRCMBR(&FILEOR *ADD) DROPMBR(&DROPOR *ADD)
+             MONMSG     MSGID(CPF0000)
+/* e05 */    ENDDO
+/* e04 */    ENDDO
+/* e03 */    ENDDO
+/* e02 */    ENDDO
+
+             DLTSPLF    FILE(QPJOBLOG) SPLNBR(*LAST)
+             MONMSG     MSGID(CPF0000)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+/* e01 */    ENDDO
+
+             DLTOVR     FILE(*ALL)
+
+             DLTF       FILE(QTEMP/QAFDBASI)
+             MONMSG     MSGID(CPF0000)
+
+             RTVMBRD    FILE(&CURLIB/&QSQLSRC) MBR(&MEMBER) +
+                          NBRCURRCD(&NBRCURRCD)
+             MONMSG     MSGID(CPF0000)
+/* b01 */    SELECT
+/* b02 */    WHEN       COND(&NBRCURRCD > 99999) THEN(DO)
+             RGZPFM     FILE(&CURLIB/&QSQLSRC) MBR(&MEMBER) +
+                          SRCOPT(*SEQNBR) SRCSEQ(0.01 0.01)
+/* e02 */    ENDDO
+/* b02 */    WHEN       COND(&NBRCURRCD > 9999) THEN(DO)
+             RGZPFM     FILE(&CURLIB/&QSQLSRC) MBR(&MEMBER) +
+                          SRCOPT(*SEQNBR) SRCSEQ(0.1 0.1)
+/* e02 */    ENDDO
+/* b02 */    WHEN       COND(&NBRCURRCD > 1) THEN(DO)
+             RGZPFM     FILE(&CURLIB/&QSQLSRC) MBR(&MEMBER) +
+                          SRCOPT(*SEQNBR)
+/* e02 */    ENDDO
+/* e01 */    ENDSELECT
+
+             RTVMBRD    FILE(&CURLIB/&QSQLSRC) MBR(&DROPMBR) +
+                          NBRCURRCD(&NBRCURRCD)
+             MONMSG     MSGID(CPF0000)
+/* b01 */    SELECT
+/* b02 */    WHEN       COND(&NBRCURRCD > 99999) THEN(DO)
+             RGZPFM     FILE(&CURLIB/&QSQLSRC) MBR(&DROPMBR) +
+                          SRCOPT(*SEQNBR) SRCSEQ(0.01 0.01)
+/* e02 */    ENDDO
+/* b02 */    WHEN       COND(&NBRCURRCD > 9999) THEN(DO)
+             RGZPFM     FILE(&CURLIB/&QSQLSRC) MBR(&DROPMBR) +
+                          SRCOPT(*SEQNBR) SRCSEQ(0.1 0.1)
+/* e02 */    ENDDO
+/* b02 */    WHEN       COND(&NBRCURRCD > 1) THEN(DO)
+             RGZPFM     FILE(&CURLIB/&QSQLSRC) MBR(&DROPMBR) +
+                          SRCOPT(*SEQNBR)
+/* e02 */    ENDDO
+/* e01 */    ENDSELECT
+
+ END:        ENDPGM

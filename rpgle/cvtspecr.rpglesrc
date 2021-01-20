@@ -1,0 +1,28 @@
+          Ctl-opt BndDir('MFLORES') DftActGrp(*No) Option(*NoDebugio);
+          //********************************************************************************
+          //
+          // Author.....: Mark Flores
+          // Date.......: 15-Nov-2016
+          // Description: Convert D Specs to RPG/Free
+          //
+          //********************************************************************************
+
+     Fqrpglesrc ip   f  112        Disk
+
+          Dcl-Pi cvtspecr;
+             @Program Char(10);
+          End-Pi;
+      /define CVTSPEC01
+      /copy qcpysrc,cvtspec
+      /undefine CVTSPEC01
+
+     Iqrpglesrc ns
+     I                                  1    6 2srcseq
+     I                                  7   12 0srcdat
+     I                                 13  112  srcdta
+     I          aa  **
+     I                                 13  112  @1srcdta
+
+          ParseSpec(@Program: srcseq: srcdat: srcdta: @1srcdta);
+
+     Clr                 Callp     ParseSpec()

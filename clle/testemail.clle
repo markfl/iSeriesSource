@@ -1,0 +1,13 @@
+             PGM        PARM(&SHIPMENT)
+
+             DCL        VAR(&SHIPMENT) TYPE(*CHAR) LEN(12)
+
+             CRTPGM     PGM(TESTEMAILR) MODULE(TESTEMAILR SENDEMAILR)
+
+             DBG        PGM(TESTEMAILR)
+
+             CALL       PGM(TESTEMAILR) PARM(&SHIPMENT)
+
+             ENDDBG
+
+ END:        ENDPGM

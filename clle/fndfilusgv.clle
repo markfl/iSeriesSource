@@ -1,0 +1,52 @@
+             PGM        PARM(&FILELIB &OBJLIB &DSPPGMREF &FNDFILUSG +
+                          &OUTMBR)
+
+             DCL        VAR(&FILELIB) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OBJLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DSPPGMREF) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&FNDFILUSG) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OUTMBR) TYPE(*CHAR) LEN(20)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&PGMREFFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGMREFLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&FILUSGFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FILUSGLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(256)
+
+             CHGVAR     VAR(&FILE) VALUE(%SST(&FILELIB 1 10))
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&FILELIB 11 10))
+
+             CHGVAR     VAR(&PGMREFFILE) VALUE(%SST(&DSPPGMREF 1 10))
+             CHGVAR     VAR(&PGMREFLIB) VALUE(%SST(&DSPPGMREF 11 10))
+
+             CHGVAR     VAR(&FILUSGFILE) VALUE(%SST(&FNDFILUSG 1 10))
+             CHGVAR     VAR(&FILUSGLIB) VALUE(%SST(&FNDFILUSG 11 10))
+
+/* b01 */    IF         COND(&PGMREFFILE *NE *NEW) THEN(DO)
+
+             CHKOBJ     OBJ(&PGMREFLIB/&PGMREFFILE) OBJTYPE(*FILE)
+/* b02 */    MONMSG     MSGID(CPF9801) EXEC(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    File' |> &PGMREFFILE +
+                          |> 'in library' |> &PGMREFLIB |> 'not found')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+/* e02 */    ENDDO
+
+/* b02 */    MONMSG     MSGID(CPF9810) EXEC(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    Library' |> +
+                          &PGMREFLIB |> 'not found')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+/* e02 */    ENDDO
+/* e01 */    ENDDO
+
+             RMVMSG     CLEAR(*ALL)
+
+             ENDPGM

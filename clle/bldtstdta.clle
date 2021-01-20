@@ -1,0 +1,60 @@
+             PGM
+
+             DCLF       FILE(QADSPOBJ)
+
+             DCL        VAR(&FILENAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+
+             DLTF       FILE(QTEMP/QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPDBR)
+             MONMSG     MSGID(CPF0000)
+
+             DSPOBJD    OBJ(*CURLIB/*ALL) OBJTYPE(*FILE) +
+                          OUTPUT(*OUTFILE) OUTFILE(QTEMP/QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+             RMVMSG     CLEAR(*ALL)
+
+             OVRDBF     FILE(QADSPOBJ) TOFILE(QTEMP/QADSPOBJ)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+             DOWHILE    COND(&MSGID *NE CPF0864)
+
+             IF         COND(%SST(&ODOBNM 8 3) = '.MF') THEN(DO)
+             CHGVAR     VAR(&FILENAME) VALUE(%SST(&ODOBNM 1 7))
+             DSPDBR     FILE(&FILENAME) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QADSPDBR) OUTMBR(*FIRST)
+             CRTDUPOBJ  OBJ(&FILENAME) FROMLIB(*LIBL) OBJTYPE(*FILE) +
+                          TOLIB(*CURLIB) CST(*NO) TRG(*NO)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(QADSPDBR) TOFILE(QTEMP/QADSPDBR)
+             CALL       PGM(BLDTSTDTA1)
+             DLTOVR     FILE(QADSPDBR)
+
+             SBMJOB     CMD(CPYF FROMFILE(&ODOBNM) +
+                          TOFILE(*CURLIB/&FILENAME) +
+                          MBROPT(*REPLACE)) JOB(&ODOBNM) LOG(*JOBD +
+                          *JOBD *NOLIST)
+
+             ENDDO
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+             ENDDO
+
+             DLTOVR     FILE(*ALL)
+
+             DLTF       FILE(QTEMP/QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPDBR)
+             MONMSG     MSGID(CPF0000)
+
+             ENDPGM

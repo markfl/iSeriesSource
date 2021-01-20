@@ -1,0 +1,16 @@
+             PGM
+
+             DCL        VAR(&XML) TYPE(*CHAR) LEN(32000)
+             DCL        VAR(&USER) TYPE(*CHAR) LEN(10)
+
+             RTVJOBA    USER(&USER)
+
+             DBG        PGM(CARRIEREVT)
+
+             CALL       PGM(TESTEVENTX) PARM(&XML)
+
+             CALL       PGM(CARRIEREVT) PARM(&USER &XML)
+
+             ENDDBG
+
+ END:        ENDPGM

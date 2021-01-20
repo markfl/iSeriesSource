@@ -1,0 +1,167 @@
+             PGM        PARM(&JOB &PROGRAM &DFTPGM &UPDPROD &OPMSRC)
+
+             DCL        VAR(&JOB) TYPE(*CHAR) LEN(26)
+             DCL        VAR(&PROGRAM) TYPE(*CHAR) LEN(202)
+             DCL        VAR(&DFTPGM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&UPDPROD) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&OPMSRC) TYPE(*CHAR) LEN(4)
+
+             DCL        VAR(&BIN) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&DEC) TYPE(*DEC) LEN(5 0)
+
+             DCL        VAR(&JOBNAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&USER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&NUMBER) TYPE(*CHAR) LEN(6)
+
+             DCL        VAR(&PGM1) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY1) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGM2) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY2) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGM3) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY3) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGM4) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY4) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGM5) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY5) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGM6) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY6) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGM7) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY7) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGM8) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY8) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGM9) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY9) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGM10) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY10) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&JOBNAME) VALUE(%SST(&JOB 1 10))
+             CHGVAR     VAR(&USER) VALUE(%SST(&JOB 11 10))
+             CHGVAR     VAR(&NUMBER) VALUE(%SST(&JOB 21 6))
+
+             CHGVAR     VAR(&BIN) VALUE(%SST(&PROGRAM 1 2))
+             CVTBINDEC  FROMBIN(&BIN) TODEC(&DEC)
+
+             CHGVAR     VAR(&PGM1) VALUE(%SST(&PROGRAM 3 10))
+             CHGVAR     VAR(&LIBRARY1) VALUE(%SST(&PROGRAM 13 10))
+
+             IF         COND(&DEC *GE 2) THEN(DO)
+             CHGVAR     VAR(&PGM2) VALUE(%SST(&PROGRAM 23 10))
+             CHGVAR     VAR(&LIBRARY2) VALUE(%SST(&PROGRAM 33 10))
+             ENDDO
+
+             IF         COND(&DEC *GE 3) THEN(DO)
+             CHGVAR     VAR(&PGM3) VALUE(%SST(&PROGRAM 43 10))
+             CHGVAR     VAR(&LIBRARY3) VALUE(%SST(&PROGRAM 53 10))
+             ENDDO
+
+             IF         COND(&DEC *GE 4) THEN(DO)
+             CHGVAR     VAR(&PGM4) VALUE(%SST(&PROGRAM 63 10))
+             CHGVAR     VAR(&LIBRARY4) VALUE(%SST(&PROGRAM 73 10))
+             ENDDO
+
+             IF         COND(&DEC *GE 5) THEN(DO)
+             CHGVAR     VAR(&PGM5) VALUE(%SST(&PROGRAM 83 10))
+             CHGVAR     VAR(&LIBRARY5) VALUE(%SST(&PROGRAM 93 10))
+             ENDDO
+
+             IF         COND(&DEC *GE 6) THEN(DO)
+             CHGVAR     VAR(&PGM6) VALUE(%SST(&PROGRAM 103 10))
+             CHGVAR     VAR(&LIBRARY6) VALUE(%SST(&PROGRAM 113 10))
+             ENDDO
+
+             IF         COND(&DEC *GE 7) THEN(DO)
+             CHGVAR     VAR(&PGM7) VALUE(%SST(&PROGRAM 123 10))
+             CHGVAR     VAR(&LIBRARY7) VALUE(%SST(&PROGRAM 133 10))
+             ENDDO
+
+             IF         COND(&DEC *GE 8) THEN(DO)
+             CHGVAR     VAR(&PGM8) VALUE(%SST(&PROGRAM 143 10))
+             CHGVAR     VAR(&LIBRARY8) VALUE(%SST(&PROGRAM 153 10))
+             ENDDO
+
+             IF         COND(&DEC *GE 9) THEN(DO)
+             CHGVAR     VAR(&PGM9) VALUE(%SST(&PROGRAM 163 10))
+             CHGVAR     VAR(&LIBRARY9) VALUE(%SST(&PROGRAM 173 10))
+             ENDDO
+
+             IF         COND(&DEC *EQ 10) THEN(DO)
+             CHGVAR     VAR(&PGM10) VALUE(%SST(&PROGRAM 183 10))
+             CHGVAR     VAR(&LIBRARY10) VALUE(%SST(&PROGRAM 193 10))
+             ENDDO
+
+             STRSRVJOB  JOB(&NUMBER/&USER/&JOBNAME)
+
+             SELECT
+
+             WHEN       COND(&DEC *EQ 1) THEN(STRDBG +
+                          PGM(&LIBRARY1/&PGM1) DFTPGM(&DFTPGM) +
+                          UPDPROD(&UPDPROD) OPMSRC(&OPMSRC))
+
+             WHEN       COND(&DEC *EQ 2) THEN(STRDBG +
+                          PGM(&LIBRARY1/&PGM1 &LIBRARY2/&PGM2) +
+                          DFTPGM(&DFTPGM) UPDPROD(&UPDPROD) +
+                          OPMSRC(&OPMSRC))
+
+             WHEN       COND(&DEC *EQ 3) THEN(STRDBG +
+                          PGM(&LIBRARY1/&PGM1 &LIBRARY2/&PGM2 +
+                          &LIBRARY3/&PGM3) DFTPGM(&DFTPGM) +
+                          UPDPROD(&UPDPROD) OPMSRC(&OPMSRC))
+
+             WHEN       COND(&DEC *EQ 4) THEN(STRDBG +
+                          PGM(&LIBRARY1/&PGM1 &LIBRARY2/&PGM2 +
+                          &LIBRARY3/&PGM3 &LIBRARY4/&PGM4) +
+                          DFTPGM(&DFTPGM) UPDPROD(&UPDPROD) +
+                          OPMSRC(&OPMSRC))
+
+             WHEN       COND(&DEC *EQ 5) THEN(STRDBG +
+                          PGM(&LIBRARY1/&PGM1 &LIBRARY2/&PGM2 +
+                          &LIBRARY3/&PGM3 &LIBRARY4/&PGM4 +
+                          &LIBRARY5/&PGM5) DFTPGM(&DFTPGM) +
+                          UPDPROD(&UPDPROD) OPMSRC(&OPMSRC))
+
+             WHEN       COND(&DEC *EQ 6) THEN(STRDBG +
+                          PGM(&LIBRARY1/&PGM1 &LIBRARY2/&PGM2 +
+                          &LIBRARY3/&PGM3 &LIBRARY4/&PGM4 +
+                          &LIBRARY5/&PGM5 &LIBRARY6/&PGM6) +
+                          DFTPGM(&DFTPGM) UPDPROD(&UPDPROD) +
+                          OPMSRC(&OPMSRC))
+
+             WHEN       COND(&DEC *EQ 7) THEN(STRDBG +
+                          PGM(&LIBRARY1/&PGM1 &LIBRARY2/&PGM2 +
+                          &LIBRARY3/&PGM3 &LIBRARY4/&PGM4 +
+                          &LIBRARY5/&PGM5 &LIBRARY6/&PGM6 +
+                          &LIBRARY7/&PGM7) DFTPGM(&DFTPGM) +
+                          UPDPROD(&UPDPROD) OPMSRC(&OPMSRC))
+
+             WHEN       COND(&DEC *EQ 8) THEN(STRDBG +
+                          PGM(&LIBRARY1/&PGM1 &LIBRARY2/&PGM2 +
+                          &LIBRARY3/&PGM3 &LIBRARY4/&PGM4 +
+                          &LIBRARY5/&PGM5 &LIBRARY6/&PGM6 +
+                          &LIBRARY7/&PGM7 &LIBRARY8/&PGM8) +
+                          DFTPGM(&DFTPGM) UPDPROD(&UPDPROD) +
+                          OPMSRC(&OPMSRC))
+
+             WHEN       COND(&DEC *EQ 9) THEN(STRDBG +
+                          PGM(&LIBRARY1/&PGM1 &LIBRARY2/&PGM2 +
+                          &LIBRARY3/&PGM3 &LIBRARY4/&PGM4 +
+                          &LIBRARY5/&PGM5 &LIBRARY6/&PGM6 +
+                          &LIBRARY7/&PGM7 &LIBRARY8/&PGM8 +
+                          &LIBRARY9/&PGM9) DFTPGM(&DFTPGM) +
+                          UPDPROD(&UPDPROD) OPMSRC(&OPMSRC))
+
+             WHEN       COND(&DEC *EQ 10) THEN(STRDBG +
+                          PGM(&LIBRARY1/&PGM1 &LIBRARY2/&PGM2 +
+                          &LIBRARY3/&PGM3 &LIBRARY4/&PGM4 +
+                          &LIBRARY5/&PGM5 &LIBRARY6/&PGM6 +
+                          &LIBRARY7/&PGM7 &LIBRARY8/&PGM8 +
+                          &LIBRARY9/&PGM9 &LIBRARY10/&PGM10) +
+                          DFTPGM(&DFTPGM) UPDPROD(&UPDPROD) +
+                          OPMSRC(&OPMSRC))
+
+             ENDSELECT
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

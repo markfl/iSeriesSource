@@ -1,0 +1,28 @@
+          Ctl-opt DftActGrp(*No) Option(*NoDebugio);
+
+     Fqpgmmodrl2ip   e           k Disk    Prefix(Mod_)
+          Dcl-f qafdmbrl Usage(*Output);
+
+          Dcl-Pi bldfldref2;
+             @PSrcFile Like(Mod_Object);
+             @PLibrary Like(Mod_Library);
+             @PProgram Like(Mod_Object);
+          End-Pi;
+
+     Irpgmmodref
+     I                                          Mod_object    l1
+     I                                          Mod_library   l1
+     I                                          Mod_module    l1
+
+b001      If  *Inl1
+          And Mod_module <> @PProgram;
+
+             Clear qwhfdml;
+
+             mlfile = @PSrcFile;
+             mllib  = @PLibrary;
+             mlname = Mod_module;
+
+             Write qwhfdml;
+
+e001      EndIf;

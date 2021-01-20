@@ -1,0 +1,160 @@
+             PGM        PARM(&FILE &INDEX &SRCFILE &MEMBER &DATABASE)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&INDEX) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&SRCFILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DATABASE) TYPE(*CHAR) LEN(15)
+
+             DCL        VAR(&FROMFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FROMLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&INDEXFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&INDEXLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&TOSRCFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TOSRCLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&TEXT) TYPE(*CHAR) LEN(50)
+             DCL        VAR(&NBRCURRCD) TYPE(*DEC) LEN(10 0) VALUE(0)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&FROMFILE) VALUE(%SST(&FILE 1 10))
+             CHGVAR     VAR(&FROMLIB) VALUE(%SST(&FILE 11 10))
+/* b01 */    IF         COND(&FROMLIB *EQ *CURLIB) THEN(DO)
+             CHGVAR     VAR(&FROMLIB) VALUE(&CURLIB)
+/* e01 */    ENDDO
+
+             IF         COND(&INDEX *NE '*NONE     *LIBL     ') +
+                          THEN(DO)
+             IF         COND(&INDEX *NE *FILE) THEN(DO)
+             CHGVAR     VAR(&INDEXFILE) VALUE(%SST(&INDEX 1 10))
+             CHGVAR     VAR(&INDEXLIB) VALUE(%SST(&INDEX 11 10))
+             ENDDO
+             ELSE       CMD(DO)
+             CHGVAR     VAR(&INDEXFILE) VALUE(&FROMFILE)
+             CHGVAR     VAR(&INDEXLIB) VALUE(&FROMLIB)
+             ENDDO
+             ENDDO
+/* b01 */    IF         COND(&INDEXLIB *EQ *CURLIB) THEN(DO)
+             CHGVAR     VAR(&INDEXLIB) VALUE(&CURLIB)
+/* e01 */    ENDDO
+
+             CHGVAR     VAR(&TOSRCFILE) VALUE(%SST(&SRCFILE 1 10))
+             CHGVAR     VAR(&TOSRCLIB) VALUE(%SST(&SRCFILE 11 10))
+/* b01 */    IF         COND(&TOSRCLIB *EQ *CURLIB) THEN(DO)
+             CHGVAR     VAR(&TOSRCLIB) VALUE(&CURLIB)
+/* e01 */    ENDDO
+
+             IF         COND(&MEMBER = *FILE) THEN(CHGVAR +
+                          VAR(&MEMBER) VALUE(&FROMFILE))
+
+             DLTF       FILE(QTEMP/QADSPFFD)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QAFDACCP)
+             MONMSG     MSGID(CPF0000)
+
+/* b01 */    IF         COND(&FROMFILE *NE *ALL) THEN(DO)
+             RTVOBJD    OBJ(&FROMLIB/&FROMFILE) OBJTYPE(*FILE) +
+                          TEXT(&TEXT)
+/* e01 */    ENDDO
+
+             DSPFFD     FILE(&FROMLIB/&FROMFILE) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QADSPFFD)
+
+             CHGJOB     SWS(00000000)
+             IF         COND(&INDEX *NE '*NONE     *LIBL     ') +
+                          THEN(DO)
+             DSPFD      FILE(&INDEXLIB/&INDEXFILE) TYPE(*ACCPTH) +
+                          OUTPUT(*OUTFILE) OUTFILE(QTEMP/QAFDACCP)
+             CHGJOB     SWS(10000000)
+             ENDDO
+
+             CHKOBJ     OBJ(&TOSRCLIB/QJAVASRCDB) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             CRTSRCPF   FILE(&TOSRCLIB/QJAVASRCDB) RCDLEN(212)
+             ENDDO
+
+             CHKOBJ     OBJ(&TOSRCLIB/QJAVASRCMS) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             CRTSRCPF   FILE(&TOSRCLIB/QJAVASRCMS) RCDLEN(212)
+             ENDDO
+
+             CHKOBJ     OBJ(&TOSRCLIB/QJAVASRCMY) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             CRTSRCPF   FILE(&TOSRCLIB/QJAVASRCMY) RCDLEN(212)
+             ENDDO
+
+             CHKOBJ     OBJ(&TOSRCLIB/QJAVASRCOR) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             CRTSRCPF   FILE(&TOSRCLIB/QJAVASRCOR) RCDLEN(212)
+             ENDDO
+
+             ADDPFM     FILE(&TOSRCLIB/QJAVASRCDB) MBR(&MEMBER) +
+                          TEXT(&TEXT) SRCTYPE(JAVA)
+             MONMSG     MSGID(CPF0000)
+             CLRPFM     FILE(&TOSRCLIB/QJAVASRCDB) MBR(&MEMBER)
+             MONMSG     MSGID(CPF0000)
+             RMVMSG     CLEAR(*ALL)
+
+             ADDPFM     FILE(&TOSRCLIB/QJAVASRCMS) MBR(&MEMBER) +
+                          TEXT(&TEXT) SRCTYPE(JAVA)
+             MONMSG     MSGID(CPF0000)
+             CLRPFM     FILE(&TOSRCLIB/QJAVASRCMS) MBR(&MEMBER)
+             MONMSG     MSGID(CPF0000)
+             RMVMSG     CLEAR(*ALL)
+
+             ADDPFM     FILE(&TOSRCLIB/QJAVASRCMY) MBR(&MEMBER) +
+                          TEXT(&TEXT) SRCTYPE(JAVA)
+             MONMSG     MSGID(CPF0000)
+             CLRPFM     FILE(&TOSRCLIB/QJAVASRCMY) MBR(&MEMBER)
+             MONMSG     MSGID(CPF0000)
+             RMVMSG     CLEAR(*ALL)
+
+             ADDPFM     FILE(&TOSRCLIB/QJAVASRCOR) MBR(&MEMBER) +
+                          TEXT(&TEXT) SRCTYPE(JAVA)
+             MONMSG     MSGID(CPF0000)
+             CLRPFM     FILE(&TOSRCLIB/QJAVASRCOR) MBR(&MEMBER)
+             MONMSG     MSGID(CPF0000)
+             RMVMSG     CLEAR(*ALL)
+
+             OVRDBF     FILE(QADSPFFD) TOFILE(QTEMP/QADSPFFD)
+             OVRDBF     FILE(QAFDACCP) TOFILE(QTEMP/QAFDACCP)
+             OVRDBF     FILE(QJAVASRCMS) +
+                          TOFILE(&TOSRCLIB/QJAVASRCMS) MBR(&MEMBER)
+             OVRDBF     FILE(QJAVASRCMY) +
+                          TOFILE(&TOSRCLIB/QJAVASRCMY) MBR(&MEMBER)
+             OVRDBF     FILE(QJAVASRCOR) +
+                          TOFILE(&TOSRCLIB/QJAVASRCOR) MBR(&MEMBER)
+             OVRDBF     FILE(QJAVASRCDB) +
+                          TOFILE(&TOSRCLIB/QJAVASRCDB) MBR(&MEMBER)
+
+             CALL       PGM(CRTJAVANEW) PARM(&DATABASE)
+             MONMSG     MSGID(CPF0000) EXEC(DO)
+             DLTOVR     FILE(*ALL)
+             ENDDO
+
+             DLTOVR     FILE(*ALL)
+goto around
+             RTVMBRD    FILE(&TOSRCLIB/&TOSRCFILE) MBR(&MEMBER) +
+                          NBRCURRCD(&NBRCURRCD)
+             SELECT
+             WHEN       COND(&NBRCURRCD > 99999) THEN(DO)
+/*           RGZPFM     FILE(&TOSRCLIB/&TOSRCFILE) MBR(&MEMBER) +
+                          SRCOPT(*SEQNBR) SRCSEQ(0.01 0.01)     */
+             ENDDO
+             WHEN       COND(&NBRCURRCD > 9999) THEN(DO)
+/*           RGZPFM     FILE(&TOSRCLIB/&TOSRCFILE) MBR(&MEMBER) +
+                          SRCOPT(*SEQNBR) SRCSEQ(0.1 0.1)       */
+             ENDDO
+             WHEN       COND(&NBRCURRCD > 0) THEN(DO)
+/*           RGZPFM     FILE(&TOSRCLIB/&TOSRCFILE) MBR(&MEMBER) +
+                          SRCOPT(*SEQNBR)                       */
+             ENDDO
+             ENDSELECT
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

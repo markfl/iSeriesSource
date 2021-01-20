@@ -1,0 +1,8 @@
+             PGM        PARM(&SBMFROM &OUTPUT)
+
+             DCL        VAR(&SBMFROM) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&OUTPUT) TYPE(*CHAR) LEN(6)
+
+             WRKSBMJOB  SBMFROM(&SBMFROM) OUTPUT(&OUTPUT)
+
+ END:        ENDPGM

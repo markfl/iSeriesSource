@@ -1,0 +1,40 @@
+             CMD        PROMPT('Purge Files')
+
+             PARM       KWD(PURGEGROUP) TYPE(*NAME) MIN(1) +
+                          PROMPT('Group name')
+
+             PARM       KWD(SAVF) TYPE(SAVF) MIN(1) PROMPT('Save file')
+ SAVF:       QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*CURLIB)) +
+                          CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(ARCLIB) TYPE(*NAME) MIN(1) +
+                          PROMPT('Archive library')
+
+             PARM       KWD(DLTARCHIVE) TYPE(*CHAR) LEN(4) +
+                          RSTD(*YES) DFT(*YES) SPCVAL((*YES '1') +
+                          (*NO '0')) PROMPT('Delete Archive On +
+                          Completion?')
+
+             PARM       KWD(PURGEKEYF) TYPE(*CHAR) LEN(4) RSTD(*YES) +
+                          DFT(*YES) VALUES(*NO *YES) SPCVAL((*YES +
+                          '1') (*NO '0')) PROMPT('Use purge key file')
+
+             PARM       KWD(FIRSTKEY) TYPE(*CHAR) LEN(50) +
+                          CHOICE(*NONE) PMTCTL(PURGEKEY) +
+                          PROMPT('First key field')
+
+             PARM       KWD(SECONDKEY) TYPE(*CHAR) LEN(50) +
+                          CHOICE(*NONE) PMTCTL(PURGEKEY) +
+                          PROMPT('Second key field')
+
+             PARM       KWD(THIRDKEY) TYPE(*CHAR) LEN(50) +
+                          CHOICE(*NONE) PMTCTL(PURGEKEY) +
+                          PROMPT('Third key field')
+
+             PARM       KWD(FOURTHKEY) TYPE(*CHAR) LEN(50) +
+                          CHOICE(*NONE) PMTCTL(PURGEKEY) +
+                          PROMPT('Fourth key field')
+
+ PURGEKEY:   PMTCTL     CTL(PURGEKEYF) COND((*EQ '0'))
+

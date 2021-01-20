@@ -1,0 +1,14 @@
+
+/* b01 */    IF         COND(&QCURLIB) THEN(DO)
+
+             DLTF       FILE(QTEMP/QCURLIBL1)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QCURLIBL2)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QCURLIBL)
+             MONMSG     MSGID(CPF0000)
+
+/* e01 */    ENDDO
+

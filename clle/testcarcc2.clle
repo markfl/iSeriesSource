@@ -1,0 +1,11 @@
+             PGM
+
+/*           CALL       PGM(CLRTSTCAR) */
+
+             DBG        PGM(TPSCARCRT)
+
+             CALL       PGM(TESTCARCR2)
+
+             ENDDBG
+
+ END:        ENDPGM

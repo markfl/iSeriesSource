@@ -1,0 +1,31 @@
+     H NoMain
+      **********************************************************************************************
+      *
+      * Author.....: Mark Flores
+      * Date.......: 11-Nov-2015
+      * Description: API To Fill Timestamp
+      *
+      **********************************************************************************************
+      * Change Control Information
+      *---------------------------------------------------------------------------------------------
+      * Date     Task #  Description of Changes                     Pgmr ID
+      * -------- ------- ------------------------------------------ ----------
+      * 11/11/05  42361      Program Creation                       Flores M
+      **********************************************************************************************
+
+          Dcl-Proc @TimeStamp Export;
+
+          Dcl-pi @TimeStamp TimeStamp End-pi;
+
+          Dcl-s #TimeStamp TimeStamp Inz(*Loval);
+
+          Exec SQL Set :#TimeStamp = current_timestamp;
+
+b001      If sqlcod <> *Zeros;
+             Reset #TimeStamp;
+x001      EndIf;
+
+          Return @TimeStamp;
+
+          End-Proc;
+

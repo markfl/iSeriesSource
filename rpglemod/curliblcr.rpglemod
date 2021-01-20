@@ -1,0 +1,25 @@
+          Ctl-opt NoMain Option(*NoDebugio);
+
+          Dcl-f qcurlibl2 Usage(*Input) Keyed UsrOpn;
+
+          Dcl-Proc @CheckLibl Export;
+
+          Dcl-Pi @CheckLibl Ind;
+             @P_Library Char(10) Const;
+          End-Pi;
+
+b001      If Not %Open(qcurlibl2);
+             Open qcurlibl2;
+e001      EndIF;
+
+          Chain @P_library rcurlibl;
+b001      If %Found(qcurlibl2);
+             Close qcurlibl2;
+             Return *On;
+x001      Else;
+             Close qcurlibl2;
+             Return *Off;
+e001      EndIF;
+
+          End-Proc;
+

@@ -1,0 +1,13 @@
+          Ctl-opt Option(*NoDebugIO) DftActGrp(*No);
+
+     Fqadspdbr  up   e             Disk
+          Dcl-f qadsppgl1 Usage(*Input) Keyed;
+
+          Dcl-s @whfnam Like(whfnam);
+
+          @whfnam = %Trim(whrefi);
+          Chain @whfnam qwhdrppr;
+b001      If Not %Found(qadsppgl1);
+             Delete qwhdrdbr;
+e001      EndIf;
+

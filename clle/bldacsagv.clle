@@ -1,0 +1,36 @@
+             PGM
+
+             CRTSQL     FILE(TPSDTA50/ACSAGVTP) SRCMBR(ACSAGVTP) +
+                          DROPMBR(ACSAGVTPDR)
+             CRTSQL     FILE(TPSDTA50/ACVICHGFLD) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/ORDOPOTP) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/TPSRGVTP) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/VNDVDTTP) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/ORDOHDTP) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/ORDOCGTP) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/ORDOSGTP) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/TPSRDTTP) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/VNDVHDTP) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/VICHGFLDS) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/ORDOINTP) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/ORDOBATP) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/ORDOBSTP) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/ORDOCATP) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+             CRTSQL     FILE(TPSDTA50/TPSIACWP) SRCMBR(ACSAGVTP +
+                          *ADD) DROPMBR(ACSAGVTPDR *ADD)
+
+             ENDPGM

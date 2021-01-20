@@ -1,0 +1,11 @@
+             PGM        PARM(&SHIPMENT)
+
+             DCL        VAR(&SHIPMENT) TYPE(*CHAR) LEN(12)
+
+             DBG        PGM(TEST2615R)
+
+             CALL       PGM(TEST2615R) PARM(&SHIPMENT)
+
+             ENDDBG
+
+ END:        ENDPGM

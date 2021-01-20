@@ -1,0 +1,15 @@
+
+          Exec Sql
+          Drop procedure tpsobj50ut/BookingXML;
+
+          Exec Sql
+          create procedure tpsobj50ut/BookingXML
+          (in BOOKINGXML varchar (32000 ))
+          dynamic result sets 1
+          language rpgle
+          not deterministic
+          reads sql data
+          external name tpsobj50ut/BookingXML
+          parameter style general;
+
+          Return;

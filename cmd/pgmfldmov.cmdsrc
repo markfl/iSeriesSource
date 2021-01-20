@@ -1,0 +1,22 @@
+             CMD        PROMPT('Field Movement Reference')
+
+             PARM       KWD(PROGRAM) TYPE(*NAME) DFT(*FIRST) +
+                          SPCVAL((*ALL) (*FIRST)) PROMPT('Program +
+                          name')
+
+             PARM       KWD(SRCFILE) TYPE(SRCFILE) PROMPT('To Source +
+                          File')
+ SRCFILE:    QUAL       TYPE(*NAME) DFT(QRPGLESRC)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(REFFILE) TYPE(REFFILE) DFT(*DFT) +
+                          SNGVAL((*DFT 'QPGMFLDREF*CURLIB')) +
+                          PROMPT('Program reference file')
+ REFFILE:    QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*CURLIB)) CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(REFMBR) TYPE(*NAME) DFT(*FIRST) +
+                          SPCVAL((*FIRST)) PROMPT('Member')

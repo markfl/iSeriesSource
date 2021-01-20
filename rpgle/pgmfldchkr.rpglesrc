@@ -1,0 +1,167 @@
+          Ctl-opt BndDir('MFLORES') DftActGrp(*No) Option(*NoDebugio);
+
+          Dcl-f Input Disk(112) Usage(*Input);
+          Dcl-f qadspffdq2 Usage(*Update:*Delete) Keyed
+                           Rename(qwhdrffd:rqwhdrffd2);
+
+          /define rpgstruct01
+          /define rpgstruct02
+          /define rpgstruct03
+          /define rpgstruct04
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct01
+          /undefine rpgstruct02
+          /undefine rpgstruct03
+          /undefine rpgstruct04
+
+          /define mflores003
+          /copy qcpysrc,mflores
+          /undefine mflores003
+
+          Dcl-s @a            Packed(5:0)  Inz(*Zeros);
+          Dcl-s @b            Packed(5:0)  Inz(*Zeros);
+          Dcl-s @c            Packed(5:0)  Inz(*Zeros);
+          Dcl-s @Prefix       Char(10)     Inz(*Blanks);
+          Dcl-s @srcseq       Like(@_srcseq) Inz(*Zeros);
+          Dcl-s @srcwork      Like(@_srcdta) Inz(*Blanks);
+          Dcl-s @LastFileName Char(10)     Inz(*Blanks);
+          Dcl-s @FromRecord   Char(10)     Inz(*Blanks);
+          Dcl-s @ToRecord     Char(10)     Inz(*Blanks);
+          Dcl-s @Field        Like(whfldi) Inz(*Blanks);
+          Dcl-Ds @FSpecDs     LikeDs(@FspecDsRPGILE);
+          Dcl-s @CurrentFile  Like(@IspecDsRPGILE.@IRcdfmt) Inz(*Blanks);
+
+          Read Input @SourceDs;
+b001      Dow Not %Eof(Input);
+
+             @srcwork = @ToUpper(@_srcdta);
+             @srcseq  = @_srcseq;
+
+b002         If  %Subst(@srcwork:6:1)  =  'D'
+             And %Subst(@srcwork:7:1)  <> '*'
+             And @LastFileName <> *Blanks;
+                CheckForPrefix(@srcwork);
+e002         EndIf;
+
+b002         If  %Subst(@srcwork:6:1)  = 'D'
+             And %Subst(@srcwork:7:1)  <> '*'
+             Or  %Subst(@srcwork:6:1)  = 'I'
+             And %Subst(@srcwork:7:1)  <> '*'
+             Or  %Subst(@srcwork:6:1)  = 'C'
+             And %Subst(@srcwork:7:1)  <> '*'
+             Or  %Subst(@srcwork:6:1)  = 'O'
+             And %Subst(@srcwork:7:1)  <> '*';
+                Clear @LastFileName;
+x002         Else;
+                @a = %Scan('DCL-S':@srcwork);
+b003            If @a > *Zeros;
+                   Clear @LastFileName;
+x003            Else;
+                   @a = %Scan('DCL-DS':@srcwork);
+b004               If @a > *Zeros;
+                      Clear @LastFileName;
+x004               Else;
+                      @a = %Scan('/COPY':@srcwork);
+b005                  If @a > *Zeros;
+                         Clear @LastFileName;
+x005                  Else;
+                         @a = %Scan('/DEFI':@srcwork);
+b006                     If @a > *Zeros;
+                            Clear @LastFileName;
+x006                     Else;
+                            @a = %Scan('/FREE':@srcwork);
+b007                        If @a > *Zeros;
+                               Clear @LastFileName;
+e007                        EndIf;
+e006                     EndIf;
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+
+b002         If  %Subst(@srcwork:6:1)  =  'F'
+             And %Subst(@srcwork:7:1)  <> '*';
+                Clear @LastFileName;
+                @FspecDs = @srcwork;
+b003            If %Trim(@FspecDs.@FDevice) = 'DISK'
+                Or %Trim(@FspecDs.@FDevice) = 'WORKSTN'
+                Or %Trim(@FspecDs.@FDevice) = 'PRINTER';
+                   @LastFileName = %Subst(@srcwork:7:10);
+e003            EndIf;
+
+                CheckForPrefix(@srcwork);
+
+x002         ElseIf %Subst(@srcwork:6:1)  =  'D'
+             And    %Subst(@srcwork:7:1)  <> '*';
+
+b003            If @LastFileName <> *Blanks;
+                   CheckForPrefix(@srcwork);
+e003            EndIf;
+                @DspecDsRPGILE = @srcwork;
+                @a = %Scan('EXTNAME':@srcwork);
+b003            If @a > *Zeros;
+                   @b = %Scan(')':@srcwork:@a);
+b004               If @b > *Zeros;
+                      @LastFileName = %Subst(@srcwork:@a+8:@b-(@a+8));
+b005                  If @LastFileName <> *Blanks;
+                         CheckForPrefix(@srcwork);
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+x002         Else;
+
+                @a = %Scan('DCL-F':@srcwork);
+b003            If @a > *Zeros;
+b004               If %Subst(@srcwork:@a+5:1) = *Blanks;
+                      @b = %Scan(' ':@srcwork:@a+6);
+                      @LastFileName = %Subst(@srcwork:@a+6:@b-(@a+6));
+
+e004               EndIf;
+e003            EndIf;
+
+b003            If @LastFileName <> *Blanks;
+                   CheckForPrefix(@srcwork);
+e003            EndIf;
+e002         EndIf;
+
+             Read Input @SourceDs;
+e001      EndDo;
+
+          *Inlr = *On;
+          Return;
+
+          Dcl-Proc CheckForPrefix;
+
+          Dcl-Pi CheckForPrefix;
+             @Source Char(100) Const;
+          End-Pi;
+
+          Dcl-s @a      Packed(5:0) Inz(*Zeros);
+          Dcl-s @b      Packed(5:0) Inz(*Zeros);
+          Dcl-s @c      Packed(5:0) Inz(*Zeros);
+          Dcl-s @Prefix Char(10)    Inz(*Blanks);
+
+          @a = %Scan('PREFIX(':@Source);
+b001      If @a > *Zeros;
+             @b = %Scan(''')':@Source:@a);
+             @c = %Scan(':':@Source:@a);
+b002         If @b > *Zeros;
+b003            If @c = *Zeros;
+                   @Prefix = %Subst(@Source: @a+8:@b-(@a+8));
+x003            Else;
+                   @Prefix = %Subst(@Source: @a+8:@c-(@a+8));
+e003            EndIf;
+                Setll *Loval        rqwhdrffd2;
+                Setll @LastFileName rqwhdrffd2;
+                Reade @LastFileName rqwhdrffd2;
+b003            Dow Not %Eof(qadspffdq2);
+                   Reset @Field;
+                   @Field = %Trim(@Prefix) + %Trim(whfldi);
+                   whfldi = @Field;
+                   Update rqwhdrffd2 %Fields(whfldi);
+                   Reade @LastFileName rqwhdrffd2;
+e003            EndDo;
+e002         EndIf;
+e001      EndIf;
+
+          End-Proc;

@@ -1,0 +1,41 @@
+          Ctl-opt Option(*NoDebugio);
+
+          Dcl-f qcurlibl Usage(*Output);
+
+          Dcl-Pi curliblar;
+             @usrlibl Char(2750) Const;
+             @curlib  Char(10)   Const;
+          End-Pi;
+
+          Dcl-Ds @usrliblDs;
+             @Lib Char(11) Dim(250);
+          End-Ds;
+
+          Dcl-s @a Like(sequence) Inz(*Zeros);
+          Dcl-s @b Like(sequence) Inz(*Zeros);
+
+          @usrliblDs = @usrlibl;
+
+b001      For @a = 1 To 250;
+b002         If @lib(@a) <> *Blanks;
+                Clear rcurlibl;
+                @b += 10;
+                sequence = @b;
+                library  = @lib(@a);
+                curlib = *Off;
+b003            If Library = @curlib;
+                   curlib = *On;
+e003            EndIf;
+                Write rcurlibl;
+e002         EndIf;
+e001      EndFor;
+          Clear rcurlibl;
+          @b += 10;
+          sequence = @b;
+          library  = @curlib;
+          curlib = *On;
+          Write rcurlibl;
+
+          *Inlr = *On;
+          Return;
+

@@ -1,0 +1,15 @@
+     HDftActGrp(*No)
+     D  @worktimec1    s              8a   Inz('04:15 PM')
+     D  @worktimec2    s              8a   Inz('08:45 AM')
+     D  @worktime1     s               t
+     D  @worktime2     s               t
+
+          @worktime1 = %Time(@worktimec1:*USA);
+          @worktime2 = %Time(@worktimec2:*USA);
+     C     @worktime1    subdur    @worktime2    @Min:*MN          3 0
+     C     @Min          Div       60            @Hours            4 2
+          dsply @worktime1;
+          dsply @worktime2;
+          dsply @hours;
+          *inlr = *On;
+          Return;

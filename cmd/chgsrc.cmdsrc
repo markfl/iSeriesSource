@@ -1,0 +1,22 @@
+             CMD        PROMPT('Change Source')
+
+             PARM       KWD(FROMFILE) TYPE(FROMFILE) PROMPT('Data +
+                          base source file')
+ FROMFILE:   QUAL       TYPE(*NAME) DFT(QRPGLESRC)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(TOFILE) TYPE(TOFILE) DFT(*FROMFILE) +
+                          SNGVAL((*FROMFILE)) PROMPT('To file')
+ TOFILE:     QUAL       TYPE(*NAME)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(FROMMBR) TYPE(*NAME) DFT(*FIRST) +
+                          SPCVAL((*FIRST)) PROMPT('From member')
+
+             PARM       KWD(TOMBR) TYPE(*NAME) DFT(*FROMMBR) +
+                          SPCVAL((*FROMMBR)) PROMPT('To member')
+

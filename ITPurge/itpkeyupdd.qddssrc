@@ -1,0 +1,209 @@
+     A*%%TS  SD  20150721  111006  ISFLORESM   REL-V7R1M0  5770-WDS
+     A********************************************************************
+     A* Description.: Purge File Maintenance Screen File                 *
+     A*                                                                  *
+     A* Author......: Mark Flores                                        *
+     A* Date Written: 08/07/2015                                         *
+     A********************************************************************
+     A*                   Change Control Information                     *
+     A********************************************************************
+     A*            Design                                                *
+     A* Date       Request Mod Pgmr Description                          *
+     A* ---------- ------- --- ---- -------------------------------------*
+     A********************************************************************
+     A*
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/HREF)
+     A                                      PRINT
+     A                                      CA03
+     A          R SCRN1
+     A*%%TS  SD  20150520  100259  ISFLORESM   REL-V7R1M0  5770-WDS
+     A                                      BLINK
+     A                                      CF04
+     A                                      CA05
+     A                                      ROLLUP(81)
+     A                                      ROLLDOWN(82)
+     A            QPROG     R        O  1  2REFFLD(PGMVNM)
+     A                                      COLOR(BLU)
+     A                                  1 27'Purge Key File Maintenance'
+     A                                      DSPATR(HI)
+     A                                  1 70DATE
+     A                                      EDTCDE(Y)
+     A                                      COLOR(BLU)
+     A            QUSER     R        O  2  2REFFLD(BCTPRF)
+     A                                      COLOR(BLU)
+     A                                  2 70TIME
+     A                                      COLOR(BLU)
+     A                                  6 18'Group:'
+     A            @1GROUP   R        B  6 31REFFLD(KEYGROUP ITPPURKEY)
+     A                                      COLOR(BLU)
+     A  21                                  DSPATR(PC)
+     A  21                                  DSPATR(RI)
+     A                                 22  5'F3=Exit'
+     A                                 23  5'F4=Search'
+     A                                 23 16'F5=Refresh'
+     A                                 23 56'Roll Keys Active'
+     A                                      COLOR(RED)
+     A            @1ERRMSG  R   -2   O 24  5REFFLD(MS1DSC)
+     A                                      DSPATR(HI)
+     A          R SFLH01
+     A*%%TS  SD  20150520  102056  ISFLORESM   REL-V7R1M0  5770-WDS
+     A                                      WINDOW(WSF01)
+     A                                      PROTECT
+     A                                      PUTOVR
+     A                                      OVERLAY
+     A                                  2  2'1'
+     A                                      DSPATR(UL)
+     A                                      COLOR(WHT)
+     A                                  2  4'Group       '
+     A                                      DSPATR(UL)
+     A                                      COLOR(WHT)
+     A          R SFLD01                    SFL
+     A*%%TS  SD  20150520  090908  ISFLORESM   REL-V7R1M0  5770-WDS
+     A  20                                  SFLNXTCHG
+     A            @2SEL          1A  B  3  2DSPATR(UL)
+     A                                      DSPATR(CS)
+     A  21                                  DSPATR(RI)
+     A  21                                  DSPATR(PC)
+     A            @2GROUP   R        O  3  4REFFLD(KEYGROUP   ITPPURKEY)
+     A          R SFLC01                    SFLCTL(SFLD01)
+     A*%%TS  SD  20150520  084048  ISFLORESM   REL-V7R1M0  5770-WDS
+     A                                      CA12
+     A                                      KEEP
+     A                                      BLINK
+     A                                      OVERLAY
+     A                                      PROTECT
+     A                                      PUTOVR
+     A N03                                  ROLLUP(04)
+     A  01                                  SFLDSP
+     A  02                                  SFLDSPCTL
+     A N02                                  SFLCLR
+     A  03                                  SFLEND(*MORE)
+     A                                      SFLSIZ(0011)
+     A                                      SFLPAG(0010)
+     A                                      WINDOW(WSF01)
+     A            DSPRRN         4S 0H      SFLRCDNBR
+     A                                 14  1'1=Select  F12=Return'
+     A                                      COLOR(BLU)
+     A  20        @ERRORMSG1    22A    15  2
+     A                                      COLOR(RED)
+     A          R WSF01
+     A*%%TS  SD  20150520  084048  ISFLORESM   REL-V7R1M0  5770-WDS
+     A                                      WINDOW(2 10 16 24)
+     A                                      WDWBORDER((*DSPATR RI) (*CHAR '    -
+     A                                          '))
+     A          R SCRN2
+     A*%%TS  SD  20150721  093722  ISFLORESM   REL-V7R1M0  5770-WDS
+     A                                      BLINK
+     A                                      CF04
+     A                                      CA05
+     A                                      CA08
+     A                                      CF10
+     A                                      CF13
+     A                                      ROLLUP(81)
+     A                                      ROLLDOWN(82)
+     A            QPROG     R        O  1  2REFFLD(PGMVNM)
+     A                                      COLOR(BLU)
+     A                                  1 27'Purge Key File Maintenance'
+     A                                      DSPATR(HI)
+     A                                  1 70DATE
+     A                                      EDTCDE(Y)
+     A                                      COLOR(BLU)
+     A            QUSER     R        O  2  2REFFLD(BCTPRF)
+     A                                      COLOR(BLU)
+     A                                  2 70TIME
+     A                                      COLOR(BLU)
+     A                                  6  8'Group:'
+     A            @3GROUP   R        O  6 21REFFLD(KEYGROUP ITPPURKEY)
+     A                                      COLOR(WHT)
+     A                                  7  8'Sequence:'
+     A            @3SEQ     R        B  7 21REFFLD(KEYSEQ ITPPURKEY)
+     A                                      COLOR(BLU)
+     A  21                                  DSPATR(PC)
+     A  21                                  DSPATR(RI)
+     A                                  9  8'Key Field 1:'
+     A            @3KEYFLD1 R        B  9 21REFFLD(KEYKEYFLD1 ITPPURKEY)
+     A                                      COLOR(BLU)
+     A  24                                  DSPATR(PC)
+     A  24                                  DSPATR(RI)
+     A                                 11  8'Key Field 2:'
+     A            @3KEYFLD2 R        B 11 21REFFLD(KEYKEYFLD2 ITPPURKEY)
+     A                                      COLOR(BLU)
+     A  25                                  DSPATR(PC)
+     A  25                                  DSPATR(RI)
+     A                                 13  8'Key Field 3:'
+     A            @3KEYFLD3 R        B 13 21REFFLD(KEYKEYFLD3 ITPPURKEY)
+     A                                      COLOR(BLU)
+     A  26                                  DSPATR(PC)
+     A  26                                  DSPATR(RI)
+     A                                 22  5'F3=Exit'
+     A                                 22 16'F4=Search'
+     A                                 23  5'F5=Refresh'
+     A                                 23 16'F8=Resequence'
+     A                                 23 31'F10=Update'
+     A                                 23 43'F13=Delete'
+     A                                 23 56'Roll Keys Active'
+     A                                      COLOR(RED)
+     A            @3ERRMSG  R   -2   O 24  5REFFLD(MS1DSC)
+     A                                      DSPATR(HI)
+     A          R SFLH02
+     A*%%TS  SD  20150721  111006  ISFLORESM   REL-V7R1M0  5770-WDS
+     A                                      WINDOW(WSF02)
+     A                                      PROTECT
+     A                                      PUTOVR
+     A                                      OVERLAY
+     A                                  2  2'1'
+     A                                      DSPATR(UL)
+     A                                      COLOR(WHT)
+     A                                  2  4'Group     '
+     A                                      DSPATR(UL)
+     A                                      COLOR(WHT)
+     A                                  2 15'  Seq'
+     A                                      DSPATR(UL)
+     A                                      COLOR(WHT)
+     A                                  2 21'From Keys                         '
+     A                                      DSPATR(UL)
+     A                                      COLOR(WHT)
+     A          R SFLD02                    SFL
+     A*%%TS  SD  20150721  110523  ISFLORESM   REL-V7R1M0  5770-WDS
+     A  20                                  SFLNXTCHG
+     A            @4SEL          1A  B  3  2DSPATR(UL)
+     A                                      DSPATR(CS)
+     A  21                                  DSPATR(RI)
+     A  21                                  DSPATR(PC)
+     A            @4GROUP   R        O  3  4REFFLD(KEYGROUP ITPPURKEY)
+     A            @4SEQ     R        O  3 15REFFLD(KEYSEQ ITPPURKEY)
+     A            @4KEYFLD1 R  -20   O  3 21REFFLD(KEYKEYFLD1 ITPPURKEY)
+     A          R SFLC02                    SFLCTL(SFLD02)
+     A*%%TS  SD  20150520  084048  ISFLORESM   REL-V7R1M0  5770-WDS
+     A                                      CA12
+     A                                      KEEP
+     A                                      BLINK
+     A                                      OVERLAY
+     A                                      PROTECT
+     A                                      PUTOVR
+     A N03                                  ROLLUP(04)
+     A  01                                  SFLDSP
+     A  02                                  SFLDSPCTL
+     A N02                                  SFLCLR
+     A  03                                  SFLEND(*MORE)
+     A                                      SFLSIZ(0011)
+     A                                      SFLPAG(0010)
+     A                                      WINDOW(WSF02)
+     A            DSPRRN         4S 0H      SFLRCDNBR
+     A                                 14 12'1=Select                F12=Return'
+     A                                      COLOR(BLU)
+     A  20        @ERRORMSG2    56A    15  2
+     A                                      COLOR(RED)
+     A          R WSF02
+     A*%%TS  SD  20150520  084048  ISFLORESM   REL-V7R1M0  5770-WDS
+     A                                      WINDOW(2 10 16 58)
+     A                                      WDWBORDER((*DSPATR RI) (*CHAR '    -
+     A                                          '))
+     A          R DUMMY
+     A                                      OVERLAY
+     A                                      ASSUME
+     A                                      PUTOVR
+     A                                  1  2' '
+     A                                      DSPATR(ND)

@@ -1,0 +1,2654 @@
+     H/title    Purge File Maintenance
+     H Option(*NoDebugio)
+     H copyright ('(C) Copyright Hub Group, Inc. 2015')
+      **************************************************************************
+      *                                                                        *
+      *   H U B   G R O U P ,   I N C .                                        *
+      *                                                                        *
+      **************************************************************************
+      *                                                                        *
+      *  Program Title: Purge File Maintenance                                 *
+      *                                                                        *
+      *  Date Written:  08/28/2015                                             *
+      *                                                                        *
+      *  Input:                                                                *
+      *                                                                        *
+      *  Output:                                                               *
+      *                                                                        *
+      **************************************************************************
+      *            Design                                                      *
+      * Date       Request Mod Pgmr Description                                *
+      * ---------- ------- --- ---- ------------------------------------------ *
+      * 08-28-15   42268       MF   Initial Creation                           *
+      *                                                                        *
+      **************************************************************************
+
+     ‚* Division Master
+     Fitppurgel1uf a e           k Disk    Rename(ritppurgep:ritppurgl1)
+
+     ‚* Division Master
+     Fitppurgel2if   e           k Disk    Rename(ritppurgep:ritppurgl2)
+
+     ‚* Work Display Screen
+     Fitpprgupddcf   e             Workstn sfile(sfld01:@Rrn1)
+     F                                     sfile(sfld02:@Rrn2)
+
+      * Program Status Data Structure
+     D                sds
+     D QProg             *Proc
+     D QParms            *Parms
+     D QErrorMessage          91    170
+     D QUser                 254    263
+
+‚     * Procedure Prototype
+     Ditpprgupdr       pr
+
+‚     * Procedure Interface
+     Ditpprgupdr       pi
+
+‚     * Screen 1 Control Procedure
+     DControl01        pr
+
+‚     * Initialize Screen 1 Procedure Prototype
+     DInitialize...
+     DScreen01         pr              n
+
+‚     * Fill Screen 1 Procedure Prototype
+     DFillScreen01     pr
+
+‚     * Display Screen 1 Procedure Prototype
+     DDisplayScreen01  pr
+
+‚     * Edit Screen 1 Procedure Prototype
+     DEditScreen01     pr              n
+
+     DDisplayGroups...
+     DSubfile          pr              n
+
+     DInitializeSubfile...
+     DWindow01         pr
+
+     DFillSubfile...
+     DWindow01         pr              n
+
+     DDisplaySubfile...
+     DWindow01         pr              n
+
+     DReadSubfile...
+     DWindow01         pr              n
+
+‚     * Screen 2 Control Procedure
+     DControl02        pr
+
+‚     * Initialize Screen 1 Procedure Prototype
+     DInitialize...
+     DScreen02         pr
+
+‚     * Fill Screen 2 Procedure Prototype
+     DFillScreen02     pr
+
+‚     * Display Screen 2 Procedure Prototype
+     DDisplayScreen02  pr
+
+‚     * Reset Screen 2 Messages & Inds Prototype
+     DResetScreen02    pr
+
+‚     * Edit Screen 2 Procedure Prototype
+     DEditScreen02     pr              n
+
+     DEditKeyField     pr              n
+     D                                1p 0 Const
+     D                               +0    Const Like(purfrmfile)
+     D                               +0    Const Like(purfrmlib)
+     D                               +0    Const Like(purkeyfld1)
+     D                                 n
+     D                               +0          Like(purandor2)
+     D                                 n
+     D                               +0          Like(purkeycnd1)
+     D                                 n
+     D                                1a
+     D                                 n
+     D                                1a
+     D                                 n
+     D                                1a
+     D                                 n
+     D                               +0          Like(purfldatr1)
+     D                               +0          Like(purflsize1)
+     D                                 n
+
+‚     * Get Next Sequence Number Prototype
+     DGetNextSequence  pr            +0    Like(purseq)
+
+‚     * Display select statement for parameters input
+     DDisplaySelect    pr
+     D                               +0    Const Like(purfrmfile)
+     D                               +0    Const Like(purfrmlib)
+     D                               +0    Const Like(purtofile)
+     D                               +0    Const Like(purkeyfld1)
+     D                               +0    Const Like(purkeyfld2)
+     D                               +0    Const Like(purkeyfld3)
+     D                               +0    Const Like(purkeyfld4)
+     D                               +0    Const Like(purandor2)
+     D                               +0    Const Like(purandor3)
+     D                               +0    Const Like(purandor4)
+     D                               +0    Const Like(purkeycnd1)
+     D                               +0    Const Like(purkeycnd2)
+     D                               +0    Const Like(purkeycnd3)
+     D                               +0    Const Like(purkeycnd4)
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                               +0    Const Like(purflsize1)
+     D                               +0    Const Like(purflsize2)
+     D                               +0    Const Like(purflsize3)
+     D                               +0    Const Like(purflsize4)
+
+‚     * Save Screen 2 Procedure Prototype
+     DSaveScreen02     pr              n
+     D                                7a
+
+‚     * Convert Y/N fields To 1/0 Indicators
+     DConvertToInd     pr
+     D                               +0    Const Like(purkeyfld1)
+     D                               +0    Const Like(purkeyfld2)
+     D                               +0    Const Like(purkeyfld3)
+     D                               +0    Const Like(purkeyfld4)
+     D                                1a
+     D                                1a
+     D                                1a
+     D                                1a
+     D                                1a
+     D                                1a
+     D                                1a
+     D                                1a
+     D                                1a
+     D                                1a
+     D                                1a
+     D                                1a
+
+‚     * Delete Screen 2 Procedure Prototype
+     DDeleteScreen02   pr              n
+     D                                7a
+
+     DDisplayITPurge...
+     DFile             pr              n
+     D                               +0    Like(purgroup) Const
+     D                               +0    Like(purseq)
+
+     DInitializeSubfile...
+     DWindow02         pr              n
+     D                               +0    Like(purgroup) Const
+     D                               +0    Like(purseq)
+
+     DFillSubfile...
+     DWindow02         pr              n
+     D                               +0    Like(purgroup) Const
+
+     DDisplaySubfile...
+     DWindow02         pr              n
+     D                               +0    Like(purgroup) Const
+
+     DReadSubfile...
+     DWindow02         pr              n
+     D                               +0    Like(purgroup) Const
+     D                               +0    Like(purseq)
+
+     DValidKey...
+     DCondition        pr              n
+     D                               +0    Like(purkeycnd1)
+
+     D @TimeStamp      s               z
+     D  @rrn1          s                   Like(dsprrn) Inz(*Zeros)
+     D  @rrn2          s                   Like(dsprrn) Inz(*Zeros)
+     D  @FullPage      s              4s 0 Inz(10)
+     D  @Rows          s              4s 0 Inz(%Elem(@GroupDs))
+     D  @Last          s              5p 0 Inz(*Zeros)
+     D  @i             s              5p 0 Inz(1)
+     D  @Cond          s              2    Dim(12) ctdata perrcd(1)
+     D  @ToCond        s              2    Dim(12) alt(@Cond)
+     D  @RecordAdded   s               n   Inz(*Off)
+
+     D@GroupDs         ds                  Dim(10) Qualified
+     D  @Group                       +0    Like(keygroup) Inz(*Blanks)
+
+     D  @Yes           c                   Const('Y')
+     D  @No            c                   Const('N')
+     D  @And           c                   Const('and')
+     D  @Or            c                   Const('or')
+     D  @File          c                   Const('FILE      ')
+
+     D/DEFINE ITPSHARE01
+     D/DEFINE ITPSHARE04
+     D/DEFINE ITPSHARE07
+     D/DEFINE ITPSHARE08
+     D/DEFINE ITPSHARE09
+     D/DEFINE ITPSHARE10
+     D/DEFINE ITPSHARE11
+     D/DEFINE ITPSHARE16
+     D/DEFINE ITPSHARE18
+     D/DEFINE ITPSHARE19
+     D/copy qcpysrc,itpshare
+
+      /free
+
+          //‚Execute display screen procedure
+          Control01();
+
+          *Inlr = *On;
+          Return;
+
+          // ************************************************************************
+          // *‚Program Initialization Subroutine
+          // ************************************************************************
+
+          BegSr *InzSr;
+
+             @1Group    = *Blanks;
+             @3Group    = *Blanks;
+             @3Seq      = *Zeros;
+             @3FrmFile  = *Blanks;
+             @3FrmLib   = *Blanks;
+             @3ToFile   = *Blanks;
+             @3KeyFld1  = *Blanks;
+             @3KeyCnd1  = *Blanks;
+             @3AlwBlk1  = *Blanks;
+             @3RJust1   = *Blanks;
+             @3flsize1  = *Zeros;
+             @3AndOr2   = *Blanks;
+             @3KeyFld2  = *Blanks;
+             @3KeyCnd2  = *Blanks;
+             @3AlwBlk2  = *Blanks;
+             @3RJust2   = *Blanks;
+             @3flsize2  = *Zeros;
+             @3AndOr3   = *Blanks;
+             @3KeyFld3  = *Blanks;
+             @3KeyCnd3  = *Blanks;
+             @3AlwBlk3  = *Blanks;
+             @3RJust3   = *Blanks;
+             @3flsize3  = *Zeros;
+             @3AndOr4   = *Blanks;
+             @3KeyFld4  = *Blanks;
+             @3KeyCnd4  = *Blanks;
+             @3AlwBlk4  = *Blanks;
+             @3RJust4   = *Blanks;
+             @3flsize4  = *Zeros;
+             @3ErrMsg   = *Blanks;
+             @3Select   = *Blanks;
+             @TimeStamp = GetTimeStamp();
+             *In01      = *Off;
+             *In02      = *Off;
+             *In03      = *Off;
+             *In04      = *Off;
+             *In10      = *Off;
+             *In11      = *Off;
+             *In12      = *Off;
+             *In13      = *Off;
+             *In14      = *Off;
+             *In15      = *Off;
+             *In21      = *Off;
+             *In22      = *Off;
+             *In23      = *Off;
+             *In24      = *Off;
+             *In25      = *Off;
+             *In26      = *Off;
+             *In27      = *Off;
+             *In28      = *Off;
+             *In29      = *Off;
+             *In30      = *Off;
+             *In31      = *Off;
+             *In32      = *Off;
+             *In33      = *Off;
+             *In34      = *Off;
+             *In35      = *Off;
+             *In36      = *Off;
+             *In37      = *Off;
+             *In38      = *Off;
+             *In39      = *Off;
+             *In40      = *Off;
+             *In41      = *Off;
+             *In42      = *Off;
+             *In43      = *Off;
+             *In44      = *Off;
+             *In45      = *Off;
+             *In46      = *Off;
+
+          EndSr;
+
+      /end-free
+
+      ************************************************************************
+      *‚Control01 - Screen 1 Control Procedure
+      ************************************************************************
+
+     PControl01        b
+
+     DControl01        pi
+
+      /free
+
+          // Initialize Screen 1 subroutine
+b001      If InitializeScreen01();
+e001      EndIf;
+
+          // Do until exit key is pressed
+b001      Dow Not *Inkc;
+
+             // Display subfile
+             DisplayScreen01();
+
+e001      EndDo;
+
+      /end-free
+
+     PControl01        e
+
+      ************************************************************************
+      *‚Initialize01 - Initialize Screen 1 subroutine
+      ************************************************************************
+
+     PInitialize...
+     PScreen01         b
+
+     DInitialize...
+     DScreen01         pi              n
+
+     D  @SelectStmt    s           1024a   Varying
+
+      /free
+
+          // initialize screen fields
+          Reset @1Group;
+          Reset *In21;
+
+          // Build Select statement
+          @SelectStmt = 'SELECT purgroup FROM itppurgep';
+
+          @SelectStmt = %Trim(@SelectStmt) + ' GROUP BY PURGROUP +
+                                               ORDER BY PURGROUP';
+
+          Exec SQL Close CsrCl;
+          Exec SQL Declare SQLStmt statement;
+          Exec SQL Declare CsrCl Scroll Cursor For SQLStmt;
+          Exec SQL Prepare SQLStmt From :@SelectStmt;
+
+          // Check for record found
+b001      If Sqlcod <> *Zeros;
+b002         If sqlerrmc <> *Blanks;
+                dsply %SubSt(sqlerrmc:1:50);
+e002         EndIf;
+             Return *Off;
+e001      EndIf;
+
+          // Open Cursor
+          Exec SQL Open CsrCl;
+          // Check for record found
+b001      If Sqlcod <> *Zeros;
+             Return *Off;
+e001      EndIf;
+
+          // Get First Set Of Records
+          Exec SQL Fetch CsrCl for :@Rows ROWS Into :@GroupDs;
+
+          // Configure last row
+b001      For @Last = 1 To @Rows;
+b002         If @GroupDs(@Last).@Group = *Blanks;
+                Leave;
+e002         EndIf;
+e001      EndFor;
+          @Last -= 1;
+
+          Return *On;
+
+      /end-free
+
+     PInitialize...
+     PScreen01         e
+
+      ************************************************************************
+      *‚FillScreen01 - Initialize Screen 1 subroutine
+      ************************************************************************
+
+     PFillScreen01     b
+
+     DFillScreen01     pi
+
+      /free
+
+          // initialize screen fields
+          @1Group   = purgroup;
+
+      /end-free
+
+     PFillScreen01     e
+
+      ************************************************************************
+      *‚DisplayScreen01 - Display screen 1
+      ************************************************************************
+
+     PDisplayScreen01  b
+
+     DDisplayScreen01  pi
+
+      /free
+
+          // Do until exit key is pressed
+b001      Dow Not *Inkc;
+
+             // Display subfile
+             ExFmt scrn1;
+
+             Reset @1ErrMsg;
+             Reset *In21;
+             Clear sqlcod;
+
+             // Start Select
+b002         Select;
+
+                // Check for search key pressed
+x002            When *Inkd;
+
+b003               If DisplayGroupsSubfile();
+
+x003               Else;
+
+                      *Inke = *On;
+
+e003               EndIf;
+
+                // Check for refresh requested
+x002            When *Inke;
+
+                   // Initialize Screen 1 subroutine
+b003               If InitializeScreen01();
+e003               EndIf;
+
+                // Do while roll key is pressed
+x002            When *In81;
+
+                   // Get group record
+                   @i += 1;
+b003               If @GroupDs(@i).@Group <> *Blanks;
+
+                      // Set group record
+                      @1Group = @GroupDs(@i).@Group;
+
+x003               Else;
+
+                      // Set to beginning of array
+                      Reset @i;
+
+                      // Set group record
+                      @1Group = @GroupDs(@i).@Group;
+
+e003               EndIf;
+
+                // Do while roll key is pressed
+x002            When *In82;
+
+                   // Get group record
+                   @i -= 1;
+b004               If @i = *Zeros;
+                      @i = @Last;
+e004               EndIf;
+b003               If @GroupDs(@i).@Group <> *Blanks;
+
+                      // Set group record
+                      @1Group = @GroupDs(@i).@Group;
+
+x003               Else;
+
+                      // Set to beginning of array
+                      @i = @Last;
+
+                      // Set group record
+                      @1Group = @GroupDs(@i).@Group;
+
+
+e003               EndIf;
+
+                // Do until exit key is pressed
+x002            When Not *Inkc
+                And  Not *Inke;
+
+                   // check for search requested
+b003               If %Trim(@1Group) = '?';
+
+                      // Initialize Screen 1 subroutine
+b004                  If InitializeScreen01();
+e004                  EndIf;
+
+                      // Customer has Been Prompted
+                      Clear @1Group;
+
+e003               EndIf;
+
+                   // Edit Screen 1
+b003               If EditScreen01();
+
+                      //‚Execute display screen procedure
+                      Control02();
+                      *InKc = *Off;
+                      *InKe = *Off;
+                      *InKj = *Off;
+                      *InKl = *Off;
+
+e003               EndIf;
+e002         EndSl;
+e001      EndDo;
+
+      /end-free
+
+     PDisplayScreen01  e
+
+      ************************************************************************
+      *‚EditScreen01 - Edit screen 1
+      ************************************************************************
+
+     PEditScreen01     b
+
+     DEditScreen01     pi              n
+
+      /free
+
+          // Validate from file field
+b001      If @1Group = *Blanks;
+
+             // Set on error ind.
+             *In21 = *On;
+
+             // Set error message id
+             Clear @1ErrMsg;
+             @1ErrMsg = 'Group name required.';
+             @1ErrMsg = RtvMsgD('ERR9898': *Blanks:
+                                @1ErrMsg: %Len(%Trim(@1ErrMsg)));
+
+             // Exit procedure
+             Return *Off;
+
+e001      EndIf;
+
+          // If program passees to here all fields are good
+          Return *On;
+
+      /end-free
+
+     PEditScreen01     e
+
+      ****************************************************************
+      *‚DisplayGroupsSubfile
+      ****************************************************************
+
+     PDisplayGroups...
+     PSubfile          b
+
+     DDisplayGroups...
+     DSubfile          pi              n
+
+     C/free
+
+          // Initialize Subfile
+          InitializeSubfileWindow01();
+
+          // Fill first page in subfile
+b001      If FillSubfileWindow01();
+e001      EndIf;
+
+          // Do until Command key 3 or 12 is pressed or message id selected
+b001      Dow DisplaySubfileWindow01();
+
+             // Read subfile
+b002         If  *In01
+             And ReadSubfileWindow01();
+
+                Return *On;
+
+e002         EndIf;
+e001      EndDo;
+
+          *Inkc = *Off;
+          *Inkl = *Off;
+
+          Return *Off;
+
+      /end-free
+
+     PDisplayGroups...
+     PSubfile          e
+
+      ****************************************************************
+      *‚InitializeSubfileWindow 1
+      ****************************************************************
+
+     PInitializeSubfile...
+     PWindow01         b
+
+     DInitializeSubfile...
+     DWindow01         pi
+
+     C/free
+
+          // initialize subfile
+          Reset @Rrn1;
+          Reset *In01;
+          Reset *In02;
+          Reset *In03;
+          Reset *In04;
+          Write Sflc01;
+          *In02 = *On;
+
+      /end-free
+
+     PInitializeSubfile...
+     PWindow01         e
+
+      ****************************************************************
+      *‚FillSubfileWindow 1
+      ****************************************************************
+
+     PFillSubfile...
+     PWindow01         b
+
+     DFillSubfile...
+     DWindow01         pi              n
+
+     C/free
+
+          // Check for record found
+b001      If Sqlcod = *Zeros;
+
+             // Do for each row
+b002         For @i = 1 to @FullPage;
+
+                // Check for end of array
+b003            If @GroupDs(@i).@Group <> *Blanks;
+
+                   // set screen fields
+                   @2Sel     = *Blanks;
+                   @2Group   = @GroupDs(@i).@Group;
+
+                   // incriment relative record number
+                   *In01 = *On;
+                   @rrn1 += 1;
+
+                   // Write subfile record
+                   Write Sfld01;
+
+x003            Else;
+
+                   Leave;
+
+e003            EndIf;
+e002         EndFor;
+e001      EndIf;
+
+          // Check for all records written to subfile
+b001      If @rrn1 >= @Fullpage;
+
+             // Get Next Set Of Record
+             Reset @GroupDs;
+             Exec SQL Fetch CsrCl for :@FullPage ROWS Into :@GroupDs;
+
+             // Check for record found
+b002         If Sqlcod <> *Zeros;
+
+                // Check for more records to write to subfile
+b003            If @GroupDs(1).@Group = *Blanks;
+
+                   // Set On end of file ind.
+                   *In03 = *On;
+                   dsprrn = @Rrn1;
+
+e003            EndIf;
+x002         Else;
+
+                dsprrn = @Rrn1 - @FullPage + 1;
+
+e002         EndIf;
+x001      Else;
+
+             dsprrn = @Rrn1;
+
+e001      EndIf;
+
+          Return *On;
+
+      /end-free
+
+     PFillSubfile...
+     PWindow01         e
+
+      ****************************************************************
+      *‚InitializeSubfileWindow 1
+      ****************************************************************
+
+     PDisplaySubfile...
+     PWindow01         b
+
+     DDisplaySubfile...
+     DWindow01         pi              n
+
+     C/free
+
+          // Display error window
+          Write wsf01;
+          Write sflh01;
+          Exfmt sflc01;
+
+          // Check for roll key pressed
+b001      Dow *in04;
+
+             // Fill first page in subfile
+b002         If FillSubfileWindow01();
+e002         EndIf;
+
+             // Display error window
+             Write wsf01;
+             Write sflh01;
+             Exfmt sflc01;
+
+e001      EndDo;
+
+          // Check for command 3 or 12 pressed
+b001      If *inkc
+          Or *inkl;
+
+             Return *Off;
+
+x001      Else;
+
+             Return *On;
+
+e001      EndIf;
+
+      /end-free
+
+     PDisplaySubfile...
+     PWindow01         e
+
+      ****************************************************************
+      *‚ReadSubfileWindow 1
+      ****************************************************************
+
+     PReadSubfile...
+     PWindow01         b
+
+     DReadSubfile...
+     DWindow01         pi              n
+
+     C/free
+
+          // set file pointer to beof
+          @rrn1 = 1;
+          Reset *In20;
+
+          // Read till end of file
+          readc Sfld01;
+b001      Dow not %Eof(itpprgupdd);
+
+             *In21 = *Off;
+
+             // check for selection made
+b002         If @2Sel = '1';
+
+                purgroup = @2Group;
+                @i       = @rrn1;
+
+                // setup screen fields
+                FillScreen01();
+
+                Return *On;
+
+x002         Else;
+
+                // don't set error ind if blanks
+b003            If @2Sel <> *Blanks;
+
+                   *In20 = *On;
+                   *In21 = *On;
+                   @ErrorMsg1 = RtvMsgD('OSR0714');
+
+e003            EndIf;
+e002         EndIf;
+
+             // Update subfile with errors if occured
+             Update Sfld01;
+
+             // Read till end of file
+             readc Sfld01;
+
+e001      EndDo;
+
+          Return *Off;
+
+      /end-free
+
+     PReadSubfile...
+     PWindow01         e
+
+      ************************************************************************
+      *‚Control02 - Screen 2 Control Procedure
+      ************************************************************************
+
+     PControl02        b
+
+     DControl02        pi
+
+      /free
+
+          // Initialize Screen 1 subroutine
+          InitializeScreen02();
+
+          // Do until exit key is pressed
+b001      Dow Not *Inkc;
+
+             // Display subfile
+             DisplayScreen02();
+
+e001      EndDo;
+
+      /end-free
+
+     PControl02        e
+
+      ************************************************************************
+      *‚Initialize02 - Initialize Screen 1 subroutine
+      ************************************************************************
+
+     PInitialize...
+     PScreen02         b
+
+     DInitialize...
+     DScreen02         pi
+
+     D  @RecordAddedS  s               n   Inz(*Off)
+
+      /free
+
+          // initialize screen fields
+          @3Group = @1Group;
+          Reset @3Seq;
+          @RecordAddedS = @RecordAdded;
+
+          // Clear screen fields
+          Reset @3FrmFile;
+          Reset @3FrmLib;
+          Reset @3ToFile;
+          Reset @3KeyFld1;
+          Reset @3KeyCnd1;
+          Reset @3AlwBlk1;
+          Reset @3RJust1;
+          Reset @3flsize1;
+          Reset @3AndOr2;
+          Reset @3KeyFld2;
+          Reset @3KeyCnd2;
+          Reset @3AlwBlk2;
+          Reset @3RJust2;
+          Reset @3flsize2;
+          Reset @3AndOr3;
+          Reset @3KeyFld3;
+          Reset @3KeyCnd3;
+          Reset @3AlwBlk3;
+          Reset @3RJust3;
+          Reset @3flsize3;
+          Reset @3AndOr4;
+          Reset @3KeyFld4;
+          Reset @3KeyCnd4;
+          Reset @3AlwBlk4;
+          Reset @3RJust4;
+          Reset @3flsize4;
+
+          // Reset messages & Ind.
+          ResetScreen02();
+
+          // Check for record added
+b001      If @RecordAddedS;
+
+             // Get next sequence subroutine
+             @3Seq = GetNextSequence();
+
+e001      EndIf;
+
+      /end-free
+
+     PInitialize...
+     PScreen02         e
+
+      ************************************************************************
+      *‚ResetScreen02 - Reset screen 2
+      ************************************************************************
+
+     PResetScreen02    b
+
+     DResetScreen02    pi
+
+      /free
+
+          // Clear screen fields
+          Reset @3ErrMsg;
+          Reset @3Select;
+          Reset *In10;
+          Reset *In11;
+          Reset *In12;
+          Reset *In13;
+          Reset *In14;
+          Reset *In15;
+          Reset *In21;
+          Reset *In22;
+          Reset *In23;
+          Reset *In24;
+          Reset *In25;
+          Reset *In26;
+          Reset *In27;
+          Reset *In28;
+          Reset *In29;
+          Reset *In30;
+          Reset *In31;
+          Reset *In32;
+          Reset *In33;
+          Reset *In34;
+          Reset *In35;
+          Reset *In36;
+          Reset *In37;
+          Reset *In38;
+          Reset *In39;
+          Reset *In40;
+          Reset *In41;
+          Reset *In42;
+          Reset *In43;
+          Reset *In44;
+          Reset *In45;
+          Reset *In46;
+          Reset @RecordAdded;
+
+      /end-free
+
+     PResetScreen02    e
+
+      ************************************************************************
+      *‚FillScreen02 - Initialize Screen 1 subroutine
+      ************************************************************************
+
+     PFillScreen02     b
+
+     DFillScreen02     pi
+
+      /free
+
+          // initialize screen fields
+          @3Seq     = purseq;
+          @3FrmFile = purfrmfile;
+          @3FrmLib  = purfrmlib;
+          @3ToFile  = purtofile;
+
+          @3KeyFld1 = purkeyfld1;
+          @3KeyCnd1 = purkeycnd1;
+          @3FldAtr1 = purfldatr1;
+b001      If @3KeyFld1 <> *Blanks;
+b002         If puralwblk1 = *On;
+                @3AlwBlk1 = @Yes;
+x002         Else;
+                @3AlwBlk1 = @No;
+e002         EndIf;
+b002         If purfldatr1 = 'A';
+                *In11 = *On;
+                @3FlSize1 = purflsize1;
+b003            If purrjust1 = *On;
+                   @3RJust1 = @Yes;
+x003            Else;
+                   @3RJust1 = @No;
+e003            EndIf;
+b003            If purzrfill1 = *On;
+                   @3ZrFill1 = @Yes;
+x003            Else;
+                   @3ZrFill1 = @No;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          @3KeyFld2 = purkeyfld2;
+          @3AndOr2  = purandor2;
+          @3KeyCnd2 = purkeycnd2;
+          @3FldAtr2 = purfldatr2;
+b001      If @3KeyFld2 <> *Blanks;
+b002         If puralwblk2 = *On;
+                @3AlwBlk2 = @Yes;
+x002         Else;
+                @3AlwBlk2 = @No;
+e002         EndIf;
+b002         If purfldatr2 = 'A';
+                *In12 = *On;
+                @3FlSize2 = purflsize2;
+b003            If purrjust2 = *On;
+                   @3RJust2 = @Yes;
+x003            Else;
+                   @3RJust2 = @No;
+e003            EndIf;
+b003            If purzrfill2 = *On;
+                   @3ZrFill2 = @Yes;
+x003            Else;
+                   @3ZrFill2 = @No;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          @3KeyFld3 = purkeyfld3;
+          @3AndOr3  = purandor3;
+          @3KeyCnd3 = purkeycnd3;
+          @3FldAtr3 = purfldatr3;
+b001      If @3KeyFld3 <> *Blanks;
+b002         If puralwblk3 = *On;
+                @3AlwBlk3 = @Yes;
+x002         Else;
+                @3AlwBlk3 = @No;
+e002         EndIf;
+b002         If purfldatr3 = 'A';
+                *In13 = *On;
+                @3FlSize3 = purflsize3;
+b003            If purrjust3 = *On;
+                   @3RJust3 = @Yes;
+x003            Else;
+                   @3RJust3 = @No;
+e003            EndIf;
+b003            If purzrfill3 = *On;
+                   @3ZrFill3 = @Yes;
+x003            Else;
+                   @3ZrFill3 = @No;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          @3KeyFld4 = purkeyfld4;
+          @3AndOr4  = purandor4;
+          @3KeyCnd4 = purkeycnd4;
+          @3FldAtr4 = purfldatr4;
+b001      If @3KeyFld4 <> *Blanks;
+b002         If puralwblk4 = *On;
+                @3AlwBlk4 = @Yes;
+x002         Else;
+                @3AlwBlk4 = @No;
+e002         EndIf;
+b002         If purfldatr4 = 'A';
+                *In14 = *On;
+                @3FlSize4 = purflsize4;
+b003            If purrjust4 = *On;
+                   @3RJust4 = @Yes;
+x003            Else;
+                   @3RJust4 = @No;
+e003            EndIf;
+b003            If purzrfill4 = *On;
+                   @3ZrFill4 = @Yes;
+x003            Else;
+                   @3ZrFill4 = @No;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          // Display eventual select statement
+          DisplaySelect(@3FrmFile:  @3Frmlib:   @3ToFile:
+                        @3KeyFld1:  @3KeyFld2:  @3KeyFld3: @3KeyFld4:
+                                    @3AndOr2:   @3AndOr3:  @3AndOr4:
+                        @3KeyCnd1:  @3KeyCnd2:  @3KeyCnd3: @3KeyCnd4:
+                        @3alwblk1:  @3alwblk2:  @3alwblk3: @3alwblk4:
+                        @3rjust1:   @3rjust2:   @3rjust3:  @3rjust4:
+                        @3zrfill1:  @3zrfill2:  @3zrfill3: @3zrfill4:
+                        @3flsize1:  @3flsize2:  @3flsize3: @3flsize4);
+
+      /end-free
+
+     PFillScreen02     e
+
+      ************************************************************************
+      *‚DisplayScreen02 - Display screen 2
+      ************************************************************************
+
+     PDisplayScreen02  b
+
+     DDisplayScreen02  pi
+
+     D  @ErrMsgId      s              7a   Inz(*Blanks)
+
+      /free
+
+          // Do until exit key is pressed
+b001      Dow Not *Inkc;
+
+             // Display subfile
+             ExFmt scrn2;
+
+             // Reset messages & Ind.
+             ResetScreen02();
+
+             // Start Select
+b002         Select;
+
+                // Check for search key pressed
+x002            When *Inkd;
+
+b003               If DisplayITPurgeFile(@3Group: @3Seq);
+
+x003               Else;
+
+                      *Inke = *On;
+
+e003               EndIf;
+
+                // Check for refresh requested
+x002            When *InKe;
+
+                   // Initialize Screen 2 subroutine
+                   InitializeScreen02();
+
+                // Check for get next sequence
+x002            When *InKf;
+
+                   // Initialize Screen 2 subroutine
+                   InitializeScreen02();
+
+                   // Get next sequence subroutine
+                   @3Seq = GetNextSequence();
+
+                // Do while roll key is pressed
+x002            When *In81;
+
+                   // Read next vendor charge back record
+                   Reade(n) @3Group ritppurgl1;
+b003               If %Eof(itppurgel1);
+
+                      // Set file pointer to bof
+                      Setll    *Loval  ritppurgl1;
+                      Setll    @3Group ritppurgl1;
+                      Reade(n) @3Group ritppurgl1;
+
+e003               EndIf;
+
+                   // Check for a record read
+b003               If Not %Eof(itppurgel1);
+
+                      // Initialize Screen 2 subroutine
+                      InitializeScreen02();
+
+                      // setup screen fields
+                      FillScreen02();
+
+e003               EndIf;
+
+                // Do while roll key is pressed
+x002            When *In82;
+
+                   // Read prior vendor charge back record
+                   Readpe(n) @3Group ritppurgl1;
+b003               If %Eof(itppurgel1);
+
+                      // Set file pointer to eof
+                      Setgt     *Hival  ritppurgl1;
+                      Setgt     @3Group ritppurgl1;
+                      Readpe(n) @3Group ritppurgl1;
+
+e003               EndIf;
+
+                   // Check for a record read
+b003               If Not %Eof(itppurgel1);
+
+                      // Initialize Screen 2 subroutine
+                      InitializeScreen02();
+
+                      // setup screen fields
+                      FillScreen02();
+
+e003               EndIf;
+
+                // Do until exit key is pressed
+x002            When Not *Inkc
+                And  Not *Inke
+                And  Not *Inkh;
+
+                   // check for search requested
+b003               If %Trim(@3FrmFile) = '?';
+
+                      // Initialize Screen 1 subroutine
+                      InitializeScreen02();
+
+e003               EndIf;
+
+                   // Edit Screen 2
+b003               If EditScreen02();
+
+                      // Display eventual select statement
+                      DisplaySelect(
+                      @3FrmFile:  @3Frmlib:   @3ToFile:
+                      @3KeyFld1:  @3KeyFld2:  @3KeyFld3: @3KeyFld4:
+                                  @3AndOr2:   @3AndOr3:  @3AndOr4:
+                      @3KeyCnd1:  @3KeyCnd2:  @3KeyCnd3: @3KeyCnd4:
+                      @3alwblk1:  @3alwblk2:  @3alwblk3: @3alwblk4:
+                      @3rjust1:   @3rjust2:   @3rjust3:  @3rjust4:
+                      @3zrfill1:  @3zrfill2:  @3zrfill3: @3zrfill4:
+                      @3flsize1:  @3flsize2:  @3flsize3: @3flsize4);
+
+                      // Start Select
+b004                  Select;
+
+                         // Check for save key pressed
+x004                     When *Inkj;
+
+                            // Save to file
+b005                        If SaveScreen02(@ErrMsgId);
+
+                               // Initialize Screen 2 subroutine
+                               InitializeScreen02();
+
+                               // Set error message id
+                               @3ErrMsg = RtvMsgD(@ErrMsgId);
+
+e005                        EndIf;
+
+                         // Check for delete key pressed
+x004                     When *Inkm;
+
+                            // Save to file
+b005                        If DeleteScreen02(@ErrMsgId);
+
+                               // Initialize Screen 2 subroutine
+                               InitializeScreen02();
+
+                               // Set error message id
+                               @3ErrMsg = RtvMsgD(@ErrMsgId);
+
+e005                        EndIf;
+e004                  EndSl;
+e003               EndIf;
+
+                // Check for resequence key pressed
+x002            When *Inkh;
+
+                   // Initialize Screen 2 subroutine
+                   InitializeScreen02();
+
+                   Resequence('ITPPURGEPI': 'ITPPURGEL1': @3Group);
+
+                   // Set error message id
+                   Clear @3ErrMsg;
+                   @3ErrMsg = 'All Records For Group ' + %Trim(@3Group) +
+                              ' Resequenced.';
+                   @3ErrMsg = RtvMsgD('ERR9898': *Blanks:
+                                      @3ErrMsg: %Len(%Trim(@3ErrMsg)));
+
+e002         EndSl;
+e001      EndDo;
+
+      /end-free
+
+     PDisplayScreen02  e
+
+      ************************************************************************
+      *‚EditScreen02 - Edit screen 2
+      ************************************************************************
+
+     PEditScreen02     b
+
+     DEditScreen02     pi              n
+
+     D@FileLibDs       ds
+     D                               10a   Inz('QCPFMSG   ')
+     D                               10a   Inz('QSYS      ')
+
+     D  @MsgId         s              7a   Inz(*Blanks)
+     D  @3AndOr1       s                   Inz(*Blanks) Like(@3AndOr2)
+
+     D Keyitppurgep1   ds                  likerec(ritppurgl1 : *key)
+     D Keyitppurgep2   ds                  likerec(ritppurgl2 : *key)
+
+      /free
+
+          // Validate sequence field
+b001      If @3Seq = *Zeros;
+
+             // Set on error ind.
+             *In21 = *On;
+
+             // Set error message id
+             Clear @3ErrMsg;
+             @3ErrMsg = RtvMsgD('BRK0002');
+
+             // Exit procedure
+             Return *Off;
+
+e001      EndIf;
+
+          // Check for from library blank
+b001      If @3FrmLib = *Blanks;
+             @3FrmLib = @Libl;
+e001      EndIf;
+
+          // Validate from file field
+b001      If @3FrmFile = *Blanks;
+
+             // Set on error ind.
+             *In22 = *On;
+
+             // Set error message id
+             Clear @3ErrMsg;
+             @3ErrMsg = RtvMsgD('RPT1001');
+
+             // Exit procedure
+             Return *Off;
+
+x001      Else;
+
+b002         If Not RetrieveObjectDescription(@3FrmFile: @3FrmLib:
+                                              @MsgID: @FileLibDs);
+
+                // Set on error ind.
+                *In22 = *On;
+
+                // Check for errors passed back
+b003            If @MsgId <> *Blanks;
+
+                   // Set error message id
+                   Clear @3ErrMsg;
+                   @3ErrMsg = 'File ' + %Trim(@3FrmFile) +
+                              ', library ' + %Trim(@3FrmLib) +
+                              ' not a database file.';
+                   @3ErrMsg = RtvMsgD(@MsgId: @FileLibDs:
+                                      @3ErrMsg: %Len(%Trim(@3ErrMsg)));
+
+x003            Else;
+
+                   // Set error message id
+                   Clear @3ErrMsg;
+                   @3ErrMsg = RtvMsgD('CPF3012': @FileLibDs:
+                                      @3FrmFile + %Trim(@3FrmLib): 20);
+
+e003            EndIf;
+
+                // Exit procedure
+                Return *Off;
+
+e002         EndIf;
+e001      EndIf;
+
+          // set keys
+          Keyitppurgep1.purgroup = @3Group;
+          Keyitppurgep1.purseq   = @3Seq;
+
+          // Get record if exists
+          Setll %Kds(Keyitppurgep1) ritppurgl1;
+b001      If Not %Equal(itppurgel1);
+
+             // set keys
+             Keyitppurgep2.purgroup   = @3Group;
+             Keyitppurgep2.purfrmfile = @3FrmFile;
+             Keyitppurgep2.purfrmlib  = @3FrmLib;
+             Keyitppurgep2.purkeyfld1 = @3KeyFld1;
+             Keyitppurgep2.purkeyfld2 = @3KeyFld2;
+             Keyitppurgep2.purkeyfld3 = @3KeyFld3;
+             Keyitppurgep2.purkeyfld4 = @3KeyFld4;
+
+             // Get record if exists
+             Setll %Kds(Keyitppurgep2) ritppurgl2;
+b002         If %Equal(itppurgel2);
+
+                // Set on error ind.
+                *In22 = *On;
+                *In24 = *On;
+                *In25 = *On;
+                *In26 = *On;
+
+                @3ErrMsg = 'File/Key Fields already in group.';
+                @3ErrMsg = RtvMsgD('ERR9898': *Blanks:
+                                   @3ErrMsg: %Len(%Trim(@3ErrMsg)));
+
+                // Exit procedure
+                Return *Off;
+
+e002         EndIf;
+e001      EndIf;
+
+          // Check for from library blank
+b001      If @3ToFile = *Blanks;
+             @3ToFile = %Trim(@3FrmFile) + '_S';
+e001      EndIf;
+
+          // Validate to file field
+b001      If @3ToFile = *Blanks;
+
+             // Set on error ind.
+             *In23 = *On;
+
+             // Set error message id
+             @3ErrMsg = RtvMsgD('RPT1001');
+
+             // Exit procedure
+             Return *Off;
+
+x001      Else;
+
+             If RetrieveObjectDescription(@3ToFile);
+
+                // Set on error ind.
+                *In23 = *On;
+
+                // Set error message id
+                Clear @3ErrMsg;
+                @3ErrMsg = RtvMsgD('CPD2104': @FileLibDs:
+                                   @3ToFile + @Libl + @fILE: 30);
+
+                // Exit procedure
+                Return *Off;
+
+e002         EndIf;
+
+e001      EndIf;
+
+          // Check for key field 1 entered
+b001      If @3KeyFld1 = *Blanks;
+
+             // Set on error ind.
+             *In24 = *On;
+
+             // Set error message id
+             @3ErrMsg = 'Key Field information required.';
+             @3ErrMsg = RtvMsgD('ERR9898': *Blanks:
+                                @3ErrMsg: %Len(%Trim(@3ErrMsg)));
+
+             // Exit procedure
+             Return *Off;
+
+x001      Else;
+
+             // Edit key field attributes
+             *In99 = *Off;
+b002         If EditKeyField(1: @3FrmFile: @3FrmLib:
+                             @3KeyFld1: *In24:
+                             @3AndOr1:  *In99:
+                             @3KeyCnd1: *In27:
+                             @3AlwBlk1: *In30:
+                             @3RJust1:  *In33:
+                             @3ZrFill1: *In36:
+                             @3FldAtr1:  @3FlSize1: *In11);
+
+x002         Else;
+
+                // Exit procedure
+                Return *Off;
+
+e002         EndIf;
+e001      EndIf;
+
+          // Check for key field 2 entered
+b001      If @3KeyFld2 <> *Blanks;
+
+             // Edit key field attributes
+b002         If EditKeyField(2: @3FrmFile: @3FrmLib:
+                             @3KeyFld2: *In25:
+                             @3AndOr2:  *In39:
+                             @3KeyCnd2: *In28:
+                             @3AlwBlk2: *In31:
+                             @3RJust2:  *In34:
+                             @3ZrFill2: *In37:
+                             @3FldAtr2:  @3FlSize2: *In12);
+
+                // Check for key field 2 unique
+b003            If @3KeyFld2 = @3KeyFld1;
+
+                   // Set on error ind.
+                   *In25 = *On;
+
+                   // Set error message id
+                   Clear @3ErrMsg;
+                   @3ErrMsg = 'Key Field Already used.';
+                   @3ErrMsg = RtvMsgD('ERR9898':
+                                      *Blanks:
+                                      @3ErrMsg:
+                                      %Len(%Trim(@3ErrMsg)));
+
+                   // Exit procedure
+                   Return *Off;
+
+e003            EndIf;
+x002         Else;
+
+                // Exit procedure
+                Return *Off;
+
+e002         EndIf;
+e001      EndIf;
+
+          // Check for key field 1 entered
+b001      If @3KeyFld3 <> *Blanks;
+
+             // Edit key field attributes
+b002         If EditKeyField(3: @3FrmFile: @3FrmLib:
+                             @3KeyFld3: *In26:
+                             @3AndOr3:  *In40:
+                             @3KeyCnd3: *In29:
+                             @3AlwBlk3: *In32:
+                             @3RJust3:  *In35:
+                             @3ZrFill3: *In38:
+                             @3FldAtr3:  @3FlSize3: *In13);
+
+                // Check for key field 1 entered
+b003            If @3KeyFld2 = *Blanks;
+
+                   // Set on error ind.
+                   *In25 = *On;
+                   *In26 = *On;
+
+                   @3ErrMsg = 'Key Field 2 Must be entered.';
+                   @3ErrMsg = RtvMsgD('ERR9898': *Blanks:
+                                      @3ErrMsg: %Len(%Trim(@3ErrMsg)));
+
+                   // Exit procedure
+                   Return *Off;
+
+e003            EndIf;
+
+                // Check for key field 2 unique
+b003            If @3KeyFld3 = @3KeyFld1
+                Or @3KeyFld3 = @3KeyFld2;
+
+                   // Set on error ind.
+                   *In26 = *On;
+
+                   // Set error message id
+                   Clear @3ErrMsg;
+                   @3ErrMsg = 'Key Field Already used.';
+                   @3ErrMsg = RtvMsgD('ERR9898':
+                                      *Blanks:
+                                      @3ErrMsg:
+                                      %Len(%Trim(@3ErrMsg)));
+
+                   // Exit procedure
+                   Return *Off;
+
+e003            EndIf;
+x002         Else;
+
+                // Exit procedure
+                Return *Off;
+
+e002         EndIf;
+e001      EndIf;
+
+          // Check for key field 1 entered
+b001      If @3KeyFld4 <> *Blanks;
+
+             // Edit key field attributes
+b002         If EditKeyField(4: @3FrmFile: @3FrmLib:
+                             @3KeyFld4: *In42:
+                             @3AndOr4:  *In41:
+                             @3KeyCnd4: *In43:
+                             @3AlwBlk4: *In44:
+                             @3RJust4:  *In45:
+                             @3ZrFill4: *In46:
+                             @3FldAtr4:  @3FlSize4: *In14);
+
+                // Check for key field 3 entered
+b003            If @3KeyFld3 = *Blanks;
+
+                   // Set on error ind.
+                   *In26 = *On;
+                   *In42 = *On;
+
+                   @3ErrMsg = 'Key Field 3 Must be entered.';
+                   @3ErrMsg = RtvMsgD('ERR9898': *Blanks:
+                                      @3ErrMsg: %Len(%Trim(@3ErrMsg)));
+
+                   // Exit procedure
+                   Return *Off;
+
+e003            EndIf;
+
+                // Check for key field 2 unique
+b003            If @3KeyFld4 = @3KeyFld1
+                Or @3KeyFld4 = @3KeyFld2
+                Or @3KeyFld4 = @3KeyFld3;
+
+                   // Set on error ind.
+                   *In42 = *On;
+
+                   // Set error message id
+                   Clear @3ErrMsg;
+                   @3ErrMsg = 'Key Field Already used.';
+                   @3ErrMsg = RtvMsgD('ERR9898':
+                                      *Blanks:
+                                      @3ErrMsg:
+                                      %Len(%Trim(@3ErrMsg)));
+
+                   // Exit procedure
+                   Return *Off;
+
+e003            EndIf;
+x002         Else;
+
+                // Exit procedure
+                Return *Off;
+
+e002         EndIf;
+e001      EndIf;
+
+          // If program passees to here all fields are good
+          Return *On;
+
+      /end-free
+
+     PEditScreen02     e
+
+      ************************************************************************
+      *‚EditKeyField - Edit Field Entries
+      ************************************************************************
+
+     PEditKeyField     b
+
+     DEditKeyField     pi              n
+     D  @Level                        1p 0 Const
+     D  @Frmfile                     +0    Const Like(purfrmfile)
+     D  @Frmlib                      +0    Const Like(purfrmlib)
+     D  @KeyFld                      +0    Const Like(purkeyfld1)
+     D  @KeyFldInd                     n
+     D  @AndOr                       +0          Like(purandor2)
+     D  @AndOrInd                      n
+     D  @KeyCnd                      +0          Like(purkeycnd1)
+     D  @KeyCndInd                     n
+     D  @AlwBlk                       1a
+     D  @AlwBlkInd                     n
+     D  @RJust                        1a
+     D  @RJustInd                      n
+     D  @ZrFill                       1a
+     D  @ZrFillInd                     n
+     D  @FldAtr                      +0          Like(purfldatr1)
+     D  @FlSize                      +0          Like(purflsize1)
+     D  @DisplayInd                    n
+
+     D@FileLibDs       ds
+     D                               10a   Inz('QCPFMSG   ')
+     D                               10a   Inz('QSYS      ')
+
+      /free
+
+          // Check for key field exists in file
+b001      If Not RetrieveFieldDescription(@3FrmFile: @3FrmLib:
+                                          @KeyFld:   @DisplayInd:
+                                          @FldAtr:   @FlSize);
+
+             // Set on error ind.
+             @KeyFldInd = *On;
+
+             // Set error message id
+             @3ErrMsg = RtvMsgD('CPF7E14': @FileLibDs);
+
+             // Exit procedure
+             Return *Off;
+
+e001      EndIf;
+
+          // Check for not 1st key field
+b001      If @Level > 1;
+
+             // Check for valid and/or entered
+             @AndOr = @ToLower(%Trim(@AndOr));
+b002         If  @AndOr <> @And
+             And @AndOr <> @Or;
+
+                // Set on error ind.
+                @AndOrInd = *On;
+
+                // Set error message id
+                @3ErrMsg = 'Valid Entries are ' + @And + ' or ' + @Or;
+                @3ErrMsg = RtvMsgD('ERR9898': *Blanks:
+                                   @3ErrMsg: %Len(%Trim(@3ErrMsg)));
+
+                // Exit procedure
+                Return *Off;
+
+e002         EndIf;
+e001      EndIf;
+
+          // Check for valid key condition
+b001      If Not ValidKeyCondition(@KeyCnd);
+
+             // Set on error ind.
+             @KeyCndInd = *On;
+
+             // Set error message id
+             @3ErrMsg = 'Key Field Condition Invalid.';
+             @3ErrMsg = RtvMsgD('ERR9898': *Blanks:
+                                @3ErrMsg: %Len(%Trim(@3ErrMsg)));
+
+             // Exit procedure
+             Return *Off;
+
+e001      EndIf;
+
+          // Check for right adjust used
+b001      If @DisplayInd;
+
+             // Check for valid allow blanks entered
+b002         If  @AlwBlk <> @Yes
+             And @AlwBlk <> @No
+             And @AlwBlk <> *Blanks;
+
+                // Set on error ind.
+                @AlwBlkInd = *On;
+
+                // Set error message id
+                @3ErrMsg = 'Valid Entries are ' + @Yes + ',' + @No +
+                           ' Or blank';
+                @3ErrMsg = RtvMsgD('ERR9898': *Blanks:
+                                   @3ErrMsg: %Len(%Trim(@3ErrMsg)));
+
+                // Exit procedure
+                Return *Off;
+
+e002         EndIf;
+
+             // Check allow blanks not entered
+b002         If @AlwBlk = *Blanks;
+
+                @AlwBlk = @No;
+
+e002         EndIf;
+
+             // Check for valid right adjust entered
+b002         If  @RJust <> @Yes
+             And @RJust <> @No
+             And @RJust <> *Blanks;
+
+                // Set on error ind.
+                @RJustInd = *On;
+
+                // Set error message id
+                @3ErrMsg = 'Valid Entries are ' + @Yes + ',' + @No +
+                           ' Or blank';
+                @3ErrMsg = RtvMsgD('ERR9898': *Blanks:
+                                   @3ErrMsg: %Len(%Trim(@3ErrMsg)));
+
+                // Exit procedure
+                Return *Off;
+
+e002         EndIf;
+
+             // Check for valid right adjust entered
+b002         If  @RJust = *Blanks;
+
+                @RJust  = @No;
+
+e002         EndIf;
+
+             // Check for valid allow blanks entered
+b002         If  @ZrFill <> @Yes
+             And @ZrFill <> @No
+             And @ZrFill <> *Blanks;
+
+                // Set on error ind.
+                @ZrFillInd = *On;
+
+                // Set error message id
+                @3ErrMsg = 'Valid Entries are ' + @Yes + ',' + @No +
+                           ' Or blank';
+                @3ErrMsg = RtvMsgD('ERR9898': *Blanks:
+                                   @3ErrMsg: %Len(%Trim(@3ErrMsg)));
+
+                // Exit procedure
+                Return *Off;
+
+e002         EndIf;
+
+             // Check for valid allow blanks entered
+b002         If  @ZrFill = *Blanks;
+
+                @ZrFill  = @No;
+
+e002         EndIf;
+e001      EndIf;
+
+          // If program passees to here all fields are good
+          Return *On;
+
+      /end-free
+
+     PEditKeyField     e
+
+      ************************************************************************
+      *‚GetNextSequence - Get next sequence # subroutine
+      ************************************************************************
+
+     PGetNextSequence  b
+
+     DGetNextSequence  pi            +0    Like(purseq)
+
+     D  @Sequence      s             +0    Like(purseq) Inz(*Zeros)
+
+      /free
+
+          // Get Last sequence number
+          Setgt  *Hival  ritppurgl1;
+          Setgt  @3Group ritppurgl1;
+          Readpe @3Group ritppurgl1;
+b001      If Not %Eof(itppurgel1);
+             @Sequence = purseq + 10;
+x001      Else;
+             @Sequence = 10;
+e001      EndIf;
+
+          // postition cursor to next field
+          *In10 = *On;
+
+          // send sequence back to calling function
+          Return @Sequence;
+
+      /end-free
+
+     PGetNextSequence  e
+
+      ************************************************************************
+      *‚DisplaySelect - Display Select Statement
+      ************************************************************************
+
+     PDisplaySelect    b
+
+     DDisplaySelect    pi
+     D  @Frmfile                     +0    Const Like(purfrmfile)
+     D  @Frmlib                      +0    Const Like(purfrmlib)
+     D  @ToFile                      +0    Const Like(purtofile)
+     D  @KeyFld1                     +0    Const Like(purkeyfld1)
+     D  @KeyFld2                     +0    Const Like(purkeyfld2)
+     D  @KeyFld3                     +0    Const Like(purkeyfld3)
+     D  @KeyFld4                     +0    Const Like(purkeyfld4)
+     D  @AndOr2                      +0    Const Like(purandor2)
+     D  @AndOr3                      +0    Const Like(purandor3)
+     D  @AndOr4                      +0    Const Like(purandor4)
+     D  @KeyCnd1                     +0    Const Like(purkeycnd1)
+     D  @KeyCnd2                     +0    Const Like(purkeycnd2)
+     D  @KeyCnd3                     +0    Const Like(purkeycnd3)
+     D  @KeyCnd4                     +0    Const Like(purkeycnd4)
+     D  @PAlwBlk1                      n   Const
+     D  @PAlwBlk2                      n   Const
+     D  @PAlwBlk3                      n   Const
+     D  @PAlwBlk4                      n   Const
+     D  @PRJust1                       n   Const
+     D  @PRJust2                       n   Const
+     D  @PRJust3                       n   Const
+     D  @PRJust4                       n   Const
+     D  @PZrFill1                      n   Const
+     D  @PZrFill2                      n   Const
+     D  @PZrFill3                      n   Const
+     D  @PZrFill4                      n   Const
+     D  @FlSize1                     +0    Const Like(purflsize1)
+     D  @FlSize2                     +0    Const Like(purflsize2)
+     D  @FlSize3                     +0    Const Like(purflsize3)
+     D  @FlSize4                     +0    Const Like(purflsize4)
+
+     D  @SelectStmt    s            256a   Inz(*Blanks)
+     D  @FileLib       s             25a   Inz(*Blanks)
+     D  @Key1          s             +0    Like(keykeyfld1) Inz('?')
+     D  @Key2          s             +0    Like(keykeyfld2) Inz('?')
+     D  @Key3          s             +0    Like(keykeyfld3) Inz('?')
+     D  @Key4          s             +0    Like(keykeyfld4) Inz('?')
+     D  @AlwBlk1       s               n   Inz(*Off)
+     D  @AlwBlk2       s               n   Inz(*Off)
+     D  @AlwBlk3       s               n   Inz(*Off)
+     D  @AlwBlk4       s               n   Inz(*Off)
+     D  @RJust1        s               n   Inz(*Off)
+     D  @RJust2        s               n   Inz(*Off)
+     D  @RJust3        s               n   Inz(*Off)
+     D  @RJust4        s               n   Inz(*Off)
+     D  @ZrFill1       s               n   Inz(*Off)
+     D  @ZrFill2       s               n   Inz(*Off)
+     D  @ZrFill3       s               n   Inz(*Off)
+     D  @ZrFill4       s               n   Inz(*Off)
+
+      /free
+
+          @AlwBlk1 = @PAlwBlk1;
+          @AlwBlk2 = @PAlwBlk2;
+          @AlwBlk3 = @PAlwBlk3;
+          @AlwBlk4 = @PAlwBlk4;
+          @RJust1  = @PRJust1;
+          @RJust2  = @PRJust2;
+          @RJust3  = @PRJust3;
+          @RJust4  = @PRJust4;
+          @ZrFill1 = @PZrFill1;
+          @ZrFill2 = @PZrFill2;
+          @ZrFill3 = @PZrFill3;
+          @ZrFill4 = @PZrFill4;
+
+          // Convert Y/N fields into indicators 1/0
+          ConvertToInd(@KeyFld1: @KeyFld2: @KeyFld3: @KeyFld4:
+                       @AlwBlk1: @AlwBlk2: @AlwBlk3: @AlwBlk4:
+                       @RJust1:  @RJust2:  @RJust3:  @RJust4:
+                       @ZrFill1: @ZrFill2: @ZrFill3: @ZrFill4);
+
+          // Build qualified file name
+b001      If @Frmlib <> @Libl;
+             @FileLib = %Trim(@FrmLib) + '/' + %Trim(@FrmFile);
+x001      Else;
+             @FileLib = %Trim(@FrmFile);
+e001      EndIf;
+
+          // Check for multiple key fields used
+b001      If @KeyFld2 = *Blanks;
+             Clear @Key2;
+e001      EndIf;
+
+          // Check for multiple key fields used
+b001      If @KeyFld3 = *Blanks;
+             Clear @Key3;
+e001      EndIf;
+
+          // Check for allow blanks fields used
+b001      If @AlwBlk1;
+             @Key1 = '*BLANKS';
+e001      EndIf;
+
+          // Check for allow blanks fields used
+b001      If @AlwBlk2;
+             @Key2 = '*BLANKS';
+e001      EndIf;
+
+          // Check for allow blanks fields used
+b001      If @AlwBlk3;
+             @Key3 = '*BLANKS';
+e001      EndIf;
+
+          // Check for allow blanks fields used
+b001      If @AlwBlk4;
+             @Key4 = '*BLANKS';
+e001      EndIf;
+
+          // Build select statement for display
+b001      If BuildSelect(@FileLib:
+                         @KeyFld1:  @KeyFld2:  @KeyFld3: @KeyFld4:
+                                    @AndOr2:   @AndOr3:  @AndOr4:
+                         @KeyCnd1:  @KeyCnd2:  @KeyCnd3: @KeyCnd4:
+                         @AlwBlk1:  @AlwBlk2:  @AlwBlk3: @AlwBlk4:
+                         @RJust1:   @RJust2:   @RJust3:  @RJust4:
+                         @ZrFill1:  @ZrFill2:  @ZrFill3: @ZrFill4:
+                         @FlSize1:  @FlSize2:  @FlSize3: @FlSize4:
+                         @Key1:     @Key2:     @Key3:    @Key4:
+                         @SelectStmt);
+
+             // Set on display select statement
+             *In15    = *On;
+             @3Select = @SelectStmt;
+
+e001      EndIf;
+
+     PDisplaySelect    e
+
+      ************************************************************************
+      *‚SaveScreen02 - Save screen 2
+      ************************************************************************
+
+     PSaveScreen02     b
+
+     DSaveScreen02     pi              n
+     D  @ErrorId                      7a
+
+     D Keyitppurgep    ds                  likerec(ritppurgl1 : *key)
+
+      /free
+
+          // set keys
+          Keyitppurgep.purgroup = @3Group;
+          Keyitppurgep.purseq   = @3Seq;
+
+          // Get record if exists
+          Chain %Kds(Keyitppurgep) ritppurgl1;
+b001      If Not %found(itppurgel1);
+
+             // initialize all fields
+             Clear ritppurgl1;
+
+             // move screen fields to file fields
+             purgroup = @3Group;
+             purseq   = @3seq;
+
+e001      EndIf;
+
+          // move screen fields to file fields
+          purfrmfile = @3FrmFile;
+          purfrmlib  = @3FrmLib;
+          purtofile  = @3ToFile;
+          purkeyfld1 = @3KeyFld1;
+          purkeyfld2 = @3KeyFld2;
+          purkeyfld3 = @3KeyFld3;
+          purkeyfld4 = @3KeyFld4;
+          Clear purfldatr1;
+          Clear purkeycnd1;
+          Clear puralwblk1;
+          Clear purrjust1;
+          Clear purzrfill1;
+          Clear purflsize1;
+          Clear purandor2;
+          Clear purfldatr2;
+          Clear purkeycnd2;
+          Clear puralwblk2;
+          Clear purrjust2;
+          Clear purzrfill2;
+          Clear purflsize2;
+          Clear purandor3;
+          Clear purfldatr3;
+          Clear purkeycnd3;
+          Clear puralwblk3;
+          Clear purrjust3;
+          Clear purzrfill3;
+          Clear purflsize3;
+          Clear purandor4;
+          Clear purfldatr4;
+          Clear purkeycnd4;
+          Clear puralwblk4;
+          Clear purrjust4;
+          Clear purzrfill4;
+          Clear purflsize4;
+
+          // Convert Y/N fields into indicators 1/0
+          ConvertToInd(@3KeyFld1: @3KeyFld2: @3KeyFld3: @3KeyFld4:
+                       @3AlwBlk1: @3AlwBlk2: @3AlwBlk3: @3AlwBlk4:
+                       @3RJust1:  @3RJust2:  @3RJust3:  @3RJust4:
+                       @3ZrFill1: @3ZrFill2: @3ZrFill3: @3ZrFill4);
+
+          // Check for key field used
+b001      If @3KeyFld1 <> *Blanks;
+             purkeycnd1 = @3KeyCnd1;
+             puralwblk1 = @3AlwBlk1;
+             purfldatr1 = @3FldAtr1;
+             purflsize1 = @3FlSize1;
+             purrjust1  = @3RJust1;
+             purzrfill1 = @3ZrFill1;
+e001      EndIf;
+
+          // Check for key field used
+b001      If @3KeyFld2 <> *Blanks;
+             purandor2  = @3AndOr2;
+             purkeycnd2 = @3KeyCnd2;
+             puralwblk2 = @3AlwBlk2;
+             purfldatr2 = @3FldAtr2;
+             purflsize2 = @3FlSize2;
+             purrjust2  = @3RJust2;
+             purzrfill2 = @3ZrFill2;
+e001      EndIf;
+
+          // Check for key field used
+b001      If @3KeyFld3 <> *Blanks;
+             purandor3  = @3AndOr3;
+             purkeycnd3 = @3KeyCnd3;
+             puralwblk3 = @3AlwBlk3;
+             purfldatr3 = @3FldAtr3;
+             purflsize3 = @3FlSize3;
+             purrjust3  = @3RJust3;
+             purzrfill3 = @3ZrFill3;
+e001      EndIf;
+
+          // Check for key field used
+b001      If @3KeyFld4 <> *Blanks;
+             purandor4  = @3AndOr4;
+             purkeycnd4 = @3KeyCnd4;
+             puralwblk4 = @3AlwBlk4;
+             purfldatr4 = @3FldAtr4;
+             purflsize4 = @3FlSize4;
+             purrjust4  = @3RJust4;
+             purzrfill4 = @3ZrFill4;
+e001      EndIf;
+
+          // Get record if exists
+b001      If Not %found(itppurgel1);
+
+             // initiialize status code
+             purstatus = *Off;
+
+             // update history fields
+             purcrtusr = QUser;
+             purcrtpgm = QProg;
+             purcrtms  = GetTimeStamp();
+
+             // Write new record
+             Write ritppurgl1;
+
+             // Send back message id
+             @ErrorId = 'ERR0126';
+
+             @RecordAdded = *On;
+
+x001      Else;
+
+             // update history fields
+             purlstusr = QUser;
+             purlstpgm = QProg;
+             purlstms  = GetTimeStamp();
+
+             // Update record
+             Update ritppurgl1;
+
+             // Send back message id
+             @ErrorId = 'ERR0127';
+
+e001      EndIf;
+
+          // If program passees to here all fields are good
+          Return *On;
+
+      /end-free
+
+     PSaveScreen02     e
+
+      ************************************************************************
+      *‚ConvertToInd - Convert Y/N fields To 1/0 Indicators
+      ************************************************************************
+
+     PConvertToInd     b
+
+     DConvertToInd     pi
+     D  @KeyFld1                     +0    Const Like(purkeyfld1)
+     D  @KeyFld2                     +0    Const Like(purkeyfld2)
+     D  @KeyFld3                     +0    Const Like(purkeyfld3)
+     D  @KeyFld4                     +0    Const Like(purkeyfld4)
+     D  @AlwBlk1                      1a
+     D  @AlwBlk2                      1a
+     D  @AlwBlk3                      1a
+     D  @AlwBlk4                      1a
+     D  @RJust1                       1a
+     D  @RJust2                       1a
+     D  @RJust3                       1a
+     D  @RJust4                       1a
+     D  @ZrFill1                      1a
+     D  @ZrFill2                      1a
+     D  @ZrFill3                      1a
+     D  @ZrFill4                      1a
+
+      /free
+
+          // Check for key field used
+b001      If @KeyFld1 <> *Blanks;
+b002         If @AlwBlk1 = @Yes;
+                @AlwBlk1 = *On;
+x002         Else;
+                @AlwBlk1 =*Off;
+e002         EndIf;
+             // Check for char field
+b002         If *In11;
+                // Check Justify field used
+b003            If @RJust1 <> *Blanks;
+                   // Set justify field
+b004               If @RJust1 = @Yes;
+                      @RJust1 = *On;
+x004               Else;
+                      @RJust1  = *Off;
+e004               EndIf;
+e003            EndIf;
+                // Check Zeros fill field used
+b003            If @ZrFill1 <> *Blanks;
+                   // Set Zeros fill field
+b004               If @ZrFill1 = @Yes;
+                      @ZrFill1 = *On;
+x004               Else;
+                      @ZrFill1 = *Off;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          // Check for key field used
+b001      If @KeyFld2 <> *Blanks;
+b002         If @AlwBlk2 = @Yes;
+                @AlwBlk2 = *On;
+x002         Else;
+                @AlwBlk2 =*Off;
+e002         EndIf;
+             // Check for char field
+b002         If *In12;
+                // Check Justify field used
+b003            If @RJust2 <> *Blanks;
+                   // Set justify field
+b004               If @RJust2 = @Yes;
+                      @RJust2 = *On;
+x004               Else;
+                      @RJust2  = *Off;
+e004               EndIf;
+e003            EndIf;
+                // Check Zeros fill field used
+b003            If @ZrFill2 <> *Blanks;
+                   // Set Zeros fill field
+b004               If @ZrFill2 = @Yes;
+                      @ZrFill2 = *On;
+x004               Else;
+                      @ZrFill2 = *Off;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          // Check for key field used
+b001      If @KeyFld3 <> *Blanks;
+b002         If @AlwBlk3 = @Yes;
+                @AlwBlk3 = *On;
+x002         Else;
+                @AlwBlk3 =*Off;
+e002         EndIf;
+             // Check for char field
+b002         If *In13;
+                // Check Justify field used
+b003            If @RJust3 <> *Blanks;
+                   // Set justify field
+b004               If @RJust3 = @Yes;
+                      @RJust3 = *On;
+x004               Else;
+                      @RJust3  = *Off;
+e004               EndIf;
+e003            EndIf;
+                // Check Zeros fill field used
+b003            If @ZrFill3 <> *Blanks;
+                   // Set Zeros fill field
+b004               If @ZrFill3 = @Yes;
+                      @ZrFill3 = *On;
+x004               Else;
+                      @ZrFill3 = *Off;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          // Check for key field used
+b001      If @KeyFld4 <> *Blanks;
+b002         If @AlwBlk4 = @Yes;
+                @AlwBlk4 = *On;
+x002         Else;
+                @AlwBlk4 =*Off;
+e002         EndIf;
+             // Check for char field
+b002         If *In14;
+                // Check Justify field used
+b003            If @RJust4 <> *Blanks;
+                   // Set justify field
+b004               If @RJust4 = @Yes;
+                      @RJust4 = *On;
+x004               Else;
+                      @RJust4  = *Off;
+e004               EndIf;
+e003            EndIf;
+                // Check Zeros fill field used
+b003            If @ZrFill4 <> *Blanks;
+                   // Set Zeros fill field
+b004               If @ZrFill4 = @Yes;
+                      @ZrFill4 = *On;
+x004               Else;
+                      @ZrFill4 = *Off;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+      /end-free
+
+     PConvertToInd     e
+
+      ************************************************************************
+      *‚DeleteScreen02 - Delete screen 1
+      ************************************************************************
+
+     PDeleteScreen02   b
+
+     DDeleteScreen02   pi              n
+     D  @ErrorId                      7a
+
+     D Keyitppurgep    ds                  likerec(ritppurgl1 : *key)
+
+      /free
+
+          // set keys
+          Keyitppurgep.purgroup = @3Group;
+          Keyitppurgep.purseq   = @3Seq;
+
+          // Get record if exists
+          Chain %Kds(Keyitppurgep) ritppurgl1;
+b001      If %found(itppurgel1);
+
+             // Write new record
+             Delete ritppurgl1;
+
+             // Send back message id
+             @ErrorId = 'ERR0128';
+
+             // If program passes  to here all fields are good
+             Return *On;
+
+e001      EndIf;
+
+          // If program passes record not found
+          Return *Off;
+
+      /end-free
+
+     PDeleteScreen02   e
+
+      ****************************************************************
+      *‚DisplayITPurgeFile
+      ****************************************************************
+
+     PDisplayITPurge...
+     PFile             b
+
+     DDisplayITPurge...
+     DFile             pi              n
+     D  @PGroup                      +0    Like(purgroup) Const
+     D  @PSeq                        +0    Like(purseq)
+
+     C/free
+
+          // Initialize Subfile
+b001      If InitializeSubfileWindow02(@PGroup: @PSeq);
+
+             // Fill first page in subfile
+b002         If FillSubfileWindow02(@PGroup);
+e002         EndIf;
+
+             // Do until Command key 3 or 12 is pressed or message id selected
+b002         Dow DisplaySubfileWindow02(@PGroup);
+
+                // Read subfile
+b002            If  *In01
+                And ReadSubfileWindow02(@PGroup: @PSeq);
+
+                   Return *On;
+
+e003            EndIf;
+e002         EndDo;
+e001      EndIf;
+
+          *Inkc = *Off;
+          *Inkl = *Off;
+
+          Return *Off;
+
+      /end-free
+
+     PDisplayITPurge...
+     PFile             e
+
+      ****************************************************************
+      *‚InitializeSubfileWindow
+      ****************************************************************
+
+     PInitializeSubfile...
+     PWindow02         b
+
+     DInitializeSubfile...
+     DWindow02         pi              n
+     D  @PGroup                      +0    Like(purgroup) Const
+     D  @PSeq                        +0    Like(purseq)
+
+     D Keyitppurgep    ds                  likerec(ritppurgl1 : *key)
+
+     C/free
+
+          // initialize subfile
+          Reset @Rrn2;
+          *In01 = *Off;
+          *In02 = *Off;
+          *In03 = *Off;
+          *In04 = *Off;
+          Write Sflc02;
+          *In02 = *On;
+
+          // set keys
+          Keyitppurgep.purgroup = @PGroup;
+          Keyitppurgep.purseq   = @PSeq;
+
+          // set to beginning of file
+          Setll    *Loval             ritppurgl1;
+          Setll    %Kds(Keyitppurgep) ritppurgl1;
+
+          Reade(n) @PGroup            ritppurgl1;
+
+          Return *On;
+
+      /end-free
+
+     PInitializeSubfile...
+     PWindow02         e
+
+      ****************************************************************
+      *‚FillSubfileWindow
+      ****************************************************************
+
+     PFillSubfile...
+     PWindow02         b
+
+     DFillSubfile...
+     DWindow02         pi              n
+     D  @PGroup                      +0    Like(purgroup) Const
+
+     D  @rrn           s                   Like(dsprrn) Inz(*Zeros)
+
+     C/free
+
+          // Check for record found
+b001      Dow Not %Eof(itppurgel1);
+
+             // set screen fields
+             @4Sel      = *Blanks;
+             @4Group    = purgroup;
+             @4Seq      = purseq;
+             @4FrmFile  = purfrmfile;
+             @4FrmLib   = purfrmlib;
+b001         If purfrmlib <> *Blanks;
+                @4FrmFiled = %Trim(purfrmlib) + '/' + %Trim(purfrmfile);
+x001         Else;
+                @4FrmFiled = %Trim(purfrmfile);
+e001         EndIf;
+             @4ToFile   = purTofile;
+
+             // incriment relative record number
+             *In01 = *On;
+             @rrn  += 1;
+             @rrn2 += 1;
+
+             // Write subfile record
+             Write Sfld02;
+
+             // read next vendor chargeback record
+             Reade(n) @PGroup ritppurgl1;
+
+             // Check for full page
+b002         If @rrn >= @FullPage;
+
+                Leave;
+
+e002         EndIf;
+
+e001      EndDo;
+
+          // Check for not end of file
+b001      If Not %Eof(itppurgel1);
+
+             dsprrn = @Rrn2 - @FullPage + 1;
+
+x001      Else;
+
+             dsprrn = @Rrn2;
+             *In03 = *On;
+
+e001      EndIf;
+
+          Return *On;
+
+      /end-free
+
+     PFillSubfile...
+     PWindow02         e
+
+      ****************************************************************
+      *‚InitializeSubfileWindow
+      ****************************************************************
+
+     PDisplaySubfile...
+     PWindow02         b
+
+     DDisplaySubfile...
+     DWindow02         pi              n
+     D  @PGroup                      +0    Like(purgroup) Const
+
+     C/free
+
+          // Display error window
+          Write wsf02;
+          Write sflh02;
+          Exfmt sflc02;
+
+          // Check for roll key pressed
+b001      Dow *in04;
+
+             // Fill first page in subfile
+b002         If FillSubfileWindow02(@PGroup);
+e002         EndIf;
+
+             // Display error window
+             Write wsf02;
+             Write sflh02;
+             Exfmt sflc02;
+
+e001      EndDo;
+
+          // Check for command 3 or 12 pressed
+b001      If *inkc
+          Or *inkl;
+
+             Return *Off;
+
+x001      Else;
+
+             Return *On;
+
+e001      EndIf;
+
+      /end-free
+
+     PDisplaySubfile...
+     PWindow02         e
+
+      ****************************************************************
+      *‚ReadSubfileWindow
+      ****************************************************************
+
+     PReadSubfile...
+     PWindow02         b
+
+     DReadSubfile...
+     DWindow02         pi              n
+     D  @PGroup                      +0    Like(purgroup) Const
+     D  @PSeq                        +0    Like(purseq)
+
+     D Keyitppurgep    ds                  likerec(ritppurgl1 : *key)
+
+     C/free
+
+          // set file pointer to beof
+          @rrn1 = 1;
+          *In20 = *Off;
+          Clear @PSeq;
+
+          // Read till end of file
+          readc Sfld02;
+b001      Dow not %Eof(itpprgupdd);
+
+             *In21 = *Off;
+
+             // check for selection made
+b002         If @4Sel = '1';
+
+                @PSeq   = @4Seq;
+
+                // set keys
+                Keyitppurgep.purgroup = @PGroup;
+                Keyitppurgep.purseq   = @PSeq;
+
+                // Get record if exists
+                Chain(n) %Kds(Keyitppurgep) ritppurgl1;
+
+                // Initialize Screen 2 subroutine
+                InitializeScreen02();
+
+                // setup screen fields
+                FillScreen02();
+
+                Return *On;
+
+x002         Else;
+
+                // don't set error ind if blanks
+b003            If @4Sel <> *Blanks;
+
+                   *In20 = *On;
+                   *In21 = *On;
+                   @ErrorMsg2 = RtvMsgD('OSR0714');
+
+e003            EndIf;
+e002         EndIf;
+
+             // Update subfile with errors if occured
+             Update Sfld02;
+
+             // Read till end of file
+             readc Sfld02;
+
+e001      EndDo;
+
+          Return *Off;
+
+      /end-free
+
+     PReadSubfile...
+     PWindow02         e
+
+      ************************************************************************
+      *‚ValidKeyCondition - Validate Key Condition field
+      ************************************************************************
+
+     PValidKey...
+     PCondition        b
+
+     DValidKey...
+     DCondition        pi              n
+     D  @PKeyCond                    +0    Like(purkeycnd1)
+
+     D  @a             s              3p 0 Inz(*Zeros)
+
+      /free
+
+          // Check array for valid key condition
+          @a = %LookUp(@PKeyCond: @Cond);
+
+          // Check for condition found
+b001      If @a > *Zeros;
+             @PKeyCond = @ToCond(@a);
+             Return *On;
+x001      Else;
+             Return *Off;
+e001      EndIf;
+
+      /end-free
+
+     PValidKey...
+     PCondition        e
+
+**
+= =
+<><>
+> >
+< <
+>=>=
+<=<=
+EQ=
+NE<>
+GT>
+LT<
+GE>=
+LE<=

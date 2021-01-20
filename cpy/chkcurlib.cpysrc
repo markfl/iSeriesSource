@@ -1,0 +1,15 @@
+
+             DLTF       FILE(QTEMP/QCURLIBL)
+             MONMSG     MSGID(CPF0000)
+
+             CRTPF      FILE(QTEMP/QCURLIBL) +
+                          SRCFILE(&CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST) SIZE(*NOMAX)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(QCURLIBL) TOFILE(QTEMP/QCURLIBL)
+
+             CALL       PGM(CURLIBLR)
+
+             DLTOVR     FILE(QCURLIBL)
+

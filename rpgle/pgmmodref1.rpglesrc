@@ -1,0 +1,163 @@
+          Ctl-opt DftActGrp(*No) Option(*NoDebugio);
+
+     Fspoolfile ip   f  198        Disk
+
+      /copy qcpysrc,pgmmodreff
+
+          Dcl-f qpgmmodref Usage(*Input:*Output);
+          Dcl-f qdspobjdl3 Usage(*Input) Keyed Prefix(@_);
+
+          Dcl-Pi pgmmodref1;
+             @PProgram  Like(object);
+             @PLibrary  Like(library);
+             @PAttr     Like(ModAttr);
+          End-Pi;
+
+     D @statusDs      sds
+     D  @_proc           *Proc
+
+          Dcl-Ds @KeyDs      likerec(qlidobjd : *key);
+          Dcl-c @pgmcheck     Const('Program  . . . . . . . :');
+          Dcl-c @pgmattrcheck Const('Program attribute  . . :');
+          Dcl-c @detailcheck  Const('Detail . . . . . . . . :');
+          Dcl-c @modulecheck  Const('Module         Library  ');
+          Dcl-c @srvpgmcheck  Const('Program        Library  ');
+          Dcl-c @pagecheck    Const('Page');
+          Dcl-s @pgmFound     Ind                Inz(*Off);
+          Dcl-s @attrFound    Ind                Inz(*Off);
+          Dcl-s @detailFound  Ind                Inz(*Off);
+          Dcl-s @moduleFound  Ind                Inz(*Off);
+          Dcl-s @srvpgmFound  Ind                Inz(*Off);
+          Dcl-s @spoolfiledta Like(spoolfiledta) Inz(*Blanks);
+
+      /copy qcpysrc,pgmmodrefd
+
+      /define mflores059
+      /copy qcpysrc,mflores
+      /undefine mflores059
+
+     Ispoolfile ns
+     I                                  1  198  spoolfiledta
+     I                                  2   25  @Check1
+     I                                 29   38  @PGMAttr
+     I                                 96  105  @PGMLib
+     I                                  2   11  @ModuleName
+     I                                 17   26  @ModuleLib
+     I                                 32   40  @ModuleAttr
+     I                                 47   56  @ModuleDate
+     I                                 47   78  @ModuleSig
+     I                                121  124  @Page
+
+          @spoolfiledta = spoolfiledta;
+b001      If @Page = @pagecheck;
+             Reset @moduleFound;
+             Reset @srvpgmFound;
+             Reset @detailFound;
+e001      EndIf;
+
+b001      If  Not @pgmFound
+          And @Check1  = @pgmcheck;
+             object    = @PGMAttr;
+             library   = @PGMLib;
+             @pgmFound = *On;
+e001      EndIf;
+
+b001      If  Not @attrFound
+          And @Check1 = @pgmattrcheck;
+             pgmattr    = @PGMAttr;
+             @attrFound = *On;
+e001      EndIf;
+
+b001      If  Not @detailFound
+          And @Check1 = @detailcheck;
+b002         If @PGMAttr = '*MODULE';
+                @moduleFound = *On;
+e002         EndIf;
+b002         If @PGMAttr = '*SRVPGM';
+                @srvpgmFound = *On;
+e002         EndIf;
+e001      EndIf;
+
+b001      If @DetailFound
+          And @ModuleName <> *Blanks
+          And @ModuleLib  <> *Blanks
+          And @ModuleLib  <> 'QSYS'
+       // And @ModuleLib  <> 'QTEMP'
+          And @ModuleAttr <> *Blanks
+          And @ModuleDate <> *Blanks;
+
+             @KeyDs.@_odobnm = @ModuleName;
+             @KeyDs.@_odobtp = @PAttr;
+             @KeyDs.@_odlbnm = @ModuleLib;
+
+b002         If  @ModuleLib <> '*LIBL'
+             And @ModuleLib <> 'QTEMP';
+                Chain %Kds(@KeyDs) qlidobjd;
+b003            If %Found(qdspobjdl3);
+                   modlib  = @_odlbnm;
+                   odobtx  = @_odobtx;
+                   odsrcf  = @_odsrcf;
+                   odsrcl  = @_odsrcl;
+                   odsrcm  = @_odsrcm;
+e003            EndIf;
+x002         Else;
+                @KeyDs.@_odlbnm = library;
+                Chain %Kds(@KeyDs) qlidobjd;
+b003            If %Found(qdspobjdl3);
+                   modlib  = @_odlbnm;
+                   odobtx  = @_odobtx;
+                   odsrcf  = @_odsrcf;
+                   odsrcl  = @_odsrcl;
+                   odsrcm  = @_odsrcm;
+x003            Else;
+                   Chain %Kds(@KeyDs:2) qlidobjd;
+b004               If %Found(qdspobjdl3);
+                      odobtx  = @_odobtx;
+                      modlib  = @_odlbnm;
+                      odsrcf  = @_odsrcf;
+                      odsrcl  = @_odsrcl;
+                      odsrcm  = @_odsrcm;
+                      crtdate = %Date(@_odcdat:*mdy0);
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+b002      // If @srvpgmFound;
+          //    @KeyDs.@_odobtp = '*SRVPGM';
+          //    Chain %Kds(@KeyDs) qlidobjd;
+b003      //    If %Found(qdspobjdl3);
+          //       odobtx  = @_odobtx;
+e003      //    EndIf;
+e002      // EndIf;
+
+             objattr = '*PGM';
+             module  = @ModuleName;
+             //modlib  = @ModuleLib;
+b002         If @moduleFound;
+                modattr = '*MODULE';
+                crtdate = %Date(@ModuleDate:*mdy);
+e002         EndIf;
+b002         If @srvpgmFound;
+                modattr = '*SRVPGM';
+                signature = @modulesig;
+e002         EndIf;
+             pgmproc = @_proc;
+
+b002         If  modattr = '*MODULE';
+
+      /copy qcpysrc,pgmmodrefc
+
+x002         Else;
+
+                Write rpgmmodref;
+
+e002         EndIf;
+e001      EndIf;
+
+b001      If  Not @detailFound
+          And @Check1 = @modulecheck
+          Or  Not @detailFound
+          And @Check1 = @srvpgmcheck;
+
+             @detailFound = *On;
+
+e001      EndIf;

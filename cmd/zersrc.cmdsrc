@@ -1,0 +1,14 @@
+             CMD        PROMPT('Zero Source Date')
+
+             PARM       KWD(FILE) TYPE(FILE) PROMPT('File')
+ FILE:       QUAL       TYPE(*NAME) DFT(QRPGLESRC)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(MEMBER) TYPE(*NAME) DFT(*FIRST) +
+                          SPCVAL((*FIRST)) PROMPT('Member')
+
+             PARM       KWD(UNTAGONLY) TYPE(*CHAR) LEN(4) RSTD(*YES) +
+                          DFT(*NO) SPCVAL((*YES '1') (*NO '0')) +
+                          PROMPT('Untagged Only')

@@ -1,0 +1,26 @@
+             PGM        PARM(&FILE &MEMBER)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&TOFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&TOFILE) VALUE(%SST(&FILE 1 10))
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&FILE 11 10))
+
+             CHKOBJ     OBJ(&LIBRARY/&TOFILE) OBJTYPE(*FILE) +
+                          MBR(&MEMBER)
+
+             OVRDBF     FILE(QRPGLESRC) TOFILE(&LIBRARY/&TOFILE) +
+                          MBR(&MEMBER) LVLCHK(*NO)
+
+             CALL       PGM(CLRCODSRCR)
+
+             DLTOVR     FILE(*ALL)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

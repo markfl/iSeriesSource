@@ -1,0 +1,31 @@
+             PGM
+
+             DCLF       FILE(ITPPURGEP)
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+             DOWHILE    COND(&MSGID *NE CPF0864)
+
+             CHKOBJ     OBJ(*CURLIB/&PURFRMFILE) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+
+             CRTDUPOBJ  OBJ(&PURFRMFILE) FROMLIB(&PURFRMLIB) +
+                          OBJTYPE(*FILE) TOLIB(*CURLIB) CST(*NO) +
+                          TRG(*NO)
+
+             ENDDO
+
+             CPYF       FROMFILE(&PURFRMLIB/&PURFRMFILE) +
+                          TOFILE(*CURLIB/&PURFRMFILE) MBROPT(*REPLACE)
+             MONMSG     MSGID(CPF0000)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+             ENDDO
+
+ END:        ENDPGM

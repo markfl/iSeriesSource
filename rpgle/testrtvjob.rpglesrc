@@ -1,0 +1,35 @@
+     H DftActGrp(*No) BndDir('MFLORES')
+
+     Dtestrtvjob       pi
+     D  @PJob                        10a
+     D  @PUser                       10a   Options(*NoPass)
+     D  @PJobNbr                      6a   Options(*NoPass)
+     D  @PFormat                     10a   Options(*NoPass)
+
+      /define mflores006
+      /copy qcpysrc,mflores
+
+      /free
+
+b001      Select;
+
+x001         When %Parms = 4;
+
+b002            If RetrieveJobInformation(@PJob: @PUser: @PJobNbr: @PFormat);
+e002            EndIf;
+
+x001         When %Parms = 3;
+
+b002            If RetrieveJobInformation(@PJob: @PUser: @PJobNbr);
+e002            EndIf;
+
+x001         When %Parms < 3;
+
+b002            If RetrieveJobInformation(@PJob);
+e002            EndIf;
+e001      EndSl;
+
+          *InLr = *On;
+          Return;
+
+      /end-free

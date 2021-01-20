@@ -1,0 +1,71 @@
+             PGM        PARM(&OBJ &OBJTYPE)
+
+             DCL        VAR(&OBJ) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OBJTYPE) TYPE(*CHAR) LEN(6)
+
+             DCL        VAR(&OBJECT) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&SRCF) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SRCFLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SRCMBR) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&OBJECT) VALUE(%SST(&OBJ 1 10))
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&OBJ 11 10))
+
+             SELECT
+
+             WHEN       COND(&OBJTYPE = *FIRST) THEN(DO)
+             RTVOBJD    OBJ(&LIBRARY/&OBJECT) OBJTYPE(*FILE) +
+                          SRCF(&SRCF) SRCFLIB(&SRCFLIB) SRCMBR(&SRCMBR)
+             MONMSG     MSGID(CPF9812) EXEC(DO)
+             RTVOBJD    OBJ(&LIBRARY/&OBJECT) OBJTYPE(*MODULE) +
+                          SRCF(&SRCF) SRCFLIB(&SRCFLIB) SRCMBR(&SRCMBR)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             RTVOBJD    OBJ(&LIBRARY/&OBJECT) OBJTYPE(*PGM) +
+                          SRCF(&SRCF) SRCFLIB(&SRCFLIB) SRCMBR(&SRCMBR)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             RTVOBJD    OBJ(&LIBRARY/&OBJECT) OBJTYPE(*CMD) +
+                          SRCF(&SRCF) SRCFLIB(&SRCFLIB) SRCMBR(&SRCMBR)
+             MONMSG     MSGID(CPF9801) EXEC(GOTO CMDLBL(DIAG))
+             ENDDO
+             ENDDO
+             ENDDO
+             ENDDO
+
+             WHEN       COND(&OBJTYPE = *FILE) THEN(DO)
+             RTVOBJD    OBJ(&LIBRARY/&OBJECT) OBJTYPE(*FILE) +
+                          SRCF(&SRCF) SRCFLIB(&SRCFLIB) SRCMBR(&SRCMBR)
+             MONMSG     MSGID(CPF9812) EXEC(GOTO CMDLBL(DIAG))
+             ENDDO
+
+             WHEN       COND(&OBJTYPE = *PGM) THEN(DO)
+             RTVOBJD    OBJ(&LIBRARY/&OBJECT) OBJTYPE(*MODULE) +
+                          SRCF(&SRCF) SRCFLIB(&SRCFLIB) SRCMBR(&SRCMBR)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             RTVOBJD    OBJ(&LIBRARY/&OBJECT) OBJTYPE(*PGM) +
+                          SRCF(&SRCF) SRCFLIB(&SRCFLIB) SRCMBR(&SRCMBR)
+             MONMSG     MSGID(CPF9801) EXEC(GOTO CMDLBL(DIAG))
+             ENDDO
+             ENDDO
+
+             WHEN       COND(&OBJTYPE = *CMD) THEN(DO)
+             RTVOBJD    OBJ(&LIBRARY/&OBJECT) OBJTYPE(*CMD) +
+                          SRCF(&SRCF) SRCFLIB(&SRCFLIB) SRCMBR(&SRCMBR)
+             MONMSG     MSGID(CPF9801) EXEC(GOTO CMDLBL(DIAG))
+             ENDDO
+
+             ENDSELECT
+
+             RMVMSG     CLEAR(*ALL)
+
+             IF         COND(&SRCMBR *NE ' ') THEN(DO)
+             EDTSRC     SRCFILE(&SRCFLIB/&SRCF) SRCMBR(&SRCMBR) +
+                          OPTION(*DSP)
+             ENDDO
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

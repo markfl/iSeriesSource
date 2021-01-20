@@ -1,0 +1,91 @@
+          Ctl-opt Option(*NoDebugio);
+      *****************************************************************
+      *   Program to retrieve last 10 entries in the call            **
+      *   stack excluding the current program                        **
+      *                                                              **
+      *   This program accepts three parameters.                     **
+      *   Stack (Array of 10 x 10) entries                           **
+      *   Relative starting position (3,0 P)                         **
+      *   No of Entries to return.                                   **
+      *                                                              **
+      *****************************************************************
+      *Data Definitions
+      *****************************************************************
+
+      * Call Stack
+          Dcl-Ds DSStack;
+             @Stack Char(10) Dim(10);
+          End-Ds;
+
+      * Stack counter
+     D  #PCounter      s              9b 0
+
+      * Wait time on receive message
+     D  #PWait         s              9b 0
+
+      * Type Definition for the RCVM0200 format.
+     D RCVM0200        DS
+     D  RCVPgm               111    120
+     D RCVM0200Len     s              9b 0 Inz(%Size(RCVM0200))
+
+      *****
+      * API Error Data structure
+     D DSERR           DS           256
+     D  ERBYTP                 1      4B 0 INZ(256)
+     D  ERBYTA                 5      8B 0
+     D  ERMSID                 9     15
+     D  ERMSDT                17    256
+
+          // Entry parameters
+          Dcl-Pi rtvcllstk;
+             PStack      Char(100);
+             PStartPoint Packed(3:0);
+             PEntries    Packed(3:0);
+          End-Pi;
+
+          Clear DSStack;
+          Clear PStack;
+          PEntries = *Zeros;
+     C                   Z-Add     PStartPoint   StartPoint        3 0
+          If StartPoint < 1;
+     C                   Z-Add     1             StartPoint
+     C                   EndIf
+     C                   Z-Add     *Zero         S                 3 0
+      * Loop around for maximum of 10 entries
+     C     S             DOUEQ     10
+     C     ERBYTA        ORGT      *ZERO
+     C                   Add       1             S
+     C     StartPoint    Add       S             #PCounter
+      * Send A message to specified queue
+     C                   Call      'QMHSNDPM'
+     C                   Parm                    #PMsId            7
+     C                   Parm                    #PMsgf           20
+     C                   Parm      'SLIC'        #PMSDT            4
+     C                   Parm      X'00000004'   #PLen             4
+     C                   Parm      '*INFO'       #PType           10
+     C                   Parm      '*'           #PMSGQ           10
+     C                   Parm                    #PCounter
+     C                   Parm                    #PKey             4
+     C                   Parm                    DSERR
+      * Receive the message
+     C                   Call      'QMHRCVPM'
+     C                   Parm                    RCVM0200
+     C                   Parm                    RCVM0200Len
+     C                   Parm      'RCVM0200'    #PFormat          8
+     C                   Parm      '*'           #PMSGQ
+     C                   Parm      *ZERO         #PCounter
+     C                   Parm      '*ANY      '  #PType
+     C                   Parm                    #PKey
+     C                   Parm      *Zero         #PWait
+     C                   Parm      '*REMOVE'     #PAction         10
+     C                   Parm                    DSERR
+      * If no error, return stack entry
+     C     ERBYTA        IFeq      *ZERO
+     C                   MOVE      RCVPgm        @Stack(S)
+     C                   EndIf
+     C                   ENDDO
+      * Put data structure back into parameter and
+      * return no of entries processed
+     C                   Move      DSSTack       PStack
+     C     S             Sub       1             PEntries
+     C                   RETURN

@@ -1,0 +1,44 @@
+             CMD        PROMPT('Build Find File Usage')
+
+             PARM       KWD(FILE) TYPE(FILE) PROMPT('File')
+ FILE:       QUAL       TYPE(*GENERIC) DFT(*ALL) SPCVAL((*ALL))
+             QUAL       TYPE(*NAME) DFT(*ALLUSR) SPCVAL((*USRLIBL) +
+                          (*CURLIB) (*ALLUSR)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(OBJLIB) TYPE(*NAME) DFT(*ALL) +
+                          SPCVAL((*CURLIB) (*ALL)) PROMPT('Object +
+                          Library')
+
+             PARM       KWD(DSPFD) TYPE(DSPFD) DFT(*DFT) +
+                          SNGVAL((*DFT 'QDSPFDBAS *CURLIB')) +
+                          PROMPT('Display PGM File Ref File')
+ DSPFD:      QUAL       TYPE(*NAME)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(DSPPGMREF) TYPE(DSPPGMREF) DFT(*DFT) +
+                          SNGVAL((*DFT 'QDSPPGMREF*CURLIB') (*NEW)) +
+                          PROMPT('Display Program Field Ref File')
+ DSPPGMREF:  QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(FNDFILUSG) TYPE(FNDFILUSG) DFT(*DFT) +
+                          SNGVAL((*DFT 'QFNDFILUSG*CURLIB') (*NEW)) +
+                          PROMPT('Find File Usage File')
+ FNDFILUSG:  QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(OUTMBR) TYPE(OUTMBR) SNGVAL((*NEW)) +
+                          PROMPT('Output member options:')
+ OUTMBR:     ELEM       TYPE(*NAME) DFT(*FIRST) SPCVAL((*FIRST) +
+                          (*FILE)) PROMPT('Member to receive output')
+             ELEM       TYPE(*CHAR) LEN(8) RSTD(*YES) DFT(*ADD) +
+                          VALUES(*REPLACE *ADD) CHOICE(*NONE) +
+                          PROMPT('Replace or add records')
+

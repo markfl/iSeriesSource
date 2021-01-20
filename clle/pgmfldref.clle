@@ -1,0 +1,454 @@
+             PGM        PARM(&FRMOBJLIB &SRCFILE &MBR &OUTFILELIB +
+                          &OUTMBRRPL)
+
+             DCLPRCOPT  DFTACTGRP(*NO) ACTGRP(*NEW) BNDDIR(MFLORES)
+
+             DCL        VAR(&FRMOBJLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SRCFILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&MBR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTFILELIB) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OUTMBRRPL) TYPE(*CHAR) LEN(20)
+
+             DCL        VAR(&SRCF) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SRCFLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SRCTYPE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTLIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTMBR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&ADDRPL) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&PGMLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&NBRCURRCD) TYPE(*DEC) LEN(10 0)
+             DCL        VAR(&OBSOLETE) TYPE(*LGL)
+             DCL        VAR(&DEFAULT) TYPE(*LGL)
+
+             DCLF       FILE(QAFDMBRL)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             RTVOBJD    OBJ(&CURLIB/PGMFLDREF) OBJTYPE(*PGM) +
+                          RTNLIB(&PGMLIB)
+
+/* SETENVLIBL ENV(&FRMOBJLIB) */
+
+             CHGVAR     VAR(&SRCF) VALUE(%SST(&SRCFILE 1 10))
+             CHGVAR     VAR(&SRCFLIB) VALUE(%SST(&SRCFILE 11 10))
+             CHGVAR     VAR(&OUTFILE) VALUE(%SST(&OUTFILELIB 1 10))
+             CHGVAR     VAR(&OUTLIBRARY) VALUE(%SST(&OUTFILELIB 11 10))
+             CHGVAR     VAR(&OUTMBR) VALUE(%SST(&OUTMBRRPL 3 10))
+             CHGVAR     VAR(&ADDRPL) VALUE(%SST(&OUTMBRRPL 13 8))
+
+/* b01 */    IF         COND(&OUTLIBRARY = *CURLIB) THEN(DO)
+             CHGVAR     VAR(&OUTLIBRARY) VALUE(&CURLIB)
+             IF         COND(&OUTFILE *EQ QPGMFLDREF) THEN(CHGVAR +
+                          VAR(&DEFAULT) VALUE('1'))
+/* e01 */    ENDDO
+
+             DLTF       FILE(QTEMP/QAFDMBRL)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPFFDQ1)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPFFDQ2)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPFFDQ3)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPFFDQ4)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPFFDQ)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QPGMFLDREF)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/SPOOLFILE)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QPGMMODRL2)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QPGMMODREF)
+             MONMSG     MSGID(CPF0000)
+
+             CRTPF      FILE(QTEMP/QADSPFFDQ) +
+                          SRCFILE(&CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST) SIZE(*NOMAX)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(QTEMP/QADSPFFDQ1) +
+                          SRCFILE(&PGMLIB/QDDSSRC) +
+                          DTAMBRS((QTEMP/QADSPFFDQ (QADSPFFDQ))) +
+                          OPTION(*NOSRC *NOLIST)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(QTEMP/QADSPFFDQ2) +
+                          SRCFILE(&PGMLIB/QDDSSRC) +
+                          DTAMBRS((QTEMP/QADSPFFDQ (QADSPFFDQ))) +
+                          OPTION(*NOSRC *NOLIST)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(QTEMP/QADSPFFDQ3) +
+                          SRCFILE(&PGMLIB/QDDSSRC) +
+                          DTAMBRS((QTEMP/QADSPFFDQ (QADSPFFDQ))) +
+                          OPTION(*NOSRC *NOLIST)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(QTEMP/QADSPFFDQ4) +
+                          SRCFILE(&PGMLIB/QDDSSRC) +
+                          DTAMBRS((QTEMP/QADSPFFDQ (QADSPFFDQ))) +
+                          OPTION(*NOSRC *NOLIST)
+             MONMSG     MSGID(CPF0000)
+
+             CRTPF      FILE(QTEMP/QPGMMODREF) +
+                          SRCFILE(&CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST) SIZE(*NOMAX)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(QTEMP/QPGMMODRL2) +
+                          SRCFILE(&PGMLIB/QDDSSRC) +
+                          DTAMBRS((QTEMP/QPGMMODREF (QPGMMODREF))) +
+                          OPTION(*NOSRC *NOLIST)
+             MONMSG     MSGID(CPF0000)
+
+             CHKOBJ     OBJ(&OUTLIBRARY/&OUTFILE) OBJTYPE(*FILE)
+/* b01 */    MONMSG     MSGID(CPF9801) EXEC(DO)
+             CRTPF      FILE(&OUTLIBRARY/&OUTFILE) +
+                          SRCFILE(&CURLIB/QDDSSRC) +
+                          SRCMBR(QPGMFLDREF) OPTION(*NOSRC *NOLIST) +
+                          SIZE(*NOMAX) LVLCHK(*NO)
+/* b02 */    SELECT
+/* b03 */    WHEN       COND(&OUTMBR = *FIRST) THEN(DO)
+             RNMM       FILE(&OUTLIBRARY/&OUTFILE) MBR(QPGMFLDREF) +
+                          NEWMBR(&OUTFILE)
+             MONMSG     MSGID(CPF0000)
+/* e03 */    ENDDO
+/* b03 */    WHEN       COND(&OUTMBR *EQ *FILE) THEN(DO)
+             RNMM       FILE(&OUTLIBRARY/&OUTFILE) MBR(QPGMFLDREF) +
+                          NEWMBR(&OUTFILE)
+             MONMSG     MSGID(CPF0000)
+/* e03 */    ENDDO
+/* b03 */    OTHERWISE  CMD(DO)
+             RNMM       FILE(&OUTLIBRARY/&OUTFILE) MBR(QPGMFLDREF) +
+                          NEWMBR(&OUTMBR)
+             MONMSG     MSGID(CPF0000)
+/* e03 */    ENDDO
+/* e02 */    ENDSELECT
+/* e01 */    ENDDO
+
+/* e01 */    IF         COND(&ADDRPL = *REPLACE) THEN(DO)
+             CLRPFM     FILE(&OUTLIBRARY/&OUTFILE) MBR(&OUTMBR)
+             MONMSG     MSGID(CPF0000)
+/* e01 */    ENDDO
+
+/* b01 */    IF         COND(&DEFAULT) THEN(DO)
+
+             CHKOBJ     OBJ(&OUTLIBRARY/QPGMFLDRL1) OBJTYPE(*FILE)
+/* b02 */    MONMSG     MSGID(CPF9801) EXEC(DO)
+             CRTLF      FILE(&OUTLIBRARY/QPGMFLDRL1) +
+                          SRCFILE(&PGMLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST)
+             MONMSG     MSGID(CPF0000)
+/* e02 */    ENDDO
+
+             CHKOBJ     OBJ(&OUTLIBRARY/QPGMFLDRL2) OBJTYPE(*FILE)
+/* b02 */    MONMSG     MSGID(CPF9801) EXEC(DO)
+             CRTLF      FILE(&OUTLIBRARY/QPGMFLDRL2) +
+                          SRCFILE(&PGMLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST)
+             MONMSG     MSGID(CPF0000)
+/* e02 */    ENDDO
+
+             CHKOBJ     OBJ(&OUTLIBRARY/QPGMFLDRL3) OBJTYPE(*FILE)
+/* b02 */    MONMSG     MSGID(CPF9801) EXEC(DO)
+             CRTLF      FILE(&OUTLIBRARY/QPGMFLDRL3) +
+                          SRCFILE(&PGMLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST)
+             MONMSG     MSGID(CPF0000)
+/* e02 */    ENDDO
+
+             CHKOBJ     OBJ(&OUTLIBRARY/QPGMFLDRL4) OBJTYPE(*FILE)
+/* b02 */    MONMSG     MSGID(CPF9801) EXEC(DO)
+             CRTLF      FILE(&OUTLIBRARY/QPGMFLDRL4) +
+                          SRCFILE(&PGMLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST)
+             MONMSG     MSGID(CPF0000)
+/* e02 */    ENDDO
+/* e01 */    ENDDO
+
+             CRTPF      FILE(QTEMP/QPGMFLDREF) +
+                          SRCFILE(&CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST) SIZE(*NOMAX)
+
+             CRTPF      FILE(QTEMP/SPOOLFILE) RCDLEN(198) SIZE(*NOMAX)
+
+             DSPFD      FILE(&SRCFLIB/&SRCF) TYPE(*MBRLIST) +
+                          OUTPUT(*OUTFILE) OUTFILE(QTEMP/QAFDMBRL) +
+                          OUTMBR(*FIRST *ADD)
+
+             RMVMSG     CLEAR(*ALL)
+
+             CHKOBJ     OBJ(&FRMOBJLIB) OBJTYPE(*LIB)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGDTA(&@MSGDTA) +
+                          MSGID(&@MSGID) MSGF(&@MSGF) +
+                          MSGFLIB(&@MSGFLIB)
+             IF         COND(&@MSGID *NE ' ') THEN(SNDPGMMSG +
+                          MSGID(&@MSGID) MSGF(&@MSGFLIB/&@MSGF) +
+                          MSGDTA(&@MSGDTA) MSGTYPE(*ESCAPE))
+
+             CHKOBJ     OBJ(&SRCFLIB/&SRCF) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGDTA(&@MSGDTA) +
+                          MSGID(&@MSGID) MSGF(&@MSGF) +
+                          MSGFLIB(&@MSGFLIB)
+             IF         COND(&@MSGID *NE ' ') THEN(SNDPGMMSG +
+                          MSGID(&@MSGID) MSGF(&@MSGFLIB/&@MSGF) +
+                          MSGDTA(&@MSGDTA) MSGTYPE(*ESCAPE))
+
+             OVRDBF     FILE(QAFDMBRL) TOFILE(QTEMP/QAFDMBRL) +
+                          OVRSCOPE(*CALLLVL)
+             OVRDBF     FILE(QPGMMODRL2) TOFILE(QTEMP/QPGMMODRL2) +
+                          OVRSCOPE(*CALLLVL)
+
+             CALL       PGM(BLDFLDREF1) PARM(&FRMOBJLIB &MBR)
+
+             DLTOVR     FILE(*ALL) LVL(*)
+
+             OVRDBF     FILE(QAFDMBRL) TOFILE(QTEMP/QAFDMBRL) +
+                          OVRSCOPE(*CALLLVL)
+             OVRDBF     FILE(SPOOLFILE) TOFILE(QTEMP/SPOOLFILE) +
+                          OVRSCOPE(*CALLLVL)
+             OVRDBF     FILE(QPGMFLDREF) TOFILE(QTEMP/QPGMFLDREF) +
+                          OVRSCOPE(*CALLLVL)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* b01 */    DOWHILE    COND(&@MSGID *NE CPF0864)
+
+/* b02 */    IF         COND((&MLSEU2 *NE RPG) *AND (&MLSEU2 *NE +
+                          RPGLE) *AND (&MLSEU2 *NE SQLRPGLE)) THEN(DO)
+             IF         COND((&MLSEU2 *NE CLP) *AND (&MLSEU2 *NE +
+                          CLLE)) THEN(GOTO CMDLBL(AGAIN))
+/* e02 */    ENDDO
+
+             CALLPRC    PRC(CHECKOBSOLETE) PARM((&MLNAME) +
+                          (&FRMOBJLIB)) RTNVAL(&OBSOLETE)
+/* b02 */    IF         COND(&OBSOLETE) THEN(DO)
+
+             OVRDBF     FILE(QPGMFLDREF) +
+                          TOFILE(&OUTLIBRARY/&OUTFILE) MBR(&OUTMBR) +
+                          OVRSCOPE(*CALLLVL)
+             CALL       PGM(PGMFLDDLTR) PARM(&MLNAME &MLLIB)
+             DLTOVR     FILE(QPGMFLDREF) LVL(*)
+
+             CHGVAR     VAR(&NBRCURRCD) VALUE(0)
+             RTVMBRD    FILE(&MLLIB/&MLFILE) MBR(&MLNAME) +
+                          SRCTYPE(&SRCTYPE) NBRCURRCD(&NBRCURRCD)
+             MONMSG     MSGID(CPF0000)
+             IF         COND(&NBRCURRCD *EQ 0) THEN(GOTO CMDLBL(AGAIN))
+
+/* b03 */    SELECT
+/* x03 */    WHEN       COND(&SRCTYPE = SQLRPGLE) THEN(CHGVAR +
+                          VAR(&SRCTYPE) VALUE(RPGLE))
+/* x03 */    WHEN       COND(&SRCTYPE = RPG38) THEN(CHGVAR +
+                          VAR(&SRCTYPE) VALUE(RPG))
+/* x03 */    WHEN       COND(&SRCTYPE = CLLE) THEN(CHGVAR +
+                          VAR(&SRCTYPE) VALUE(CLP))
+/* x03 */    WHEN       COND(&SRCTYPE = CLP38) THEN(CHGVAR +
+                          VAR(&SRCTYPE) VALUE(CLP))
+/* e03 */    ENDSELECT
+
+             GETFLDDEF  PGM(&FRMOBJLIB/&MLNAME) +
+                          SRCFILE(&SRCFLIB/&SRCF) SRCTYPE(&SRCTYPE) +
+                          OUTFILE(QTEMP/QADSPFFDQ)
+
+             RMVMSG     CLEAR(*ALL)
+
+/* b03 */    SELECT
+/* b04 */    WHEN       COND(&MLSEU2 = RPGLE) THEN(DO)
+             CRTBNDRPG  PGM(QTEMP/&MLNAME) SRCFILE(&MLLIB/&MLFILE)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+             DLTPGM     PGM(QTEMP/&MLNAME)
+             MONMSG     MSGID(CPF0000)
+/* b05 */    IF         COND(&@MSGID *NE ' ') THEN(DO)
+             DLTSPLF    FILE(&MLNAME) SPLNBR(*LAST)
+             MONMSG     MSGID(CPF0000)
+             CRTRPGMOD  MODULE(QTEMP/&MLNAME) SRCFILE(&MLLIB/&MLFILE)
+             MONMSG     MSGID(CPF0000)
+             DLTMOD     MODULE(QTEMP/&MLNAME)
+             MONMSG     MSGID(CPF0000)
+/* e05 */    ENDDO
+/* e04 */    ENDDO
+
+/* b04 */    WHEN       COND(&MLSEU2 = SQLRPGLE) THEN(DO)
+             CRTSQLRPGI OBJ(QTEMP/&MLNAME) SRCFILE(&MLLIB/&MLFILE)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+             DLTPGM     PGM(QTEMP/&MLNAME)
+             MONMSG     MSGID(CPF0000)
+/* b05 */    IF         COND(&@MSGID *NE ' ') THEN(DO)
+             DLTSPLF    FILE(&MLNAME) SPLNBR(*LAST)
+             MONMSG     MSGID(CPF0000)
+             DLTSPLF    FILE(&MLNAME) SPLNBR(*LAST)
+             MONMSG     MSGID(CPF0000)
+             CRTSQLRPGI OBJ(QTEMP/&MLNAME) SRCFILE(&MLLIB/&MLFILE) +
+                          OBJTYPE(*MODULE) RPGPPOPT(*LVL2)
+             MONMSG     MSGID(CPF0000)
+             DLTMOD     MODULE(QTEMP/&MLNAME)
+             MONMSG     MSGID(CPF0000)
+/* e05 */    ENDDO
+/* e04 */    ENDDO
+
+/* b04 */    WHEN       COND(&MLSEU2 = CLLE) THEN(DO)
+             CRTBNDCL   PGM(QTEMP/&MLNAME) SRCFILE(&MLLIB/&MLFILE)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+             DLTPGM     PGM(QTEMP/&MLNAME)
+             MONMSG     MSGID(CPF0000)
+/* b05 */    IF         COND(&@MSGID *NE ' ') THEN(DO)
+             DLTSPLF    FILE(&MLNAME) SPLNBR(*LAST)
+             MONMSG     MSGID(CPF0000)
+             CRTCLMOD   MODULE(QTEMP/&MLNAME) SRCFILE(&MLLIB/&MLFILE)
+             MONMSG     MSGID(CPF0000)
+             DLTMOD     MODULE(QTEMP/&MLNAME)
+             MONMSG     MSGID(CPF0000)
+/* e05 */    ENDDO
+/* e04 */    ENDDO
+
+/* b04 */    WHEN       COND(&MLSEU2 = RPG) THEN(DO)
+             CRTRPGPGM  PGM(QTEMP/&MLNAME) SRCFILE(&MLLIB/&MLFILE)
+             MONMSG     MSGID(CPF0000)
+             DLTPGM     PGM(QTEMP/&MLNAME)
+             MONMSG     MSGID(CPF0000)
+/* e04 */    ENDDO
+
+/* b04 */    WHEN       COND(&MLSEU2 = CLP) THEN(DO)
+             CRTCLPGM   PGM(QTEMP/&MLNAME) SRCFILE(&MLLIB/&MLFILE)
+             MONMSG     MSGID(CPF0000)
+             DLTPGM     PGM(QTEMP/&MLNAME)
+             MONMSG     MSGID(CPF0000)
+/* e04 */    ENDDO
+/* e03 */    ENDSELECT
+
+             CPYSPLF    FILE(&MLNAME) TOFILE(QTEMP/SPOOLFILE) +
+                          SPLNBR(*LAST)
+             DLTSPLF    FILE(&MLNAME) SPLNBR(*LAST)
+/* b03 */    IF         COND(&MLSEU2 = SQLRPGLE) THEN(DO)
+             DLTSPLF    FILE(&MLNAME) SPLNBR(*LAST)
+             MONMSG     MSGID(CPF0000)
+             DLTSPLF    FILE(&MLNAME) SPLNBR(*LAST)
+             MONMSG     MSGID(CPF0000)
+/* e03 */    ENDDO
+
+             OVRDBF     FILE(QADSPFFDQ) TOFILE(QTEMP/QADSPFFDQ) +
+                          OVRSCOPE(*CALLLVL)
+             OVRDBF     FILE(QADSPFFDQ1) TOFILE(QTEMP/QADSPFFDQ1) +
+                          OVRSCOPE(*CALLLVL)
+             OVRDBF     FILE(QADSPFFDQ2) TOFILE(QTEMP/QADSPFFDQ2) +
+                          OVRSCOPE(*CALLLVL)
+             OVRDBF     FILE(QADSPFFDQ3) TOFILE(QTEMP/QADSPFFDQ3) +
+                          OVRSCOPE(*CALLLVL)
+             OVRDBF     FILE(QADSPFFDQ4) TOFILE(QTEMP/QADSPFFDQ4) +
+                          OVRSCOPE(*CALLLVL)
+             OVRDBF     FILE(INPUT) TOFILE(&MLLIB/&MLFILE) +
+                          MBR(&MLNAME) OVRSCOPE(*CALLLVL)
+             OVRDBF     FILE(QPGMFLDREF) TOFILE(QTEMP/QPGMFLDREF) +
+                          OVRSCOPE(*CALLLVL)
+
+/* b03 */    SELECT
+
+/* b04 */    WHEN       COND((&MLSEU2 = RPGLE) *OR (&MLSEU2 = +
+                          SQLRPGLE)) THEN(DO)
+             CALL       PGM(PGMFLDCHKR)
+             CALL       PGM(PGMFLDREF1) PARM(&MLNAME &MLLIB &SRCF +
+                          &MLSEU2)
+             MONMSG     MSGID(CPF4131)
+/* e04 */    ENDDO
+
+/* b04 */    WHEN       COND(&MLSEU2 = RPG) THEN(DO)
+             CALL       PGM(PGMFLDCHKR)
+             CALL       PGM(PGMFLDREF2) PARM(&MLNAME &MLLIB &srcf +
+                          &MLSEU2)
+             MONMSG     MSGID(CPF4131)
+/* e04 */    ENDDO
+
+/* b04 */    WHEN       COND((&MLSEU2 = CLP) *OR (&MLSEU2 = CLLE)) +
+                          THEN(DO)
+             CALL       PGM(PGMFLDREF3) PARM(&MLNAME &MLLIB &srcf +
+                          &MLSEU2)
+             MONMSG     MSGID(CPF4131)
+/* e04 */    ENDDO
+/* e03 */    ENDSELECT
+
+             DLTOVR     FILE(QADSPFFDQ) LVL(*)
+
+             CLRPFM     FILE(QTEMP/QADSPFFDQ)
+             MONMSG     MSGID(CPF0000)
+
+             DLTSPLF    FILE(QPJOBLOG) SPLNBR(*LAST)
+             MONMSG     MSGID(CPF0000)
+
+             DLTOVR     FILE(*ALL) LVL(*)
+
+/* e02 */    ENDDO
+
+ AGAIN:      RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* e01 */    ENDDO
+
+             DLTOVR     FILE(*ALL) LVL(*)
+
+/* b01 */    IF         COND(&ADDRPL = *REPLACE) THEN(DO)
+             CPYF       FROMFILE(QTEMP/QPGMFLDREF) +
+                          TOFILE(&OUTLIBRARY/&OUTFILE) +
+                          TOMBR(&OUTMBR) MBROPT(*REPLACE)
+             MONMSG     MSGID(CPF0000)
+/* e01 */    ENDDO
+/* b01 */    ELSE       CMD(DO)
+             CPYF       FROMFILE(QTEMP/QPGMFLDREF) +
+                          TOFILE(&OUTLIBRARY/&OUTFILE) +
+                          TOMBR(&OUTMBR) MBROPT(*ADD)
+             MONMSG     MSGID(CPF0000)
+/* e01 */    ENDDO
+
+             CALL       PGM(PGMFLDREC4) PARM(&OUTFILE &OUTLIBRARY +
+                          &CURLIB)
+
+             DLTF       FILE(QTEMP/QAFDMBRL)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/SPOOLFILE)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QPGMFLDREF)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPFFDQ4)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPFFDQ3)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPFFDQ2)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPFFDQ1)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPFFDQ)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QPGMMODREF)
+             MONMSG     MSGID(CPF0000)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

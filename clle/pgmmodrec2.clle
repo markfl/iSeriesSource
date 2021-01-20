@@ -1,0 +1,52 @@
+             PGM        PARM(&ODOBNM &ODLBNM)
+
+             DCL        VAR(&ODOBNM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&ODLBNM) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             DLTF       FILE(QTEMP/SPOOLFILE2)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(QPGMMODREF) TOFILE(QTEMP/QPGMMODREF) +
+                          OVRSCOPE(*CALLLVL)
+             OVRDBF     FILE(QPGMMODRL1) TOFILE(QTEMP/QPGMMODRL1) +
+                          OVRSCOPE(*CALLLVL)
+
+             CRTPF      FILE(QTEMP/SPOOLFILE2) RCDLEN(198) SIZE(*NOMAX)
+
+             DSPSRVPGM  SRVPGM(&ODLBNM/&ODOBNM) OUTPUT(*PRINT) +
+                          DETAIL(*SRVPGM)
+             MONMSG     MSGID(CPF9801) EXEC(GOTO CMDLBL(END))
+
+             CPYSPLF    FILE(QSYSPRT) TOFILE(QTEMP/SPOOLFILE2) +
+                          SPLNBR(*LAST)
+             DLTSPLF    FILE(QSYSPRT) SPLNBR(*LAST)
+             OVRDBF     FILE(SPOOLFILE) TOFILE(QTEMP/SPOOLFILE2) +
+                          OVRSCOPE(*CALLLVL)
+
+             CALL       PGM(PGMMODREF2) PARM(&ODOBNM &ODLBNM)
+
+             DLTOVR     FILE(SPOOLFILE) LVL(*)
+
+             DSPSRVPGM  SRVPGM(&ODLBNM/&ODOBNM) OUTPUT(*PRINT) +
+                          DETAIL(*MODULE)
+
+             CPYSPLF    FILE(QSYSPRT) TOFILE(QTEMP/SPOOLFILE2) +
+                          SPLNBR(*LAST)
+             DLTSPLF    FILE(QSYSPRT) SPLNBR(*LAST)
+             OVRDBF     FILE(SPOOLFILE) TOFILE(QTEMP/SPOOLFILE2) +
+                          OVRSCOPE(*CALLLVL)
+
+             CALL       PGM(PGMMODREF3) PARM(&ODOBNM &ODLBNM)
+
+             DLTOVR     FILE(QPGMMODRL1) LVL(*)
+             DLTOVR     FILE(QPGMMODREF) LVL(*)
+             DLTOVR     FILE(SPOOLFILE) LVL(*)
+
+             DLTF       FILE(QTEMP/SPOOLFILE2)
+             MONMSG     MSGID(CPF0000)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+ END:        ENDPGM

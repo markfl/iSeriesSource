@@ -1,0 +1,24 @@
+             CMD        PROMPT('Member List')
+
+             PARM       KWD(FILE) TYPE(FILE) MIN(1) PROMPT('File')
+ FILE:       QUAL       TYPE(*NAME) SPCVAL((*ALL)) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB) (*ALL) (*ALLUSR)) +
+                          CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(DSPFFD) TYPE(DSPFFD) MIN(1) +
+                          PROMPT('Display File Field Description')
+ DSPFFD:     QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(OUTMBR) TYPE(OUTMBR) SNGVAL((*NEW)) +
+                          PROMPT('Output member options:')
+ OUTMBR:     ELEM       TYPE(*CHAR) LEN(10) DFT(*FIRST) +
+                          SPCVAL((*FIRST)) PROMPT('Member to +
+                          receive output')
+             ELEM       TYPE(*CHAR) LEN(8) RSTD(*YES) DFT(*REPLACE) +
+                          VALUES(*REPLACE *ADD) CHOICE(*NONE) +
+                          PROMPT('Replace or add records')
+

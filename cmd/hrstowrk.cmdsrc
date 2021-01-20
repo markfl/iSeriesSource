@@ -1,0 +1,8 @@
+             CMD        PROMPT('Hours To Work')
+
+             PARM       KWD(STRTIME) TYPE(*TIME) DFT(*CURRENT) +
+                          SPCVAL((*CURRENT 000000)) PROMPT('Start +
+                          time:')
+
+             PARM       KWD(HOURS) TYPE(*CHAR) LEN(5) DFT(08.00) +
+                          PROMPT('Hours to work:')

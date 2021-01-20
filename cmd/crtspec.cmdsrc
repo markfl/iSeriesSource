@@ -1,0 +1,110 @@
+             CMD        PROMPT('Create RPG Spec(s) From DSPFFD')
+
+             PARM       KWD(FILE) TYPE(FILE) MIN(1) PROMPT('File')
+ FILE:       QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(SRCFILE) TYPE(SRCFILE) PROMPT('To Source +
+                          File')
+ SRCFILE:    QUAL       TYPE(*NAME) DFT(QRPGLESRC)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(MEMBER) TYPE(*NAME) DFT(*FILE) +
+                          SPCVAL((*FILE) (*FIRST)) PROMPT('Member')
+
+             PARM       KWD(RPGTYPE) TYPE(*CHAR) LEN(8) RSTD(*YES) +
+                          DFT(*RPGFREE) VALUES(*RPGFREE *RPG4 +
+                          *RPGSQL) PROMPT('RPG Version')
+
+             PARM       KWD(PREPARED) TYPE(*CHAR) LEN(9) RSTD(*YES) +
+                          DFT(*SQLSTMT) VALUES(*SQLSTMT *PREPARED) +
+                          PMTCTL(PREPARED) PROMPT('SQL Statement or +
+                          prepared')
+
+ PREPARED:   PMTCTL     CTL(RPGTYPE) COND((*EQ *RPGSQL))
+
+             PARM       KWD(TYPE) TYPE(*CHAR) LEN(2) RSTD(*YES) +
+                          DFT(C) VALUES(I IX D C O) PROMPT('Spec Type')
+
+             PARM       KWD(DSPEC) TYPE(*CHAR) LEN(7) RSTD(*YES) +
+                          VALUES(*DS *LIKE *DSLIKE *RENAME) +
+                          CHOICE(*NONE) PMTCTL(DSPEC) +
+                          PROMPT('Operation')
+
+ DSPEC:      PMTCTL     CTL(TYPE) COND((*NE I) (*NE C) (*NE O))
+
+             PARM       KWD(CSPEC) TYPE(*CHAR) LEN(7) RSTD(*YES) +
+                          VALUES(*MOVE *MOVEL *CLEAR *EQUAL *ZADD +
+                          *ZSUB *ADD *SUB *IFEQ *IFNE *IFGT *IFLT +
+                          *IFGE *IFLE *IFEQMV *IFNEMV *IFGTMV +
+                          *IFLTMV *IFGEMV *IFLEMV *IFEQZA *IFNEZA +
+                          *IFGTZA *IFLTZA *IFGEZA *IFLEZA *IFEQZB +
+                          *IFNEZB *IFGTZB *IFLTZB *IFGEZB *IFLEZB +
+                          *IFEQCL *IFNECL *IFGTCL *IFLTCL *IFGECL +
+                          *IFLECL *OREQ *ORNE *ORGT *ORLT *ORGE +
+                          *ORLE *ANDEQ *ANDNE *ANDGT *ANDLT *ANDGE +
+                          *ANDLE *WHENEQ *WHENNE *WHENGT *WHENLT +
+                          *WHENGE *WHENLE *CASEQ *CASNE *CASGT +
+                          *CASLT *CASGE *CASLE *CABEQ *CABNE *CABGT +
+                          *CABLT *CABGE *CABLE *PARM *KFLD) +
+                          CHOICE(*NONE) PMTCTL(CSPEC) +
+                          PROMPT('Operation')
+
+             PARM       KWD(SQLSPEC) TYPE(*CHAR) LEN(7) RSTD(*YES) +
+                          VALUES(*INSERT *UPDATE *DELETE) +
+                          CHOICE(*NONE) PMTCTL(PREPARED) +
+                          PROMPT('Operation')
+
+             PARM       KWD(INDENT) TYPE(*CHAR) LEN(1) RSTD(*YES) +
+                          DFT(*NONE) VALUES('0' '1' '2' '3' '4' +
+                          '5') SPCVAL((*NONE '0')) CHOICE(*NONE) +
+                          PMTCTL(CSPEC) PROMPT('Indent')
+
+ CSPEC:      PMTCTL     CTL(TYPE) COND((*EQ C))
+             PMTCTL     CTL(RPGTYPE) COND((*NE *RPGSQL))
+
+             PARM       KWD(PREFIXSRC) TYPE(*CHAR) LEN(5) DFT(*NONE) +
+                          SPCVAL((*NONE)) PROMPT('Prefix Source Field')
+
+             PARM       KWD(PREFIXDST) TYPE(*CHAR) LEN(5) DFT(*NONE) +
+                          SPCVAL((*NONE)) PMTCTL(PREFIXDST) +
+                          PROMPT('Prefix Destination Field')
+
+             PARM       KWD(CHECKNULL) TYPE(*LGL) RSTD(*YES) +
+                          DFT(*NO) SPCVAL((*YES '1') (*NO '0')) +
+                          PROMPT('Check for NULL')
+
+ CHECKNULL:  PMTCTL     CTL(SQLSPEC) COND((*EQ *INSERT)) NBRTRUE(*EQ 1)
+
+ PREFIXDST:  PMTCTL     CTL(RPGTYPE) COND((*NE *RPGSQL))
+
+             PARM       KWD(CASE) TYPE(*CHAR) LEN(6) RSTD(*YES) +
+                          DFT(*LOWER) VALUES(*LOWER *UPPER) +
+                          PROMPT('Upper/Lower Case')
+
+             PARM       KWD(COMPARE) TYPE(*CHAR) LEN(15) +
+                          PMTCTL(COMPARE2) PROMPT('Compare value')
+
+             PARM       KWD(SKIP) TYPE(*CHAR) RSTD(*YES) DFT(*NO) +
+                          SPCVAL((*YES '1') (*NO '0')) +
+                          PMTCTL(COMPAREVAL) PROMPT('Skip a line +
+                          after ENDIF')
+
+ COMPAREVAL: PMTCTL     CTL(CSPEC) COND((*EQ *IFEQ) (*EQ *IFNE) (*EQ +
+                          *IFGT) (*EQ *IFLT) (*EQ *IFGE) (*EQ +
+                          *IFLE) (*EQ *IFEQMV) (*EQ *IFNEMV) (*EQ +
+                          *IFGTMV) (*EQ *IFLTMV) (*EQ *IFGEMV) (*EQ +
+                          *IFLEMV)) NBRTRUE(*EQ 1)
+             PMTCTL     CTL(CHECKNULL) COND((*EQ '1')) LGLREL(*OR)
+
+ COMPARE2:   PMTCTL     CTL(CSPEC) COND((*EQ *IFEQ) (*EQ *IFNE) (*EQ +
+                          *IFGT) (*EQ *IFLT) (*EQ *IFGE) (*EQ +
+                          *IFLE) (*EQ *IFEQMV) (*EQ *IFNEMV) (*EQ +
+                          *IFGTMV) (*EQ *IFLTMV) (*EQ *IFGEMV) (*EQ +
+                          *IFLEMV)) NBRTRUE(*EQ 1)
+
+

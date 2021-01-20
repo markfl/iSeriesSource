@@ -1,0 +1,53 @@
+             PGM
+
+             DCLF       FILE(QAFDMBRL)
+
+             DCL        VAR(&FFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FLIBRARY) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&FFILE) VALUE(QRPGLESRC)
+             CHGVAR     VAR(&FLIBRARY) VALUE(&CURLIB)
+
+             DLTF       FILE(QTEMP/QAFDMBRL)
+             MONMSG     MSGID(CPF0000)
+
+             DSPFD      FILE(&FLIBRARY/&FFILE) TYPE(*MBRLIST) +
+                          OUTPUT(*OUTFILE) OUTFILE(QTEMP/QAFDMBRL)
+
+             OVRDBF     FILE(QAFDMBRL) TOFILE(QTEMP/QAFDMBRL) +
+                          OVRSCOPE(*CALLLVL)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* b01 */    DOWHILE    COND(&@MSGID *NE CPF0864)
+             IF         COND(&MLNAME *EQ CHGSRC) THEN(GOTO +
+                          CMDLBL(AGAIN))
+             IF         COND(&MLNAME *EQ CHGSRCR) THEN(GOTO +
+                          CMDLBL(AGAIN))
+             IF         COND(&MLNAME *EQ CHGSRCC) THEN(GOTO +
+                          CMDLBL(AGAIN))
+
+             INCLUDE    SRCMBR(RCVRSTSRC) SRCFILE(QCPYSRC)
+
+             CHGSRC     FROMFILE(&FLIBRARY/&FFILE) FROMMBR(&MLNAME)
+
+             INCLUDE    SRCMBR(RCVSETSRC) SRCFILE(QCPYSRC)
+
+ AGAIN:      RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* e01 */    ENDDO
+
+             DLTOVR     FILE(*ALL) LVL(*)
+
+             DLTF       FILE(QTEMP/QAFDMBRL)
+             MONMSG     MSGID(CPF0000)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

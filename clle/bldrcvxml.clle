@@ -1,0 +1,9 @@
+             PGM
+
+             CRTPGM     PGM(RCVXMLORDR) MODULE(RCVXMLORDR ORDNBRGET) +
+                          ENTMOD(RCVXMLORDR) +
+                          BNDSRVPGM((QSYS/QRNXUTIL) +
+                          (TPSOBJ50/$SPORDUTL) (TPSOBJ50/$SPENTINF) +
+                          (TPSOBJ50/$SPSYSDICT))
+
+ END:        ENDPGM

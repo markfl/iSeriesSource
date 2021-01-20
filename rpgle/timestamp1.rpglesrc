@@ -1,0 +1,19 @@
+     H Option(*Nodebugio) BndDir('MFLORES') DftActGrp(*No)
+
+     D/define mflores002
+     D/define mflores005
+     D/copy qcpysrc,mflores
+
+     D  @TimeStampC    s             26a   Inz(*Blanks)
+     D  @a             s              3p 0 Inz(*Zeros)
+
+          For @a = 1 To 10;
+             @TimeStampC =  %Char(@TimeStamp());
+             SndPgmMsg(%Trim(@TimeStampC): %Len(%Trim(@TimeStampC)));
+          EndFor;
+          For @a = 1 To 10;
+             @TimeStampC =  %Char(%TimeStamp());
+             SndPgmMsg(%Trim(@TimeStampC): %Len(%Trim(@TimeStampC)));
+          EndFor;
+          *inlr = *On;
+      /end-free

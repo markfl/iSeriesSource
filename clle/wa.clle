@@ -1,0 +1,8 @@
+             PGM        PARM(&SBS &OUTPUT)
+
+             DCL        VAR(&SBS) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTPUT) TYPE(*CHAR) LEN(6)
+
+             WRKACTJOB  OUTPUT(&OUTPUT) SBS(&SBS)
+
+ END:        ENDPGM

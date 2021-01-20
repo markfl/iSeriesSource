@@ -1,0 +1,21 @@
+     H DftActGrp(*No) BndDir('MFLORES')
+
+     Dtestrtvobj       pi
+     D  @PObject                     10a
+     D  @PLibrary                    10a
+     D  @PType                       10a
+     D  @PFormat                     10a
+
+      /define mflores031
+      /copy qcpysrc,mflores
+
+      /free
+
+          If RetrieveObjectDescription(@PObject: @PLibrary:
+                                       @PType: @PFormat);
+          EndIf;
+
+          *InLr = *On;
+          Return;
+
+      /end-free

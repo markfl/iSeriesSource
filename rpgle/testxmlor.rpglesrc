@@ -1,0 +1,23 @@
+     h DftActGrp(*NO)
+
+     Ftext      ip   f  256        Disk
+
+     d @xmlParser      pr                  extpgm('XMLPARSE')
+     d                            20000a
+
+     d @wXmlString     s          20000a   Inz(*Blanks)
+
+     Itext      ns
+     I                                  1  256  @Tdata
+
+      /free
+
+b001      If not *in01;
+             @wXmlString = %Trim(@Tdata);
+             *In01 = *On;
+x001      Else;
+             @wXmlString = %Trim(@wXmlString) + %Trim(@Tdata);
+e001      EndIf;
+
+      /end-free
+     Clr                 callp     @xmlParser(@wXmlString)

@@ -1,0 +1,95 @@
+             PGM        PARM(&FILE &SRCFILE &MEMBER &RPGTYPE +
+                          &PREPARED &TYPE &DSPEC &CSPEC &SQLSPEC +
+                          &INDENT &PREFIXSRC &PREFIXDST &CHECKNULL +
+                          &CASE &COMPARE &SKIP)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&SRCFILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&RPGTYPE) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&PREPARED) TYPE(*CHAR) LEN(9)
+             DCL        VAR(&TYPE) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&DSPEC) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&CSPEC) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&SQLSPEC) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&INDENT) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&PREFIXSRC) TYPE(*CHAR) LEN(5)
+             DCL        VAR(&PREFIXDST) TYPE(*CHAR) LEN(5)
+             DCL        VAR(&CHECKNULL) TYPE(*LGL)
+             DCL        VAR(&CASE) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&COMPARE) TYPE(*CHAR) LEN(15)
+             DCL        VAR(&SKIP) TYPE(*LGL)
+
+             DCL        VAR(&FROMFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FROMLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&TOSRCFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TOSRCLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&TEXT) TYPE(*CHAR) LEN(50)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&FROMFILE) VALUE(%SST(&FILE 1 10))
+             CHGVAR     VAR(&FROMLIB) VALUE(%SST(&FILE 11 10))
+
+             CHGVAR     VAR(&TOSRCFILE) VALUE(%SST(&SRCFILE 1 10))
+             CHGVAR     VAR(&TOSRCLIB) VALUE(%SST(&SRCFILE 11 10))
+
+             IF         COND(&MEMBER = *FILE) THEN(CHGVAR +
+                          VAR(&MEMBER) VALUE(&FROMFILE))
+
+             DLTF       FILE(QTEMP/QADSPFFD)
+             MONMSG     MSGID(CPF0000)
+
+             RMVMSG     CLEAR(*ALL)
+
+             RTVOBJD    OBJ(&FROMLIB/&FROMFILE) OBJTYPE(*FILE) +
+                          TEXT(&TEXT)
+             DSPFFD     FILE(&FROMLIB/&FROMFILE) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QADSPFFD)
+             MONMSG     MSGID(CPF0000)
+
+             CHKOBJ     OBJ(&TOSRCLIB/&TOSRCFILE) OBJTYPE(*FILE) +
+                          MBR(&MEMBER)
+             MONMSG     MSGID(CPF9815) EXEC(DO)
+
+             IF         COND(&RPGTYPE *EQ *RPGSQL) THEN(DO)
+             ADDPFM     FILE(&TOSRCLIB/&TOSRCFILE) MBR(&MEMBER) +
+                          TEXT(&TEXT) SRCTYPE(SQLRPGLE)
+             MONMSG     MSGID(CPF0000)
+             RMVMSG     CLEAR(*ALL)
+             ENDDO
+
+             ELSE       CMD(DO)
+             ADDPFM     FILE(&TOSRCLIB/&TOSRCFILE) MBR(&MEMBER) +
+                          TEXT(&TEXT) SRCTYPE(RPGLE)
+             MONMSG     MSGID(CPF0000)
+             RMVMSG     CLEAR(*ALL)
+             ENDDO
+             ENDDO
+
+             OVRDBF     FILE(QADSPFFD) TOFILE(QTEMP/QADSPFFD)
+             OVRDBF     FILE(QRPGLESRC) TOFILE(&TOSRCLIB/&TOSRCFILE) +
+                          MBR(&MEMBER)
+
+             CALL       PGM(CRTSPECR) PARM(&FROMFILE &RPGTYPE &TYPE +
+                          &PREPARED &DSPEC &CSPEC &SQLSPEC &INDENT +
+                          &PREFIXSRC &PREFIXDST &CHECKNULL &CASE +
+                          &COMPARE &SKIP)
+             MONMSG     MSGID(CPF0000) EXEC(DO)
+             CLOF       OPNID(QADSPFFD)
+             CLOF       OPNID(QRPGLESRC)
+             ENDDO
+
+             DLTOVR     FILE(*ALL)
+
+             RGZPFM     FILE(&TOSRCLIB/&TOSRCFILE) MBR(&MEMBER) +
+                          SRCOPT(*SEQNBR)
+
+             DLTF       FILE(QTEMP/QADSPFFD)
+             MONMSG     MSGID(CPF0000)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

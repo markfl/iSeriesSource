@@ -1,0 +1,22 @@
+
+          Dcl-Pi testsql;
+             @odobsy Char(8);
+          End-Pi;
+
+          Dcl-s @SelectStmt  Char(256) Inz(*Blanks);
+          Dcl-s @SelectCount Packed(9) Inz(*Zeros);
+
+          @SelectStmt = 'Delete from qrplauth Where odobsy = ''';
+          @SelectStmt = %Trim(@SelectStmt) + %Trim(@odobsy) + '''';
+
+          Exec SQL Declare SQLStmt statement;
+          Exec SQL Prepare SQLStmt From :@SelectStmt;
+
+          Exec SQL Execute SQLStmt;
+
+          Exec SQL Select Count(*) Into :@SelectCount
+          From qrplauth Where odobsy = :@odobsy;
+
+          *Inlr = *On;
+          Return;
+

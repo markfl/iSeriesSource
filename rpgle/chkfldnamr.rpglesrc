@@ -1,0 +1,40 @@
+     H Option(*Nodebugio) BndDir('MFLORES') DftActGrp(*No)
+     Fqadspffd  ip   e             Disk
+     Fqsysprt   o    f  132        Printer OflInd(*InOa)
+     D
+     Dchkfldnamr       pi
+     D  @Name                        10a
+     D
+     D/define mflores003
+     D/copy qcpysrc,mflores
+
+     D@a               s              5p 0 Inz(*Zeros)
+
+          whftxt = @ToUpper(whftxt);
+          *In01 = *Off;
+          Reset @a;
+          @a = %Scan(%Trim(@Name): whftxt);
+b001      If @a = *Zeros;
+             @a = %Scan(%Trim(@Name): whflde);
+x001      Else;
+             *In01 = *On;
+e001      EndIf;
+
+b001      If @a > *Zeros;
+b002         If *InOa ;
+                Except Heading;
+e002         EndIf;
+             Except Detail;
+e001      EndIf;
+
+          BegSr *Inzsr;
+             Except Heading;
+          EndSr;
+
+     OQsysprt   e            Heading        2  2
+     O                       @Name               +1
+     O          e            Detail
+     O                       whfile              +1
+     O                       whlib               +1
+     O                       whflde              +1
+     O               01      whftxt              +1

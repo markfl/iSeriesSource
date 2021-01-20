@@ -1,0 +1,160 @@
+             PGM        PARM(&PGM &SRCFILE &SRCTYPE &OUTFILELIB +
+                          &OUTMBRRPL)
+
+             DCLF       FILE(QADSPPGM)
+
+             DCL        VAR(&PGM) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&SRCFILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&SRCTYPE) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&OUTFILELIB) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OUTMBRRPL) TYPE(*CHAR) LEN(20)
+
+             DCL        VAR(&OBJ) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OBJLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTLIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTMBR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&ADDRPL) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&NBRCURRCD) TYPE(*DEC) LEN(10 0)
+             DCL        VAR(&UPDATEIND) TYPE(*LGL) VALUE('0')
+             DCL        VAR(&OBJATR) TYPE(*CHAR) LEN(10)
+
+             DLTF       FILE(QTEMP/QADSPPGM)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPFFD)
+             MONMSG     MSGID(CPF0000)
+
+             CHGVAR     VAR(&OBJ) VALUE(%SST(&PGM 1 10))
+             CHGVAR     VAR(&OBJLIB) VALUE(%SST(&PGM 11 10))
+             CHGVAR     VAR(&FILE) VALUE(%SST(&SRCFILE 1 10))
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&SRCFILE 11 10))
+             CHGVAR     VAR(&OUTFILE) VALUE(%SST(&OUTFILELIB 1 10))
+             CHGVAR     VAR(&OUTLIBRARY) VALUE(%SST(&OUTFILELIB 11 10))
+             CHGVAR     VAR(&OUTMBR) VALUE(%SST(&OUTMBRRPL 3 10))
+             CHGVAR     VAR(&ADDRPL) VALUE(%SST(&OUTMBRRPL 13 8))
+
+             ADDLIBLE   LIB(&OBJLIB)
+             MONMSG     MSGID(CPF0000)
+
+             RMVMSG     MSGQ(*PGMQ) CLEAR(*ALL)
+
+             DSPPGMREF  PGM(&OBJLIB/&OBJ) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QADSPPGM)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+/* b01 */    IF         COND(&MSGID = ' ') THEN(DO)
+
+             OVRDBF     FILE(QADSPPGM) TOFILE(QTEMP/QADSPPGM)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+/* b02 */    DOWHILE    COND(&MSGID *NE CPF0864)
+
+/* b03 */    IF         COND(&WHOBJT = F) THEN(DO)
+/* b04 */    IF         COND((%SST(&WHFNAM 1 1) *NE '&') *AND +
+                          (%SST(&WHFNAM 1 1) *NE '*')) THEN(DO)
+
+/* b05 */    IF         COND((&WHFNAM *NE ' ') *AND (&WHFNAM *NE +
+                          '1')) THEN(DO)
+
+             RTVOBJD    OBJ(&WHFNAM) OBJTYPE(*FILE) OBJATR(&OBJATR)
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(AGAIN))
+             IF         COND(&OBJATR = DDMF) THEN(GOTO CMDLBL(AGAIN))
+
+             CHKOBJ     OBJ(&WHFNAM) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+/* b06 */    IF         COND(&MSGID = CPF9801) THEN(DO)
+             CHKOBJ     OBJ(&OBJLIB/&WHFNAM) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+/* b07 */    IF         COND(&MSGID = CPF9801) THEN(DO)
+/* e07 */    ENDDO
+/* b07 */    ELSE       CMD(DO)
+             DSPFFD     FILE(&OBJLIB/&WHFNAM) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QADSPFFD) OUTMBR(*FIRST *ADD)
+             MONMSG     MSGID(CPF9899)
+/* e07 */    ENDDO
+/* e06 */    ENDDO
+/* b06 */    ELSE       CMD(DO)
+             CHKOBJ     OBJ(&WHFNAM) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+/* b07 */    IF         COND(&MSGID = '       ') THEN(DO)
+             DSPFFD     FILE(&WHFNAM) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QADSPFFD) OUTMBR(*FIRST *ADD)
+             MONMSG     MSGID(CPF9899)
+/* e07 */    ENDDO
+/* b07 */    ELSE       CMD(DO)
+             CHKOBJ     OBJ(&WHLNAM/&WHFNAM) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+/* b08 */    IF         COND((&MSGID = CPF9801) *OR (&MSGID = +
+                          CPF9810)) THEN(DO)
+             DSPFFD     FILE(&WHFNAM) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QADSPFFD) OUTMBR(*FIRST *ADD)
+             MONMSG     MSGID(CPF9899)
+/* e08 */    ENDDO
+/* b08 */    ELSE       CMD(DO)
+             DSPFFD     FILE(&WHLNAM/&WHFNAM) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QADSPFFD) OUTMBR(*FIRST *ADD)
+             MONMSG     MSGID(CPF9899)
+/* e08 */    ENDDO
+/* e07 */    ENDDO
+/* b06 */    ENDDO
+/* b05 */    ENDDO
+/* b04 */    ENDDO
+/* b03 */    ENDDO
+
+/* b03 */    IF         COND(&UPDATEIND = '0') THEN(DO)
+             CHGPF      FILE(QTEMP/QADSPFFD) SIZE(*NOMAX)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+/* b04 */    IF         COND(&MSGID = ' ') THEN(DO)
+             CHGVAR     VAR(&UPDATEIND) VALUE('1')
+/* b04 */    ENDDO
+/* b03 */    ENDDO
+
+ AGAIN:      RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+/* b02 */    ENDDO
+
+             RMVMSG     MSGQ(*PGMQ) CLEAR(*ALL)
+             OVRDBF     FILE(INPUT) TOFILE(&LIBRARY/&FILE) MBR(&OBJ)
+             CALL       PGM(GETFLDDEFR) PARM(&SRCTYPE)
+             DLTOVR     FILE(*ALL)
+             RTVMBRD    FILE(QTEMP/QADSPFFD) NBRCURRCD(&NBRCURRCD)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+/* b02 */    IF         COND(&MSGID = ' ') THEN(DO)
+/* b03 */    IF         COND(&NBRCURRCD *GT 0) THEN(DO)
+/* b04 */    IF         COND(&ADDRPL = *REPLACE) THEN(DO)
+             CPYF       FROMFILE(QTEMP/QADSPFFD) +
+                          TOFILE(&OUTLIBRARY/&OUTFILE) +
+                          MBROPT(*REPLACE) CRTFILE(*YES) +
+                          INCREL((*IF WHFLDI *NE ' ')) ERRLVL(*NOMAX)
+/* e04 */    ENDDO
+/* b04 */    ELSE       CMD(DO)
+             CPYF       FROMFILE(QTEMP/QADSPFFD) +
+                          TOFILE(&OUTLIBRARY/&OUTFILE) MBROPT(*ADD) +
+                          INCREL((*IF WHFLDI *NE ' ')) ERRLVL(*NOMAX)
+/* e04 */    ENDDO
+/* e03 */    ENDDO
+/* e02 */    ENDDO
+/* e01 */    ENDDO
+
+             DLTF       FILE(QTEMP/QADSPPGM)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/QADSPFFD)
+             MONMSG     MSGID(CPF0000)
+             RMVMSG     MSGQ(*PGMQ) CLEAR(*ALL)
+
+             ENDPGM

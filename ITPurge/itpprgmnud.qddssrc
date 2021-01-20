@@ -1,0 +1,43 @@
+     A*%%TS  SD  20150821  131125  ISFLORESM   REL-V7R1M0  5770-WDS
+     A********************************************************************
+     A* Description.: Purge Process Screen File                          *
+     A*                                                                  *
+     A* Author......: Mark Flores                                        *
+     A* Date Written: 08/28/2015                                         *
+     A********************************************************************
+     A*                   Change Control Information                     *
+     A********************************************************************
+     A*            Design                                                *
+     A* Date       Request Mod Pgmr Description                          *
+     A* ---------- ------- --- ---- -------------------------------------*
+     A********************************************************************
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/HREF)
+     A                                      PRINT
+     A                                      CA03
+     A          R SCRN1
+     A*%%TS  SD  20150729  105502  ISFLORESM   REL-V7R1M0  5770-WDS
+     A                                      BLINK
+     A            QPROG     R        O  1  2REFFLD(PGMVNM)
+     A                                      COLOR(BLU)
+     A                                  1 31'Purge File Process'
+     A                                      DSPATR(HI)
+     A                                  1 70DATE
+     A                                      EDTCDE(Y)
+     A                                      COLOR(BLU)
+     A            QUSER     R        O  2  2REFFLD(BCTPRF)
+     A                                      COLOR(BLU)
+     A                                  2 70TIME
+     A                                      COLOR(BLU)
+     A                                  7 26'1) Purge Key File Maintenance'
+     A                                  9 26'2) Purge File Maintenance'
+     A                                 11 26'3) Submit Purge Process'
+     A                                 13 26'4) Submit Restore Process'
+     A                                 15 26'Option:'
+     A            @1OPTION       1A  B 15 34COLOR(BLU)
+     A  21                                  DSPATR(PC)
+     A  21                                  DSPATR(RI)
+     A                                 23  5'F3=Exit'
+     A            @1ERRMSG  R   -2   O 24  5REFFLD(MS1DSC)
+     A                                      DSPATR(HI)

@@ -1,0 +1,24 @@
+             CMD        PROMPT('Display Program Fields')
+
+             PARM       KWD(PROGRAM) TYPE(*NAME) MIN(1) +
+                          PROMPT('Program')
+
+             PARM       KWD(SRCLIB) TYPE(*NAME) DFT(*LIBL) +
+                          SPCVAL((*LIBL) (*CURLIB)) PROMPT('Source +
+                          library')
+
+             PARM       KWD(FILE) TYPE(FILE) DFT(*DFT) SNGVAL((*DFT +
+                          'QPGMFLDREF*CURLIB')) PROMPT('Physical +
+                          file to use')
+ FILE:       QUAL       TYPE(*NAME)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(LOGFILE) TYPE(LOGFILE) DFT(*DFT) +
+                          SNGVAL((*DFT 'QPGMFLDRL1*CURLIB')) +
+                          PROMPT('Logical file to use')
+ LOGFILE:    QUAL       TYPE(*NAME)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')

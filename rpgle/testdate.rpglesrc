@@ -1,0 +1,30 @@
+     D* @workdate      s               d   datfmt(*usa)
+     D* @workdatec     s             12a   Inz('10/14/2014')
+     D* @workdatec1    s             12a
+     D* @workdate2     s               d   datfmt(*usa)
+     D* @workdatec2    s              7p 0 Inz(1141014)
+     D* @workdatec12   s             12a
+
+          Dcl-s @workdate  Date;
+          Dcl-s @worktime  Time;
+          Dcl-s @TimeStamp TimeStamp;
+          Dcl-s @field     Char(8);
+          Dcl-s @field1    Char(26);
+          Dcl-s @workdatec Char(26) Inz('2019-09-30T16:56:29-05:00 ');
+
+          @workdate = %Date(%Subst(@workdatec:1:10):*iso);
+          dsply @workdate;
+       // @field    = %Subst(@workdatec:12:8);
+       // dsply @field;
+          @worktime = %Time(%Subst(@workdatec:12:8):*JIS);
+          dsply @worktime;
+          @field1 = %Char(@workdate) + '-' + %Char(@worktime) + '.000000';
+          dsply @field1;
+          @TimeStamp = %TimeStamp(@field1:*ISO);
+          dsply @TimeStamp;
+       // @workdatec1 = %Char(@workdate:*cymd0);
+       // dsply @workdatec1;
+       // @workdate2  = %Date(@workdatec2:*cymd);
+       //   @workdatec1 = %Char(@workdate:*cymd0);
+       //   dsply @workdatec1;
+          *inlr = *On;

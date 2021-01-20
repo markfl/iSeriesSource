@@ -1,0 +1,26 @@
+             PGM        PARM(&OUTFILE &OUTLIBRARY &CURLIB)
+
+             DCL        VAR(&OUTFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTLIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&CURLIB) TYPE(*CHAR) LEN(10)
+
+             DLTF       FILE(QTEMP/QPGMMODRL2)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(QTEMP/QPGMMODRL2) +
+                          SRCFILE(&CURLIB/QDDSSRC) +
+                          DTAMBRS((QTEMP/QPGMMODREF (QPGMMODREF))) +
+                          OPTION(*NOSRC *NOLIST)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(QPGMMODRL2) TOFILE(QTEMP/QPGMMODRL2) +
+                          OVRSCOPE(*CALLLVL)
+
+             CALL       PGM(PGMFLDREF4)
+
+             DLTOVR     FILE(*ALL) LVL(*)
+
+             DLTF       FILE(QTEMP/QPGMMODRL2)
+             MONMSG     MSGID(CPF0000)
+
+             ENDPGM

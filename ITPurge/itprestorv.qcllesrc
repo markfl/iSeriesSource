@@ -1,0 +1,35 @@
+             PGM        PARM(&GROUP &SAVF &SAVLIB)
+
+             DCL        VAR(&GROUP) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SAVF) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&SAVLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&SAVFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SAVFLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&VALIDGROUP) TYPE(*LGL)
+
+             DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(256)
+
+             CALLPRC    PRC(VALIDATEGROUP) PARM((&GROUP)) +
+                          RTNVAL(&VALIDGROUP)
+             IF         COND(&VALIDGROUP) THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    GROUP is not valid')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             CHGVAR     VAR(&SAVFILE) VALUE(%SST(&SAVF 1 10))
+             CHGVAR     VAR(&SAVFLIB) VALUE(%SST(&SAVF 11 10))
+
+             CHKOBJ     OBJ(&SAVFLIB/&SAVFILE) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    SAVFILE does not +
+                          exist')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+ END:        ENDPGM

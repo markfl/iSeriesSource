@@ -1,0 +1,255 @@
+          Ctl-opt DftActGrp(*No) Option(*NoDebugio);
+
+     Fspoolfile ip   f  198        Disk
+
+          Dcl-f qadspffdq  Usage(*Input:*Update) Keyed;
+          Dcl-f qadspffdq3 Usage(*Input:*Update) Keyed
+                           Rename(qwhdrffd:qwhdrffd3);
+          Dcl-f qpgmfldref Usage(*Output);
+
+          Dcl-Pi pgmfldref1;
+             @PProgram    Like(program);
+             @PLibrary    Like(library);
+             @PSourceFile Like(srcfile);
+             @PSourceType Like(srctype);
+          End-Pi;
+
+          Dcl-s @found        Ind            Inz(*Off);
+          Dcl-s @FirstBlank   Ind            Inz(*Off);
+          Dcl-s @FirstChar    Ind            Inz(*Off);
+          Dcl-s @a            Packed(5:0)    Inz(*Zeros);
+          Dcl-s @FieldsFound  Packed(5:0)    Inz(*Zeros);
+          Dcl-s @Chk          Packed(5:0)    Inz(*Zeros);
+          Dcl-s @SaveFunction Like(function) Inz(*Blanks);
+          Dcl-s @Sequence     Like(Sequence) Inz(*Zeros);
+          Dcl-s @DSNAME       Char(15)       Inz(*Blanks);
+          Dcl-s @OldField     Char(10)       Inz(*Blanks);
+
+          /define mflores074
+          /copy qcpysrc,mflores
+          /undefine mflores074
+
+          Dcl-Pr GetSize;
+              char1 Char(198) Const;
+              packed1 Packed(11:0);
+              packed1 Packed(3:0);
+          End-Pr;
+
+     Ispoolfile ns
+     I                                  1  198  spoolfiledta
+     I                                  8    8  @DspecChk
+     I                                  9    9  @CommentChk
+     I                                  5    9  @CheckUsed
+     I                                  9   23  @InFieldName
+     I                                 10   27  @FieldName
+     I                                 10   70  @LongFieldName
+     I                                 28   28  @Type
+     I                                 28   29  @Ds
+     I                                 28   33  @Notwanted
+     I                                 28   37  @Notwantedlbl
+     I                                 41   75  @Function
+     I                                 46   51  @CheckRnm
+     I                                 54   63  @OldFldChk
+     I          aa  **
+     I                                  1  198  @1spoolfiledta
+     I                                 28   32  @1Notwanted
+
+b001      If not @Found;
+
+b002         If  @DspecChk    = 'D'
+             And @CommentChk <> '*';
+b003            If @CheckRnm = 'EXTNAM';
+                   @DsName = %Trim(%Subst(@InFieldName:1:15));
+e003            EndIf;
+e002         EndIf;
+
+b002         If @CheckRnm = 'EXTFLD';
+                @a = %Scan(')':@OldFldChk);
+b003            If @a > *Zeros;
+                   @OldField = %Subst(@OldFldChk:1:@a-1);
+                   whfldi = @OldField;
+                   Chain (whfldi:@DsName) qwhdrffd;
+                   Chain (whfldi:@DsName) qwhdrffd;
+b004               If %Found(qadspffdq);
+                      whflde = %Trim(@InFieldName);
+                      Update qwhdrffd;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+
+             @FieldsFound = %Scan('Global Field References:': spoolfiledta);
+b002         If @FieldsFound > *Zeros;
+                @Found = *On;
+e002         EndIf;
+x001      Else;
+
+             @FieldsFound = %Scan('Indicator References:': spoolfiledta);
+b002         If @FieldsFound > *Zeros;
+                *Inlr = *On;
+                Return;
+e002         EndIf;
+
+             @FieldsFound = %Scan('Field References for subprocedure':
+                                  spoolfiledta);
+b002         If @FieldsFound <> *Zeros;
+                @SaveFunction = @Function;
+x002         Else;
+
+                @FieldsFound = %Scan(%Trim(@PProgram): spoolfiledta);
+b003            If @FieldsFound = *Zeros;
+b004               If %Subst(@FieldName:1:1) = *Blanks;
+                      @FieldsFound = *Hival;
+x004               Else;
+                      Reset @FirstBlank;
+                      Reset @FirstChar;
+b005                  For @a = 1 to 15;
+b006                     If %Subst(@FieldName:@a:1) = *Blanks;
+b007                        If Not @FirstBlank;
+                               @FirstBlank = *On;
+x007                        Else;
+e007                        EndIf;
+e006                     EndIf;
+b006                     If %Subst(@FieldName:@a:1) <> *Blanks;
+b007                        If Not @FirstChar;
+                               @FirstChar = *On;
+x007                        Else;
+b008                           If @FirstBlank;
+                                  @FieldsFound = *Hival;
+                                  Leave;
+e008                           EndIf;
+e007                        EndIf;
+e006                     EndIf;
+e005                  EndFor;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+
+b002         If  @Type        <> *Blanks
+             And @FieldsFound =  *Zeros
+             And @FieldName   <> *Blanks
+             And @FieldName   <> 'Field '
+             And @FieldName   <> 'No references in t'
+             And @FieldName   <> 'ld References for'
+             And @FieldName   <> ' - Initial subrout';
+
+                Clear rpgmfldref;
+
+                program = @PProgram;
+                library = @Plibrary;
+                srcfile = @PSourceFile;
+                srctype = @PSourceType;
+
+                @Chk = %Scan('...':@LongFieldName);
+b003            If @Chk > *Zeros;
+b004               If @1Notwanted <> 'PROTO';
+                      intfield = %Subst(@LongFieldName:1:@Chk-1);
+                      extfield = intfield;
+                      GetSize(@1spoolfiledta: size: dec);
+x004               Else;
+                      intfield = %Subst(@LongFieldName:1:@Chk-1);
+                      extfield = intfield;
+e004               EndIf;
+x003            Else;
+                   @Chk = %Scan('(':@FieldName);
+b004               If @Chk > *Zeros;
+                      %Subst(@FieldName:@Chk:18-(@Chk-1)) = *Blanks;
+e004               EndIf;
+                   intfield = @FieldName;
+                   extfield = intfield;
+
+b004               Select;
+x004                  When @Notwanted = 'BEGSR '
+                      Or   @Notwanted = 'PLIST '
+                      Or   @Notwanted = 'PROTOT'
+                      Or   @Notwanted = 'TAG   '
+                      Or   @Notwanted = 'CONST '
+                      Or   @notwanted = 'EXCEPT';
+                         type = %Trim(@Notwantedlbl);
+x004                  When @Ds = 'DS';
+                         type  = @Ds;
+x004                  When @1Notwanted = 'PROTO';
+                         type = %Trim(@1Notwanted);
+x004                  Other;
+                         type  = @Type;
+e004               EndSl;
+                   GetSize(spoolfiledta: size: dec);
+e003            EndIf;
+
+b003            If intfield <> *Blanks;
+
+b004               If @CheckUsed = *Blanks;
+                      UsedinPgm = @Yes;
+e004               EndIf;
+b004               If @CheckUsed = '7031';
+                      UsedinPgm = @No;
+e004               EndIf;
+
+                   intext = 'I';
+                   whfldi = @FieldName;
+                   Chain(n) whfldi qwhdrffd;
+b004               If %Found(qadspffdq);
+                      extfield  = whflde;
+                      intext    = 'E';
+                      extfile   = whfile;
+                      fielddesc = whftxt;
+x004               Else;
+                      whflde = @FieldName;
+                      Chain(n) whflde qwhdrffd3;
+b005                  If %Found(qadspffdq3);
+                         extfield  = whflde;
+                         intext    = 'E';
+                         extfile   = whfile;
+                         fielddesc = whftxt;
+e005                  EndIf;
+e004               EndIf;
+
+                   @Sequence += 1;
+                   Sequence = @Sequence;
+
+                   function = @SaveFunction;
+
+                   Write rpgmfldref;
+
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          Dcl-Proc GetSize Export;
+
+          Dcl-Pi GetSize;
+             @SpoolFiledta Char(198) Const;
+             @Size         Packed(11:0);
+             @Dec          Packed(3:0);
+          End-Pi;
+
+          Dcl-s @a Packed(3:0) Inz(*Zeros);
+          Dcl-s @b Packed(3:0) Inz(*Zeros);
+          Dcl-Ds @SpoolFile Len(198);
+
+             @Ds   Char(2) Pos(28);
+             @Type Char(1) Pos(28);
+          End-Ds;
+
+          @Size = *Zeros;
+          @Dec  = *Zeros;
+          @SpoolFile = @SpoolFiledta;
+
+          @a = %Scan(')': @SpoolFile: 30);
+b001      If @a > *Zeros;
+b002         If @Ds = 'DS';
+                @Size = %Uns(%Subst(@SpoolFile:31:@a-31));
+x002         Else;
+b003            If @Type = 'A'
+                OR @Type = 'Z';
+                   @Size = %Uns(%Subst(@SpoolFile:30:@a-30));
+x003            Else;
+                   @b = %Scan(',': @SpoolFile: 30);
+b004               If @b > *Zeros;
+                      @Size = %Uns(%Subst(@SpoolFile:30:@b-30));
+                      @Dec  = %Uns(%Subst(@SpoolFile:@b+1:@a-(@b+1)));
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          End-Proc;

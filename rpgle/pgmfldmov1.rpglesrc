@@ -1,0 +1,2790 @@
+          Ctl-opt BndDir('MFLORES') DftActGrp(*No) Option(*NoDebugio);
+
+     FInput     ip   f  112        Disk
+          Dcl-f qpgmfldrl1 Usage(*Input:*Output) Keyed Prefix(@_);
+          Dcl-f qpgmfldml1 Usage(*Output) Keyed;
+
+          Dcl-Pi pgmfldmov1;
+             @PProgram  Like(program);
+             @PLibrary  Like(library);
+          End-Pi;
+
+          Dcl-Pr GetSize;
+              char1   Char(198) Const;
+              packed1 Packed(11:0);
+              packed1 Packed(3:0);
+          End-Pr;
+
+          Dcl-Ds @DspecDsLower  LikeDs(@DspecDsRPGILE);
+
+          Dcl-s @SaveRecordFmt Like(@IFormatName) Inz(*Blanks);
+          Dcl-s @RoutineName   Like(@IFormatName) Inz(*Blanks);
+          Dcl-s @Field         Like(extfield) Inz(*Blanks);
+          Dcl-s @Type          Like(Type)         Inz(*Blanks);
+          Dcl-s @Size          Like(Size)         Inz(*Zeros);
+          Dcl-s @Size1         Like(Size)         Inz(*Zeros);
+          Dcl-s @Size2         Like(Size)         Inz(*Zeros);
+          Dcl-s @Size3         Like(Size)         Inz(*Zeros);
+          Dcl-s @Dec           Like(Dec)          Inz(*Zeros);
+          Dcl-s @Dec1          Like(Dec)          Inz(*Zeros);
+          Dcl-s @Dec2          Like(Dec)          Inz(*Zeros);
+          Dcl-s @Dec3          Like(Dec)          Inz(*Zeros);
+          Dcl-s @srcseq        Like(srcseq)       Inz(*Zeros);
+          Dcl-s @ProcName      Like(@IFormatName) Inz(*Blanks);
+
+          Dcl-s @a             Packed(5:0)        Inz(*Zeros);
+          Dcl-s @b             Packed(5:0)        Inz(*Zeros);
+          Dcl-s @c             Packed(5:0)        Inz(*Zeros);
+
+          Dcl-s @Found         Ind                Inz(*Off);
+          Dcl-s @InDs          Ind                Inz(*Off);
+          Dcl-s @InPr          Ind                Inz(*Off);
+          Dcl-s @Skip          Ind                Inz(*Off);
+          Dcl-s @SQLSkip       Ind                Inz(*Off);
+          Dcl-s @Written       Ind                Inz(*Off);
+
+          Dcl-Ds @KeyDs likerec(rpgmfldref : *key);
+
+          /define rpgstruct01
+          /define rpgstruct03
+          /define rpgstruct04
+          /define rpgstruct05
+          /define rpgstruct06
+          /define rpgstruct07
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct01
+          /undefine rpgstruct03
+          /undefine rpgstruct04
+          /undefine rpgstruct05
+          /undefine rpgstruct06
+          /undefine rpgstruct07
+
+          /define mflores003
+          /define mflores072
+          /copy qcpysrc,mflores
+          /undefine mflores003
+          /undefine mflores072
+
+          /define pgmfldmov01
+          /define pgmfldmov02
+          /define pgmfldmov03
+          /copy qcpysrc,pgmfldmov
+          /undefine pgmfldmov01
+          /undefine pgmfldmov02
+          /undefine pgmfldmov03
+
+     IInput     ns
+     I                                  1    6 2srcseq
+     I                                  7   12 0srcdat
+     I                                 13  112  srcdta
+     I          aa  **
+     I                                 13  112  @1srcdta
+
+          @_srcdta = @ToUpper(srcdta);
+          Clear @DspecDs;
+          Clear @IspecDs;
+          Clear @CspecDs;
+          Clear @CspecFreeDs;
+          Reset @Size1;
+          Reset @Dec1;
+          Reset @Size2;
+          Reset @Dec2;
+          Reset @Size3;
+          Reset @Dec3;
+          Reset MisMatch;
+          Reset @Written;
+          Reset @Found;
+
+b001      If  %Subst(@_srcdta:1:3) = '** ';
+             *InLr = *On;
+             Return;
+e001      EndIf;
+
+b001      If  %Subst(@_srcdta:6:1)  =  'D'
+          And %Subst(@_srcdta:7:1)  <> '/'
+          And %Subst(@_srcdta:7:1)  <> '*'
+          And %Subst(@_srcdta:8:92) <> *Blanks;
+
+             Reset @Skip;
+             Reset @SQLSkip;
+
+             @DspecDsLower  = srcdta;
+             @DspecDsRPGILE = @_srcdta;
+b002         If  @DspecDsRPGILE.@DFieldName <> *Blanks
+             And @DspecDsRPGILE.@DDsId      =  'DS';
+                @InDs = *On;
+                @InPr = *Off;
+                @SaveRecordFmt = %Trim(@DspecDsRPGILE.@DFieldName);
+                @DSName   = @SaveRecordFmt;
+                @DKeyWord = @DspecDsRPGILE.@DKeyWords;
+e002         EndIf;
+
+b002         If  @DspecDsRPGILE.@DFieldName = *Blanks
+             And @DspecDsRPGILE.@DDsId      = 'DS';
+                @InDs = *On;
+                @InPr = *Off;
+                Clear @SaveRecordFmt;
+                @SaveRecordFmt = @DspecDsRPGILE.@DExternal
+                               + @DspecDsRPGILE.@DSystem
+                               + @DspecDsRPGILE.@DDsid;
+e002         EndIf;
+
+b002         If  @DspecDsRPGILE.@DFieldName <> *Blanks
+             And @DspecDsRPGILE.@DDsId      =  'PR';
+                @InDs = *Off;
+                @InPr = *On;
+                @SaveRecordFmt = %Trim(@DspecDsRPGILE.@DFieldName);
+                @DSName   = @SaveRecordFmt;
+                @DKeyWord = @DspecDsRPGILE.@DKeyWords;
+e002         EndIf;
+
+b002         If  @DspecDsRPGILE.@DFieldName = *Blanks
+             And @DspecDsRPGILE.@DDsId      = 'PR';
+                @InDs = *Off;
+                @InPr = *On;
+                Clear @SaveRecordFmt;
+                @SaveRecordFmt = @DspecDsRPGILE.@DExternal
+                               + @DspecDsRPGILE.@DSystem
+                               + @DspecDsRPGILE.@DDsid;
+e002         EndIf;
+
+             @Field  = %Trim(@DspecDsRPGILE.@DFieldName);
+
+b002         If @DspecDsRPGILE.@DDsid = 'DS'
+             Or @DspecDsRPGILE.@DDsid = 'PR'
+             Or @DspecDsRPGILE.@DDsid = 'S '
+             Or @DspecDsRPGILE.@DDsid = *Blanks;
+b003            If GetAttributes(@PProgram: @PLibrary: @Field:
+                                 @Type: @Size: @Dec);
+
+                   @Field = %Trim(@DspecDsLower.@DFieldName);
+
+b004               If @DspecDsRPGILE.@DDsid = 'S ';
+                      Reset @InDs;
+e004               EndIf;
+
+b004               If @DspecDsRPGILE.@DDsid = *Blanks;
+e004               EndIf;
+
+b004               If  @InDs
+                   And @DspecDsRPGILE.@DDsid = *Blanks;
+                      @DSName = @SaveRecordFmt;
+e004               EndIf;
+
+b004               If  @InPr
+                   And @DspecDsRPGILE.@DDsid = *Blanks;
+                      @DSName = @SaveRecordFmt;
+e004               EndIf;
+
+                   SetAttributes(@Field: @Type: @Size: @Dec:
+                                 @DField: @DFAtr);
+
+b004               If  @DspecDsRPGILE.@DDsid = 'S '
+                   Or  @InDs
+                   And @DspecDsRPGILE.@DDsid = *Blanks;
+                      @DKeyWord = %Trim(@DspecDsLower.@DKeyWords);
+e004               EndIf;
+
+                   Program  = @PProgram;
+                   Library  = @PLibrary;
+                   SrcSeq   = srcseq;
+                   @Field   = %Trim(@DspecDsLower.@DFieldName);
+                   SpecType = 'D';
+                   Free     = *Off;
+b004               If  @DspecDsRPGILE.@DDsid <> 'DS'
+                   And @DspecDsRPGILE.@DFrom <> *Blanks
+                   And @DspecDsRPGILE.@DTo   <> *Blanks;
+                      Evalr @DFrom = %Trim(@DspecDsRPGILE.@DFrom);
+                      Evalr @DTo   = %Trim(@DspecDsRPGILE.@DTo);
+e004               EndIf;
+                   DataLine = @DspecDs;
+                   FullLine = %Trim(%SubSt(srcdta:6:94));
+
+                   Write rpgmfldmov;
+
+                   @Written = *On;
+
+e003            EndIf;
+e002         EndIf;
+
+b002         If  @DspecDsRPGILE.@DDsid = 'C '
+             And Not @Written;
+
+                @Field = %Trim(@DspecDsRPGILE.@DFieldName);
+
+b003            If GetAttributes(@PProgram: @PLibrary: @Field:
+                                 @Type: @Size: @Dec);
+                      SetAttributes(@Field: @Type: @Size: @Dec:
+                                    @DField: @DFAtr);
+                   Reset @InDs;
+                   @DKeyWord = %Trim(@DspecDsRPGILE.@DKeywords);
+e003            EndIf;
+
+                Program  = @PProgram;
+                Library  = @PLibrary;
+                SrcSeq   = srcseq;
+                SpecType = 'D';
+                Free     = *Off;
+                DataLine = @DspecDsLower;
+                FullLine = %Trim(%SubSt(srcdta:6:94));
+
+                Write rpgmfldmov;
+
+                @Written = *On;
+
+e002         EndIf;
+e001      EndIf;
+
+b001      If  %Subst(@_srcdta:6:1)  =  'I'
+          And %Subst(@_srcdta:7:1)  <> '*'
+          And %Subst(@_srcdta:7:1)  <> '/'
+          And %Subst(@_srcdta:5:95) <> *Blanks;
+
+             Reset @Skip;
+             Reset @SQLSkip;
+             Reset @InDs;
+             @IspecDsRPGILE = @_srcdta;
+b002         If %Trim(@IspecDsRPGILE.@IRcdfmt) <> *Blanks;
+                @SaveRecordFmt = %Trim(@IspecDsRPGILE.@IRcdfmt);
+e002         EndIf;
+
+e001      EndIf;
+
+b001      If  %Subst(@_srcdta:6:1) = 'I'
+          And %Subst(@_srcdta:7:10) =  *Blanks
+          And Not @Written;
+
+             Reset @InDs;
+             @IspecDsRPGILE  = @_srcdta;
+             @IFormatName    = @SaveRecordFmt;
+             @Field          = @IspecDsRPGILE.@IInField;
+
+b002         If @Field <> *Blanks;
+b003            If GetAttributes(@PProgram: @PLibrary: @Field:
+                                 @Type: @Size: @Dec);
+b004               If %Trim(@Type) <> 'N';
+
+                      SetAttributes(@Field: @Type: @Size: @Dec:
+                                    @IField1: @IF1Atr);
+
+e004               EndIf;
+x003            Else;
+                   @IField1 = @Field;
+e003            EndIf;
+e002         EndIf;
+
+             @Field = @IspecDsRPGILE.@IOutField;
+b002         If @Field <> *Blanks;
+b003            If GetAttributes(@PProgram: @PLibrary: @Field:
+                                 @Type: @Size: @Dec);
+b004               If @Type <> %Trim('N');
+
+                      SetAttributes(@Field: @Type: @Size: @Dec:
+                                    @IField2: @IF2Atr);
+                      @IF1Atr = @IF2Atr;
+
+e004               EndIf;
+x003            Else;
+                   @IField2 = @Field;
+e003            EndIf;
+e002         EndIf;
+
+             Program  = @PProgram;
+             Library  = @PLibrary;
+             SrcSeq   = srcseq;
+             SpecType = 'I';
+             Free     = *Off;
+             DataLine = @IspecDs;
+             FullLine = %Trim(%SubSt(srcdta:6:94));
+
+             Write rpgmfldmov;
+
+             @Written = *On;
+
+e001      EndIf;
+
+b001      If %Subst(@_srcdta:6:2) = 'C '
+          And Not @Written
+          And @_srcdta <> *Blanks
+          Or %Subst(@_srcdta:6:3) = 'CSR'
+          And @_srcdta <> *Blanks
+          Or %Subst(@_srcdta:6:2) = 'CL'
+          And Not @Written
+          And %Subst(@_srcdta:5:95) <> *Blanks;
+
+             Reset @a;
+             Reset @b;
+             Clear @CspecDs;
+             Clear @CspecDsRPGILE;
+             Reset @Found;
+             Reset @Skip;
+             Reset @SQLSkip;
+             Reset @InDs;
+             @CspecDsRPGILE = @_srcdta;
+
+b002         If @CspecDsRPGILE.@COption = 'CALL  ';
+                @SaveRecordFmt = %Trim(@CspecDsRPGILE.@CField2);
+e002         EndIf;
+
+b002         If @CspecDsRPGILE.@COption = 'BEGSR ';
+                @RoutineName = %Trim(@CspecDsRPGILE.@CField1);
+e002         EndIf;
+
+b002         If @CspecDsRPGILE.@COption = 'PLIST '
+             Or @CspecDsRPGILE.@COption = 'KLIST ';
+                @SaveRecordFmt = %Trim(@CspecDsRPGILE.@CField1);
+e002         EndIf;
+
+b002         If @CspecDsRPGILE.@COption = 'Z-ADD '
+             Or @CspecDsRPGILE.@COption = 'Z-SUB '
+             Or @CspecDsRPGILE.@COption = 'PARM  '
+             Or @CspecDsRPGILE.@COption = 'KFLD  '
+             Or @CspecDsRPGILE.@COption = 'MOVE  '
+             Or @CspecDsRPGILE.@COption = 'MOVEL '
+             Or @CspecDsRPGILE.@COption = 'MOVEA '
+             Or @CspecDsRPGILE.@COption = 'ADD   '
+             Or @CspecDsRPGILE.@COption = 'SUB   '
+             Or @CspecDsRPGILE.@COption = 'MULT  '
+             Or @CspecDsRPGILE.@COption = 'DIV   '
+             Or @CspecDsRPGILE.@COption = 'TIME  '
+             Or @CspecDsRPGILE.@COption = 'BEGSR '
+             Or @CspecDsRPGILE.@COption = 'ENDSR ';
+
+b003            If @CspecDsRPGILE.@COption = 'BEGSR '
+                Or @CspecDsRPGILE.@COption = 'ENDSR ';
+                   @COption = @CspecDsRPGILE.@COption;
+                   @CField1 = @RoutineName;
+e003            EndIf;
+
+b003            If @CspecDsRPGILE.@COption = 'PARM  '
+                Or @CspecDsRPGILE.@COption = 'KFLD  ';
+                   @COption = @CspecDsRPGILE.@COption;
+                   @CField1 = @SaveRecordFmt;
+x003            Else;
+                   @COption = @CspecDsRPGILE.@COption;
+e003            EndIf;
+
+b003            If @CspecDsRPGILE.@CField1 <> *Blanks;
+
+                   @a = %Scan(',':@CspecDsRPGILE.@CField1);
+b004               If @a = *Zeros;
+                      @a = %Scan('(':@CspecDsRPGILE.@CField1);
+e004               EndIf;
+b004               If @a = *Zeros;
+                      @Field = %Trim(@CspecDsRPGILE.@CField1);
+x004               Else;
+                      @Field = %Subst(@CspecDsRPGILE.@CField1:1:@a-1);
+e004               EndIf;
+
+b004               If GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+
+                      @Found = *On;
+
+                      SetAttributes(@Field: @Type: @Size: @Dec:
+                                    @CField1: @CF1Atr);
+                      @Size1 = @Size;
+
+x004               Else;
+                      @CField1 = %Trim(@CspecDsRPGILE.@CField1);
+e004               EndIf;
+x003            Else;
+b004               If @CspecDsRPGILE.@COption = 'ENDSR ';
+
+                      @Field = @RoutineName;
+
+b005                  If GetAttributes(@PProgram: @PLibrary: @Field:
+                                       @Type: @Size: @Dec);
+
+                         @Found = *On;
+
+                         SetAttributes(@Field: @Type: @Size: @Dec:
+                                       @CField1: @CF1Atr);
+                         @Size1 = @Size;
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+
+b003            If  @CspecDsRPGILE.@CField2 <> *Blanks;
+
+                   @a = %Scan(',':@CspecDsRPGILE.@CField2);
+b004               If @a = *Zeros;
+                      @a = %Scan('(':@CspecDsRPGILE.@CField2);
+e004               EndIf;
+b004               If @a = *Zeros;
+                      @Field = %Trim(@CspecDsRPGILE.@CField2);
+x004               Else;
+                      @Field = %Subst(@CspecDsRPGILE.@CField2:1:@a-1);
+e004               EndIf;
+
+b004               If  %Trim(@CspecDsRPGILE.@CField2) <> '*HIVAL'
+                   And %Trim(@CspecDsRPGILE.@CField2) <> '*LOVAL'
+                   And %Trim(@CspecDsRPGILE.@CField2) <> '*ZEROS'
+                   And %Trim(@CspecDsRPGILE.@CField2) <> '*BLANKS'
+                   And %Trim(@CspecDsRPGILE.@CField2) <> '*ALL'
+                   And GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+
+                      @Found = *On;
+
+                      SetAttributes(@Field: @Type: @Size: @Dec:
+                                    @CField2: @CF2Atr);
+                      @Size2 = @Size;
+
+b005                  If  @CspecDsRPGILE.@CField1 <> *Blanks
+                      And @CF1Atr <> *Blanks
+                      And @CF2Atr <> *Blanks
+                      And @CF1Atr <> 'CONST'
+                      And @CF2Atr <> 'CONST'
+                      And @Size1  <> @Size2;
+                         MisMatch = *On;
+e005                  EndIf;
+x004               Else;
+                      @CField2 = %Trim(@CspecDsRPGILE.@CField2);
+e004               EndIf;
+e003            EndIf;
+
+b003            If @CspecDsRPGILE.@CResult <> *Blanks;
+
+                   @a = %Scan(',':@CspecDsRPGILE.@CResult);
+b004               If @a = *Zeros;
+                      @Field = %Trim(@CspecDsRPGILE.@CResult);
+x004               Else;
+                      @Field = %Subst(@CspecDsRPGILE.@CResult:1:@a-1);
+e004               EndIf;
+
+b004               If  %Trim(@CspecDsRPGILE.@CResult) <> '*HIVAL'
+                   And %Trim(@CspecDsRPGILE.@CResult) <> '*LOVAL'
+                   And GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+
+                      @Found = *On;
+
+                      SetAttributes(@Field: @Type: @Size: @Dec:
+                                    @CResult: @CRsAtr);
+                      @Size3 = @Size;
+
+b005                  If  @CspecDsRPGILE.@CField1 <> *Blanks
+                      And @CF1Atr <> *Blanks
+                      And @CRsAtr <> *Blanks
+                      And @CF1Atr <> 'CONST'
+                      And @CRsAtr <> 'CONST'
+                      And @Size1  <> @Size3;
+                         MisMatch = *On;
+e005                  EndIf;
+
+b005                  If  @CspecDsRPGILE.@CField2 <> *Blanks
+                      And @CF2Atr <> *Blanks
+                      And @CRsAtr <> *Blanks
+                      And @CF2Atr <> 'CONST'
+                      And @CRsAtr <> 'CONST'
+                      And @Size2  <> @Size3;
+                         MisMatch = *On;
+e005                  EndIf;
+x004               Else;
+                      @CResult = %Trim(@CspecDsRPGILE.@CResult);
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+
+b002         If @CspecDsRPGILE.@COption = 'EVAL  '
+             Or @CspecDsRPGILE.@COption = 'EVALR ';
+
+                @COption = @CspecDsRPGILE.@COption;
+
+                @a = %Scan('=':@CspecDsRPGILE.@CExtFact2);
+b003            If @a > *Zeros;
+
+                   @Field = %Subst(@CspecDsRPGILE.@CExtFact2:1:@a-1);
+
+b004               If GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+
+                      @Found = *On;
+
+                      SetAttributes(@Field: @Type: @Size: @Dec:
+                                    @CField1: @CF1Atr);
+
+e004               EndIf;
+
+b004               If  %Subst(@CspecDsRPGILE.@CExtFact2:@a+1:1) =  *Blanks
+                   And %Subst(@CspecDsRPGILE.@CExtFact2:@a+2)   <> *Blanks
+                   And %Subst(@CspecDsRPGILE.@CExtFact2:@a+2:1) <> '*'
+                   And %Subst(@CspecDsRPGILE.@CExtFact2:@a+2:1) <> '%'
+                   Or  %Subst(@CspecDsRPGILE.@CExtFact2:@a+1:1) <> *Blanks
+                   And %Subst(@CspecDsRPGILE.@CExtFact2:@a+1:1) <> '*'
+                   And %Subst(@CspecDsRPGILE.@CExtFact2:@a+1:1) <> '%';
+
+                      For @b = @a+1 to 69;
+                         If %Subst(@CspecDsRPGILE.@CExtFact2:@b:1) <> *Blanks;
+                            Leave;
+                         EndIf;
+                      EndFor;
+
+                      @a = @b;
+                      @b = %Scan(' ':@CspecDsRPGILE.@CExtFact2:@a);
+b005                  If @b > *Zeros;
+                         @Field = %Subst(@CspecDsRPGILE.@CExtFact2:
+                                         @a:@b-@a);
+
+b006                     If GetAttributes(@PProgram: @PLibrary: @Field:
+                                          @Type: @Size: @Dec);
+b007                        If %Trim(@Type) <> 'N';
+
+                               SetAttributes(@Field: @Type: @Size: @Dec:
+                                             @CField2: @CF2Atr);
+
+e007                        EndIf;
+x006                     Else;
+                            @CField2 = @Field;
+e006                     EndIf;
+e005                  EndIf;
+x004               Else;
+
+                      @b = %Scan('= %SUBST(':@CspecDsRPGILE.@CExtFact2);
+b005                  If @b > *Zeros;
+
+                         @c = %Scan(':':@CspecDsRPGILE.@CExtFact2:@b+9);
+b006                     If @c > *Zeros;
+
+                            @Field = %Subst(@CspecDsRPGILE.@CExtFact2:@b+9:
+                                            @c-(@b+9));
+
+b007                        If GetAttributes(@PProgram: @PLibrary: @Field:
+                                             @Type: @Size: @Dec);
+
+b008                           If %Trim(@Type) <> 'N';
+
+                                  SetAttributes(@Field: @Type: @Size: @Dec:
+                                                @CField2: @CF2Atr);
+                                  @CExtFact3 = %Subst(@CspecDsRPGILE.@CExtFact2:
+                                                      @a+2:42-(@a+2));
+e008                           EndIf;
+e007                        EndIf;
+e006                     EndIf;
+x005                  Else;
+
+                         @b = %Scan('= %EDITC(':@CspecDsRPGILE.@CExtFact2);
+b006                     If @b > *Zeros;
+
+                            @c = %Scan(':':@CspecDsRPGILE.@CExtFact2:@b+9);
+b007                        If @c > *Zeros;
+
+                               @Field = %Subst(@CspecDsRPGILE.@CExtFact2:@b+9:
+                                               @c-(@b+9));
+
+b008                           If GetAttributes(@PProgram: @PLibrary: @Field:
+                                                @Type: @Size: @Dec);
+
+b009                              If %Trim(@Type) <> 'N';
+
+                                     SetAttributes(@Field: @Type: @Size: @Dec:
+                                                   @CField2: @CF2Atr);
+                                     @CExtFact3 =
+                                     %Subst(@CspecDsRPGILE.@CExtFact2:
+                                     @a+2:42-(@a+2));
+
+e009                              EndIf;
+e008                           EndIf;
+e007                        EndIf;
+x006                     Else;
+
+                            @CExtFact2 = %Trim(%Subst(@CspecDsRPGILE.@CExtFact2:
+                                                @a+1:42-(@a+1)));
+b007                        If CheckContinue(@CspecDsRPGILE.@CExtFact2);
+
+                               @CExtFact2 = %Trim(@CExtFact2) + ' '
+                                          + %Trim(%Subst(@1srcdta:36:44));
+
+e007                        EndIf;
+e006                     EndIf;
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+
+b002         If @CspecDsRPGILE.@COption = 'SUBST ';
+
+                @COption = @CspecDsRPGILE.@COption;
+                @CField1 = %Trim(@CspecDsRPGILE.@CField1);
+b003            If %Trim(@CspecDsRPGILE.@CSize) <> *Blanks;
+                   @Size1   = %Dec(%Trim(@CspecDsRPGILE.@CSize):11:0);
+                EndIf;
+
+b003            If  @CspecDsRPGILE.@CField2 <> *Blanks;
+
+                   @a = %Scan(':':@CspecDsRPGILE.@CField2);
+b004               If @a = *Zeros;
+                      @Field = %Trim(@CspecDsRPGILE.@CField2);
+x004               Else;
+                      @Field = %Subst(@CspecDsRPGILE.@CField2:1:@a-1);
+e004               EndIf;
+
+b004               If  GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+b005                  If %Trim(@Type) <> 'N';
+
+                         @Found = *On;
+
+                         SetAttributes(@Field: @Type: @Size: @Dec:
+                                       @CField2: @CF2Atr);
+                         @Size2 = @Size;
+
+e005                  EndIf;
+x004               Else;
+                      @CField2 = %Trim(@CspecDsRPGILE.@CField2);
+e004               EndIf;
+e003            EndIf;
+
+b003            If @CspecDsRPGILE.@CResult <> *Blanks;
+
+                   @Field = %Trim(@CspecDsRPGILE.@CResult);
+
+b004               If GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+b005                  If %Trim(@Type) <> 'N';
+
+                         @Found = *On;
+
+                         SetAttributes(@Field: @Type: @Size: @Dec:
+                                       @CResult: @CRsAtr);
+                         @Size3 = @Size;
+
+b006                     If  @CspecDsRPGILE.@CField1 <> *Blanks
+                         And @CRsAtr <> *Blanks
+                         And @CF1Atr <> 'CONST'
+                         And @CRsAtr <> 'CONST'
+                         And @Size1  <> @Size3;
+                            MisMatch = *On;
+e006                     EndIf;
+
+e005                  EndIf;
+x004               Else;
+                      @CResult = %Trim(@CspecDsRPGILE.@CResult);
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+
+b002         If @CspecDsRPGILE.@COption = 'IFEQ  '
+             Or @CspecDsRPGILE.@COption = 'DOWEQ '
+             Or @CspecDsRPGILE.@COption = 'DOUEQ '
+             Or @CspecDsRPGILE.@COption = 'OREQ  '
+             Or @CspecDsRPGILE.@COption = 'ANDEQ '
+             Or @CspecDsRPGILE.@COption = 'IFNE  '
+             Or @CspecDsRPGILE.@COption = 'DOWNE '
+             Or @CspecDsRPGILE.@COption = 'DOUNE '
+             Or @CspecDsRPGILE.@COption = 'ORNE  '
+             Or @CspecDsRPGILE.@COption = 'ANDNE '
+             Or @CspecDsRPGILE.@COption = 'IFGT  '
+             Or @CspecDsRPGILE.@COption = 'DOWGT '
+             Or @CspecDsRPGILE.@COption = 'DOUGT '
+             Or @CspecDsRPGILE.@COption = 'ORGT  '
+             Or @CspecDsRPGILE.@COption = 'ANDGT '
+             Or @CspecDsRPGILE.@COption = 'IFLT  '
+             Or @CspecDsRPGILE.@COption = 'DOWLT '
+             Or @CspecDsRPGILE.@COption = 'DOULT '
+             Or @CspecDsRPGILE.@COption = 'ORLT  '
+             Or @CspecDsRPGILE.@COption = 'ANDLT '
+             Or @CspecDsRPGILE.@COption = 'IFGE  '
+             Or @CspecDsRPGILE.@COption = 'DOWGE '
+             Or @CspecDsRPGILE.@COption = 'DOUGE '
+             Or @CspecDsRPGILE.@COption = 'ORGE  '
+             Or @CspecDsRPGILE.@COption = 'ANDGE '
+             Or @CspecDsRPGILE.@COption = 'IFLE  '
+             Or @CspecDsRPGILE.@COption = 'DOWLE '
+             Or @CspecDsRPGILE.@COption = 'DOULE '
+             Or @CspecDsRPGILE.@COption = 'ORLE  '
+             Or @CspecDsRPGILE.@COption = 'ANDLE ';
+
+                @COption = @CspecDsRPGILE.@COption;
+
+b003            If @CspecDsRPGILE.@CField1 <> *Blanks;
+
+                   @a = %Scan(',':@CspecDsRPGILE.@CField1);
+b004               If @a = *Zeros;
+                      @Field = %Trim(@CspecDsRPGILE.@CField1);
+x004               Else;
+                      @Field = %Subst(@CspecDsRPGILE.@CField1:1:@a-1);
+e004               EndIf;
+
+b004               If GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+
+                         @Found = *On;
+
+                         SetAttributes(@Field: @Type: @Size: @Dec:
+                                       @CField1: @CF1Atr);
+                         @Size1 = @Size;
+
+x004               Else;
+                      @CField1 = %Trim(@CspecDsRPGILE.@CField1);
+e004               EndIf;
+e003            EndIf;
+
+b003            If  @CspecDsRPGILE.@CField2 <> *Blanks;
+
+                   @a = %Scan(',':@CspecDsRPGILE.@CField2);
+b004               If @a = *Zeros;
+                      @Field = %Trim(@CspecDsRPGILE.@CField2);
+x004               Else;
+                      @Field = %Subst(@CspecDsRPGILE.@CField2:1:@a-1);
+e004               EndIf;
+
+b004               If  %Trim(@CspecDsRPGILE.@CField2) <> '*HIVAL'
+                   And %Trim(@CspecDsRPGILE.@CField2) <> '*LOVAL'
+                   And %Trim(@CspecDsRPGILE.@CField2) <> '*ZEROS'
+                   And %Trim(@CspecDsRPGILE.@CField2) <> '*BLANKS'
+                   And %Trim(@CspecDsRPGILE.@CField2) <> '*ALL'
+                   And GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+b005                  If %Trim(@Type) <> 'N';
+
+                         @Found = *On;
+
+                         SetAttributes(@Field: @Type: @Size: @Dec:
+                                       @CField2: @CF2Atr);
+                         @Size2 = @Size;
+
+b006                     If  @CspecDsRPGILE.@CField1 <> *Blanks
+                         And @CF1Atr <> *Blanks
+                         And @CF2Atr <> *Blanks
+                         And @CF1Atr <> 'CONST'
+                         And @CF2Atr <> 'CONST'
+                         And @Size1  <> @Size2;
+                            MisMatch = *On;
+e006                     EndIf;
+x005                  Else;
+                         @CField1 = %Trim(@Field);
+e005                  EndIf;
+x004               Else;
+                      @CField2 = %Trim(@CspecDsRPGILE.@CField2);
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+
+b002         If @Found;
+
+                Program  = @PProgram;
+                Library  = @PLibrary;
+                SrcSeq   = srcseq;
+                SpecType = 'C';
+                Free     = *Off;
+                DataLine = @CspecDs;
+                FullLine = %Trim(%SubSt(srcdta:6:94));
+
+                Write rpgmfldmov;
+
+                @Written = *On;
+
+e002         EndIf;
+x001      Else;
+
+b002         If Not @Skip;
+b003            If %Subst(@_srcdta:5:95) <> *Blanks;
+b004               If Not @Written;
+b005                  If @SQLSkip;
+                         @a = %Scan(';':@_srcdta);
+b006                     If @a > *Zeros;
+                            Reset @SQLSkip;
+e006                     EndIf;
+x005                  Else;
+
+b006                     If %Subst(@_srcdta:6:2) = *Blanks;
+                            @a = %Scan('DCL-F':@_srcdta);
+b007                        If @a = *Zeros;
+                               @a = %Scan('CTL-OPT':@_srcdta);
+e007                        EndIf;
+b007                        If @a = *Zeros;
+                               @a = %Scan('END-P':@_srcdta);
+e007                        EndIf;
+b007                        If @a = *Zeros;
+                               @a = %Scan('/DEFI':@_srcdta);
+e007                        EndIf;
+b007                        If @a = *Zeros;
+                               @a = %Scan('/UNDE':@_srcdta);
+e007                        EndIf;
+b007                        If @a = *Zeros;
+                               @a = %Scan('/COPY':@_srcdta);
+e007                        EndIf;
+b007                        If @a = *Zeros;
+                               @a = %Scan('DCL-P':@_srcdta);
+e007                        EndIf;
+b007                        If @a = *Zeros;
+
+                               @a = %Scan('//':@_srcdta);
+b008                           If @a =  *Zeros;
+                                  @a = %Scan('EXEC SQL':@_srcdta);
+                                  @b = %Scan(';':@_srcdta);
+b009                              If  @b =  *Zeros;
+                                     @_srcdta = %Trimr(@_srcdta) + '\';
+                                     @c = %Scan('+\':@_srcdta);
+e009                              EndIf;
+b009                              Select;
+x009                                 When @a =  *Zeros
+                                     And  @b =  *Zeros
+                                     And  @c >  *Zeros;
+                                        @SQLSkip = *On;
+x009                                 When @a =  *Zeros
+                                     And  @b =  *Zeros;
+                                        ProcessFree(srcseq: srcdta);
+x009                                 When @a <> *Zeros;
+                                        @SQLSkip = *On;
+x009                                 When @a =  *Zeros
+                                     And  @b <> *Zeros;
+                                        ProcessFree(srcseq: srcdta);
+x009                                 Other;
+                                        ProcessFree(srcseq: srcdta);
+e009                              EndSl;
+e008                           EndIf;
+e007                        EndIf;
+e006                     EndIf;
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+x002         Else;
+                @a = %Scan(';':@_srcdta);
+b003            If @a > *Zeros;
+                   Reset @Skip;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+b001      If  %Subst(@_srcdta:6:1)  =  'P'
+          And %Subst(@_srcdta:7:1)  <> '*'
+          And %Subst(@_srcdta:5:95) <> *Blanks;
+
+             Reset @PspecDs;
+             Clear @PspecDsRPGILE;
+             @PspecDsRPGILE = @_srcdta;
+             @PFormatName = %Trim(@PspecDsRPGILE.@PName);
+             @PBeginEnd   = @PspecDsRPGILE.@PBegEnd;
+             @PKeywords   = @PspecDsRPGILE.@PKeyword;
+
+b002         If @PBeginEnd = 'B';
+
+                Program  = @PProgram;
+                Library  = @PLibrary;
+                SrcSeq   = srcseq;
+                SpecType = 'P';
+                Free     = *Off;
+                DataLine = @PspecDs;
+                FullLine = %Trim(%SubSt(srcdta:6:94));
+
+                Write rpgmfldmov;
+
+                @Written = *On;
+
+e002         EndIf;
+e001      EndIf;
+
+b001      If  %Subst(@_srcdta:6:1)  =  'O'
+          And %Subst(@_srcdta:7:1)  <> '*'
+          And %Subst(@_srcdta:30:10) <> *Blanks;
+
+             Reset @OspecDs;
+             Clear @OspecDsRPGILE;
+             @OspecDsRPGILE = @_srcdta;
+
+b002         If @OspecDsRPGILE.@OExcept = *Blanks;
+                @Field = %Trim(@OspecDsRPGILE.@OFName);
+x002         Else;
+                @Field = %Trim(@OspecDsRPGILE.@OFName);
+e002         EndIf;
+
+b002         If GetAttributes(@PProgram: @PLibrary: @Field:
+                              @Type: @Size: @Dec);
+b003            If %Trim(@Type) <> 'N';
+
+                   SetAttributes(@Field: @Type: @Size: @Dec:
+                                 @OFieldName: @OFAtr);
+
+e003            EndIf;
+x002         Else;
+                @IField1 = @Field;
+e002         EndIf;
+
+             @OEdtCde     = @OspecDsRPGILE.@OEdtcde;
+             @OFEndPos    = @OspecDsRPGILE.@OEndPos;
+             @OFormat     = @OspecDsRPGILE.@OFormat;
+             @OConstValue = @OspecDsRPGILE.@OConstant;
+
+             Program  = @PProgram;
+             Library  = @PLibrary;
+             SrcSeq   = srcseq;
+             SpecType = 'O';
+             Free     = *Off;
+             DataLine = @OspecDs;
+             FullLine = %Trim(%SubSt(srcdta:6:94));
+
+             Write rpgmfldmov;
+
+             @Written = *On;
+
+e001      EndIf;
+
+š         Dcl-Proc ProcessFree;
+
+          Dcl-Pi ProcessFree;
+             @P_srcseq  Like(srcseq) Const;
+             @P_srcdta  Like(srcdta) Const;
+          End-Pi;
+
+          Dcl-s @Psrcseq Like(srcseq);
+          Dcl-s @Psrcdta Like(srcdta);
+          Dcl-s @srcdta Like(srcdta);
+          Dcl-Ds @ScanStringDs;
+             @ScnStr Char(1) Dim(100);
+          End-Ds;
+
+          Dcl-s @Comments Packed(3:0) Inz(*Zeros);
+          Dcl-s @aa Packed(3:0) Inz(*Zeros);
+          Dcl-s @bb Packed(3:0) Inz(*Zeros);
+          Dcl-s @cc Packed(3:0) Inz(*Zeros);
+          Dcl-s @dd Packed(3:0) Inz(*Zeros);
+          Dcl-s @ee Packed(3:0) Inz(*Zeros);
+          Dcl-s @f Packed(3:0) Inz(*Zeros);
+          Dcl-s @e Packed(3:0) Inz(*Zeros);
+          Dcl-s @s Packed(3:0) Inz(*Zeros) Dim(100);
+          Dcl-s @ss Packed(3:0) Inz(*Zeros) Dim(100);
+          Dcl-s @v Packed(3:0) Inz(*Zeros);
+          Dcl-s @w Packed(3:0) Inz(*Zeros);
+          Dcl-s @x Packed(3:0) Inz(*Zeros);
+          Dcl-s @y Packed(3:0) Inz(*Zeros);
+          Dcl-s @z Packed(3:0) Inz(*Zeros);
+          Dcl-s @SaveSign Char(2) Inz(*Blanks);
+          Dcl-s @Size1 Like(Size)  Inz(*Zeros);
+          Dcl-s @Size2 Like(Size)  Inz(*Zeros);
+          Dcl-s @Size3 Like(Size)  Inz(*Zeros);
+          Dcl-s @plus Packed(3:0) Inz(*Zeros);
+          Dcl-s @minus Packed(3:0) Inz(*Zeros);
+          Dcl-s @mult Packed(3:0) Inz(*Zeros);
+          Dcl-s @div Packed(3:0) Inz(*Zeros);
+          Dcl-s @xfoot Zoned(12:0) Dim(4);
+          Dcl-s @Tot Packed(5:0) Inz(*Zeros);
+          Dcl-s @First Packed(3:0) Inz(*Zeros);
+          Dcl-s @EqualSign Packed(3:0) Inz(*Zeros);
+          Dcl-s @LineProcessed Ind Inz(*Off);
+
+          @Psrcseq = @P_srcseq;
+          @Psrcdta = @ToUpper(@P_srcdta);
+          @ScanStringDs = %Trim(%Subst(@Psrcdta:6:94)) + '\';
+          @e = %Scan('\':@ScanStringDs);
+          @f = %Scan(';':@ScanStringDs);
+
+b001      Monitor;
+
+b002         For @aa = 1 to 100;
+b003            If @Found = *On
+                And @ScnStr(@aa) = *Blanks;
+                   @ScnStr(@aa) = *Hival;
+e003            EndIf;
+b003            If @ScnStr(@aa) = '''';
+b004               If @Found;
+                      @Found = *Off;
+x004               Else;
+                      @Found = *On;
+e004               EndIf;
+e003            EndIf;
+e002         EndFor;
+
+b002         For @aa = 1 to 100;
+b003            If @Found = *On
+                And @ScnStr(@aa) = *Blanks;
+                   @ScnStr(@aa) = *Hival;
+e003            EndIf;
+b003            If  @ScnStr(@aa) = '('
+                And Not @Found;
+                   @Found = *On;
+e003            EndIf;
+b003            If  @ScnStr(@aa) = ')'
+                And @Found;
+                   @Found = *On;
+e003            EndIf;
+e002         EndFor;
+
+             Reset @aa;
+             Reset @Found;
+
+     C                   Movea     *Hival        @ScnStr(@e)
+     C     ' '           Scan      @ScanStringDs @s
+
+             @v = %LookUp(*Zeros:@s);
+b002         If @v > *Zeros;
+                @s(@v) = @f;
+e002         EndIf;
+
+             @EqualSign = %Scan('=':@Psrcdta);
+b002         If @EqualSign > *Zeros;
+                @f = @EqualSign + 1;
+                @Comments = %Scan('//':@Psrcdta);
+b003            If  @Comments > *Zeros
+                And @Comments < @EqualSign;
+                   Reset @EqualSign;
+                   Reset @f;
+e003            EndIf;
+b003            If  @EqualSign > *Zeros
+                And @CFOption  = *Blanks;
+                   @CFOption   = 'Eval';
+e003            EndIf;
+                @y = %Scan('FOR':@Psrcdta);
+b003            If  @y = *Zeros;
+                   @y = %Scan('DOW':@Psrcdta);
+e003            EndIf;
+b003            If  @y = *Zeros;
+                   @y = %Scan('DOU':@Psrcdta);
+e003            EndIf;
+b003            If  @y > *Zeros
+                And @y < @EqualSign;
+                   Reset @EqualSign;
+e003            EndIf;
+e002         EndIf;
+
+             @bb = 1;
+b002         If CheckBypassProcess(@Psrcdta);
+b003            Dow @s(@bb) <> *Zeros;
+b004               If @aa = *Zeros;
+                      @srcdta = %Trim(%Subst(@ScanStringDs:1:@s(@bb)));
+x004               Else;
+                      @srcdta = %Trim(%Subst(@ScanStringDs:@s(@aa):
+                                @s(@bb)-@s(@aa)));
+e004               EndIf;
+
+b004               If @srcdta <> *Blanks;
+b005                  If  %Subst(@srcdta:1:1) <> ''''
+                      And CheckProcess(%Trim(@srcdta));
+                         @CFOption = %Trim(@srcdta);
+x005                  Else;
+b006                     If  Not CheckSign(@srcdta:1:3)
+                         And     %Trim(@srcdta) <> '='
+                         And     %Trim(@srcdta) <> '''';
+
+b007                        If CheckFunction(@srcdta: 1:
+                                             @EqualSign: @x: @y: @z);
+b008                           If @y > *Zeros;
+                                  @z = %Scan(')':@srcdta:@y);
+b009                              If  @z = *Zeros;
+                                     @z = %Scan(':':@srcdta:@y);
+b010                                 If  @z = *Zeros;
+                                        @z = %Scan(' ':@srcdta:@y);
+e010                                 EndIf;
+e009                              EndIf;
+b009                              If @z > *Zeros;
+                                     @Field = %SubSt(@srcdta:@y:@z-@y);
+x009                              Else;
+                                     @Field = %Trim(@srcdta);
+e009                              EndIf;
+x008                           Else;
+                                  @Field = %Trim(@srcdta);
+e008                           EndIf;
+x007                        Else;
+                               @Field = %Trim(@srcdta);
+e007                        EndIf;
+
+                            @cc += 1;
+                            @Found = *On;
+
+b007                        If @CFField1 = *Blanks;
+b008                           If GetAttributes(@PProgram: @PLibrary: @Field:
+                                                @Type: @Size: @Dec);
+                                  SetAttributes(@Field: @Type: @Size: @Dec:
+                                                @CFField1: @CFF1Atr);
+                                  @Size1 = @Size;
+                                  Clear @Field;
+b009                              If @CFF1Atr = 'PROTOTYP';
+                                     @y = %Scan('(':@srcdta);
+                                     @y += 1;
+b010                                 If @y > *Zeros;
+
+     C     ':'           Scan      @srcdta       @ss
+
+                                        @v = %LookUp(*Zeros:@ss);
+b011                                    If @v > 1;
+                                           @CFExtFact2 = %Subst(@srcdta:@y);
+x011                                    Else;
+                                           @z = %Scan(')':@srcdta);
+b012                                       If @z = *Zeros;
+                                              @z = %Scan(':':@srcdta);
+x012                                       Else;
+e012                                       EndIf;
+b012                                       If @z <> *Zeros;
+                                              @Field = %SubSt(@srcdta:@y:@z-@y);
+b013                                          If GetAttributes(@PProgram:
+                                                               @PLibrary:
+                                                               @Field: @Type:
+                                                               @Size: @Dec);
+                                                 SetAttributes(@Field: @Type:
+                                                               @Size: @Dec:
+                                                               @CFField2:
+                                                               @CFF2Atr);
+                                                 @Size2 = @Size;
+                                                 Clear @Field;
+x013                                          Else;
+                                                 @CFField2 = %Trim(@Field);
+e013                                          EndIf;
+e012                                       EndIf;
+e011                                    EndIf;
+e010                                 EndIf;
+e009                              EndIf;
+x008                           Else;
+                                  @CFField1 = %Trim(@Field);
+e008                           EndIf;
+x007                        Else;
+
+b008                           If @CFField2 = *Blanks;
+b009                              If GetAttributes(@PProgram: @PLibrary: @Field:
+                                                   @Type: @Size: @Dec);
+                                     SetAttributes(@Field: @Type: @Size: @Dec:
+                                                   @CFField2: @CFF2Atr);
+                                     @Size2 = @Size;
+                                     Clear @Field;
+x009                              Else;
+                                     @CFExtFact2 = %Trim(@Field);
+e009                              EndIf;
+x008                           Else;
+
+b009                              If @CFResult = *Blanks;
+b010                                 If GetAttributes(@PProgram: @PLibrary:
+                                                      @Field: @Type:
+                                                      @Size: @Dec);
+b011                                    If %Trim(@Type) <> 'N';
+                                           SetAttributes(@Field: @Type: @Size:
+                                                         @Dec: @CFResult:
+                                                         @CFRsAtr);
+                                           @Size3 = @Size;
+e011                                    EndIf;
+x010                                 Else;
+                                        @CFExtFact3 = %Trim(@Field);
+e010                                 EndIf;
+e009                              EndIf;
+e008                           EndIf;
+e007                        EndIf;
+
+b007                        If @cc = 3;
+
+                               MisMatch = *Off;
+
+b008                           If  @CFF1Atr <> *Blanks
+                               And @CFF2Atr <> *Blanks
+                               And @CFF1Atr <> 'CONST'
+                               And @CFF2Atr <> 'CONST'
+                               And @Size1   <> *Zeros
+                               And @Size2   <> *Zeros
+                               And @Size1   <> @Size2;
+                                  MisMatch = *On;
+e008                           EndIf;
+
+b008                           If  @CFF1Atr <> *Blanks
+                               And @CFRsAtr <> *Blanks
+                               And @CFF1Atr <> 'CONST'
+                               And @CFRsAtr <> 'CONST'
+                               And @Size1   <> *Zeros
+                               And @Size3   <> *Zeros
+                               And @Size1   <> @Size3;
+                                  MisMatch = *On;
+e008                           EndIf;
+
+b008                           If  @CFF2Atr <> *Blanks
+                               And @CFRsAtr <> *Blanks
+                               And @CFF2Atr <> 'CONST'
+                               And @CFRsAtr <> 'CONST'
+                               And @Size2   <> *Zeros
+                               And @Size3   <> *Zeros
+                               And @Size2   <> @Size3;
+                                  MisMatch = *On;
+e008                           EndIf;
+
+b008                           If  @EqualSign > *Zeros
+                               And @CFOption =  *Blanks;
+                                  @CFOption = 'Eval';
+e008                           EndIf;
+                               Program  = @PProgram;
+                               Library  = @PLibrary;
+                               SrcSeq   = @Psrcseq;
+                               SpecType = 'F';
+                               Free     = *On;
+                               DataLine = @CspecFreeDs;
+                               FullLine = %Trim(%SubSt(@P_srcdta:6:94));
+
+                               Write rpgmfldmov;
+
+                               @LineProcessed = *On;
+                               Reset @cc;
+                               Reset @Found;
+                               Clear @CFField1;
+                               Clear @CFF1Atr;
+                               Clear @CFField2;
+                               Clear @CFF2Atr;
+                               Clear @CFResult;
+                               Clear @CFRsAtr;
+                               Clear @Size1;
+                               Clear @Size2;
+                               Clear @Size3;
+e007                        EndIf;
+e006                     EndIf;
+e005                  EndIf;
+e004               EndIf;
+                   @aa += 1;
+                   @bb += 1;
+e003            EndDo;
+x002         Else;
+                @a = %Scan(';':@P_srcdta);
+b003            If  @a =  *Zeros;
+                   @_srcdta = %Trimr(@P_srcdta) + '\';
+                   @a = %Scan('+\':@P_srcdta);
+e003            EndIf;
+b003            If  @a =  *Zeros;
+                   @Skip = *On;
+e003            EndIf;
+e002         EndIf;
+
+b002         If @Found;
+
+                MisMatch = *Off;
+
+b003            If  @CFF1Atr <> *Blanks
+                And @CFF2Atr <> *Blanks
+                And @CFF1Atr <> 'CONST'
+                And @CFF2Atr <> 'CONST'
+                And @Size1   <> *Zeros
+                And @Size2   <> *Zeros
+                And @Size1   <> @Size2;
+                   MisMatch = *On;
+e003            EndIf;
+
+b003            If  @CFF1Atr <> *Blanks
+                And @CFRsAtr <> *Blanks
+                And @CFF1Atr <> 'CONST'
+                And @CFRsAtr <> 'CONST'
+                And @Size1   <> *Zeros
+                And @Size3   <> *Zeros
+                And @Size1   <> @Size3;
+                   MisMatch = *On;
+e003            EndIf;
+
+b003            If  @CFF2Atr <> *Blanks
+                And @CFRsAtr <> *Blanks
+                And @CFF2Atr <> 'CONST'
+                And @CFRsAtr <> 'CONST'
+                And @Size2   <> *Zeros
+                And @Size3   <> *Zeros
+                And @Size2   <> @Size3;
+                   MisMatch = *On;
+e003            EndIf;
+
+b003            If  @EqualSign > *Zeros
+                And @CFOption =  *Blanks;
+                   @CFOption = 'Eval';
+e003            EndIf;
+                Program  = @PProgram;
+                Library  = @PLibrary;
+                SrcSeq   = @Psrcseq;
+                SpecType = 'F';
+                Free     = *On;
+                DataLine = @CspecFreeDs;
+                FullLine = %Trim(%SubSt(@P_srcdta:6:94));
+
+                Write rpgmfldmov;
+
+                @LineProcessed = *On;
+                Reset @cc;
+                Reset @Found;
+                Clear @CFField1;
+                Clear @CFF1Atr;
+                Clear @CFField2;
+                Clear @CFF2Atr;
+                Clear @CFResult;
+                Clear @CFRsAtr;
+                Clear @Size1;
+                Clear @Size2;
+                Clear @Size3;
+e002         EndIf;
+
+b002         If Not @LineProcessed;
+                @e = %Scan(';':@Psrcdta);
+b003            If @e = *Zeros;
+                   @srcdta = %Trimr(@Psrcdta) + '\';
+                   @e = %Scan('\':@srcdta);
+b004               If @e <> *Zeros;
+                      @e -= 1;
+e004               EndIf;
+e003            EndIf;
+
+                @y = %Scan('WHEN':@Psrcdta);
+b003            If @y = *Zeros;
+                   @y = %Scan(' IF ':@Psrcdta);
+b004               If @y = *Zeros;
+                      @y = %Scan('ELSEIF':@Psrcdta);
+b005                  If @y = *Zeros;
+                         @y = %Scan(' AND ':@Psrcdta);
+b006                     If @y = *Zeros;
+                            @y = %Scan(' OR ':@Psrcdta);
+b007                        If @y = *Zeros;
+x007                        Else;
+                               @y += 3;
+                               @CFOption = 'Or';
+e007                        EndIf;
+x006                     Else;
+                            @y += 4;
+                            @CFOption = 'And';
+e006                     EndIf;
+x005                  Else;
+                         @y += 6;
+                         @CFOption = 'ElseIf';
+e005                  EndIf;
+x004               Else;
+                      @y += 3;
+                      @CFOption = 'If';
+e004               EndIf;
+x003            Else;
+                   @y += 5;
+                   @CFOption = 'When';
+e003            EndIf;
+
+b003            If @y = *Zeros;
+b004               If  @EqualSign > *Zeros
+                   And @Comments  = *Zeros
+                   Or  @EqualSign > *Zeros
+                   And @Comments  > @EqualSign;
+
+                      @x = @EqualSign;
+
+                      @y = %Scan('%SCAN':@Psrcdta);
+b005                  If @y = *Zeros;
+                         @y = %Scan('%CHECK':@Psrcdta);
+e005                  EndIf;
+b005                  If @y = *Zeros;
+
+                         @CFOption = 'Eval';
+
+                         @Found = *On;
+
+                         @y = %Scan('EVAL':@Psrcdta);
+b006                     If @y = *Zeros;
+                            @y = 6;
+e006                     EndIf;
+b006                     If GetNextField(@Psrcdta: @y+5: @e: @Field: @First);
+                            @Found = *On;
+x006                     Else;
+
+b007                        If CheckFunction(@Psrcdta: 1:
+                                             @EqualSign: @f: @y: @z);
+
+b008                           If @y > @EqualSign;
+                                  @y = *Zeros;
+e008                           EndIf;
+b008                           If @z > @EqualSign;
+                                  @z = *Zeros;
+e008                           EndIf;
+
+b008                           If  @y = *Zeros
+                               And @z = *Zeros;
+                                  @y = %Scan('EVALR(H)':@Psrcdta);
+b009                              If @y > *Zeros;
+                                     @y += 9;
+x009                              Else;
+                                     @y = %Scan('EVAL(H)':@Psrcdta);
+b010                                 If @y > *Zeros;
+                                        @y += 8;
+x010                                 Else;
+                                        @y = %Scan('EVALR':@Psrcdta);
+b011                                    If @y > *Zeros;
+                                           @y += 6;
+x011                                    Else;
+                                           @y = %Scan('EVAL':@Psrcdta);
+b012                                       If @y > *Zeros;
+                                              @y += 5;
+e012                                       EndIf;
+e011                                    EndIf;
+e010                                 EndIf;
+e009                              EndIf;
+                                  @Field = %Trim(%Subst(@P_srcdta:7:@x-8));
+e008                           EndIf;
+x007                        Else;
+b008                           If  @y <> *Zeros
+                               And @z =  *Zeros;
+                                  @aa = %Scan('(': @Psrcdta:@y);
+                                  @bb = %Scan(')': @Psrcdta:@y);
+                                  @cc = %Scan(':': @Psrcdta:@y);
+                                  @dd = %Scan(';': @Psrcdta:@y);
+
+b009                              If @aa <> *Zeros;
+                                     @z  = @aa;
+e009                              EndIf;
+
+b009                              If  @bb <> *Zeros
+                                  And @bb <  @z
+                                  Or  @bb <> *Zeros
+                                  And @z  =  *Zeros;
+                                     @z  = @bb;
+e009                              EndIf;
+
+b009                              If  @cc <> *Zeros
+                                  And @cc <  @z
+                                  Or  @cc <> *Zeros
+                                  And @z  =  *Zeros;
+                                     @z  = @cc;
+e009                              EndIf;
+
+b009                              If  @dd <> *Zeros
+                                  And @dd <  @z
+                                  Or  @dd <> *Zeros
+                                  And @z  =  *Zeros;
+                                     @z  = @dd;
+e009                              EndIf;
+
+b009                              If @z <> *Zeros;
+                                     @Field = %Trim(%Subst(@P_srcdta:@y:@z-@y));
+e009                              EndIf;
+x008                           Else;
+b009                              If @y > *Zeros;
+                                     @Field =
+                                     %Trim(%Subst(@P_srcdta:@y:(@x-1)-@y));
+x009                              Else;
+                                     @Field = %Trim(%Subst(@P_srcdta:7:@x-8));
+e009                              EndIf;
+e008                           EndIf;
+e007                        EndIf;
+                            @y = %Scan('%SUBST(': @Field);
+b007                        If @y > *Zeros;
+                               @z = %Scan('(': @Field:@y+7);
+b008                           If @z > *Zeros;
+                                  @Field = %Trim(%Subst(@Field:
+                                                 @y+7:(@z)-(@y+7)));
+x008                           Else;
+                                  @z = %Scan(':': @Field);
+b009                              If @z > *Zeros;
+                                     @Field =
+                                     %Trim(%Subst(@Field:@y+7:(@z-1)-(@y+7)));
+e009                              EndIf;
+e008                           EndIf;
+e007                        EndIf;
+e006                     EndIf;
+
+b006                     If GetAttributes(@PProgram: @PLibrary: @Field:
+                                          @Type: @Size: @Dec);
+                            SetAttributes(@Field: @Type: @Size: @Dec:
+                                          @CFField1: @CFF1Atr);
+                            @Size1 = @Size;
+                            Clear @Field;
+e006                     EndIf;
+
+                         @CFField1 = %Trim(@CFField1) + ' ' + '=';
+
+b006                     If @EqualSign > *Zeros;
+                            @First = @EqualSign+1;
+e006                     EndIf;
+
+b006                     If GetNextField(@Psrcdta: @First:
+                                         @e: @Field: @z);
+b007                        If @z > *Zeros;
+                               @First = @z;
+e007                        EndIf;
+                            @Found = *On;
+x006                     Else;
+
+                            @XFoot(1) = %Scan('+':@Psrcdta:@EqualSign);
+b007                        If @XFoot(1) >= @e;
+                               @XFoot(1) =  *Zeros;
+x007                        Else;
+                               @First = @XFoot(1);
+b008                           If @XFoot(1) <> *Zeros;
+                                  @SaveSign = '+';
+e008                           EndIf;
+e007                        EndIf;
+                            @XFoot(2) = %Scan('-':@Psrcdta:@EqualSign);
+b007                        If @XFoot(2) > @e;
+                               @XFoot(2) = *Zeros;
+x007                        Else;
+b008                           If  @XFoot(2) <> *Zeros
+                               And @XFoot(1) =  *Zeros
+                               Or  @XFoot(2) <> *Zeros
+                               And @XFoot(1) <> *Zeros
+                               And @XFoot(2) <  @XFoot(1);
+                                  Clear    @XFoot(1);
+                                  @First = @XFoot(2);
+                                  @SaveSign = '-';
+e008                           EndIf;
+e007                        EndIf;
+                            @XFoot(3) = %Scan(' * ':@Psrcdta:@EqualSign);
+b007                        If @XFoot(3) > @e;
+                               @XFoot(3) = *Zeros;
+x007                        Else;
+b008                           If  @XFoot(3) <> *Zeros
+                               And @XFoot(2) =  *Zeros
+                               And @XFoot(1) =  *Zeros
+                               Or  @XFoot(3) <> *Zeros
+                               And @XFoot(2) <> *Zeros
+                               And @XFoot(3) <  @XFoot(2)
+                               Or  @XFoot(3) <> *Zeros
+                               And @XFoot(1) <> *Zeros
+                               And @XFoot(3) <  @XFoot(1);
+                                  Clear    @XFoot(1);
+                                  Clear    @XFoot(2);
+                                  @First = @XFoot(3);
+                                  @SaveSign = '*';
+e008                           EndIf;
+e007                        EndIf;
+                            @XFoot(4) = %Scan(' / ':@Psrcdta:@EqualSign);
+b007                        If @XFoot(4) > @e;
+                               @XFoot(4) = *Zeros;
+x007                        Else;
+b008                           If  @XFoot(4) <> *Zeros
+                               And @XFoot(3) =  *Zeros
+                               And @XFoot(2) =  *Zeros
+                               And @XFoot(1) =  *Zeros
+                               Or  @XFoot(4) <> *Zeros
+                               And @XFoot(3) <> *Zeros
+                               and @XFoot(4) <  @XFoot(3)
+                               Or  @XFoot(4) <> *Zeros
+                               And @XFoot(2) <> *Zeros
+                               And @XFoot(4) <  @XFoot(2)
+                               Or  @XFoot(4) <> *Zeros
+                               And @XFoot(1) <> *Zeros
+                               And @XFoot(4) <  @XFoot(1);
+                                  Clear    @XFoot(1);
+                                  Clear    @XFoot(2);
+                                  Clear    @XFoot(3);
+                                  @First = @XFoot(4);
+                                  @SaveSign = '/';
+e008                           EndIf;
+e007                        EndIf;
+
+b007                        If @First > *Zeros;
+
+b008                           If CheckFunction(@Psrcdta:
+                                                @EqualSign: @First: @f: @y: @z);
+
+b009                              If @y > @e;
+                                     Reset @y;
+e009                              EndIf;
+
+b009                              If @z > *Zeros;
+                                     @aa = %Scan(':':@Psrcdta:@z);
+                                     @bb = %Scan(')':@Psrcdta:@z);
+b010                                 If @aa > @bb
+                                     Or @aa = *Zeros;
+                                        @aa = @bb;
+e010                                 EndIf;
+x009                              Else;
+b010                                 If @y > *Zeros;
+                                        @aa = %Scan(':':@Psrcdta:@y);
+b011                                    If @aa = *Zeros;
+                                           @aa = %Scan(')':@Psrcdta:@y);
+e011                                    EndIf;
+e010                                 EndIf;
+e009                              EndIf;
+
+                                  @Field = %Trim(%Subst(@P_srcdta:@y:@aa-@y));
+
+x008                           Else;
+
+                                  @Tot   = %XFoot(@XFoot);
+b009                              If  @Tot =  *Zeros
+                                  Or  @Tot >  @f
+                                  And @f   <> *Zeros;
+b010                                 If @f > *Zeros;
+b011                                    If @z > *Zeros;
+
+                                           @Field =
+                                           %Trim(%Subst(@P_srcdta:@z:@aa-(@z)));
+b012                                       If @First > @z;
+                                              @y = @First + 1;
+x012                                       Else;
+                                              @y = @z;
+e012                                       EndIf;
+x011                                    Elseif @y > *Zeros;
+                                           @Field =
+                                           %Trim(%Subst(@P_srcdta:@y:@aa-@y));
+x011                                    Else;
+                                           @Field = %Trim(%Subst(@P_srcdta:
+                                                          @f+1:@e-(@f+1)));
+e011                                    EndIf;
+x010                                 Else;
+
+                                        @z = %Scan(';':@Psrcdta:@EqualSign);
+b011                                    If @z <> *Zeros;
+                                           @Field =
+                                           %Trim(%Subst(@P_srcdta:
+                                                 @x+1:@z-(@x+1)));
+e011                                    EndIf;
+e010                                 EndIf;
+x009                              Else;
+
+                                     @plus  = @XFoot(1);
+b010                                 If @XFoot(1) > @e;
+                                        @XFoot(1) = *Zeros;
+e010                                 EndIf;
+                                     @minus = @XFoot(2);
+b010                                 If @XFoot(2) > @e;
+                                        @XFoot(2) = *Zeros;
+e010                                 EndIf;
+                                     @mult  = @XFoot(3);
+b010                                 If @XFoot(3) > @e;
+                                        @XFoot(3) = *Zeros;
+e010                                 EndIf;
+                                     @div   = @XFoot(4);
+b010                                 If @XFoot(4) > @e;
+                                        @XFoot(4) = *Zeros;
+e010                                 EndIf;
+                                     @Field = CheckMathCalc(@Psrcdta: @x:
+                                                            @plus: @minus:
+                                                            @mult: @div: @y);
+                                     @y += 1;
+
+e009                              EndIf;
+e008                           EndIf;
+x007                        Else;
+
+                               @Field = %Trim(%Subst(@P_srcdta:
+                                        @EqualSign+1:@e-(@EqualSign+1)));
+e007                        EndIf;
+e006                     EndIf;
+
+b006                     If @Field <>*Blanks;
+                            @CFField2 = @Field;
+b007                        If GetAttributes(@PProgram: @PLibrary: @Field:
+                                             @Type: @Size: @Dec);
+
+b008                           If %Trim(@Type) <> 'N';
+
+                                  SetAttributes(@Field: @Type: @Size: @Dec:
+                                                @CFField2: @CFF2Atr);
+
+                                  @Size2 = @Size;
+
+e008                           EndIf;
+x007                        Else;
+b008                           If @e <> *Zeros;
+                                  @CFExtFact2 =
+                                  %Trim(%Subst(@P_srcdta:@x+1:@e-(@x+1)));
+e008                           EndIf;
+e007                        EndIf;
+x006                     Else;
+                            @CFExtFact2 = %Trim(%Subst(@P_srcdta:
+                                          @EqualSign+1: @e-(@EqualSign+1)));
+e006                     EndIf;
+
+                         @CFField2 = %Trim(@CFField2) + ' ' + @SaveSign;
+                         Clear @Field;
+
+b006                     If GetNextField(@Psrcdta: @First:
+                                         @e: @Field: @First);
+                            @Found = *On;
+x006                     Else;
+b007                        If @First < @e;
+
+                               Clear @x;
+                               Clear @Field;
+
+b008                           If  @First > *Zeros
+                               And @First < @e;
+
+b009                              If CheckFunction(@Psrcdta: @First:
+                                                   @e: @f: @w: @x);
+
+b010                                 If @w > @e;
+                                        Reset @w;
+e010                                 EndIf;
+
+b010                                 If @x > *Zeros;
+                                        @aa = %Scan(':':@Psrcdta:@x);
+                                        @bb = %Scan(')':@Psrcdta:@x);
+b011                                    If @aa > @bb
+                                        Or @aa = *Zeros;
+                                           @aa = @bb;
+e011                                    EndIf;
+x010                                 Else;
+b011                                    If @w > *Zeros;
+                                           @aa = %Scan(':':@Psrcdta:@w);
+b012                                       If @aa = *Zeros;
+                                              @aa = %Scan(')':@Psrcdta:@w);
+e012                                       EndIf;
+e011                                    EndIf;
+e010                                 EndIf;
+
+                                     @Field = %Trim(%Subst(@P_srcdta:
+                                                    @x+1:@aa-(@x+1)));
+x009                              Else;
+
+b010                                 If  @w = *Zeros
+                                     And @x = *Zeros;
+                                        Reset @SaveSign;
+                                        Reset @Tot;
+b011                                    If @First > *Zeros;
+                                           @XFoot(1) =
+                                           %Scan('+':@Psrcdta:@First+1);
+                                           @XFoot(2) =
+                                           %Scan('-':@Psrcdta:@First+1);
+                                           @XFoot(3) =
+                                           %Scan(' * ':@Psrcdta:@First+1);
+                                           @XFoot(4) =
+                                           %Scan(' / ':@Psrcdta:@First+1);
+                                           @Tot   = %XFoot(@XFoot);
+e011                                    EndIf;
+
+                                        Reset @Field;
+b011                                    If @Tot > *Zeros;
+
+                                           @plus  = @XFoot(1);
+b012                                       If @XFoot(1) > @e;
+                                              @XFoot(1) = *Zeros;
+x012                                       Else;
+                                              @SaveSign = '+';
+e012                                       EndIf;
+                                           @minus = @XFoot(2);
+b012                                       If @XFoot(2) > @e;
+                                              @XFoot(2) = *Zeros;
+x012                                       Else;
+                                              @SaveSign = '-';
+e012                                       EndIf;
+                                           @mult  = @XFoot(3);
+b012                                       If @XFoot(3) > @e;
+                                              @XFoot(3) = *Zeros;
+x012                                       Else;
+                                              @SaveSign = '*';
+e012                                       EndIf;
+                                           @div   = @XFoot(4);
+b012                                       If @XFoot(4) > @e;
+                                              @XFoot(4) = *Zeros;
+x012                                       Else;
+                                              @SaveSign = '/';
+e012                                       EndIf;
+
+                                           @Field = CheckMathCalc(@Psrcdta:
+                                                                  @First:
+                                                                  @plus:
+                                                                  @minus:
+                                                                  @mult:
+                                                                  @Div:     @z);
+
+x011                                    Else;
+
+b012                                       If @y > *Zeros;
+b013                                          If @f = *Zeros;
+                                                 @f = %Scan('=':@Psrcdta:@y);
+b014                                             If @f > *Zeros;
+                                                    @f += 1;
+                                                    @z = %Scan(';':@Psrcdta:@y);
+b015                                                If @z > *Zeros;
+
+                                                       @Field =
+                                                       %Trim(%Subst(@Psrcdta:
+                                                       @f + 1:@z - (@f + 1)));
+
+e015                                                EndIf;
+x014                                             Else;
+                                                    @z = %Scan(';':@Psrcdta:@y);
+b015                                                If @z > *Zeros;
+
+                                                       @Field =
+                                                       %Trim(%Subst(@Psrcdta:
+                                                       @y:@z - @y));
+
+e015                                                EndIf;
+e014                                             EndIf;
+e013                                          EndIf;
+e012                                       EndIf;
+e011                                    EndIf;
+x010                                 Else;
+
+b011                                    If @w > *Zeros;
+                                           @y = @w;
+                                           @z = %Scan(':':@Psrcdta:@w);
+b012                                       If @z = *Zeros;
+                                              @z = %Scan(')':@Psrcdta:@w);
+e012                                       EndIf;
+x011                                    Else;
+b012                                       If @x > *Zeros;
+                                              @y = @x;
+                                              @z = %Scan(':':@Psrcdta:@x);
+b013                                          If @z = *Zeros;
+                                                 @z = %Scan(')':@Psrcdta:@x);
+e013                                          EndIf;
+e012                                       EndIf;
+e011                                    EndIf;
+e010                                 EndIf;
+
+                                     @Field = %Trim(%Subst(@P_srcdta:
+                                              @y+1:@z-(@y+1)));
+
+e009                              EndIf;
+e008                           EndIf;
+e007                        EndIf;
+e006                     EndIf;
+
+b006                     If @Field <>*Blanks;
+b007                        If GetAttributes(@PProgram: @PLibrary: @Field:
+                                             @Type: @Size: @Dec);
+
+b008                           If %Trim(@Type) <> 'N';
+
+                                  SetAttributes(@Field: @Type: @Size: @Dec:
+                                                @CFResult: @CFRsAtr);
+
+                                  @Size3 = @Size;
+
+e008                           EndIf;
+x007                        Else;
+                               @CFExtFact3 = %Trim(@Field);
+e007                        EndIf;
+e006                     EndIf;
+e005                  EndIf;
+e004               EndIf;
+x003            Else;
+
+                   @w = %Scan(' AND ':@Psrcdta);
+b004               If @w = *Zeros;
+                      @w = %Scan(' OR ':@Psrcdta);
+b005                  If @w = *Zeros;
+x005                  Else;
+                         @aa = 3;
+e005                  EndIf;
+x004               Else;
+                      @aa = 4;
+e004               EndIf;
+
+                   @z = %Scan('<=':@Psrcdta:@y);
+b004               If @z = *Zeros;
+                      @z = %Scan('>=':@Psrcdta:@y);
+b005                  If @z = *Zeros;
+                         @z = %Scan('=':@Psrcdta:@y);
+b006                     If @z = *Zeros;
+                            @z = %Scan('<>':@Psrcdta:@y);
+b007                        If @z = *Zeros;
+                               @z = %Scan('<':@Psrcdta:@y);
+b008                           If @z = *Zeros;
+                                  @z = %Scan('>':@Psrcdta:@y);
+b009                              If @z = *Zeros;
+x009                              Else;
+                                     @x = 1;
+                                     @SaveSign = '>';
+e009                              EndIf;
+x008                           Else;
+                                  @x = 1;
+                                  @SaveSign = '<';
+e008                           EndIf;
+x007                        Else;
+                               @x = 2;
+                               @SaveSign = '<>';
+e007                        EndIf;
+x006                     Else;
+                            @x = 1;
+                            @SaveSign = '=';
+e006                     EndIf;
+x005                  Else;
+                         @SaveSign = '>=';
+e005                  EndIf;
+x004               Else;
+                      @x = 2;
+                      @SaveSign = '<=';
+e004               EndIf;
+
+b004               If  @w <> *Zeros
+                   And @z <> *Zeros
+                   And @w <  @z;
+
+                      Clear @Field;
+                      @Field = %Trim(%Subst(@P_srcdta:@y:@z-@y));
+b005                  If @Field <> *Blanks;
+                         @Found = *On;
+b006                     If GetAttributes(@PProgram: @PLibrary: @Field:
+                                          @Type: @Size: @Dec);
+
+                            SetAttributes(@Field: @Type: @Size: @Dec:
+                                          @CFField1: @CFF1Atr);
+
+                            @CFField1 = %Trim(@CFField1) + ' ' + @SaveSign;
+
+                            @Size1 = @Size;
+
+x006                     Else;
+                            @CFField1 = %Trim(@Field);
+e006                     EndIf;
+e005                  EndIf;
+
+                      Clear @Field;
+                      @Field = %Trim(%Subst(@P_srcdta:@w+@aa:@z-(@w+@aa)));
+b005                  If @Field <> *Blanks;
+                         @Found = *On;
+b006                     If GetAttributes(@PProgram: @PLibrary: @Field:
+                                          @Type: @Size: @Dec);
+
+                            SetAttributes(@Field: @Type: @Size: @Dec:
+                                          @CFField2: @CFF2Atr);
+
+                            @Size2 = @Size;
+
+x006                     Else;
+                            @CFField2 = %Trim(@Field);
+e006                     EndIf;
+e005                  EndIf;
+x004               Else;
+
+b005                  If  @y        > *Zeros
+                      And @Comments > *Zeros
+                      And @Comments <  @y;
+                         Clear @x;
+                         Clear @y;
+e005                  EndIf;
+
+b005                  If @x > *Zeros;
+                         Clear @Field;
+                         @Field = %Trim(%Subst(@P_srcdta:@y:(@z-1)-@y));
+b006                     If @Field <> *Blanks;
+                            @Found = *On;
+b007                        If GetAttributes(@PProgram: @PLibrary: @Field:
+                                             @Type: @Size: @Dec);
+
+                               SetAttributes(@Field: @Type: @Size: @Dec:
+                                             @CFField1: @CFF1Atr);
+
+                               @CFField1 = %Trim(@CFField1) + ' ' + @SaveSign;
+                               @Size1 = @Size;
+
+x007                        Else;
+                               @CFField1 = %Trim(@Field);
+e007                        EndIf;
+e006                     EndIf;
+
+                         Clear @Field;
+                         @Field = %Trim(%Subst(@P_srcdta:@z+@x:@e-(@z+@x)));
+b006                     If @Field <> *Blanks;
+                            @Found = *On;
+b007                        If GetAttributes(@PProgram: @PLibrary: @Field:
+                                             @Type: @Size: @Dec);
+
+                               SetAttributes(@Field: @Type: @Size: @Dec:
+                                             @CFField2: @CFF2Atr);
+
+                               @Size2 = @Size;
+
+x007                        Else;
+                               @CFField2 = %Trim(@Field);
+e007                        EndIf;
+e006                     EndIf;
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+
+                MisMatch = *Off;
+
+b003            If  @CFF1Atr <> *Blanks
+                And @CFF2Atr <> *Blanks
+                And @CFF1Atr <> 'CONST'
+                And @CFF2Atr <> 'CONST'
+                And @Size1   <> *Zeros
+                And @Size2   <> *Zeros
+                And @Size1   <> @Size2;
+                   MisMatch = *On;
+e003            EndIf;
+
+b003            If  @CFF1Atr <> *Blanks
+                And @CFRsAtr <> *Blanks
+                And @CFF1Atr <> 'CONST'
+                And @CFRsAtr <> 'CONST'
+                And @Size1   <> *Zeros
+                And @Size3   <> *Zeros
+                And @Size1   <> @Size3;
+                   MisMatch = *On;
+e003            EndIf;
+
+b003            If  @CFF2Atr <> *Blanks
+                And @CFRsAtr <> *Blanks
+                And @CFF2Atr <> 'CONST'
+                And @CFRsAtr <> 'CONST'
+                And @Size2   <> *Zeros
+                And @Size3   <> *Zeros
+                And @Size2   <> @Size3;
+                   MisMatch = *On;
+e003            EndIf;
+
+b003            If CheckBypassProcess(@Psrcdta);
+b004               If Not @Found;
+                      @a = %Scan('BEGSR':@Psrcdta);
+b005                  If @a > *Zeros;
+                         @CFOption  = %Subst(@P_srcdta:@a:5);
+                         @ProcName  = %Trim(%Subst(@P_srcdta:@a+5:20));
+                         @CFField1  = @ProcName;
+                         @Found = *On;
+e005                  EndIf;
+e004               EndIf;
+
+b004               If Not @Found;
+                      @a = %Scan('ENDSR':@Psrcdta);
+b005                  If @a > *Zeros;
+                         @CFOption  = %Subst(@P_srcdta:@a:5);
+                         @CFField1  = @ProcName;
+                         Reset        @ProcName;
+                         @Found = *On;
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+
+b003            If @Found;
+
+                   Program  = @PProgram;
+                   Library  = @PLibrary;
+                   SrcSeq   = @Psrcseq;
+                   SpecType = 'F';
+                   Free     = *On;
+                   DataLine = @CspecFreeDs;
+                   FullLine = %Trim(%SubSt(@P_srcdta:6:94));
+
+                   Write rpgmfldmov;
+
+e003            EndIf;
+e002         EndIf;
+x001      On-Error;
+
+             Program  = @PProgram;
+             Library  = @PLibrary;
+             SrcSeq   = @Psrcseq;
+             SpecType = 'C';
+             Free     = *On;
+             DataLine = %Trim(%SubSt(@P_srcdta:6:94));
+             FullLine = %Trim(%SubSt(@P_srcdta:6:94));
+
+             Write rpgmfldmov;
+
+e001      EndMon;
+
+š         End-Proc;
+
+š         Dcl-Proc GetNextField;
+
+          Dcl-Pi GetNextField  Ind;
+             @P_srcdta Like(srcdta) Const;
+             @P_start  Packed(3:0)  Const;
+             @P_end    Packed(3:0)  Const;
+             @P_Field  Like(extField);
+             @P_last   Packed(3:0);
+          End-Pi;
+
+          Dcl-Ds @PsrcdtaDs;
+             @Psrcdtaara Char(1)   Inz(*Blanks) Dim(100);
+             @Psrcdta    Char(100) Inz(*Blanks) Pos(1);
+          End-Ds;
+
+          Dcl-s @TestField Like(extField);
+          Dcl-s @End       Packed(3:0) Inz(*Zeros);
+          Dcl-s @aa        Packed(3:0) Inz(*Zeros);
+          Dcl-s @bb        Packed(3:0) Inz(*Zeros);
+          Dcl-s @xx        Packed(3:0) Inz(*Zeros);
+          Dcl-s @yy        Packed(3:0) Inz(*Zeros);
+          Dcl-s @zz        Packed(3:0) Inz(*Zeros);
+          Dcl-s @PNewEnd   Packed(3:0) Inz(*Zeros);
+          Dcl-s @PSaveSign Char(1)     Inz(*Blanks);
+
+          Clear @P_Field;
+          @PsrcdtaDs = @ToUpper(@P_srcdta);
+
+b001      For @aa = @P_start To @P_end;
+b002         If @Psrcdtaara(@aa) <> *Blanks;
+                Leave;
+e002         EndIf;
+e001      EndFor;
+
+b001      If @aa > *Zeros;
+b002         If @aa >= @P_end;
+                @P_last = @P_end;
+                Return *Off;
+e002         EndIf;
+             @P_last  = %Scan(' ': @PsrcdtaDs: @aa);
+b002         If @aa + 1 = @P_last;
+                @End = %Scan(';': @PsrcdtaDs: @aa);
+b002            If @End = *Zeros;
+                   @End = %Scan(':': @PsrcdtaDs: @aa);
+b003               If @End = *Zeros;
+                      @End = %Scan(')': @PsrcdtaDs: @aa);
+e003               EndIf;
+e002            EndIf;
+b002            If @End = *Zeros;
+                   @TestFIeld = %Trim(%SubSt(@PsrcdtaDs:@aa:@P_end-@aa)) + '\';
+                   @End = %Scan('\': @TestField);
+e002            EndIf;
+                @TestField = %SubSt(@PsrcdtaDs:@aa:@End-@aa);
+                @P_last = @End;
+x002         Else;
+                @TestField = %SubSt(@PsrcdtaDs:@aa:@P_last-@aa);
+e002         EndIf;
+b002         If @aa >= @P_end;
+                @P_last = @P_end;
+                Return *Off;
+e002         EndIf;
+
+             @End = %Scan(';': @TestField);
+b002         If @End = *Zeros;
+                @End = %Scan(':': @TestField);
+b003            If @End = *Zeros;
+                   @End = %Scan(')': @TestField);
+e003            EndIf;
+e002         EndIf;
+b002         If @End = *Zeros;
+                @TestFIeld = %Trim(@TestField) + '\';
+                @End = %Scan('\': @TestField);
+e002         EndIf;
+b002         If CheckFunction(@TestField: 1: @End-1: @xx: @yy: @zz);
+
+b003            If @yy >= @P_end;
+                   Reset @yy;
+e003            EndIf;
+
+b003            If @zz > *Zeros;
+b004               If @yy = *Zeros;
+                      @yy = @zz;
+e004               EndIf;
+                   @aa = %Scan(':':@TestField:@zz);
+                   @bb = %Scan(')':@TestField:@zz);
+b004               If @aa > @bb
+                   Or @aa = *Zeros;
+                      @aa = @bb;
+e004               EndIf;
+x003            Else;
+b004               If @yy > *Zeros;
+                      @aa = %Scan(':':@TestField:@yy);
+b005                  If @aa = *Zeros;
+                         @aa = %Scan(')':@TestField:@yy);
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+b003            If @aa <= *Zeros;
+                   @aa = @End-1;
+e003            EndIf;
+                @P_Field = %Trim(%Subst(@TestField:@yy:@aa-@yy));
+x002         Else;
+                @P_Field = %Subst(@TestField:1:@End-1);
+e002         EndIf;
+b002         If (@P_last + 1) < @P_end;
+b003            If CheckSign(@PsrcdtaDs:@P_last:100:@bb:@PSaveSign);
+                   @P_Last = @bb + 1;
+e003            EndIf;
+e002         EndIf;
+             Return *On;
+e001      EndIf;
+
+          Return *Off;
+
+š         End-Proc;
+
+š         Dcl-Proc CheckBypassProcess;
+
+          Dcl-Pi CheckBypassProcess  Ind;
+             @Psrcdta  Const Like(srcdta);
+          End-Pi;
+
+          Dcl-s @aa Packed(3:0) Inz(*Zeros);
+
+          @aa = %Scan('ENDIF':@Psrcdta);
+b001      If @aa = *Zeros;
+             @aa = %Scan('ENDDO':@Psrcdta);
+b002         If @aa = *Zeros;
+                @aa = %Scan(' END  ':@Psrcdta);
+b003            If @aa = *Zeros;
+                   @aa = %Scan(' UPDATE ':@Psrcdta);
+b004               If  @aa = *Zeros;
+                      @aa = %Scan(' WRITE ':@Psrcdta);
+b005                  If @aa = *Zeros;
+                         @aa = %Scan(' DELETE ':@Psrcdta);
+b006                     If @aa = *Zeros;
+                            @aa = %Scan(' READ ':@Psrcdta);
+b007                        If @aa = *Zeros;
+                               @aa = %Scan('%EOF':@Psrcdta);
+b008                           If @aa = *Zeros;
+                                  @aa = %Scan('CLEAR':@Psrcdta);
+b009                              If @aa = *Zeros;
+                                     @aa = %Scan('SET':@Psrcdta);
+b010                                 If @aa = *Zeros;
+x010                                 Else;
+                                        Return *Off;
+e010                                 EndIf;
+x009                              Else;
+                                     Return *Off;
+e009                              EndIf;
+x008                           Else;
+                                  Return *Off;
+e008                           EndIf;
+x007                        Else;
+                               Return *Off;
+e007                        EndIf;
+x006                     Else;
+                            Return *Off;
+e006                     EndIf;
+x005                  Else;
+                         Return *Off;
+e005                  EndIf;
+x004               Else;
+                      Return *Off;
+e004               EndIf;
+x003            Else;
+                   Return *Off;
+e003            EndIf;
+x002         Else;
+                Return *Off;
+e002         EndIf;
+x001      Else;
+             Return *Off;
+e001      EndIf;
+
+          @aa = %Scan(' SELECT ':@Psrcdta);
+b001      If @aa = *Zeros;
+             @aa = %Scan('RETURN':@Psrcdta);
+b002         If @aa = *Zeros;
+                @aa = %Scan('ENDSL':@Psrcdta);
+b003            If @aa = *Zeros;
+                   @aa = %Scan('EXFMT':@Psrcdta);
+b004               If  @aa = *Zeros;
+                      @aa = %Scan('LEAVE':@Psrcdta);
+b005                  If @aa = *Zeros;
+                         @aa = %Scan('EXSR':@Psrcdta);
+b006                     If @aa = *Zeros;
+                            @aa = %Scan('ELSE':@Psrcdta);
+b007                        If @aa = *Zeros;
+                               @aa = %Scan(' CHAIN ':@Psrcdta);
+b008                           If @aa = *Zeros;
+                                  @aa = %Scan('%FOUND':@Psrcdta);
+b009                              If @aa = *Zeros;
+                                     @aa = %Scan('SELECT':@Psrcdta);
+b010                                 If @aa = *Zeros;
+x010                                 Else;
+                                        Return *Off;
+e010                                 EndIf;
+x009                              Else;
+                                     Return *Off;
+e009                              EndIf;
+x008                           Else;
+                                  Return *Off;
+e008                           EndIf;
+x007                        Else;
+                               Return *Off;
+e007                        EndIf;
+x006                     Else;
+                            Return *Off;
+e006                     EndIf;
+x005                  Else;
+                         Return *Off;
+e005                  EndIf;
+x004               Else;
+                      Return *Off;
+e004               EndIf;
+x003            Else;
+                   Return *Off;
+e003            EndIf;
+x002         Else;
+                Return *Off;
+e002         EndIf;
+x001      Else;
+             Return *Off;
+e001      EndIf;
+
+          @aa = %Scan('BEGSR ':@Psrcdta);
+b001      If @aa = *Zeros;
+             @aa = %Scan(' ENDSR':@Psrcdta);
+b002         If @aa = *Zeros;
+                @aa = %Scan('UNLOCK':@Psrcdta);
+b003            If @aa = *Zeros;
+                   @aa = %Scan('READE':@Psrcdta);
+b004               If  @aa = *Zeros;
+                      @aa = %Scan('READPE':@Psrcdta);
+b005                  If @aa = *Zeros;
+                         @aa = %Scan('ITER':@Psrcdta);
+b006                     If @aa = *Zeros;
+                            @aa = %Scan('OTHER':@Psrcdta);
+b007                        If @aa = *Zeros;
+                               @aa = %Scan('OPEN':@Psrcdta);
+b008                           If @aa = *Zeros;
+                                  @aa = %Scan('CLOSE':@Psrcdta);
+b009                              If @aa = *Zeros;
+                                     @aa = %Scan('READC':@Psrcdta);
+b010                                 If @aa = *Zeros;
+x010                                 Else;
+                                        Return *Off;
+e010                                 EndIf;
+x009                              Else;
+                                     Return *Off;
+e009                              EndIf;
+x008                           Else;
+                                  Return *Off;
+e008                           EndIf;
+x007                        Else;
+                               Return *Off;
+e007                        EndIf;
+x006                     Else;
+                            Return *Off;
+e006                     EndIf;
+x005                  Else;
+                         Return *Off;
+e005                  EndIf;
+x004               Else;
+                      Return *Off;
+e004               EndIf;
+x003            Else;
+                   Return *Off;
+e003            EndIf;
+x002         Else;
+                Return *Off;
+e002         EndIf;
+x001      Else;
+             Return *Off;
+e001      EndIf;
+
+          @aa = %Scan('%EQUAL':@Psrcdta);
+b001      If @aa = *Zeros;
+             @aa = %Scan('%ERROR':@Psrcdta);
+b002         If @aa = *Zeros;
+                @aa = %Scan('END-DS':@Psrcdta);
+b003            If @aa = *Zeros;
+                   @aa = %Scan(' READ(':@Psrcdta);
+b004               If @aa = *Zeros;
+x004               Else;
+                      Return *Off;
+e004               EndIf;
+x003            Else;
+                   Return *Off;
+e003            EndIf;
+x002         Else;
+                Return *Off;
+e002         EndIf;
+x001      Else;
+             Return *Off;
+e001      EndIf;
+
+          Return *On;
+
+š         End-Proc;
+
+š         Dcl-Proc CheckProcess;
+
+          Dcl-Pi CheckProcess  Ind;
+             @Psrcdta  Const Like(srcdta);
+          End-Pi;
+
+          Dcl-s @aa Packed(3:0) Inz(*Zeros);
+
+          @aa = %Scan('IF':@Psrcdta);
+b001      If @aa = *Zeros;
+             @aa = %Scan('DOW':@Psrcdta);
+b002         If @aa = *Zeros;
+                @aa = %Scan('DOU':@Psrcdta);
+b003            If @aa = *Zeros;
+                   @aa = %Scan('FOR':@Psrcdta);
+b004               If  @aa = *Zeros;
+                      @aa = %Scan('AND ':@Psrcdta);
+b005                  If @aa = *Zeros;
+                         @aa = %Scan('OR ':@Psrcdta);
+b006                     If @aa = *Zeros;
+                            @aa = %Scan('EVALR':@Psrcdta);
+b007                        If @aa = *Zeros;
+                               @aa = %Scan('EVAL':@Psrcdta);
+b008                           If @aa = *Zeros;
+                                  @aa = %Scan('EVAL(H)':@Psrcdta);
+b009                              If @aa = *Zeros;
+                                     @aa = %Scan('EVALR':@Psrcdta);
+b010                                 If @aa = *Zeros;
+                                        @aa = %Scan('WHEN':@Psrcdta);
+b011                                    If @aa = *Zeros;
+                                           @aa = %Scan('ELSEIF':@Psrcdta);
+b012                                       If @aa = *Zeros;
+                                              @aa = %Scan(' IN ':@Psrcdta);
+b013                                          If @aa = *Zeros;
+x013                                          Else;
+                                                 Return *On;
+e013                                          EndIf;
+x012                                       Else;
+                                              Return *On;
+e012                                       EndIf;
+x011                                    Else;
+                                           Return *On;
+e010                                    EndIf;
+x010                                 Else;
+                                        Return *On;
+e010                                 EndIf;
+x009                              Else;
+                                     Return *On;
+e009                              EndIf;
+x008                           Else;
+                                  Return *On;
+e008                           EndIf;
+x007                        Else;
+                               Return *On;
+e007                        EndIf;
+x006                     Else;
+                            Return *On;
+e006                     EndIf;
+x005                  Else;
+                         Return *On;
+e005                  EndIf;
+x004               Else;
+                      Return *On;
+e004               EndIf;
+x003            Else;
+                   Return *On;
+e003            EndIf;
+x002         Else;
+                Return *On;
+e002         EndIf;
+x001      Else;
+             Return *On;
+e001      EndIf;
+
+          Return *Off;
+
+š         End-Proc;
+
+š         Dcl-Proc CheckFunction;
+
+          Dcl-Pi CheckFunction  Ind;
+             @Psrcdta Like(srcdta) Const;
+             @Pstart  Packed(3:0)  Const;
+             @Pend    Packed(3:0)  Const;
+             @aa      Packed(3:0);
+             @bb      Packed(3:0);
+             @cc      Packed(3:0);
+          End-Pi;
+
+          Clear @aa;
+          Clear @bb;
+          Clear @cc;
+
+          @cc = %Scan('%DEC(%SUBST(%CHAR':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @cc > *Zeros;
+             @aa = @cc;
+             @cc += 18;
+             Return *On;
+e001      EndIf;
+
+          @cc = %Scan('%LEN(%TRIM':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @cc > *Zeros;
+             @aa = @cc;
+             @cc += 11;
+             Return *On;
+e001      EndIf;
+
+          @cc = %Scan('%DEC(%CHAR':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @cc > *Zeros;
+             @aa = @cc;
+             @cc += 10;
+             Return *On;
+e001      EndIf;
+
+          @cc = %Scan('%SUBST(%CHAR':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @cc > *Zeros;
+             @aa = @cc;
+             @cc += 12;
+             Return *On;
+e001      EndIf;
+
+          @cc = %Scan('%DATE(%DEC(%TRIM':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @cc > *Zeros;
+             @aa = @cc;
+             @cc += 17;
+             Return *On;
+e001      EndIf;
+
+          @cc = %Scan('%DEC(%SUBST(%EDITC':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @cc > *Zeros;
+             @aa = @cc;
+             @cc += 19;
+             Return *On;
+e001      EndIf;
+
+          @cc = %Scan('%TIMESTAMP(%CHAR':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @cc > *Zeros;
+             @aa = @cc;
+             @cc += 17;
+             Return *On;
+e001      EndIf;
+
+          @cc = %Scan('%DEC(%SUBST(%EDITW':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @cc > *Zeros;
+             @aa = @cc;
+             @cc += 19;
+             Return *On;
+e001      EndIf;
+
+          @cc = %Scan('%SUBST(%EDITC':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @cc > *Zeros;
+             @aa = @cc;
+             @cc += 14;
+             Return *On;
+e001      EndIf;
+
+          @cc = %Scan('%SUBST(%EDITW':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @cc > *Zeros;
+             @aa = @cc;
+             @cc += 14;
+             Return *On;
+e001      EndIf;
+
+          @cc = %Scan('%DEC(%SUBST':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @cc > *Zeros;
+             @aa = @cc;
+             @cc += 12;
+             Return *On;
+e001      EndIf;
+
+          @cc = %Scan('%DEC(%TRIM':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @cc > *Zeros;
+             @aa = @cc;
+             @cc += 11;
+             Return *On;
+e001      EndIf;
+
+          @bb = %Scan('%LEN':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @bb > *Zeros;
+             @aa = @bb;
+             @bb += 5;
+             Return *On;
+e001      EndIf;
+
+          @bb = %Scan('%DEC':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @bb > *Zeros;
+             @aa = @bb;
+             @bb += 5;
+             Return *On;
+e001      EndIf;
+
+          @bb = %Scan('%SUBST':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @bb > *Zeros;
+             @aa = @bb;
+             @bb += 7;
+             Return *On;
+e001      EndIf;
+
+          @bb = %Scan('%CHAR':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @bb > *Zeros;
+             @aa = @bb;
+             @bb += 6;
+             Return *On;
+e001      EndIf;
+
+          @bb = %Scan('%UNS':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @bb > *Zeros;
+             @aa = @bb;
+             @bb += 5;
+             Return *On;
+e001      EndIf;
+
+          @bb = %Scan('%EDITW':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @bb > *Zeros;
+             @aa = @bb;
+             @bb += 7;
+             Return *On;
+e001      EndIf;
+
+          @bb = %Scan('%EDITC':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @bb > *Zeros;
+             @aa = @bb;
+             @bb += 7;
+             Return *On;
+e001      EndIf;
+
+          @bb = %Scan('%DATE':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @bb > *Zeros;
+             @aa = @bb;
+             @bb += 6;
+             Return *On;
+e001      EndIf;
+
+          @bb = %Scan('%TRIM':%Subst(@Psrcdta:1:@Pend):@Pstart);
+b001      If @bb > *Zeros;
+             @aa = @bb;
+             @bb += 6;
+             Return *On;
+e001      EndIf;
+
+          Return *Off;
+
+š         End-Proc;
+
+š         Dcl-Proc CheckSign;
+
+          Dcl-Pi CheckSign  Ind;
+             @Psrcdta    Like(srcdta) Const;
+             @Pstart     Packed(3:0)  Const;
+             @Pend       Packed(3:0)  Const;
+             @P_NewEnd   Packed(3:0)  Options(*NoPass);
+             @P_SaveSign Char(1)      Options(*NoPass);
+          End-Pi;
+
+          Dcl-s @xfoot     Zoned(12:0) Inz(*Zeros) Dim(4);
+          Dcl-s @PNewEnd   Packed(3:0) Inz(*Zeros);
+          Dcl-s @PSaveSign Char(1)     Inz(*Blanks);
+
+          @XFoot(1) = %Scan('+': @Psrcdta: @PStart);
+b001      If @XFoot(1) >= @Pend;
+             @XFoot(1) =  *Zeros;
+x001      Else;
+             @PNewEnd = @XFoot(1);
+b002         If @XFoot(1) <> *Zeros;
+                @PSaveSign = '+';
+e002         EndIf;
+e001      EndIf;
+          @XFoot(2) = %Scan('-': @Psrcdta: @PStart);
+b001      If @XFoot(2) >= @Pend;
+             @XFoot(2) = *Zeros;
+x001      Else;
+b002         If  @XFoot(2) <> *Zeros
+             And @XFoot(1) =  *Zeros
+             Or  @XFoot(2) <> *Zeros
+             And @XFoot(1) <> *Zeros
+             And @XFoot(2) <  @XFoot(1);
+                Clear        @XFoot(1);
+                @PNewEnd   = @XFoot(2);
+                @PSaveSign = '-';
+e002         EndIf;
+e001      EndIf;
+          @XFoot(3) = %Scan(' * ': @Psrcdta: @PStart);
+b001      If @XFoot(3) >= @Pend;
+             @XFoot(3) = *Zeros;
+x001      Else;
+b002         If  @XFoot(3) <> *Zeros
+             And @XFoot(2) =  *Zeros
+             And @XFoot(1) =  *Zeros
+             Or  @XFoot(3) <> *Zeros
+             And @XFoot(2) <> *Zeros
+             And @XFoot(3) <  @XFoot(2)
+             Or  @XFoot(3) <> *Zeros
+             And @XFoot(1) <> *Zeros
+             And @XFoot(3) <  @XFoot(1);
+                Clear        @XFoot(1);
+                Clear        @XFoot(2);
+                @PNewEnd   = @XFoot(3);
+                @PSaveSign = '*';
+e002         EndIf;
+e001      EndIf;
+          @XFoot(4) = %Scan(' / ': @Psrcdta: @PStart);
+b001      If @XFoot(4) >= @Pend;
+             @XFoot(4) = *Zeros;
+x001      Else;
+b002         If  @XFoot(4) <> *Zeros
+             And @XFoot(3) =  *Zeros
+             And @XFoot(2) =  *Zeros
+             And @XFoot(1) =  *Zeros
+             Or  @XFoot(4) <> *Zeros
+             And @XFoot(3) <> *Zeros
+             and @XFoot(4) <  @XFoot(3)
+             Or  @XFoot(4) <> *Zeros
+             And @XFoot(2) <> *Zeros
+             And @XFoot(4) <  @XFoot(2)
+             Or  @XFoot(4) <> *Zeros
+             And @XFoot(1) <> *Zeros
+             And @XFoot(4) <  @XFoot(1);
+                Clear        @XFoot(1);
+                Clear        @XFoot(2);
+                Clear        @XFoot(3);
+                @PNewEnd   = @XFoot(4);
+                @PSaveSign = '/';
+e002         EndIf;
+e001      EndIf;
+
+b001      If %Parms() >= 4;
+             @P_NewEnd = @PNewEnd;
+e001      EndIf;
+
+b001      If %Parms() >= 5;
+             @P_SaveSign = @PSaveSign;
+e001      EndIf;
+
+          If @PNewEnd > *Zeros;
+             Return *On;
+          EndIf;
+
+          Return *Off;
+
+š         End-Proc;
+
+š         Dcl-Proc CheckMathCalc;
+
+          Dcl-Pi CheckMathCalc  Like(extfield);
+             @Psrcdta Like(srcdta) Const;
+             @Pstart  Packed(3:0)  Const;
+             @Pplus   Packed(3:0)  Const;
+             @Pminus  Packed(3:0)  Const;
+             @Pmult   Packed(3:0)  Const;
+             @Pdiv    Packed(3:0)  Const;
+             @Plast   Packed(3:0);
+          End-Pi;
+
+          Dcl-s @aa     Packed(3:0)    Inz(*Zeros);
+          Dcl-s @bb     Packed(3:0)    Inz(*Zeros);
+          Dcl-s @ee     Packed(3:0)    Inz(*Zeros);
+          Dcl-s @PField Like(extfield) Inz(*Blanks);
+          Dcl-s @Nstart Packed(3:0)    Inz(*Zeros);
+          Dcl-s @Nend   Packed(3:0)    Inz(*Zeros);
+
+          @Nstart = @Pstart;
+          @aa = %Scan('(':@Psrcdta:@PStart);
+b001      If @aa > *Zeros;
+             @bb = %Scan(')':@Psrcdta:@aa);
+b002      EndIf;
+          @ee   = %Scan(';':@Psrcdta:@PStart);
+          @Nend = @ee;
+
+b001      Select;
+
+x001         When @Pplus  <> *Zeros;
+
+b002            If  @aa <  @Pplus
+                And @aa <> *Zeros;
+                   @Nstart = @aa;
+                   @Nend   = @bb;
+e002            EndIf;
+                @Plast  = @Pplus;
+                @PField = %Trim(%Subst(@Psrcdta:@Nstart+1:@Nend-(@Nstart+1)));
+
+x001         When @Pminus <> *Zeros;
+
+b002            If  @aa <  @Pminus
+                And @aa <> *Zeros;
+                   @Nstart = @aa;
+                   @Nend   = @bb;
+e002            EndIf;
+                @Plast  = @Pminus;
+                @PField = %Trim(%Subst(@Psrcdta:@Nstart+1:@Nend-(@Nstart+1)));
+
+x001         When @Pmult  <> *Zeros;
+
+b002            If  @aa <  @Pmult
+                And @aa <> *Zeros;
+                   @Nstart = @aa;
+                   @Nend   = @bb;
+e002            EndIf;
+                @Plast  = @Pmult;
+                @PField = %Trim(%Subst(@Psrcdta:@Nstart+1:@Nend-(@Nstart+1)));
+
+x001         When @Pdiv   <> *Zeros;
+
+b002            If  @aa <  @Pdiv
+                And @aa <> *Zeros;
+                   @Nstart = @aa;
+                   @Nend   = @bb;
+e002            EndIf;
+                @Plast  = @Pdiv;
+                @PField = %Trim(%Subst(@Psrcdta:@Nstart+1:@Nend-(@Nstart+1)));
+
+e001      EndSl;
+
+          Return @PField;
+
+š         End-Proc;
+
+š         Dcl-Proc CheckContinue;
+
+          Dcl-Pi CheckContinue  Ind;
+             @chkField  Const Like(@cspecDsRPGILE.@CExtFact2);
+          End-Pi;
+
+          Dcl-s @x         Packed(3:0)     Inz(*Zeros);
+          Dcl-s @TestField Like(@ChkField) Inz(*Blanks);
+
+          @TestField = %Trim(@ChkField) + '\';
+          @x = %Scan('\':@TestField);
+b001      If  @x > *Zeros
+          And %Subst(@TestField:@x-1:1) = '+';
+             Return *On;
+e001      EndIf;
+
+          Return *Off;
+
+š         End-Proc;
+

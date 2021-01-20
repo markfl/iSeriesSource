@@ -1,0 +1,173 @@
+          Ctl-opt Option(*NoDebugIO) DftActGrp(*No);
+
+          Dcl-f qadspffd Disk Usage(*Input);
+          Dcl-f qafdaccp Disk Usage(*Input);
+          Dcl-f qadspobj Disk Usage(*Input);
+          Dcl-f fieldd   WorkStn sfile(sfl01:SFLrcd);
+
+          Dcl-Pi Fieldr;
+             @P_File    Char(10);
+             @P_Library Char(10);
+             @P_Again   Ind;
+          End-Pi;
+
+          Dcl-s @a      Packed(3:0) Inz(*Zeros);
+          Dcl-s @FieldA Char(10)    Dim(9999);
+          Dcl-s @KeyA   Packed(3:0) Dim(9999);
+          Dcl-s @LastTo Like(@To)   Inz(*Zeros);
+
+          // Execute Initialize subtoutine
+          @P_Again = Initialize(@P_File: @P_Library);
+          *Inlr = *On;
+          Return;
+
+          Dcl-Proc Initialize;
+
+          Dcl-Pi Initialize Ind;
+             @File    Char(10);
+             @Library Char(10);
+          End-Pi;
+
+          // Execute Subfile Initialization routine
+          InitSubfile();
+
+          // Execute Subfile Fill First Page routine
+          FillSubfilePage(@File: @Library);
+
+b001      Dow Not *inkc;
+             // Execute Subfile display routine
+             DisplaySubfilePage();
+
+             // Check for file or library name change
+b002         If @1File    <> @File
+             Or @1Library <> @Library;
+                Leave;
+e002         EndIf;
+e001      EndDo;
+
+          // Check for file or library name change
+b001      If @1File    <> @File
+          Or @1Library <> @Library;
+             @File    = @1File;
+             @Library = @1Library;
+             Return *On;
+x001      Else;
+             Return *Off;
+e001      EndIf;
+
+          End-Proc;
+
+          Dcl-Proc InitSubfile;
+
+          Dcl-Pi InitSubfile;
+          End-Pi;
+
+          // get key fields into array
+          Read qafdaccp;
+b001      Dow not %eof(qafdaccp);
+
+             @a += 1;
+             @FieldA(@a) = apkeyf;
+             @keyA(@a)   = apkeyn;
+
+             Read qwhfdacp;
+e001      EndDo;
+
+          // get file text info
+          Read qlidobjd;
+          Close qadspobj;
+
+          // Initialize subfile
+          *in01 = *Off;
+          *in02 = *Off;
+          *in03 = *Off;
+          Write ctl01;
+          *in02 = *On;
+
+          // Clear relative record number
+          Clear SflRcd;
+
+          End-Proc;
+
+          Dcl-Proc FillSubFilePage;
+
+          Dcl-Pi FillSubFilePage;
+             @File    Char(10);
+             @Library Char(10);
+          End-Pi;
+
+          @1File    = @File;
+          @1Library = @Library;
+
+          // read first file field record
+          Read qwhdrffd;
+b001      Dow not %Eof(qadspffd);
+
+             // Incriment relative record number
+             SflRcd += 1;
+
+b002         If SflRcd = 1;
+                @rname   = whname;
+                @From    = 1;
+                @To      = whfldb;
+                @LastTo  = @To;
+x002         Else;
+                @From    = @LastTo + 1;
+                @To      = @LastTo + whfldb;
+                @LastTo  = @To;
+e002         EndIf;
+b002         If whfldd = *Zeros;
+                @whfldb = whfldb;
+x002         Else;
+                @whfldb = whfldd;
+e002         EndIf;
+
+b002         If whfldt = 'L'
+             Or whfldt = 'T';
+                @whfldt = %Subst(whfmt:2:3);
+x002         Else;
+                @whfldt = ' ' + whfldt + ' ';
+e002         EndIf;
+             @whftxt = whftxt;
+             Clear @whfldp;
+b002         If whfldt = 'S'
+             Or whfldt = 'P';
+                @whfldp = %Char(whfldp);
+e002         EndIf;
+
+             Clear @Key;
+             @a = %Lookup(whflde: @FieldA);
+b002         If @a > *Zeros;
+                @Key = @keyA(@a);
+e002         EndIf;
+
+             // Write subfile record
+             Write sfl01;
+
+             // read next file field record
+             Read qwhdrffd;
+e001      EndDo;
+
+b001      If SflRcd > *Zeros;
+             // set on display subfile ind.
+             *in01 = *On;
+             *in03 = *On;
+e001      EndIf;
+
+          @1File    = @File;
+          @1Library = @Library;
+
+          End-Proc;
+
+          Dcl-Proc DisplaySubFilePage;
+
+          Dcl-Pi DisplaySubFilePage;
+          End-Pi;
+
+          // display screen
+          SflRcd = 1;
+          Write cmd01;
+          Exfmt ctl01;
+
+          End-Proc;
+

@@ -1,0 +1,131 @@
+     H DftActGrp(*No)
+     D  testeventx     pr
+     D                               +0    Like(@Xml)
+
+     D  testeventx     pi
+     D   @wXmlString                 +0    Like(@Xml)
+     D  @a             s              3p 0 Inz(112)
+     D  @b             s              3p 0 Inz(*Zeros)
+     D  @Array         s             90a   Dim(112) ctdata
+     D  @Xml           s          32000a   Varying Inz(*Blanks)
+      /free
+          For @b = 1 to @a;
+             @Xml = %Trim(@Xml) + %Trim(@Array(@b));
+          EndFor;
+          @wXmlString = @Xml;
+          *Inlr = *Off;
+          Return;
+      /End-free
+**
+<Events event="http://www.unysonlogistics.com/services/events/event/v1";
+xsi="http://www.w3.org/2001/XMLSchema-instance">;
+  <Event>
+    <CustomerId>000000000290</CustomerId>
+    <CarrierId>LNTCAR</CarrierId>
+    <ShipmentId></ShipmentId>
+    <ShipmentIdQualifier/>
+    <LoadStop>3</LoadStop>
+    <EventCode>0001</EventCode>
+    <EventReason>991</EventReason>
+    <EventDate>2015-03-05</EventDate>
+    <EventTime>16.32.47</EventTime>
+    <EventCity>BONO</EventCity>
+    <EventState>AR</EventState>
+    <EventCountry>US</EventCountry>
+    <References>
+      <Reference>
+        <ReferenceMode>IR</ReferenceMode>
+        <ReferenceQualifier>$SD</ReferenceQualifier>
+        <ReferenceInfo>03/13/2008 1</ReferenceInfo>
+      </Reference>
+      <Reference>
+        <ReferenceMode>IA</ReferenceMode>
+        <ReferenceQualifier>CR</ReferenceQualifier>
+        <ReferenceInfo>LNT459367 2</ReferenceInfo>
+      </Reference>
+      <Reference>
+        <ReferenceMode>IR</ReferenceMode>
+        <ReferenceQualifier>VN</ReferenceQualifier>
+        <ReferenceInfo>011651 1</ReferenceInfo>
+      </Reference>
+      <Reference>
+        <ReferenceMode>IA</ReferenceMode>
+        <ReferenceQualifier>DP</ReferenceQualifier>
+        <ReferenceInfo>030 2</ReferenceInfo>
+      </Reference>
+      <Reference>
+        <ReferenceMode>IR</ReferenceMode>
+        <ReferenceQualifier>PO</ReferenceQualifier>
+        <ReferenceInfo>N001227897 1</ReferenceInfo>
+      </Reference>
+      <Reference>
+        <ReferenceMode>IA</ReferenceMode>
+        <ReferenceQualifier>VN</ReferenceQualifier>
+        <ReferenceInfo>011651 2</ReferenceInfo>
+      </Reference>
+      <Reference>
+        <ReferenceMode>IR</ReferenceMode>
+        <ReferenceQualifier>WO</ReferenceQualifier>
+        <ReferenceInfo>031408 1</ReferenceInfo>
+      </Reference>
+      <Reference>
+        <ReferenceMode>IA</ReferenceMode>
+        <ReferenceQualifier>DP</ReferenceQualifier>
+        <ReferenceInfo>030 2</ReferenceInfo>
+      </Reference>
+      <Reference>
+        <ReferenceMode>IR</ReferenceMode>
+        <ReferenceQualifier>PO</ReferenceQualifier>
+        <ReferenceInfo>R001243369 1</ReferenceInfo>
+      </Reference>
+      <Reference>
+        <ReferenceMode>IA</ReferenceMode>
+        <ReferenceQualifier>VN</ReferenceQualifier>
+        <ReferenceInfo>011651 2</ReferenceInfo>
+      </Reference>
+      <Reference>
+        <ReferenceMode>IR</ReferenceMode>
+        <ReferenceQualifier>WO</ReferenceQualifier>
+        <ReferenceInfo>031408 1</ReferenceInfo>
+      </Reference>
+    </References>
+    <Memos>
+      <Memo>
+        <MemoFlag>Y</MemoFlag>
+        <MemoText>closed w/ wrong carrier - incorrect rate applied 1</MemoText>
+      </Memo>
+      <Memo>
+        <MemoFlag>N</MemoFlag>
+        <MemoText>requested pro transfer to USF Holland on 07/07/03 1 1</MemoText>
+      </Memo>
+     <Memo>
+        <MemoFlag>Y</MemoFlag>
+        <MemoText>closed w/ wrong carrier - incorrect rate applied 2 1</MemoText>
+      </Memo>
+      <Memo>
+        <MemoFlag>N</MemoFlag>
+        <MemoText>requested pro transfer to USF Holland on 07/07/03 2 1</MemoText>
+      </Memo>
+      <Memo>
+        <MemoFlag/>
+        <MemoText>closed w/ wrong carrier - incorrect rate applied 3 1</MemoText>
+      </Memo>
+      <Memo>
+        <MemoFlag>Y</MemoFlag>
+        <MemoText>requested pro transfer to USF Reddaway on 07/07/03 3 1</MemoText>
+      </Memo>
+      <Memo>
+        <MemoFlag>N</MemoFlag>
+        <MemoText>closed w/ wrong carrier - incorrect rate applied 4</MemoText>
+      </Memo>
+      <Memo>
+        <MemoFlag>N</MemoFlag>
+        <MemoText>closed w/ wrong carrier - incorrect rate applied 4</MemoText>
+      </Memo>
+      <Memo>
+        <MemoFlag/>
+        <MemoText>requested pro transfer to USF Reddaway on 07/07/03 4 1</MemoText>
+      </Memo>
+    </Memos>
+  </Event>
+</Events>

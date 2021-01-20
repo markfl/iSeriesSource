@@ -1,0 +1,35 @@
+             PGM        PARM(&SRCFILE &MBR &TAG)
+
+             DCL        VAR(&SRCFILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&MBR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TAG) TYPE(*CHAR) LEN(9)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&FILE) VALUE(%SST(&SRCFILE 1 10))
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&SRCFILE 11 10))
+
+             DLTF       FILE(QTEMP/QRPGLESRC)
+             MONMSG     MSGID(CPF0000)
+             CRTSRCPF   FILE(QTEMP/QRPGLESRC) RCDLEN(112) MBR(&MBR)
+             MONMSG     MSGID(CPF0000)
+             OVRDBF     FILE(QRPGLESRC) TOFILE(&LIBRARY/&FILE) +
+                          MBR(&MBR)
+             OVRDBF     FILE(QRPGLESRCO) TOFILE(QTEMP/QRPGLESRC) +
+                          MBR(&MBR)
+             CALL       PGM(DLTSRCTAGR) PARM(&TAG)
+             DLTOVR     FILE(*ALL)
+             RGZPFM     FILE(QTEMP/QRPGLESRC) MBR(&MBR) +
+                          SRCOPT(*SEQNBR) SRCSEQ(0.10 0.10)
+             CPYSRCF    FROMFILE(QTEMP/QRPGLESRC) +
+                          TOFILE(&LIBRARY/&FILE) FROMMBR(&MBR) +
+                          TOMBR(&MBR)
+             DLTF       FILE(QTEMP/QRPGLESRC)
+             MONMSG     MSGID(CPF0000)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

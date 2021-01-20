@@ -1,0 +1,141 @@
+     H/title    Delete Save Files
+     H Option(*NoDebugio)
+     H copyright ('(C) Copyright Hub Group, Inc. 2015')
+      **************************************************************************
+      *                                                                        *
+      *   H U B   G R O U P ,   I N C .                                        *
+      *                                                                        *
+      **************************************************************************
+      *                                                                        *
+      *  Program Title: Delete Save Files                                      *
+      *                                                                        *
+      *  Date Written:  08/28/2015                                             *
+      *                                                                        *
+      *  Input:                                                                *
+      *                                                                        *
+      *  Output:                                                               *
+      *                                                                        *
+      **************************************************************************
+      *            Design                                                      *
+      * Date       Request Mod Pgmr Description                                *
+      * ---------- ------- --- ---- ------------------------------------------ *
+      * 08-28-15   42268       MF   Initial Creation                           *
+      *                                                                        *
+      **************************************************************************
+
+     ‚* Purge File Driver
+     Fitppurgel1if   e           k Disk
+
+      * Program Status Data Structure
+     D                sds
+     D QProg             *Proc
+     D QParms            *Parms
+     D QErrorMessage          91    170
+     D QUser                 254    263
+
+     Ditpdelete        pr
+     D                               +0    Const Like(purgroup)
+     D                               +0    Const Like(purfrmlib)
+
+     Ditpdelete        pi
+     D  @PGroup                      +0    Const Like(purgroup)
+     D  @PLibrary                    +0    Const Like(purfrmlib)
+
+     D ReadPurgeFile   pr
+     D                               +0    Const Like(purgroup)
+     D                               +0    Const Like(purfrmlib)
+
+     D DeleteSaveFile  pr
+     D                               +0    Const Like(purtofile)
+     D                               +0    Const Like(purfrmlib)
+
+     D/DEFINE ITPSHARE21
+     D/DEFINE ITPSHARE25
+     D/copy qcpysrc,itpshare
+     D/UNDEFINE ITPSHARE21
+     D/UNDEFINE ITPSHARE25
+
+      /free
+
+          // Create Source File
+          ReadPurgeFile(@PGroup: @PLibrary);
+
+          *Inlr = *On;
+          Return;
+
+          // ************************************************************************
+          // *‚Program Initialization Subroutine
+          // ************************************************************************
+
+          BegSr *InzSr;
+
+
+          EndSr;
+
+      /end-free
+
+      ************************************************************************
+      *‚ReadPurgeFile = Read Purge File and Process
+      ************************************************************************
+
+     P ReadPurgeFile   b
+
+     D ReadPurgeFile   pi
+     D  @Group                       +0    Const Like(purgroup)
+     D  @Library                     +0    Const Like(purfrmlib)
+
+      /free
+
+          //‚get first purge record
+          Setll *Loval  ritppurgep;
+          Setll @Group ritppurgep;
+          Reade @Group ritppurgep;
+b001      Dow not %Eof(itppurgel1);
+
+             // Update member source
+             DeleteSaveFile(purtofile: @Library);
+
+             // Execute update itppurgep file routine
+             SetStatusForITPPURGEP(@Group: @DeleteFStatus: purseq);
+
+             //‚get next purge record
+             Reade @Group ritppurgep;
+
+e001      EndDo;
+
+      /end-free
+
+     P ReadPurgeFile   e
+
+      ************************************************************************
+      *‚DeleteSaveFile - Delete Save File
+      ************************************************************************
+
+     P DeleteSaveFile  b
+
+     D DeleteSaveFile  pi
+     D  @ToFile                      +0    Const Like(purtofile)
+     D  @Library                     +0    Const Like(purfrmlib)
+
+     DDeleteFile       c                   'DLTF FILE('
+
+     D/DEFINE ITPSHARE15
+     D/copy qcpysrc,itpshare
+
+      /free
+
+          // Start monitor for duplicate files with different keys
+b001      Monitor;
+
+             @Command = DeleteFile + %Trim(@Library) + '/'
+                      + %Trim(@ToFile) + ')';
+             @Length  = %Len(%Trim(@Command));
+             @RunCommand(@Command: @Length);
+
+x001      On-Error;
+e001      EndMon;
+
+      /end-free
+
+     P DeleteSaveFile  e
+

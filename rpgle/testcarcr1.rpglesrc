@@ -1,0 +1,151 @@
+          Ctl-opt Option(*NoDebugio) DftActGrp(*No);
+
+          Dcl-f xmlmsgwebq Usage(*Input) Rename(xmlmsgwebq:rxmlmsgweb);
+
+     Dtestcarcc1       Ds             9    DtaAra
+     D  @Skip                  1      9s 0
+
+     DCreateCarrier    Pr                  ExtPgm('TPSCARCRT')
+     D                            32500a   Varying
+     D                            32500a   Varying
+     D                                3i 0
+
+     D @InDoc          s          32500a   Varying
+     D @OutDoc         s          32500a   Varying
+     D @Options        s           1024a   Varying Inz
+     d Carrier         ds                  likeds(CarrierDS)
+
+     d CarrierDS       ds                  qualified
+     d  DomainName                   10a   varying
+     d  Flag                         10a   varying
+     d  Status                        1a   varying
+     d  PartyID                      30a   varying
+     d  CarrierID                    30a   varying
+     d  CarrierName                  30a   varying
+     d  CarrierType                  30a   varying
+     d  CarrierNumber                30a   varying
+     d  SysconNumber                  5a   varying
+     d  Scac                          5a   varying
+     d  Hazmat                        1a   varying
+     d  HighSecurity                  1a   varying
+     d  CTPAT                        40a   varying
+     d  Addresses                          likeds(AddressesDS)
+     d  CarrierProNumber...
+     d                               30a   varying
+     d  MCNumber                     30a   varying
+     d  DOTNumber                    30a   varying
+
+     d AddressesDS     ds                  qualified
+     d  Address                            likeds(AddressDS)
+     d                                     dim(999) inz
+
+     d AddressDS       ds                  qualified
+     d  AddressType                  30a   varying
+     d  Name                         30a   varying
+     d  Address1                     30a   varying
+     d  Address2                     30a   varying
+     d  City                         30a   varying
+     d  State                        30a   varying
+     d  PostalCode                   30a   varying
+     d  PostalPlus4Code...
+     d                               30a   varying
+     d  CountryCode                  30a   varying
+     d  Latitude                     30a   varying
+     d  Longitude                    30a   varying
+     d  PhoneNumber                  30a   varying
+     d  FaxNumber                    30a   varying
+     d  Sites                              likeds(SitesDS)
+      *
+     d SitesDS         ds                  qualified
+     d  Site                               likeds(SiteDS)
+     d                                     dim(99) inz
+      *
+     d SiteDS          ds                  qualified
+     d  SiteID                       30a   varying
+     d  SiteCode                     30a   varying
+     d  PaymentInfo                        likeds(PaymentDS)
+      *
+     d PaymentDS       ds                  qualified
+     d  InvoiceCurrencyCode...
+     d                                3a
+     D  PaymentCurrencyCode...
+     D                                3a
+     D  PaymentTerm                  10a
+     D  @Carrier#      s             30a   Varying
+     D  @MCNumber      s             30a   Varying
+     D  @DotNumber     s             30a   Varying
+     D @CarrierStatus  s              1a   Inz(*Blanks)
+     D  @nbr           s             10u 0 inz(*zero)
+     D  @skipcnt       s              9s 0 Inz(*Zeros)
+
+          Dcl-s @Status       Int(3:0)   Inz(*Zeros);
+
+          In testcarcc1;
+
+          Clear @InDoc;
+          Clear @OutDoc;
+
+          SetGt *Hival rxmlmsgweb;
+          Readp rxmlmsgweb;
+b001      Dow Not %Eof(xmlmsgwebq);
+b002         If XmlPgm = 'TPSCARCRT ';
+                @InDoc = %Trim(xmlmsg);
+                reset Carrier;
+                @Options = 'path=Transmission/Carriers/Carrier ' +
+                           'allowextra=yes allowmissing=yes case=any';
+                Xml-into(e) Carrier %XML( @InDoc : @Options );
+b003            If %Len(Carrier.SysconNumber) = *Zeros;
+
+                   Clear @Carrier#;
+b004               If %Len(Carrier.CarrierNumber) > 0;
+                      @Carrier# = %Trim(Carrier.CarrierNumber);
+e004               Endif;
+
+                   @MCNumber = *blanks;
+b004               If %Len(Carrier.MCNumber) > 0;
+                      @MCNumber = Carrier.MCNumber;
+e004               Endif;
+
+                   @DotNumber = *blanks;
+b004               If %Len(Carrier.DOTNumber) > 0;
+                      @DotNumber = Carrier.DOTNumber;
+e004               Endif;
+
+                   Clear @CarrierStatus;
+b004               If %Len(Carrier.CarrierNumber) > 0;
+                      @CarrierStatus = %Trim(Carrier.Status);
+e004               Endif;
+
+b004               If @CarrierStatus = 'A';
+                      Exec SQL select count(*) into :@nbr from vndglvtp
+                      where glverpnbr = :@Carrier#;
+b005                  If @Nbr = *Zeros;
+b006                     If @MCNumber <> *Blanks;
+                            Exec sql select count(*) into :@Nbr from vndglvtp
+                            where glvvmcidn = :@MCNumber;
+b007                        If @Nbr = *Zeros;
+b008                           If @DotNumber <> *blanks;
+                                  Exec sql select count(*) into :@Nbr
+                                           from vndglvtp
+                                  where glvdotidn = :@DotNumber;
+b009                              If @Nbr = *Zeros;
+b010                                 If @Skipcnt = @Skip;
+                                        CreateCarrier(@InDoc:@OutDoc:@Status);
+                                        Leave;
+x010                                 Else;
+                                        @Skipcnt += 1;
+e010                                 EndIf;
+e009                              Endif;
+e008                           EndIf;
+e007                        Endif;
+e006                     Endif;
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+             Readp rxmlmsgweb;
+e001      EndDo;
+
+          *Inlr = *On;
+          Return;
+

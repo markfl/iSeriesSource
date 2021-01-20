@@ -1,0 +1,350 @@
+          Ctl-opt NoMain Option(*NoDebugio);
+     H/Title Retrieve Member List
+
+          Dcl-pr ListMbrl0100Format;
+             *n Pointer;
+          End-pr;
+
+          Dcl-pr ListMbrl0200Format;
+             *n Pointer;
+          End-pr;
+
+          Dcl-pr ListMbrl0310Format;
+             *n Pointer;
+          End-pr;
+
+          Dcl-pr ListMbrl0320Format;
+             *n Pointer;
+          End-pr;
+
+          Dcl-pr ListMbrl0330Format;
+             *n Pointer;
+          End-pr;
+
+          Dcl-pr RtvMbrL ExtPgm('QUSLMBR');
+             *n Char(20) Const;
+             *n Char(08) Const;
+             *n Char(20) Const;
+             *n Char(10) Const;
+             *n Char(01) Const;
+             *n Char(256);
+          End-pr;
+
+          Dcl-proc RetrieveMemberList Export;
+
+          Dcl-pi RetrieveMemberList Ind;
+             @PFile    Char(10) Const;
+             @PLibrary Char(10) Const;
+             @PFormat  Char(10) Const Options(*NoPass);
+          End-pi;
+
+          Dcl-c @Format0100 Const('MBRL0100');
+          Dcl-c @Format0200 Const('MBRL0200');
+          Dcl-c @Format0310 Const('MBRL0310');
+          Dcl-c @Format0320 Const('MBRL0320');
+          Dcl-c @Format0330 Const('MBRL0330');
+
+      /define mflores026
+      /define mflores027
+      /define mflores028
+      /define mflores029
+      /define mflores030
+      /define mflores046
+      /define mflores047
+      /define mflores048
+      /define mflores049
+      /define mflores050
+      /define mflores075
+      /copy qcpysrc,mflores
+      /undefine mflores026
+      /undefine mflores027
+      /undefine mflores028
+      /undefine mflores029
+      /undefine mflores030
+      /undefine mflores046
+      /undefine mflores047
+      /undefine mflores048
+      /undefine mflores049
+      /undefine mflores050
+      /undefine mflores075
+
+          Dcl-s @Format      Char(10) Inz(@Format0100);
+          Dcl-s p_MemberName Pointer;
+          Dcl-s MemberName   Char(10) Based(p_MemberName);
+
+b001      If  %Parms()  > 2
+          And @PFormat <> *Blanks;
+
+             @Format = @PFormat;
+
+e001      EndIf;
+
+b001      Monitor;
+
+             dsECBytesP = 256;
+
+             CrtUsrSpc(@UsrSpace: 'USRSPC': 1: x'00':
+                       '*ALL': 'List of Members in File': '*YES': dsEC);
+
+             RtvMbrL(@UsrSpace: @Format: @PFile + @PLibrary:
+                     '*ALL': '0': dsEC);
+
+             RtvPtrUS(@UsrSpace: p_ListHeader);
+
+b001         If @Format = @Format0100;
+
+                ListMbrl0100Format(p_ListHeader);
+
+e001         EndIf;
+
+b001         If @Format = @Format0200;
+
+                ListMbrl0200Format(p_ListHeader);
+
+e001         EndIf;
+
+b001         If @Format = @Format0310;
+
+                ListMbrl0310Format(p_ListHeader);
+
+e001         EndIf;
+
+b001         If @Format = @Format0320;
+
+                ListMbrl0320Format(p_ListHeader);
+
+e001         EndIf;
+
+b001         If @Format = @Format0330;
+
+                ListMbrl0330Format(p_ListHeader);
+
+e001         EndIf;
+
+             DltUsrSpc(@UsrSpace: dsEC);
+
+             Return *On;
+
+x001      On-Error;
+
+             DltUsrSpc(@UsrSpace: dsEC);
+
+             Return *Off;
+
+e001      EndMon;
+
+          End-proc;
+
+      ************************************************************************
+      * ListMbrl0100Format - List members in MBRL0100 Format
+      ************************************************************************
+
+          Dcl-proc ListMbrl0100Format;
+
+          Dcl-pi ListMbrl0100Format;
+             @p_ListHeader Pointer;
+          End-pi;
+
+          Dcl-Ds @Mbrl0100Ds Based(@p_MemberName) LikeDs(mbrl0100ds);
+
+      /define mflores026
+      /define mflores045
+      /define mflores050
+      /define mflores051
+      /define mflores073
+      /copy qcpysrc,mflores
+      /undefine mflores026
+
+          @ListHeader = @p_ListHeader;
+
+b001      For @Entry = 1 To @ListHeaderDs.dsLHEntCnt;
+
+             @Offset = ((@Entry-1) * @ListHeaderDs.dsLHEntSiz)
+                                   + @ListHeaderDs.dsLHLstOff;
+
+             @p_MemberName = OffsetPtr(@ListHeader: @Offset);
+
+             Dsply @Mbrl0100Ds.@MemberNameUsed;
+
+e001      EndFor;
+
+          End-proc;
+
+      ************************************************************************
+      * ListMbrl0200Format - List members in MBRL0200 Format
+      ************************************************************************
+
+          Dcl-proc ListMbrl0200Format;
+
+          Dcl-pi ListMbrl0200Format;
+             @p_ListHeader Pointer;
+          End-pi;
+
+          Dcl-Ds @Mbrl0200Ds Based(@p_MemberName) LikeDs(mbrl0200ds);
+
+      /define mflores027
+      /copy qcpysrc,mflores
+      /undefine mflores027
+
+          @ListHeader = @p_ListHeader;
+
+b001      For @Entry = 1 To @ListHeaderDs.dsLHEntCnt;
+
+             @Offset = ((@Entry-1) * @ListHeaderDs.dsLHEntSiz)
+                                   + @ListHeaderDs.dsLHLstOff;
+
+             @p_MemberName = OffsetPtr(@ListHeader: @Offset);
+
+             Dsply @Mbrl0200Ds.@MemberNameUsed;
+             Dsply @Mbrl0200Ds.@MemberTextDescription;
+
+e001      EndFor;
+
+          End-proc;
+
+      ************************************************************************
+      * ListMbrl0310Format - List members in MBRD0310 Format
+      ************************************************************************
+
+          Dcl-proc ListMbrl0310Format;
+
+          Dcl-pi ListMbrl0310Format;
+             @p_ListHeader Pointer;
+          End-pi;
+
+          Dcl-Ds @Mbrl0310Ds Based(@p_MemberName) LikeDs(mbrl0310ds);
+
+      /define mflores022
+      /define mflores028
+      /copy qcpysrc,mflores
+      /undefine mflores022
+      /undefine mflores028
+
+           Dcl-s p@Mbrd0310Ds Pointer;
+
+           Dcl-Ds @Mbrd0310Ds Based(p@Mbrd0310Ds) LikeDs(mbrd0100ds);
+
+          @ListHeader = @p_ListHeader;
+
+b001      For @Entry = 1 To @ListHeaderDs.dsLHEntCnt;
+
+             @Offset = ((@Entry-1) * @ListHeaderDs.dsLHEntSiz)
+                                   + @ListHeaderDs.dsLHLstOff;
+
+             @p_MemberName = OffsetPtr(@p_ListHeader: @Offset);
+
+             @Offset = @Mbrl0310Ds.@OffsetToMemberDescriptionInformation;
+
+             p@Mbrd0310Ds = OffsetPtr(@p_ListHeader: @Offset);
+
+             Dsply @Mbrd0310Ds.@MemberName;
+             Dsply @Mbrd0310Ds.@MemberTextDescription;
+
+e001      EndFor;
+
+          End-proc;
+
+      ************************************************************************
+      * ListMbrl0320Format - List members in MBRD0320 Format
+      ************************************************************************
+
+          Dcl-proc ListMbrl0320Format;
+
+          Dcl-pi ListMbrl0320Format;
+             @p_ListHeader Pointer;
+          End-pi;
+
+          Dcl-Ds @Mbrl0320Ds Based(@p_MemberName) LikeDs(mbrl0320ds);
+
+      /define mflores023
+      /define mflores029
+      /copy qcpysrc,mflores
+      /undefine mflores023
+      /undefine mflores029
+
+           Dcl-s p@Mbrd0320Ds Pointer;
+
+           Dcl-Ds @Mbrd0320Ds Based(p@Mbrd0320Ds) LikeDs(mbrd0200ds);
+
+          Dcl-s @Date     Date;
+          Dcl-s @Time     Time;
+          Dcl-s @DateTime Char(20) Based(p_MemberName);
+
+          @ListHeader = @p_ListHeader;
+
+b001      For @Entry = 1 To @ListHeaderDs.dsLHEntCnt;
+
+             @Offset = ((@Entry-1) * @ListHeaderDs.dsLHEntSiz)
+                                   + @ListHeaderDs.dsLHLstOff;
+
+             @p_MemberName = OffsetPtr(@p_ListHeader: @Offset);
+
+             @Offset = @Mbrl0320Ds.@OffsetToMemberDescriptionInformation;
+
+             p@Mbrd0320Ds = OffsetPtr(@p_ListHeader: @Offset);
+
+             Dsply @Mbrd0320Ds.@MemberName;
+             Dsply @Mbrd0320Ds.@MemberTextDescription;
+             @Date = %Date(%SubSt(@Mbrd0320Ds.@ChangeDateAndTime:1:7):*cymd0);
+             @Time = %Time(%SubSt(@Mbrd0320Ds.@ChangeDateAndTime:8:6):*hms0);
+             @DateTime = %Char(@Date) + ' ' + %Char(@Time);
+             Dsply @DateTime;
+e001      EndFor;
+
+          End-proc;
+
+      ************************************************************************
+      * ListMbrl0330Format - List members in MBRD0330 Format
+      ************************************************************************
+
+          Dcl-proc ListMbrl0330Format;
+
+          Dcl-pi ListMbrl0330Format;
+             @p_ListHeader Pointer;
+          End-pi;
+
+          Dcl-Ds @Mbrl0330Ds Based(@p_MemberName) LikeDs(mbrl0330ds);
+
+      /define mflores024
+      /define mflores030
+      /copy qcpysrc,mflores
+      /undefine mflores024
+      /undefine mflores030
+      /undefine mflores045
+      /undefine mflores050
+      /undefine mflores051
+      /undefine mflores073
+
+           Dcl-s p@Mbrd0330Ds Pointer;
+
+           Dcl-Ds @Mbrd0330Ds Based(p@Mbrd0330Ds) LikeDs(mbrd0300ds);
+
+          Dcl-s @Date     Date;
+          Dcl-s @Time     Time;
+          Dcl-s @DateTime Char(20) Based(p_MemberName);
+
+          @ListHeader = @p_ListHeader;
+
+b001      For @Entry = 1 To @ListHeaderDs.dsLHEntCnt;
+
+             @Offset = ((@Entry-1) * @ListHeaderDs.dsLHEntSiz)
+                                   + @ListHeaderDs.dsLHLstOff;
+
+             @p_MemberName = OffsetPtr(@p_ListHeader: @Offset);
+
+             @Offset = @Mbrl0330Ds.@OffsetToMemberDescriptionInformation;
+
+             p@Mbrd0330Ds = OffsetPtr(@p_ListHeader: @Offset);
+
+             Dsply @Mbrd0330Ds.@MemberName;
+             Dsply @Mbrd0330Ds.@MemberTextDescription;
+             @Date = %Date(%SubSt(@Mbrd0330Ds.@ChangeDateAndTime:1:7):*cymd0);
+             @Time = %Time(%SubSt(@Mbrd0330Ds.@ChangeDateAndTime:8:6):*hms0);
+             @DateTime = %Char(@Date) + ' ' + %Char(@Time);
+             Dsply @DateTime;
+             Dsply %Char(@Mbrd0330Ds.@Maximum#OfRecords);
+
+e002      EndFor;
+
+          End-proc;
+

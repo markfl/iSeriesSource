@@ -1,0 +1,7 @@
+     Fitppurgep up   e           k Disk
+     C/free
+       // If purfrmlib = 'MFLORES';
+             Clear purfrmlib;
+             Update ritppurgep %Fields(purfrmlib);
+       // EndIf;
+      /end-free

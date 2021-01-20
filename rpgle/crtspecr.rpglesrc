@@ -1,0 +1,1403 @@
+          Ctl-opt Option(*NoDebugio) DftActGrp(*No) BndDir('MFLORES');
+
+          Dcl-f qadspffd            Usage(*Input)  UsrOpn;
+          Dcl-f qrpglesrc Disk(112) Usage(*Output) UsrOpn;
+
+          Dcl-Pi CRTSPECR;
+             @P_FileName  Const Like(@PFileName);
+             @P_RPGType   Const Like(@PRPGType);
+             @P_Type      Const Like(@PType);
+             @P_Prepared  Const Like(@Pprepared);
+             @P_Dspec     Const Like(@PCspec);
+             @P_Cspec     Const Like(@PCspec);
+             @P_SQLspec   Const Like(@PSQLspec);
+             @P_Indent    Const Like(@PIndent);
+             @P_Pref1     Const Like(@Ppref1);
+             @P_Pref2     Const Like(@Ppref2);
+             @P_CheckNull Const Like(@PCheckNull);
+             @P_Case      Const Like(@Pcase);
+             @P_Compare   Const Like(@PCompare);
+             @P_Skip      Const Like(@PSkip);
+          End-Pi;
+
+          /define mflores004
+          /copy qcpysrc,mflores
+          /undefine mflores004
+
+          Dcl-s @PFileName Char(10) Inz(*Blanks);
+          Dcl-s @PRPGType  Char(8)  Inz(*Blanks);
+          Dcl-s @Pprepared Char(9)  Inz(*Blanks);
+          Dcl-s @PType     Char(2)  Inz(*Blanks);
+          Dcl-s @PDspec    Char(7)  Inz(*Blanks);
+          Dcl-s @PCspec    Char(7)  Inz(*Blanks);
+          Dcl-s @PSQLspec  Char(7)  Inz(*Blanks);
+          Dcl-s @PIndent   Zoned(1) Inz(*Zeros);
+          Dcl-s @Ppref1    Char(5)  Inz(*Blanks);
+          Dcl-s @Ppref2    Char(5)  Inz(*Blanks);
+          Dcl-s @PCheckNull Ind;
+          Dcl-s @Pcase     Char(6)  Inz(*Blanks);
+          Dcl-s @PCompare  Char(15) Inz(*Blanks);
+          Dcl-s @PSkip     Ind      Inz(*Off);
+
+          @PFileName  = @P_FileName;
+          @PRPGType   = @P_RPGType;
+          @Pprepared  = @P_prepared;
+          @PType      = @P_Type;
+          @PDspec     = @P_Dspec;
+          @PCspec     = @P_Cspec;
+          @PSQLspec   = @P_SQLspec;
+          @PIndent    = @P_Indent;
+          @PCheckNull = @P_CheckNull;
+          @Pcase      = @P_case;
+          @PCompare   = @P_Compare;
+          @PSkip      = @P_Skip;
+
+b001      If @P_pref1 <> '*NONE';
+             @Ppref1 = @P_pref1;
+e001      EndIf;
+
+b001      If @P_pref2 <> '*NONE';
+             @Ppref2 = @P_pref2;
+e001      EndIf;
+
+b001      If @PCase = '*LOWER';
+             @PCompare = @ToLower(@PCompare);
+e001      EndIf;
+
+          Open qrpglesrc;
+
+b001      If @PRPGType = '*RPGSQL';
+
+             CrtRPGSource ('*RPGFREE': 'D': *Blanks: *Blanks: *Zeros:
+                           @Ppref1:   @Ppref2: @Pcase: @PFileName:
+                           @PCompare: @PSkip);
+
+             CrtSQLSource (@Ppref1: @Pcase: @PFileName);
+
+x001      Else;
+
+             CrtRPGSource (@PRPGType: @PType:  @PDspec: @PCspec: @PIndent:
+                           @Ppref1:   @Ppref2: @Pcase: @PFileName:
+                           @PCompare: @PSkip);
+
+e001      EndIf;
+
+          *Inlr = *On;
+          Return;
+
+š      Dcl-Proc CRTRPGSource Export;
+
+          Dcl-Pi CRTRPGSource;
+             @RPGType  Like(@PRPGType)  Const;
+             @Spec     Like(@PType)     Const;
+             @Dspec    Like(@PDspec)    Const;
+             @Cspec    Like(@PCspec)    Const;
+             @Indent   Like(@PIndent)   Const;
+             @Pref1    Like(@Ppref1)    Const;
+             @Pref2    Like(@Ppref2)    Const;
+             @Case     Like(@Pcase)     Const;
+             @FileName Like(@PFileName) Const;
+             @Compare  Like(@PCompare)  Const;
+             @Skip     Like(@PSkip)     Const;
+          End-Pi;
+
+          /define mflores072
+          /copy qcpysrc,mflores
+          /undefine mflores072
+
+          /define cvtspec04
+          /define cvtspec12
+          /copy qcpysrc,cvtspec
+          /undefine cvtspec04
+          /undefine cvtspec12
+
+          /define rpgstruct01
+          /define rpgstruct03
+          /define rpgstruct04
+          /define rpgstruct05
+          /define rpgstruct06
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct01
+          /undefine rpgstruct03
+          /undefine rpgstruct04
+          /undefine rpgstruct05
+          /undefine rpgstruct06
+
+          Dcl-s  @a      Packed(5:0)     Inz(*Zeros);
+          Dcl-s  @Last   Packed(5:0)     Inz(*Zeros);
+          Dcl-s  @Fields Like(whflde)    Inz(*Blanks) Dim(9999);
+          Dcl-s  @File   Like(@FileName) Inz(*Blanks);
+          Dcl-s  #Indent Zoned(3)        Inz(*Zeros);
+          dcl-s  @Free   Char(58)        Inz(*Blanks);
+          Dcl-s  @seqo   Zoned(6:2)      Inz(*Zeros);
+          Dcl-s  @seqd   Zoned(6:2)      Inz(*Zeros);
+          Dcl-s  @seqi   Zoned(6:2)      Inz(*Zeros);
+          Dcl-s  @BTag   Char(4)         Inz(*Blanks);
+          Dcl-s  @XTag   Char(4)         Inz(*Blanks);
+          Dcl-s  @ETag   Char(4)         Inz(*Blanks);
+          Dcl-Ds @DILE   LikeDs(@DspecDsRPGILE) Inz;
+          Dcl-Ds @IILE   LikeDs(@IspecDsRPGILE) Inz;
+          Dcl-Ds @CILE   LikeDs(@CspecDsRPGILE) Inz;
+          Dcl-Ds @OILE   LikeDs(@OspecDsRPGILE) Inz;
+
+          Open qadspffd;
+
+          Clear @seqd;
+          Clear @seqi;
+          Clear @seqo;
+
+          // Set Indent
+          #Indent = @Indent;
+          Clear @_srcdat;
+          Clear @_srcseq;
+
+          // Check for starting a case instruction
+b001      If @Spec    = 'C';
+b002         If @Cspec = '*WHENEQ '
+             Or @Cspec = '*WHENNE '
+             Or @Cspec = '*WHENGT '
+             Or @Cspec = '*WHENLT '
+             Or @Cspec = '*WHENGE '
+             Or @Cspec = '*WHENLE ';
+
+b003            If     @RPGType = '*RPG4';
+
+                   @CILE.@CTag      = 'b001';
+                   @CILE.@COutspecd = @Spec;
+                   @CILE.@COption   = 'Select';
+                   @_srcdta        = @CILE;
+                   Write qrpglesrc @SourceDs;
+
+x003            ElseIf @RPGType = '*RPGFREE';
+
+                   @CILE.@CTag     =  'b001';
+                   @CILE.@CFree    =  'Select';
+                   @CILE.@CFree    =  IndentSource(@CILE.@CFree: #Indent);
+                   #Indent         += 1;
+                   @_srcdta        =  @CILE;
+                   Write qrpglesrc @SourceDs;
+
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          Read qwhdrffd;
+b001      Dow not %Eof(qadspffd);
+
+b002         If %Subst(whflde:1:3) = '*IN';
+                Read qwhdrffd;
+                Iter;
+e002         EndIf;
+
+             @a = %LookUp(whflde: @Fields);
+b002         If @a = *Zeros;
+                @a = %LookUp(*Blanks: @Fields);
+b003            If @a <> *Zeros;
+                   @Fields(@a) = whflde;
+e003            EndIf;
+x002         Else;
+                Read qwhdrffd;
+                Iter;
+e002         EndIf;
+
+b002         If @Case = '*LOWER';
+                @File  = @ToLower(@FileName);
+                whflde = @ToLower(whflde);
+e002         EndIf;
+
+b002         Select;
+
+x002            When @Spec = 'I';
+                   @seqi += 1;
+                   @IILE.@IOutspecd = @Spec;
+b003               If whfldd = *Zeros;
+                      Clear    @IILE.@IDec;
+                      Clear    @IILE.@IAtr;
+x003               Else;
+b004                  If whfldp > *Zeros;
+                        Evalr @IILE.@IDec = %Triml(%Char(whfldp));
+x004                  Else;
+                        @IILE.@IDec = ' 0';
+e004                  EndIf;
+b004                  If whfldb <> whfldd;
+                         @IILE.@IAtr = 'p';
+x004                  Else;
+                         @IILE.@IAtr = 's';
+e004                  EndIf;
+e003               EndIf;
+b003               If @seqi  = 1;
+                      Evalr @IILE.@IFrom = %Char(1);
+                      Evalr @IILE.@ITo   = %Triml(%Char(whfldb));
+                      @Last  = %Dec(@IILE.@ITo:5:0);
+x003               Else;
+                      Evalr @IILE.@IFrom = %Triml(%Char(@Last + 1));
+                      Evalr @IILE.@ITo   = %Triml(%Char(@Last + whfldb));
+                      @Last  = @Last + whfldb;
+e003               EndIf;
+b003               If @Pref1 <> *Blanks;
+                      @IILE.@IOutField = %Trim(@Pref1) + whflde;
+x003               Else;
+                      @IILE.@IOutField = whflde;
+e003               EndIf;
+
+                   @_srcdta       = @IILE;
+                   Write qrpglesrc @SourceDs;
+
+x002            When @Spec = 'IX';
+                   @seqi += 1;
+                   @IILE.@IOutspecd = @Spec;
+b003               If @Dspec = '*RENAME';
+                      @IILE.@IInField = whflde;
+                      @IILE.@IOutField = %Trim(@Pref1)  + whflde;
+x003               Else;
+                      @IILE.@IOutField = whflde;
+e003               EndIf;
+
+                   @_srcdta       = @IILE;
+                   Write qrpglesrc @SourceDs;
+
+x002            When @Spec = 'D';
+                   Reset @DILE;
+                   @seqd += 1;
+b003               If  @Dspec   = '*DS'
+                   And @seqd    = 1
+                   Or  @Dspec   = '*DSLIKE'
+                   And @seqd    = 1;
+b004                  If     @RPGType = '*RPG4';
+                         @DILE.@DFieldName = '@' + %Trim(@File) + 'Ds';
+                         @DILE.@DDsId      = 'ds';
+                         @DILE.@DOutspecd  = @Spec;
+x004                  ElseIf @RPGType = '*RPGFREE';
+                         @DILE.@DProcPrefix = '    Dcl-Ds @'
+                                            + %Trim(@File) + ';';
+e004                  EndIf;
+                      @_srcdta = @DILE;
+                      Write qrpglesrc @SourceDs;
+                      @DILE.@DFieldName = *Blanks;
+e003               EndIf;
+b003               If  @Dspec   = '*DS'
+                   OR  @Dspec   = '*DSLIKE';
+                      @DILE.@DDsId      = *Blanks;
+e003               EndIf;
+                   @DILE.@DOutspecd = @Spec;
+b003               If @Pref1 <> *Blanks;
+                      @DILE.@DFieldName = %Trim(@Pref1) + whflde;
+x003               Else;
+                      @DILE.@DFieldName = whflde;
+e003               EndIf;
+
+b003               Select;
+x003                  When @Dspec   = '*LIKE';
+                         @DILE.@DDsId      = 's ';
+                         @DILE.@DKeywords = 'Like(' + %Trim(whflde) + ')';
+x003                  When @Dspec   = '*DSLIKE';
+                         @DILE.@DKeywords = 'Like(' + %Trim(whflde) + ')';
+x003                  Other;
+b004                     If @RPGType = '*RPGFREE';
+b005                        If @Dspec   = '*DS';
+                               @DILE.@DDsId      = 'ds';
+x005                        Else;
+                               @DILE.@DDsId      = 's ';
+e005                        EndIf;
+e004                     EndIf;
+b004                     If whfldd > *Zeros;
+                            Evalr @DILE.@DTo = %Triml(%Char(whfldd));
+b005                        If whfldp > *Zeros;
+                              Evalr @DILE.@DDec = %Triml(%Char(whfldp));
+x005                        Else;
+                              @DILE.@DDec = ' 0';
+e005                        EndIf;
+b005                        If whfldb <> whfldd;
+                               @DILE.@DType = 'p';
+x005                        Else;
+                               @DILE.@DType = 's';
+e005                        EndIf;
+                            @DILE.@DKeywords = 'Inz(*Zeros)';
+x004                     Else;
+b005                        Select;
+x005                           When whfldt = 'L';
+                                  @DILE.@DType = 'd';
+x005                           Other;
+                                  @DILE.@DType = @ToLower(whfldt);
+e005                        EndSl;
+b005                        If whfldt = 'Z'
+                            Or whfldt = 'T'
+                            Or whfldt = 'L';
+                               Clear @DILE.@DTo;
+                               @DILE.@DKeywords = 'Inz(*Loval)';
+x005                        Else;
+                               Evalr @DILE.@DTo = %Triml(%Char(whfldb));
+                               @DILE.@DKeywords = 'Inz(*Blanks)';
+e005                        EndIf;
+                            Clear @DILE.@DDec;
+b005                        If  @Cspec = '*DS'
+                            And @seqd    = 1
+                            Or  @Cspec = '*DSLIKE'
+                            And @seqd    = 1;
+                               Clear @DILE.@DDsId;
+                               Clear @DILE.@DKeywords;
+e005                        EndIf;
+e004                     EndIf;
+e003               EndSl;
+
+b003               If  @RpgType =  '*RPGFREE'
+                   And @DILE    <> *Blanks;
+
+                      @DILE = ConvertDeclareField(*Blanks: @DILE);
+
+e003               EndIf;
+
+                   @_srcdta = @DILE;
+                   Write qrpglesrc @SourceDs;
+
+x002            When @Spec = 'O';
+                   @seqo += 1;
+                   @OILE.@OOutspecd = @Spec;
+                   Clear @OILE.@OFormat;
+b003               If @Pref2 <> *Blanks;
+                      @OILE.@OEName = %Trim(@Pref2) + whflde;
+x003               Else;
+                      @OILE.@OEName = whflde;
+e003               EndIf;
+b003               If whfldd <> *Zeros;
+b004                  If whfldb <> whfldd;
+                         @OILE.@OFormat = 'p';
+x004                  Else;
+                         @OILE.@OFormat = 's';
+e004                  EndIf;
+e003               EndIf;
+
+                   @_srcdta = @OILE;
+                   Write qrpglesrc @SourceDs;
+
+x002            When @Spec    = 'C';
+
+                   @seqo += 1;
+
+                   @BTag = 'b001';
+                   @XTag = 'x001';
+                   @ETag = 'e001';
+b003               Select;
+x003                  When #Indent = 1;
+                         @BTag = 'b002';
+                         @XTag = 'x002';
+                         @ETag = 'e002';
+x003                  When #Indent = 2;
+                         @BTag = 'b003';
+                         @XTag = 'x003';
+                         @ETag = 'e003';
+x003                  When #Indent = 3;
+                         @BTag = 'b004';
+                         @XTag = 'x004';
+                         @ETag = 'e004';
+x003                  When #Indent = 4;
+                         @BTag = 'b005';
+                         @XTag = 'x005';
+                         @ETag = 'e005';
+x003                  When #Indent = 5;
+                         @BTag = 'b006';
+                         @XTag = 'x006';
+                         @ETag = 'e006';
+b003               EndSl;
+
+b003               Select;
+
+x003                  When @RPGType = '*RPG4';
+                         @CILE.@COutspecd = @Spec;
+
+b004                     Select;
+
+x004                        When @Cspec = '*MOVE ';
+                               @CILE.@COption = 'Move ';
+                               @CILE.@CField2 = %Trim(@Pref1) + whflde;
+                               @CILE.@CResult = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*MOVEL';
+                               @CILE.@COption = 'Movel';
+                               @CILE.@CField2 = %Trim(@Pref1) + whflde;
+                               @CILE.@CResult = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ADD  ';
+                               @CILE.@COption = 'Add  ';
+                               @CILE.@CField2 = %Trim(@Pref1) + whflde;
+                               @CILE.@CResult = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*SUB  ';
+                               @CILE.@COption = 'Sub  ';
+                               @CILE.@CField2 = %Trim(@Pref1) + whflde;
+                               @CILE.@CResult = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ZADD ';
+                               @CILE.@COption = 'Z-Add';
+                               @CILE.@CField2 = %Trim(@Pref1) + whflde;
+                               @CILE.@CResult = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ZSUB ';
+                               @CILE.@COption = 'Z-Sub';
+                               @CILE.@CField2 = %Trim(@Pref1) + whflde;
+                               @CILE.@CResult = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*CLEAR';
+                               @CILE.@COption = 'Clear';
+                               @CILE.@CResult = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*IFEQ ';
+                               @CILE.@COption = 'IfEq ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+                               @CILE.@CTag = @BTag;
+
+x004                        When @Cspec = '*IFNE ';
+                               @CILE.@COption = 'IfNe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+                               @CILE.@CTag = @BTag;
+
+x004                        When @Cspec = '*IFGT ';
+                               @CILE.@COption = 'IfGt ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+                               @CILE.@CTag = @BTag;
+
+x004                        When @Cspec = '*IFLT ';
+                               @CILE.@COption = 'IfLt ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+                               @CILE.@CTag = @BTag;
+
+x004                        When @Cspec = '*IFGE ';
+                               @CILE.@COption = 'IfGe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+                               @CILE.@CTag = @BTag;
+
+x004                        When @Cspec = '*IFLE ';
+                               @CILE.@COption = 'IfLe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+                               @CILE.@CTag = @BTag;
+
+x004                        When @Cspec = '*OREQ ';
+                               @CILE.@COption = 'OrEq ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ORNE ';
+                               @CILE.@COption = 'OrNe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ORGT ';
+                               @CILE.@COption = 'OrGt ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ORLT ';
+                               @CILE.@COption = 'OrLt ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ORGE ';
+                               @CILE.@COption = 'OrGe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ORLE ';
+                               @CILE.@COption = 'OrLe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ANDEQ ';
+                               @CILE.@COption = 'AndEq ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ANDNE ';
+                               @CILE.@COption = 'AndNe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ANDGT ';
+                               @CILE.@COption = 'AndGt ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ANDLT ';
+                               @CILE.@COption = 'AndLt ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ANDGE ';
+                               @CILE.@COption = 'AndGe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*ANDLE ';
+                               @CILE.@COption = 'AndLe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*WHENEQ ';
+                               @CILE.@COption = 'WhenEq ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+                               @CILE.@CTag = @XTag;
+
+x004                        When @Cspec = '*WHENNE ';
+                               @CILE.@COption = 'WhenNe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+                               @CILE.@CTag = @XTag;
+
+x004                        When @Cspec = '*WHENGT ';
+                               @CILE.@COption = 'WhenGt ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+                               @CILE.@CTag = @XTag;
+
+x004                        When @Cspec = '*WHENLT ';
+                               @CILE.@COption = 'WhenLt ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+                               @CILE.@CTag = @XTag;
+
+x004                        When @Cspec = '*WHENGE ';
+                               @CILE.@COption = 'WhenGe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+                               @CILE.@CTag = @XTag;
+
+x004                        When @Cspec = '*WHENLE ';
+                               @CILE.@COption = 'WhenLe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+                               @CILE.@CTag = @XTag;
+
+x004                        When @Cspec = '*CASEQ ';
+                               @CILE.@COption = 'CasEq ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*CASNE ';
+                               @CILE.@COption = 'CasNe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*CASGT ';
+                               @CILE.@COption = 'CasGt ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*CASLT ';
+                               @CILE.@COption = 'CasLt ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*CASGE ';
+                               @CILE.@COption = 'CasGe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*CASLE ';
+                               @CILE.@COption = 'CasLe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*CABEQ ';
+                               @CILE.@COption = 'CabEq ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*CABNE ';
+                               @CILE.@COption = 'CabNe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*CABGT ';
+                               @CILE.@COption = 'CabGt ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*CABLT ';
+                               @CILE.@COption = 'CabLt ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*CABGE ';
+                               @CILE.@COption = 'CabGe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*CABLE ';
+                               @CILE.@COption = 'CabLe ';
+                               @CILE.@CField1 = %Trim(@Pref1) + whflde;
+                               @CILE.@CField2 = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*PARM ';
+                               @CILE.@COption = 'Parm ';
+                               @CILE.@CResult = %Trim(@Pref2) + whflde;
+
+x004                        When @Cspec = '*KFLD ';
+                               @CILE.@COption = 'Kfld ';
+                               @CILE.@CResult = %Trim(@Pref2) + whflde;
+
+e004                     EndSl;
+
+                         @_srcdta = @CILE;
+                         Write qrpglesrc @SourceDs;
+
+x003                  When @RPGType = '*RPGFREE';
+
+b004                     Select;
+
+x004                        When @Cspec = '*CLEAR';
+                               @Free = 'Clear ' + %Trim(@Pref1)
+                                                + %Trim(whflde);
+
+x004                        When @Cspec = '*MOVEL';
+                               @Free = %Trim(@Pref1)
+                                     + %Trim(whflde)
+                                     + ' = '
+                                     + %Trim(@Pref2)
+                                     + %Trim(whflde);
+
+x004                        When @Cspec = '*MOVE ';
+                               @Free = 'Evalr ' + %Trim(@Pref2)
+                                     + %Trim(whflde)
+                                     + ' = '
+                                     + %Trim(@Pref1)
+                                     + %Trim(whflde);
+
+x004                        When @Cspec = '*ADD  ';
+                               @Free = %Trim(@Pref2)
+                                     + %Trim(whflde)
+                                     + ' += ' + %Trim(@Pref1)
+                                              + %Trim(whflde);
+
+x004                        When @Cspec = '*SUB  ';
+                               @Free = %Trim(@Pref2)
+                                     + %Trim(whflde)
+                                     + ' -= ' + %Trim(@Pref1)
+                                              + %Trim(whflde);
+
+x004                        When @Cspec = '*ZADD ';
+                               @Free = 'Clear ' + %Trim(@Pref2)
+                                                + %Trim(whflde) + ';';
+                               @CILE.@CFree = @Free;
+                               @_srcdta = @CILE;
+                               Write qrpglesrc @SourceDs;
+                               @Free = %Trim(@Pref2)
+                                     + %Trim(whflde)
+                                     + ' = ' + %Trim(@Pref1)
+                                             + %Trim(whflde);
+
+x004                        When @Cspec = '*ZSUB ';
+                               @Free = 'Clear ' + %Trim(@Pref2)
+                                                + %Trim(whflde) + ';';
+                               @CILE.@CFree = @Free;
+                               @_srcdta = @CILE;
+                               Write qrpglesrc @SourceDs;
+                               @Free = %Trim(@Pref2)
+                                     + %Trim(whflde)
+                                     + ' = ' + %Trim(@Pref1)
+                                             + %Trim(whflde) + ' * -1';
+
+x004                        When @Cspec = '*IFEQ '
+                            Or   @Cspec = '*IFEQMV';
+b004                           If @Compare = *Blanks;
+                                  @Free = 'If ' + %Trim(@Pref1)
+                                                + %Trim(whflde)
+                                        + ' = ' + %Trim(@Pref2)
+                                                + %Trim(whflde);
+x004                           Else;
+                                  @Free = 'If ' + %Trim(@Pref1)
+                                                + %Trim(whflde)
+                                        + ' = ' + %Trim(@Compare);
+e004                           EndIf;
+                               @CILE.@CTag = @BTag;
+
+b004                           If @Cspec = '*IFEQMV';
+                                  WriteALine(@Free:#Indent:@BTag);
+                                  @Free = %Trim(@Pref2)
+                                        + %Trim(whflde)
+                                        + ' = '
+                                        + %Trim(@Pref1)
+                                        + %Trim(whflde);
+e004                           EndIf;
+
+x004                        When @Cspec = '*IFNE '
+                            Or   @Cspec = '*IFNEMV';
+b004                           If @Compare = *Blanks;
+                                  @Free = 'If '  + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' <> ' + %Trim(@Pref2)
+                                                 + %Trim(whflde);
+x004                           Else;
+                                  @Free = 'If '  + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' <> ' + %Trim(@Compare);
+e004                           EndIf;
+                               @CILE.@CTag = @BTag;
+
+b004                           If @Cspec = '*IFNEMV';
+                                  WriteALine(@Free:#Indent:@BTag);
+                                  @Free = %Trim(@Pref2)
+                                        + %Trim(whflde)
+                                        + ' = '
+                                        + %Trim(@Pref1)
+                                        + %Trim(whflde);
+e004                           EndIf;
+
+x004                        When @Cspec = '*IFGT '
+                            Or   @Cspec = '*IFGTMV';
+b004                           If @Compare = *Blanks;
+                                  @Free = 'If ' + %Trim(@Pref1)
+                                                + %Trim(whflde)
+                                        + ' > ' + %Trim(@Pref2)
+                                                + %Trim(whflde);
+x004                           Else;
+                                  @Free = 'If ' + %Trim(@Pref1)
+                                                + %Trim(whflde)
+                                        + ' > ' + %Trim(@Compare);
+e004                           EndIf;
+                               @CILE.@CTag = @BTag;
+
+b004                           If @Cspec = '*IFGTMV';
+                                  WriteALine(@Free:#Indent:@BTag);
+                                  @Free = %Trim(@Pref2)
+                                        + %Trim(whflde)
+                                        + ' = '
+                                        + %Trim(@Pref1)
+                                        + %Trim(whflde);
+e004                           EndIf;
+
+x004                        When @Cspec = '*IFLT '
+                            Or   @Cspec = '*IFLTMV';
+b004                           If @Compare = *Blanks;
+                                  @Free = 'If ' + %Trim(@Pref1)
+                                                + %Trim(whflde)
+                                        + ' < ' + %Trim(@Pref2)
+                                                + %Trim(whflde);
+x004                           Else;
+                                  @Free = 'If ' + %Trim(@Pref1)
+                                                + %Trim(whflde)
+                                        + ' < ' + %Trim(@Compare);
+e004                           EndIf;
+                               @CILE.@CTag = @BTag;
+
+b004                           If @Cspec = '*IFLTMV';
+                                  WriteALine(@Free:#Indent:@BTag);
+                                  @Free = %Trim(@Pref2)
+                                        + %Trim(whflde)
+                                        + ' = '
+                                        + %Trim(@Pref1)
+                                        + %Trim(whflde);
+e004                           EndIf;
+
+x004                        When @Cspec = '*IFGE '
+                            Or   @Cspec = '*IFLTGE';
+b004                           If @Compare = *Blanks;
+                                  @Free = 'If '  + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' >= ' + %Trim(@Pref2)
+                                                 + %Trim(whflde);
+x004                           Else;
+                                  @Free = 'If '  + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' >= ' + %Trim(@Compare);
+e004                           EndIf;
+                               @CILE.@CTag = @BTag;
+
+b004                           If @Cspec = '*IFLTGE';
+                                  WriteALine(@Free:#Indent:@BTag);
+                                  @Free = %Trim(@Pref2)
+                                        + %Trim(whflde)
+                                        + ' = '
+                                        + %Trim(@Pref1)
+                                        + %Trim(whflde);
+e004                           EndIf;
+
+x004                        When @Cspec = '*IFLE '
+                            Or   @Cspec = '*IFLTLE';
+b004                           If @Compare = *Blanks;
+                                  @Free = 'If '  + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' <= ' + %Trim(@Pref2)
+                                                 + %Trim(whflde);
+x004                           Else;
+                                  @Free = 'If '  + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' <= ' + %Trim(@Compare);
+e004                           EndIf;
+                               @CILE.@CTag = @BTag;
+
+b004                           If @Cspec = '*IFLTLE';
+                                  WriteALine(@Free:#Indent:@BTag);
+                                  @Free = %Trim(@Pref2)
+                                        + %Trim(whflde)
+                                        + ' = '
+                                        + %Trim(@Pref1)
+                                        + %Trim(whflde);
+e004                           EndIf;
+
+x004                        When @Cspec = '*OREQ ';
+b005                           If @Compare = *Blanks;
+                                  @Free = 'Or ' + %Trim(@Pref1)
+                                                + %Trim(whflde)
+                                        + ' = ' + %Trim(@Pref2)
+                                                + %Trim(whflde);
+x005                           Else;
+                                  @Free = 'Or ' + %Trim(@Pref1)
+                                                + %Trim(whflde)
+                                        + ' = ' + %Trim(@Compare);
+e005                           EndIf;
+
+x004                        When @Cspec = '*ORNE ';
+b005                           If @Compare = *Blanks;
+                                  @Free = 'Or '  + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' <> ' + %Trim(@Pref2)
+                                                 + %Trim(whflde);
+x005                           Else;
+                                  @Free = 'Or '  + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' <> ' + %Trim(@Compare);
+e005                           EndIf;
+
+x004                        When @Cspec = '*ORGT ';
+b005                           If @Compare = *Blanks;
+                                  @Free = 'Or ' + %Trim(@Pref1)
+                                                + %Trim(whflde)
+                                        + ' > ' + %Trim(@Pref2)
+                                                + %Trim(whflde);
+x005                           Else;
+                                  @Free = 'Or ' + %Trim(@Pref1)
+                                                + %Trim(whflde)
+                                        + ' > ' + %Trim(@Compare);
+e005                           EndIf;
+
+x004                        When @Cspec = '*ORLT ';
+b005                           If @Compare = *Blanks;
+                                  @Free = 'Or ' + %Trim(@Pref1)
+                                                + %Trim(whflde)
+                                        + ' < ' + %Trim(@Pref2)
+                                                + %Trim(whflde);
+x005                           Else;
+                                  @Free = 'Or ' + %Trim(@Pref1)
+                                                + %Trim(whflde)
+                                        + ' < ' + %Trim(@Compare);
+e005                           EndIf;
+
+x004                        When @Cspec = '*ORGE ';
+b005                           If @Compare = *Blanks;
+                                  @Free = 'Or '  + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' >= ' + %Trim(@Pref2)
+                                                 + %Trim(whflde);
+x005                           Else;
+                                  @Free = 'Or '  + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' >= ' + %Trim(@Compare);
+e005                           EndIf;
+
+x004                        When @Cspec = '*ORLE ';
+b005                           If @Compare = *Blanks;
+                                  @Free = 'Or '  + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' <= ' + %Trim(@Pref2)
+                                                 + %Trim(whflde);
+x005                           Else;
+                                  @Free = 'Or '  + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' <= ' + %Trim(@Compare);
+e005                           EndIf;
+
+x004                        When @Cspec = '*ANDEQ ';
+b005                           If @Compare = *Blanks;
+                                  @Free = 'And ' + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' = '  + %Trim(@Pref2)
+                                                 + %Trim(whflde);
+x005                           Else;
+                                  @Free = 'And ' + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' = '  + %Trim(@Compare);
+e005                           EndIf;
+
+x004                        When @Cspec = '*ANDNE ';
+b005                           If @Compare = *Blanks;
+                                  @Free = 'And '  + %Trim(@Pref1)
+                                                  + %Trim(whflde)
+                                        + ' <> '  + %Trim(@Pref2)
+                                                  + %Trim(whflde);
+x005                           Else;
+                                  @Free = 'And '  + %Trim(@Pref1)
+                                                  + %Trim(whflde)
+                                        + ' <> '  + %Trim(@Compare);
+e005                           EndIf;
+
+x004                        When @Cspec = '*ANDGT ';
+b005                           If @Compare = *Blanks;
+                                  @Free = 'And ' + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' > '  + %Trim(@Pref2)
+                                                 + %Trim(whflde);
+x005                           Else;
+                                  @Free = 'And ' + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' > '  + %Trim(@Compare);
+e005                           EndIf;
+
+x004                        When @Cspec = '*ANDLT ';
+b005                           If @Compare = *Blanks;
+                                  @Free = 'And ' + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' < '  + %Trim(@Pref2)
+                                                 + %Trim(whflde);
+x005                           Else;
+                                  @Free = 'And ' + %Trim(@Pref1)
+                                                 + %Trim(whflde)
+                                        + ' < '  + %Trim(@Compare);
+e005                           EndIf;
+
+x004                        When @Cspec = '*ANDGE ';
+b005                           If @Compare = *Blanks;
+                                  @Free = 'And '  + %Trim(@Pref1)
+                                                  + %Trim(whflde)
+                                        + ' >= '  + %Trim(@Pref2)
+                                                  + %Trim(whflde);
+x005                           Else;
+                                  @Free = 'And '  + %Trim(@Pref1)
+                                                  + %Trim(whflde)
+                                        + ' >= '  + %Trim(@Compare);
+e005                           EndIf;
+
+x004                        When @Cspec = '*ANDLE ';
+b005                           If @Compare = *Blanks;
+                                  @Free = 'And '  + %Trim(@Pref1)
+                                                  + %Trim(whflde)
+                                        + ' <= '  + %Trim(@Pref2)
+                                                  + %Trim(whflde);
+x005                           Else;
+                                  @Free = 'And '  + %Trim(@Pref1)
+                                                  + %Trim(whflde)
+                                        + ' <= '  + %Trim(@Compare);
+e005                           EndIf;
+
+x004                        When @Cspec = '*WHENEQ ';
+                               @Free = 'When ' + %Trim(@Pref1)
+                                              + %Trim(whflde)
+                                     + ' = '  + %Trim(@Pref2)
+                                              + %Trim(whflde);
+                               @CILE.@CTag = @XTag;
+
+x004                        When @Cspec = '*WHENNE ';
+                               @Free = 'When ' + %Trim(@Pref1)
+                                              + %Trim(whflde)
+                                     + ' <> ' + %Trim(@Pref2)
+                                              + %Trim(whflde);
+                               @CILE.@CTag = @XTag;
+
+x004                        When @Cspec = '*WHENGT ';
+                               @Free = 'When ' + %Trim(@Pref1)
+                                              + %Trim(whflde)
+                                     + ' > '  + %Trim(@Pref2)
+                                              + %Trim(whflde);
+                               @CILE.@CTag = @XTag;
+
+x004                        When @Cspec = '*WHENLT ';
+                               @Free = 'When ' + %Trim(@Pref1)
+                                              + %Trim(whflde)
+                                     + ' < '  + %Trim(@Pref2)
+                                              + %Trim(whflde);
+                               @CILE.@CTag = @XTag;
+
+x004                        When @Cspec = '*WHENGE ';
+                               @Free = 'When ' + %Trim(@Pref1)
+                                              + %Trim(whflde)
+                                     + ' >= ' + %Trim(@Pref2)
+                                              + %Trim(whflde);
+                               @CILE.@CTag = @XTag;
+
+x004                        When @Cspec = '*WHENLE ';
+                               @Free = 'When ' + %Trim(@Pref1)
+                                              + %Trim(whflde)
+                                     + ' <= ' + %Trim(@Pref2)
+                                              + %Trim(whflde);
+                               @CILE.@CTag = @XTag;
+
+e004                     EndSl;
+
+b004                     If  @Cspec = '*MOVEL'
+                         And @PCheckNull;
+
+                            @Free = 'If ' + %Trim(@Pref1)
+                                          + %Trim(whflde) + ' = *Blanks;';
+                            WriteALine(@Free:#Indent+1:*Blanks);
+
+                            @Free = '%Nullind(' + %Trim(whflde) + ') = *On';
+                            WriteALine(@Free:#Indent+2:*Blanks);
+
+                            @Free = 'Else';
+                            WriteALine(@Free:#Indent+1:*Blanks);
+
+                            @Free = '%Nullind(' + %Trim(whflde) + ') = *Off';
+                            WriteALine(@Free:#Indent+2:*Blanks);
+
+                            @Free = %Trim(whflde) +
+                                    ' = %Trim(' + %Trim(@Pref1)
+                                      +  %Trim(whflde) + ');';
+                            WriteALine(@Free:#Indent+2:*Blanks);
+
+                            @Free = 'EndIf';
+                            WriteALine(@Free:#Indent+1:*Blanks);
+
+                            // Check for skipping a line
+b005                        If @Skip;
+
+                               Clear @CILE;
+                               @_srcdta = @CILE;
+                               Write qrpglesrc @SourceDs;
+
+e005                        EndIf;
+
+x004                     Else;
+b005                        If @Cspec = '*IFEQMV'
+                            Or @Cspec = '*IFNEMV'
+                            Or @Cspec = '*IFGTMV'
+                            Or @Cspec = '*IFLTMV'
+                            Or @Cspec = '*IFGEMV'
+                            Or @Cspec = '*IFLEMV';
+                               WriteALine(@Free:#Indent+1:*Blanks);
+x005                        Else;
+                               WriteALine(@Free:#Indent:*Blanks);
+e005                     EndIf;
+e004                  EndIf;
+e003               EndSl;
+
+b003               If @Cspec = '*IFEQ '
+                   Or @Cspec = '*IFNE '
+                   Or @Cspec = '*IFGT '
+                   Or @Cspec = '*IFLT '
+                   Or @Cspec = '*IFGE '
+                   Or @Cspec = '*IFLE '
+                   Or @Cspec = '*ANDEQ '
+                   Or @Cspec = '*ANDNE '
+                   Or @Cspec = '*ANDGT '
+                   Or @Cspec = '*ANDLT '
+                   Or @Cspec = '*ANDGE '
+                   Or @Cspec = '*ANDLE '
+                   Or @Cspec = '*IFEQMV'
+                   Or @Cspec = '*IFNEMV'
+                   Or @Cspec = '*IFGTMV'
+                   Or @Cspec = '*IFLTMV'
+                   Or @Cspec = '*IFGEMV'
+                   Or @Cspec = '*IFLEMV';
+
+b004                  If     @RPGType = '*RPG4';
+
+                         Clear @CILE.@CField1;
+                         Clear @CILE.@CField2;
+                         Clear @CILE.@CResult;
+                         @CILE.@CTag = @ETag;
+                         @CILE.@COption = 'EndIf';
+                         @_srcdta = @CILE;
+                         Write qrpglesrc @SourceDs;
+
+x004                  ElseIf @RPGType = '*RPGFREE';
+
+                         @Free = 'EndIf';
+                         WriteALine(@Free:#Indent:@ETag);
+
+                         // Check for skipping a line
+b005                     If @Skip;
+
+                            Clear @CILE;
+                            @_srcdta = @CILE;
+                            Write qrpglesrc @SourceDs;
+
+e005                     EndIf;
+e004                  EndIf;
+e003               EndIf;
+e002         EndSl;
+
+             Read qwhdrffd;
+e001      EndDo;
+
+          Close qadspffd;
+
+          // Check for starting a data structure
+b001      If  @Spec    = 'D'
+          And @RPGType = '*RPGFREE';
+b002         If @Dspec = '*DS'
+             Or @Dspec = '*DSLIKE';
+                Clear @DILE;
+                @DILE.@DFieldName = '    End-Ds;';
+                @_srcdta = @DILE;
+                Write qrpglesrc @SourceDs;
+e002         EndIf;
+e001      EndIf;
+
+          // Check for starting a case instruction
+b001      If @Spec    = 'C';
+b002         If @Cspec = '*WHENEQ '
+             Or @Cspec = '*WHENNE '
+             Or @Cspec = '*WHENGT '
+             Or @Cspec = '*WHENLT '
+             Or @Cspec = '*WHENGE '
+             Or @Cspec = '*WHENLE ';
+
+b003            If     @RPGType = '*RPG4';
+
+                   Clear @CILE.@CField1;
+                   Clear @CILE.@CField2;
+                   Clear @CILE.@CResult;
+                   @CILE.@CTag = @ETag;
+                   @CILE.@COption = 'EndSl';
+                   @_srcdta = @CILE;
+                   Write qrpglesrc @SourceDs;
+
+x003            ElseIf @RPGType = '*RPGFREE';
+
+                   @CILE.@CTag = @ETag;
+                   @CILE.@CFree = 'EndSl;';
+                   #Indent -= 1;
+                   @CILE.@CFree = IndentSource(@CILE.@CFree: #Indent);
+                   @_srcdta = @CILE;
+                   Write qrpglesrc @SourceDs;
+
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+š      End-Proc;
+
+š      Dcl-Proc CRTSQLSource Export;
+
+          Dcl-Pi CRTSQLSource;
+             @Pref1    Like(@Ppref1)    Const;
+             @Case     Like(@Pcase)     Const;
+             @FileName Like(@PFileName) Const;
+          End-Pi;
+
+          Dcl-s @Cnt       Packed(3:0) Inz(*Zeros);
+          Dcl-s @First     Ind         Inz(*Off);
+          Dcl-s @WorkField Char(15)    Inz(*Blanks);
+
+          Dcl-Ds @CspecDs Len(112);
+             @Free         Char(11) Pos(18);
+             @SQLStatement Char(78) Pos(23);
+          End-Ds;
+
+          Dcl-Ds @DspecDs Len(112);
+             @SQLStatementD Char(78) Pos(23)
+                       Inz('Dcl-s @SelectStmt Char(32000) Inz(*Blanks);');
+          End-Ds;
+
+          Write qrpglesrc @DspecDs;
+
+          Clear @Free;
+          Clear @SQLStatement;
+
+          Write qrpglesrc @CspecDs;
+
+          Open qadspffd;
+
+          // write select
+          @SqlStatement = '@SelectStmt = ''Insert into '
+                                       + %Trimr(@FileName) + ' Values('' +';
+
+          Write qrpglesrc @CspecDs;
+
+          Reset @SQLStatement;
+
+          // read through file for field names
+          Read qwhdrffd;
+b001      Dow not %Eof(qadspffd);
+
+             whflde = @ToLower(whflde);
+
+             @Cnt += 1;
+
+b002         Select;
+
+x002            When Not @First;
+
+                   @SQLStatement = '''' + '?';
+
+x002            When @Cnt = 1;
+
+                   @SQLStatement = ''', ?';
+
+x002            Other;
+
+                   @SQLStatement = %Trimr(@SQLStatement) + ', ?';
+
+e002         EndSl;
+
+             @First = *On;
+
+b002         If @Cnt = 20;
+
+                @SQLStatement = %Trimr(@SQLStatement) + ' ''+';
+
+                Write qrpglesrc @CspecDs;
+
+                Reset @SQLStatement;
+                Reset @Cnt;
+
+e002         EndIf;
+
+             // read through file for field names
+             Read qwhdrffd;
+
+e001      EndDo;
+
+b001      If @Cnt > *Zeros;
+
+             @SQLStatement = %Trimr(@SQLStatement) + ')'';';
+
+             Write qrpglesrc @CspecDs;
+
+             Reset @SQLStatement;
+             Reset @Cnt;
+
+e001      EndIf;
+
+          Close qadspffd;
+
+          Clear @SQLStatement;
+          Write qrpglesrc @CspecDs;
+
+          @SQLStatement = '// Prepare SQL Statement';
+          Write qrpglesrc @CspecDs;
+
+          @SQLStatement = 'Exec SQL Declare SQLStmt statement;';
+          Write qrpglesrc @CspecDs;
+
+          @SQLStatement = 'Exec SQL Prepare SQLStmt From :@SelectStmt;';
+          Write qrpglesrc @CspecDs;
+
+          Clear @SQLStatement;
+          Write qrpglesrc @CspecDs;
+
+          @SQLStatement = '// Check for errors found';
+          Write qrpglesrc @CspecDs;
+
+          @SQLStatement = '// SQLMessage(Sqlcod: sqlerrmc);';
+          Write qrpglesrc @CspecDs;
+
+          Clear @SQLStatement;
+          Write qrpglesrc @CspecDs;
+
+          Open qadspffd;
+
+          Reset @SQLStatement;
+
+          @SQLStatement = '// Execute SQL Statement';
+          Write qrpglesrc @CspecDs;
+
+          @SQLStatement = 'Exec SQL Execute SQLStmt Using';
+          Write qrpglesrc @CspecDs;
+
+          // read through file for field names
+          Read qwhdrffd;
+b001      Dow not %Eof(qadspffd);
+
+             Reset @WorkField;
+b002         If @Case = '*LOWER';
+                whflde = @ToLower(whflde);
+e002         EndIf;
+             @WorkField = %Trim(@Pref1) + whflde;
+
+             @Cnt += 1;
+b002         If @Cnt = 1;
+
+                @SQLStatement = ':' + %Trim(@WorkField);
+
+x002         Else;
+
+                @SQLStatement = %Trimr(@SQLStatement) + ',:'
+                              + %Trim(@WorkField);
+
+e002         EndIf;
+
+b002         If @Cnt = 5;
+
+                @SQLStatement = %Trimr(@SQLStatement) + ',';
+
+                Write qrpglesrc @CspecDs;
+
+                Reset @SQLStatement;
+                Reset @Cnt;
+
+e002         EndIf;
+
+             // read through file for field names
+             Read qwhdrffd;
+
+e001      EndDo;
+
+b001      If @Cnt > *Zeros;
+
+             @SQLStatement = %Trimr(@SQLStatement) + ';';
+
+             Write qrpglesrc @CspecDs;
+
+             Reset @SQLStatement;
+             Reset @Cnt;
+
+e001      EndIf;
+
+          Clear @SQLStatement;
+          Write qrpglesrc @CspecDs;
+
+          @SQLStatement = '// Check for errors found';
+          Write qrpglesrc @CspecDs;
+
+          @SQLStatement = '// SQLMessage(Sqlcod: sqlerrmc);';
+          Write qrpglesrc @CspecDs;
+
+          Clear @SQLStatement;
+          Write qrpglesrc @CspecDs;
+
+          Close qadspffd;
+
+š      End-Proc;
+
+š      Dcl-Proc WriteALine;
+
+          Dcl-Pi WriteALine;
+             @SourceLine Char(58) Const;
+             @IndentChar Zoned(1) Const;
+             @Tag        Char(4)  Const;
+          End-Pi;
+
+          /define rpgstruct01
+          /copy qcpysrc,rpgilestrc
+          /undefine rpgstruct01
+
+          dcl-s  @Free Like(@SourceLine) Inz(*Blanks);
+
+          Dcl-Ds @CILE Len(112);
+             @CTag  Char(5);
+             @CFree Char(58) Pos(11);
+          End-Ds;
+
+          /define cvtspec12
+          /copy qcpysrc,cvtspec
+          /undefine cvtspec12
+
+          @Free = %Trim(@SourceLine) + ';';
+
+          @Free = IndentSource(@Free: @IndentChar);
+
+          @CTag  = @Tag;
+          @CFree = @Free;
+          Clear @_srcseq;
+          Clear @_srcdat;
+          @_srcdta = @CILE;
+          Write qrpglesrc @SourceDs;
+
+š      End-Proc;
+

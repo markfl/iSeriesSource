@@ -1,0 +1,26 @@
+      ********************************************************************
+      *                                                                  *
+      * File Name:ÉITPPURGEL2                                          Ä *
+      ********************************************************************
+      * Description.: ITPPURGEL2 Purge Master Driver By Group/From File  *
+      *                                                                  *
+      *                                                                  *
+      * Author......: MF                                                 *
+      * Date written: 08/28/2015                                         *
+      ********************************************************************
+      *                   Change Control Information                     *
+      ********************************************************************
+Key   * Start  Spec# Description Of Changes                   AS/400 Id. *
+----  * -----  ----- ---------------------------------------- ---------- *
+      *                                                                  *
+      ********************************************************************
+
+     A                                      UNIQUE
+     A          R RITPPURGEP                PFILE(ITPPURGEP)
+     A          K PURGROUP
+     A          K PURFRMFILE
+     A          K PURFRMLIB
+     A          K PURKEYFLD1
+     A          K PURKEYFLD2
+     A          K PURKEYFLD3
+     A          K PURKEYFLD4

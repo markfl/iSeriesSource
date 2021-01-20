@@ -1,0 +1,16 @@
+     D  @Date          s               d
+     D  @Datec         s             10a   Inz('07/03/15')
+     D  @Date2c        s              8a   Inz(*Blanks)
+     D  @Date3         s              6s 0 Inz(*Zeros)
+     D  @Date4         s              7s 0 Inz(*Zeros)
+     C/free
+          @Date   = %Date(@Datec:*mdy);
+          dsply @Datec;
+          @Date2c = %Char(@Date:*mdy0);
+          dsply @Date2c;
+          @Date3  = %Int(@Date2c);
+          dsply @Date3;
+          @Date4  = %Int(%Char(%Date(@Datec:*mdy):*cmdy0));
+          dsply @Date4;
+          *inlr = *On;
+      /end-free

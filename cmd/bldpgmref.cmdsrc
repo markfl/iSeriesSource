@@ -1,0 +1,9 @@
+             CMD        PROMPT('Build QDSPPGMREF File')
+
+             PARM       KWD(DSPPGMREF) TYPE(DSPPGMREF) DFT(*DFT) +
+                          SNGVAL((*DFT 'QDSPPGMREF*CURLIB')) +
+                          PROMPT('Display Program Reference File')
+ DSPPGMREF:  QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')

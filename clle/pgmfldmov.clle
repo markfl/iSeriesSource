@@ -1,0 +1,88 @@
+             PGM        PARM(&PROGRAM &SRCFILE &REFFILELIB &REFMBR)
+
+             DCL        VAR(&PROGRAM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SRCFILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&REFFILELIB) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&REFMBR) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&REFFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&REFLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&SAVEMBR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&CURLIB) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             RTVJOBA    CURLIB(&CURLIB)
+
+             CHGVAR     VAR(&FILE) VALUE(%SST(&SRCFILE 1 10))
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&SRCFILE 11 10))
+
+             CHGVAR     VAR(&REFFILE) VALUE(%SST(&REFFILELIB 1 10))
+             CHGVAR     VAR(&REFLIB) VALUE(%SST(&REFFILELIB 11 10))
+
+             DLTF       FILE(QTEMP/QPGMFLDML1)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QPGMFLDMOV)
+             MONMSG     MSGID(CPF0000)
+
+             CRTPF      FILE(QTEMP/QPGMFLDMOV) +
+                          SRCFILE(&CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST) SIZE(*NOMAX)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(QTEMP/QPGMFLDML1) +
+                          SRCFILE(&CURLIB/QDDSSRC) +
+                          DTAMBRS((QTEMP/QPGMFLDMOV (QPGMFLDMOV))) +
+                          OPTION(*NOSRC *NOLIST)
+
+             CHKOBJ     OBJ(&LIBRARY/&FILE) OBJTYPE(*FILE) +
+                          MBR(&PROGRAM)
+
+             RMVMSG     CLEAR(*ALL)
+
+ AGAIN:      CLRPFM     FILE(QTEMP/QPGMFLDMOV)
+
+             OVRDBF     FILE(INPUT) TOFILE(&LIBRARY/&FILE) +
+                          MBR(&PROGRAM)
+             OVRDBF     FILE(QPGMFLDRL1) TOFILE(&REFLIB/QPGMFLDRL1) +
+                          MBR(&REFMBR)
+             OVRDBF     FILE(QPGMFLDML1) TOFILE(QTEMP/QPGMFLDML1)
+
+/* b01 */    SELECT
+
+/* b02 */    WHEN       COND(&FILE = QRPGLESRC) THEN(DO)
+             CALL       PGM(PGMFLDMOV1) PARM(&PROGRAM &LIBRARY)
+             MONMSG     MSGID(CPF4131)
+/* e02 */    ENDDO
+
+/* b02 */    WHEN       COND(&FILE = QRPGSRC) THEN(DO)
+             CALL       PGM(PGMFLDMOV2) PARM(&PROGRAM &LIBRARY)
+             MONMSG     MSGID(CPF4131)
+/* e02 */    ENDDO
+/* e01 */    ENDSELECT
+
+             CHGVAR     VAR(&SAVEMBR) VALUE(&PROGRAM)
+
+             CALL       PGM(PGMFLDMOVR) PARM(&PROGRAM &LIBRARY)
+
+             DLTOVR     FILE(*ALL)
+
+/* b01 */    IF         COND((&SAVEMBR *NE ' ') *AND (&SAVEMBR *NE +
+                          &PROGRAM)) THEN(DO)
+             GOTO       CMDLBL(AGAIN)
+/* e01 */    ENDDO
+
+             DLTF       FILE(QTEMP/QPGMFLDML1)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QPGMFLDMOV)
+             MONMSG     MSGID(CPF0000)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

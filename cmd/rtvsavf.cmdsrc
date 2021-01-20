@@ -1,0 +1,20 @@
+             CMD        PROMPT('Retrieve Save File')
+
+             PARM       KWD(SYSTEM) TYPE(*NAME) DFT(HUBGROUP) +
+                          PROMPT('System')
+
+             PARM       KWD(SAVF) TYPE(SAVF) PROMPT('Save file')
+ SAVF:       QUAL       TYPE(*NAME) DFT(ISFLORESM)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*CURLIB)) CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(TOSAVF) TYPE(TOSAVF) PROMPT('To save file')
+ TOSAVF:     QUAL       TYPE(*NAME) DFT(ISFLORESM)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*CURLIB) +
+                          (*LIBL)) CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(USER) TYPE(*NAME) DFT(TPSSUPPORT) +
+                          SPCVAL((*CURRENT)) PROMPT('User')
+
+             PARM       KWD(PASSWORD) TYPE(*CHAR) LEN(10) DFT(*NONE) +
+                          DSPINPUT(*NO) PROMPT('Password')

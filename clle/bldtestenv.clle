@@ -1,0 +1,131 @@
+             PGM        PARM(&PROGRAM &FRMDTALIB &SOURCE &OUTLIB +
+                          &PHYONLY)
+
+             DCLF       FILE(QADSPPGM)
+
+             DCL        VAR(&PROGRAM) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&FRMDTALIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SOURCE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OUTLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PHYONLY) TYPE(*LGL)
+
+             DCL        VAR(&PGMNAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGMLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&OBJATR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&NOLIB) TYPE(*LGL)
+
+             DCL        VAR(&CURLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+
+             RTVJOBA    CURLIB(&CURLIB)
+
+             CHGVAR     VAR(&PGMNAME) VALUE(%SST(&PROGRAM 1 10))
+             CHGVAR     VAR(&PGMLIB) VALUE(%SST(&PROGRAM 11 10))
+
+             DLTF       FILE(QTEMP/QADSPPGL1)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPPGM)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPPGMO)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QAFDMBR)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPDBR)
+             MONMSG     MSGID(CPF0000)
+
+             IF         COND(&OUTLIB *EQ *CURLIB) THEN(CHGVAR +
+                          VAR(&OUTLIB) VALUE(&CURLIB))
+
+             DSPPGMREF  PGM(&PGMLIB/&PGMNAME) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QADSPPGM)
+
+             OVRDBF     FILE(QADSPPGM) TOFILE(QTEMP/QADSPPGM)
+             CALL       PGM(BLDTESTER1)
+             DLTOVR     FILE(*ALL)
+
+             CPYF       FROMFILE(QTEMP/QADSPPGMO) +
+                          TOFILE(QTEMP/QADSPPGM) MBROPT(*ADD)
+
+             DLTF       FILE(QTEMP/QADSPPGMO)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(QTEMP/QADSPPGL1) +
+                          SRCFILE(&CURLIB/QDDSSRC) +
+                          DTAMBRS((QTEMP/QADSPPGM (QADSPPGM))) +
+                          OPTION(*NOSRC *NOLIST)
+
+             OVRDBF     FILE(QADSPPGL1) TOFILE(QTEMP/QADSPPGL1)
+             CALL       PGM(BLDTESTER2)
+             DLTOVR     FILE(*ALL)
+
+             RMVMSG     CLEAR(*ALL)
+
+             OVRDBF     FILE(QADSPPGM) TOFILE(QTEMP/QADSPPGM)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+/* b01 */    DOWHILE    COND(&MSGID *NE CPF0864)
+
+             CHGVAR     VAR(&NOLIB) VALUE('0')
+
+/* b02 */    IF         COND(&WHOBJT *EQ F) THEN(DO)
+
+             RTVOBJD    OBJ(&WHLNAM/&WHFNAM) OBJTYPE(*FILE) +
+                          OBJATR(&OBJATR)
+/* b03 */    MONMSG     MSGID(CPF9810 CPF9812) EXEC(DO)
+             CHGVAR     VAR(&NOLIB) VALUE('1')
+             RTVOBJD    OBJ(&WHFNAM) OBJTYPE(*FILE) OBJATR(&OBJATR)
+/* b04 */    MONMSG     MSGID(CPF9810 CPF9812) EXEC(DO)
+             GOTO       CMDLBL(AGAIN)
+/* e04 */    ENDDO
+/* e03 */    ENDDO
+
+/* b03 */    IF         COND((&OBJATR *EQ PF) *OR (&OBJATR *EQ LF)) +
+                          THEN(DO)
+
+/* b04 */    IF         COND(&NOLIB) THEN(DO)
+             DSPFD      FILE(&WHFNAM) TYPE(*MBR) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QAFDMBR) OUTMBR(*FIRST *ADD)
+/* e04 */    ENDDO
+/* b04 */    ELSE       CMD(DO)
+             DSPFD      FILE(&WHLNAM/&WHFNAM) TYPE(*MBR) +
+                          OUTPUT(*OUTFILE) OUTFILE(QTEMP/QAFDMBR) +
+                          OUTMBR(*FIRST *ADD)
+/* e04 */    ENDDO
+/* e03 */    ENDDO
+/* e02 */    ENDDO
+
+ AGAIN:      RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+/* e01 */    ENDDO
+
+             DLTOVR     FILE(*ALL)
+
+             CALL       PGM(BLDTESTEN1) PARM(&SOURCE &FRMDTALIB +
+                          &OUTLIB &PHYONLY)
+
+/* b01 */    IF         COND(&PHYONLY *EQ '0') THEN(DO)
+             CALL       PGM(BLDTESTEN2) PARM(&SOURCE &OUTLIB)
+/* e01 */    ENDDO
+
+             DLTF       FILE(QTEMP/QADSPPGL1)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPPGM)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QAFDMBR)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QADSPDBR)
+             MONMSG     MSGID(CPF0000)
+
+             ENDPGM

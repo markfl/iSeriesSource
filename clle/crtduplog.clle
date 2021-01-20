@@ -1,0 +1,53 @@
+             PGM        PARM(&FILE &TOLIB)
+
+             DCLF       FILE(QADSPDBR)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&TOLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&FROMFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FROMLIB) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&FROMFILE) VALUE(%SST(&FILE 1 10))
+             CHGVAR     VAR(&FROMLIB) VALUE(%SST(&FILE 11 10))
+
+             DLTF       FILE(QTEMP/QADSPDBR)
+             MONMSG     MSGID(CPF0000)
+
+             DSPDBR     FILE(&FROMLIB/&FROMFILE) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QADSPDBR)
+
+             OVRDBF     FILE(QADSPDBR) TOFILE(QTEMP/QADSPDBR) +
+                          SECURE(*YES)
+
+             RMVMSG     CLEAR(*ALL)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+             DOWHILE    COND(&@MSGID *NE CPF0864)
+
+             IF         COND(&WHREFI *NE ' ') THEN(DO)
+
+             CRTDUPOBJ  OBJ(&WHREFI) FROMLIB(&WHRELI) OBJTYPE(*FILE) +
+                          TOLIB(&TOLIB) CST(*NO) TRG(*NO)
+
+             ENDDO
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+             ENDDO
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+ END:        DLTOVR     FILE(*ALL)
+
+             DLTF       FILE(QTEMP/QADSPDBR)
+             MONMSG     MSGID(CPF0000)
+
+             ENDPGM

@@ -1,0 +1,353 @@
+     H Option(*Nodebugio) Nomain
+     H/Title Retrieve Member List
+
+          Dcl-proc RetrieveObjectList Export;
+
+          Dcl-pi RetrieveObjectList Ind;
+             @PObject  Char(10) Const;
+             @PLibrary Char(10) Const;
+             @PType    Char(10) Const Options(*NoPass);
+             @PFormat  Char(10) Const Options(*NoPass);
+          End-Pi;
+
+      /define mflores046
+      /define mflores047
+      /define mflores048
+      /define mflores049
+      /define mflores050
+      /define mflores051
+      /define mflores075
+      /copy qcpysrc,mflores
+      /undefine mflores046
+      /undefine mflores047
+      /undefine mflores048
+      /undefine mflores049
+      /undefine mflores050
+      /undefine mflores051
+      /undefine mflores075
+
+          Dcl-s p_MemberName Pointer;
+          Dcl-s MemberName   Char(10) Based(p_MemberName);
+          Dcl-s @Format      Char(10) Inz(@Format0100);
+
+          Dcl-c @Format0100 Const('OBJL0100');
+          Dcl-c @Format0200 Const('OBJL0200');
+          Dcl-c @Format0300 Const('OBJL0300');
+          Dcl-c @Format0400 Const('OBJL0400');
+          Dcl-c @Format0500 Const('OBJL0500');
+          Dcl-c @Format0600 Const('OBJL0600');
+          Dcl-c @Format0700 Const('OBJL0700');
+
+          Dcl-pr RtvObjL ExtPgm('QUSLOBJ');
+             *n Char(20) Const;
+             *n Char(08) Const;
+             *n Char(20) Const;
+             *n Char(10) Const;
+             *n Char(256);
+          End-Pr;
+
+b001      Monitor;
+
+b001         If  %Parms()  > 3
+             And @PFormat <> *Blanks;
+
+                @Format = @PFormat;
+
+e001         EndIf;
+
+             dsECBytesP = 256;
+
+             CrtUsrSpc(@UsrSpace: 'USRSPC': 1: x'00':
+                       '*ALL': 'List of Members in File': '*YES': dsEC);
+
+             RtvObjL(@UsrSpace: @Format: @PObject + @PLibrary:
+                     @PType: dsEC);
+
+             RtvPtrUS(@UsrSpace: p_ListHeader);
+
+b001         Select;
+
+x001         When @Format = @Format0100;
+
+                ListObjl0100Format(p_ListHeader);
+
+x001         When @Format = @Format0200;
+
+                ListObjl0200Format(p_ListHeader);
+
+x001         When @Format = @Format0300;
+
+                ListObjl0300Format(p_ListHeader);
+
+x001         When @Format = @Format0400;
+
+                ListObjl0400Format(p_ListHeader);
+
+x001         When @Format = @Format0500;
+
+                ListObjl0500Format(p_ListHeader);
+
+x001         When @Format = @Format0600;
+
+                ListObjl0600Format(p_ListHeader);
+
+x001         When @Format = @Format0700;
+
+                ListObjl0700Format(p_ListHeader);
+
+e001         EndSl;
+
+             DltUsrSpc(@UsrSpace: dsEC);
+
+             Return *On;
+
+x001      On-Error;
+
+             Return *Off;
+
+e001      EndMon;
+
+          End-Proc;
+
+      ************************************************************************
+      * ListObjl0100Format - List members in OBJL0100 Format
+      ************************************************************************
+
+          Dcl-proc ListObjl0100Format;
+
+          Dcl-pi ListObjl0100Format;
+             @p_ListHeader Pointer;
+          End-Pi;
+
+          Dcl-Ds @Objl0100Ds Based(@p_ObjectName) LikeDs(objl0100ds);
+
+      /define mflores038
+      /define mflores045
+      /define mflores050
+      /define mflores051
+      /define mflores073
+      /copy qcpysrc,mflores
+      /undefine mflores038
+
+          @ListHeader = @p_ListHeader;
+
+b001      For @Entry = 1 To @ListHeaderDs.dsLHEntCnt;
+
+             @Offset = ((@Entry-1) * @ListHeaderDs.dsLHEntSiz)
+                                   + @ListHeaderDs.dsLHLstOff;
+
+             @p_ObjectName = OffsetPtr(@ListHeader: @Offset);
+
+             Dsply @Objl0100Ds.@ObjectNameUsed;
+
+e001      EndFor;
+
+          End-Proc;
+
+      ************************************************************************
+      * ListObjl0200Format - List members in OBJL0200 Format
+      ************************************************************************
+
+          Dcl-proc ListObjl0200Format;
+
+          Dcl-pi ListObjl0200Format;
+             @p_ListHeader Pointer;
+          End-Pi;
+
+          Dcl-Ds @Objl0200Ds Based(@p_ObjectName) LikeDs(objl0200ds);
+
+      /define mflores039
+      /copy qcpysrc,mflores
+      /undefine mflores039
+
+          @ListHeader = @p_ListHeader;
+
+b001      For @Entry = 1 To @ListHeaderDs.dsLHEntCnt;
+
+             @Offset = ((@Entry-1) * @ListHeaderDs.dsLHEntSiz)
+                                   + @ListHeaderDs.dsLHLstOff;
+
+             @p_ObjectName = OffsetPtr(@ListHeader: @Offset);
+
+             Dsply @Objl0200Ds.@ObjectNameUsed;
+             Dsply @Objl0200Ds.@TextDescription;
+
+e001      EndFor;
+
+          End-Proc;
+
+      ************************************************************************
+      * ListObjl0300Format - List members in OBJL0300 Format
+      ************************************************************************
+
+          Dcl-proc ListObjl0300Format;
+
+          Dcl-pi ListObjl0300Format;
+             @p_ListHeader Pointer;
+          End-Pi;
+
+          Dcl-Ds @Objl0300Ds Based(@p_ObjectName) LikeDs(objl0300ds);
+
+      /define mflores040
+      /copy qcpysrc,mflores
+      /undefine mflores040
+
+          @ListHeader = @p_ListHeader;
+
+b001      For @Entry = 1 To @ListHeaderDs.dsLHEntCnt;
+
+             @Offset = ((@Entry-1) * @ListHeaderDs.dsLHEntSiz)
+                                   + @ListHeaderDs.dsLHLstOff;
+
+             @p_ObjectName = OffsetPtr(@ListHeader: @Offset);
+
+             Dsply @Objl0300Ds.@ObjectNameUsed;
+             Dsply @Objl0300Ds.@TextDescription;
+             Dsply @Objl0300Ds.@ObjectOwner;
+
+e001      EndFor;
+
+          End-Proc;
+
+      ************************************************************************
+      * ListObjl0400Format - List members in OBJL0400 Format
+      ************************************************************************
+
+          Dcl-proc ListObjl0400Format;
+
+          Dcl-pi ListObjl0400Format;
+             @p_ListHeader Pointer;
+          End-Pi;
+
+          Dcl-Ds @Objl0400Ds Based(@p_ObjectName) LikeDs(objl0400ds);
+
+      /define mflores041
+      /copy qcpysrc,mflores
+      /undefine mflores041
+
+          @ListHeader = @p_ListHeader;
+
+b001      For @Entry = 1 To @ListHeaderDs.dsLHEntCnt;
+
+             @Offset = ((@Entry-1) * @ListHeaderDs.dsLHEntSiz)
+                                   + @ListHeaderDs.dsLHLstOff;
+
+             @p_ObjectName = OffsetPtr(@ListHeader: @Offset);
+
+             Dsply @Objl0400Ds.@ObjectNameUsed;
+             Dsply @Objl0400Ds.@TextDescription;
+             Dsply @Objl0400Ds.@ObjectOwner;
+             Dsply @Objl0400Ds.@SystemLevel;
+
+e001      EndFor;
+
+          End-Proc;
+
+      ************************************************************************
+      * ListObjl0500Format - List members in OBJL0500 Format
+      ************************************************************************
+
+          Dcl-proc ListObjl0500Format;
+
+          Dcl-pi ListObjl0500Format;
+             @p_ListHeader Pointer;
+          End-Pi;
+
+          Dcl-Ds @Objl0500Ds Based(@p_ObjectName) LikeDs(objl0500ds);
+
+      /define mflores042
+      /copy qcpysrc,mflores
+      /undefine mflores042
+
+          @ListHeader = @p_ListHeader;
+
+b001      For @Entry = 1 To @ListHeaderDs.dsLHEntCnt;
+
+             @Offset = ((@Entry-1) * @ListHeaderDs.dsLHEntSiz)
+                                   + @ListHeaderDs.dsLHLstOff;
+
+             @p_ObjectName = OffsetPtr(@ListHeader: @Offset);
+
+             Dsply @Objl0500Ds.qusobjnu03;
+             Dsply @Objl0500Ds.qustd09;
+             Dsply @Objl0500Ds.qusobjo01;
+             Dsply @Objl0500Ds.qussl00;
+             Dsply @Objl0500Ds.qussl01;
+
+e001      EndFor;
+
+          End-Proc;
+
+      ************************************************************************
+      * ListObjl0600Format - List members in OBJL0600 Format
+      ************************************************************************
+
+          Dcl-proc ListObjl0600Format;
+
+          Dcl-pi ListObjl0600Format;
+             @p_ListHeader Pointer;
+          End-Pi;
+
+          Dcl-Ds @Objl0600Ds Based(@p_ObjectName) LikeDs(objl0600ds);
+
+      /define mflores043
+      /copy qcpysrc,mflores
+      /undefine mflores043
+
+          @ListHeader = @p_ListHeader;
+
+b001      For @Entry = 1 To @ListHeaderDs.dsLHEntCnt;
+
+             @Offset = ((@Entry-1) * @ListHeaderDs.dsLHEntSiz)
+                                   + @ListHeaderDs.dsLHLstOff;
+
+             @p_ObjectName = OffsetPtr(@ListHeader: @Offset);
+
+             Dsply @Objl0600Ds.qusobjnu04;
+             Dsply @Objl0600Ds.qustd10;
+             Dsply @Objl0600Ds.qusobjo02;
+             Dsply @Objl0600Ds.qussl02;
+             Dsply @Objl0600Ds.qussl03;
+             Dsply @Objl0600Ds.qusaspdn01;
+
+e001      EndFor;
+
+          End-Proc;
+
+      ************************************************************************
+      * ListObjl0700Format - List members in OBJL0700 Format
+      ************************************************************************
+
+          Dcl-proc ListObjl0700Format;
+
+          Dcl-pi ListObjl0700Format;
+             @p_ListHeader Pointer;
+          End-Pi;
+
+          Dcl-Ds @Objl0700Ds Based(@p_ObjectName) LikeDs(objl0700ds);
+
+      /define mflores044
+      /copy qcpysrc,mflores
+      /undefine mflores044
+
+          @ListHeader = @p_ListHeader;
+
+b001      For @Entry = 1 To @ListHeaderDs.dsLHEntCnt;
+
+             @Offset = ((@Entry-1) * @ListHeaderDs.dsLHEntSiz)
+                                   + @ListHeaderDs.dsLHLstOff;
+
+             @p_ObjectName = OffsetPtr(@ListHeader: @Offset);
+
+             Dsply @Objl0700Ds.qusobjnu05;
+             Dsply @Objl0700Ds.qustd11;
+             Dsply @Objl0700Ds.qusobjo03;
+             Dsply @Objl0700Ds.qussl04;
+             Dsply @Objl0700Ds.qussl05;
+             Dsply @Objl0700Ds.qusaspdn03;
+             Dsply @Objl0700Ds.qusobjs;
+
+e001      EndFor;
+
+          End-Proc;
+

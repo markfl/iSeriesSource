@@ -1,0 +1,31 @@
+             CMD        PROMPT('Create Rename Batch File')
+
+             PARM       KWD(FRMSRCFILE) TYPE(FRMSRCFILE) +
+                          PROMPT('From Source File')
+ FRMSRCFILE: QUAL       TYPE(*NAME) DFT(QTXTSRC)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(TOSRCFILE) TYPE(TOSRCFILE) PROMPT('To +
+                          Source File')
+ TOSRCFILE:  QUAL       TYPE(*NAME) DFT(QTXTSRC)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(TOMBR) TYPE(TOMBR) CHOICE(*NONE) +
+                          PROMPT('To member')
+
+ TOMBR:      ELEM       TYPE(*NAME) DFT(*FILE) SPCVAL((*FILE) +
+                          (*FIRST)) PROMPT('Member to receive output')
+             ELEM       TYPE(*CHAR) LEN(8) RSTD(*YES) DFT(*REPLACE) +
+                          VALUES(*REPLACE *ADD) CHOICE(*NONE) +
+                          PROMPT('Replace or add records')
+
+             PARM       KWD(FROMPREFIX) TYPE(*CHAR) LEN(15) +
+                          DFT(*FRMSRCFILE) SPCVAL((*FRMSRCFILE)) +
+                          PROMPT('From prefix')
+
+             PARM       KWD(EXTENSION) TYPE(*CHAR) LEN(10) MIN(1) +
+                          PROMPT('To extension')

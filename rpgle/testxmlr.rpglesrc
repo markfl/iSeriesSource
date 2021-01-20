@@ -1,0 +1,15 @@
+     H DftActGrp(*No)
+     Fqxmlsrc   if   e             Disk    Rename(qxmlsrc:rqxmlsrc)
+
+     D  testxmlr       pi
+     D  @Xml                      32000a   Varying
+
+          Clear @Xml;
+          Read rqxmlsrc;
+b001      Dow Not %Eof(qxmlsrc);
+             @Xml += %Trim(srcdta);
+             Read rqxmlsrc;
+e001      EndDo;
+
+          *Inlr = *On;
+          Return;

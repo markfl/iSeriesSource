@@ -1,0 +1,10 @@
+             PGM
+
+             DCL        VAR(&RTNLIB) TYPE(*CHAR) LEN(10)
+
+             RTVOBJD    OBJ(CNVACTSTSC) OBJTYPE(*DTAARA) +
+                          RTNLIB(&RTNLIB)
+
+             CHGDTAARA  DTAARA(&RTNLIB/CNVACTSTSC (1 4)) VALUE(EXIT)
+
+ END:        ENDPGM

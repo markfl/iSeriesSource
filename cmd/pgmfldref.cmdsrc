@@ -1,0 +1,30 @@
+             CMD        PROMPT('Program Field Reference')
+
+             PARM       KWD(FRMOBJLIB) TYPE(*NAME) SPCVAL((*LIBL)) +
+                          MIN(1) PROMPT('Object library')
+
+             PARM       KWD(SRCFILE) TYPE(SRCFILE) PROMPT('To Source +
+                          File')
+ SRCFILE:    QUAL       TYPE(*NAME) DFT(QRPGLESRC)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(MBR) TYPE(*GENERIC) DFT(*ALL) +
+                          SPCVAL((*ALL)) PROMPT('Member')
+
+             PARM       KWD(PGMFLDREF) TYPE(PGMFLDREF) DFT(*DFT) +
+                          SNGVAL((*DFT 'QPGMFLDREF*CURLIB')) +
+                          PROMPT('File to receive output')
+ PGMFLDREF:  QUAL       TYPE(*NAME)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*CURLIB)) CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(OUTMBR) TYPE(OUTMBR) CHOICE(*NONE) +
+                          PROMPT('Output member options')
+ OUTMBR:     ELEM       TYPE(*NAME) DFT(*FIRST) SPCVAL((*FIRST) +
+                          (*FILE)) PROMPT('Member to receive output')
+             ELEM       TYPE(*CHAR) LEN(8) RSTD(*YES) DFT(*ADD) +
+                          VALUES(*REPLACE *ADD) SPCVAL((*FIRST) +
+                          (*SRCFILE)) CHOICE(*NONE) PROMPT('Replace +
+                          or add records')

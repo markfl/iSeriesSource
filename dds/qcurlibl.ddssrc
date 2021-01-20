@@ -1,0 +1,9 @@
+     A          R RCURLIBL
+     A            SEQUENCE       5P 0       COLHDG('Sequence')
+     A                                      TEXT('Sequence')
+     A            LIBRARY       10A         COLHDG('Library')
+     A                                      TEXT('Library')
+     A            CURLIB         1A         COLHDG('Current' 'Library')
+     A                                      TEXT('Current Library')
+     A                                      VALUES('0' '1')
+     A                                      DFT('0')

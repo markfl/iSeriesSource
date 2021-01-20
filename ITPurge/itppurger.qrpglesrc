@@ -1,0 +1,424 @@
+     H/title    Purge Files
+     H Option(*NoDebugio)
+     H copyright ('(C) Copyright Hub Group, Inc. 2015')
+      **************************************************************************
+      *                                                                        *
+      *   H U B   G R O U P ,   I N C .                                        *
+      *                                                                        *
+      **************************************************************************
+      *                                                                        *
+      *  Program Title: Purge Files                                            *
+      *                                                                        *
+      *  Date Written:  08/28/2015                                             *
+      *                                                                        *
+      *  Input:                                                                *
+      *                                                                        *
+      *  Output:                                                               *
+      *                                                                        *
+      **************************************************************************
+      *            Design                                                      *
+      * Date       Request Mod Pgmr Description                                *
+      * ---------- ------- --- ---- ------------------------------------------ *
+      * 08-28-15   42268       MF   Initial Creation                           *
+      *                                                                        *
+      **************************************************************************
+
+     ‚* Purge File Driver
+     Fitppurgel1if   e           k Disk    Rename(ritppurgep:ritppurgl1)
+
+     ‚* Purge File Driver
+     Fitppurgel2if   e           k Disk    Rename(ritppurgep:ritppurgl2)
+
+     ‚* Division Master
+     Fitppurkey1uf   e           k Disk    UsrOpn
+
+     ‚* Print File
+     Fqsysprt   o    f  132        Printer OflInd(*InOa)
+
+     D/DEFINE ITPSHARE02
+     D/DEFINE ITPSHARE03
+     D/DEFINE ITPSHARE16
+     D/DEFINE ITPSHARE19
+     D/DEFINE ITPSHARE21
+     D/DEFINE ITPSHARE25
+     D/copy qcpysrc,itpshare
+
+      * Program Status Data Structure
+     D                sds
+     D QProg             *Proc
+     D QParms            *Parms
+     D QErrorMessage          91    170
+     D QUser                 254    263
+
+     Ditppurger        pr
+     D                               +0    Const Like(keygroup)
+     D                                 n   Const
+     D                               +0    Const Like(keykeyfld1)
+     D                               +0    Const Like(keykeyfld2)
+     D                               +0    Const Like(keykeyfld3)
+     D                               +0    Const Like(keykeyfld4)
+
+     Ditppurger        pi
+     D  @PGroup                      +0    Const Like(purgroup)
+     D  @PUseKeyFile                   n   Const
+     D  @PKey1                       +0    Const Like(keykeyfld1)
+     D  @PKey2                       +0    Const Like(keykeyfld2)
+     D  @PKey3                       +0    Const Like(keykeyfld3)
+     D  @PKey4                       +0    Const Like(keykeyfld4)
+
+     D ReadPurgeFile   pr
+     D                               +0    Const Like(purgroup)
+
+     D PurgeGroup      pr
+     D                               +0    Const Like(purgroup)
+     D                               +0    Const Like(keykeyfld1)
+     D                               +0    Const Like(keykeyfld2)
+     D                               +0    Const Like(keykeyfld3)
+     D                               +0    Const Like(keykeyfld4)
+     D                               +0    Const Like(purfrmfile)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(keyfrmlib)
+     D                                     Options(*NoPass)
+
+     D ProcessPurge    pr
+     D                               +0    Const Like(purgroup)
+     D                               +0    Const Like(purseq)
+     D                               +0    Const Like(purfrmfile)
+     D                               +0    Const Like(purfrmlib)
+     D                               +0    Const Like(purtofile)
+     D                               +0    Const Like(purkeyfld1)
+     D                               +0    Const Like(purkeyfld2)
+     D                               +0    Const Like(purkeyfld3)
+     D                               +0    Const Like(purkeyfld4)
+     D                               +0    Const Like(purandor2)
+     D                               +0    Const Like(purandor3)
+     D                               +0    Const Like(purandor4)
+     D                               +0    Const Like(purkeycnd1)
+     D                               +0    Const Like(purkeycnd2)
+     D                               +0    Const Like(purkeycnd3)
+     D                               +0    Const Like(purkeycnd4)
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                               +0    Const Like(purflsize1)
+     D                               +0    Const Like(purflsize2)
+     D                               +0    Const Like(purflsize3)
+     D                               +0    Const Like(purflsize4)
+     D                               +0    Const Like(keykeyfld1)
+     D                               +0    Const Like(keykeyfld2)
+     D                               +0    Const Like(keykeyfld3)
+     D                               +0    Const Like(keykeyfld4)
+
+     D PrintLine       pr
+
+     D QDate           s               d   Inz(*Loval) DatFmt(*USA)
+     D QTime           s               t   Inz(*Loval) TimFmt(*USA)
+     D@MsgDta          ds
+     D  @MsgDta1                    131a
+     D  @MsgDta2                    125a
+
+      /free
+
+          //‚check for use key file
+b001      If @PUseKeyFile;
+
+             // Create Source File
+             ReadPurgeFile(@PGroup);
+
+x001      Else;
+
+             // Copy records from input file to output file
+             PurgeGroup(@PGroup: @PKey1: @PKey2: @PKey3: @PKey4);
+
+e001      EndIf;
+
+          *Inlr = *On;
+          Return;
+
+          // ************************************************************************
+          // *‚Program Initialization Subroutine
+          // ************************************************************************
+
+          BegSr *InzSr;
+
+             // Set Date & Time
+             QDate = %Date();
+             QTime = %Time();
+
+             // Print First Page Heading
+             Except Heading;
+
+          EndSr;
+
+      /end-free
+
+     Oqsysprt   e            Heading        1  2
+     O                       QProg               11
+     O                       QDate              132
+     O          e            Heading        1
+     O                       QUser               11
+     O                       QTime              132
+     O          e            Detail         1
+     O                       @MsgDta1            +1
+     O          e            Detail2        1
+     O                       @MsgDta2            +1
+
+      ************************************************************************
+      *‚ReadPurgeFile = Read Purge File and Process
+      ************************************************************************
+
+     P ReadPurgeFile   b
+
+     D ReadPurgeFile   pi
+     D  @Group                       +0    Const Like(purgroup)
+
+      /free
+
+          // Open key file
+          Open itppurkey1;
+
+          //‚get first purge record
+          Setll *Loval ritppurkey;
+          Setll @Group ritppurkey;
+          Reade @Group ritppurkey;
+b001      Dow not %Eof(itppurkey1);
+
+             // Copy records from input file to output file
+             PurgeGroup(Keygroup:
+                        Keykeyfld1: Keykeyfld2: Keykeyfld3: Keykeyfld4:
+                        keyfrmfile: keyfrmlib);
+
+             // Update status
+             keystatus = @DeleteRStatus;
+
+             // update history fields
+             keylstusr = QUser;
+             keylstpgm = QProg;
+             keylstms  = GetTimeStamp();
+
+             // Update record
+             Update ritppurkey %Fields(keystatus: keylstusr:
+                                       keylstpgm: keylstms);
+
+             //‚get next purge record
+             Reade @Group ritppurkey;
+
+e001      EndDo;
+
+      /end-free
+
+     P ReadPurgeFile   e
+
+      ************************************************************************
+      *‚PurgeGroup - Purge all records in file
+      ************************************************************************
+
+     P PurgeGroup      b
+
+     D PurgeGroup      pi
+     D  @Group                       +0    Const Like(purgroup)
+     D  @Key1                        +0    Const Like(keykeyfld1)
+     D  @Key2                        +0    Const Like(keykeyfld2)
+     D  @Key3                        +0    Const Like(keykeyfld3)
+     D  @Key4                        +0    Const Like(keykeyfld4)
+     D  @frmfile                     +0    Const Like(keyfrmfile)
+     D                                     Options(*NoPass)
+     D  @frmlib                      +0    Const Like(keyfrmlib)
+     D                                     Options(*NoPass)
+
+     D Keyitppurgep2   ds                  likerec(ritppurgl2 : *key)
+
+      /free
+
+          //‚Check for specific file used
+b001      If @frmfile <> *Blanks;
+
+             //‚Set purge file keys
+             Keyitppurgep2.purgroup   = @Group;
+             Keyitppurgep2.purfrmfile = @frmfile;
+             Keyitppurgep2.purfrmlib  = @frmlib;
+
+             //‚get purge record
+             Chain %Kds(Keyitppurgep2:3) ritppurgl2;
+b002         If %Found(itppurgel2);
+
+                // Execute Process Purge routine
+                ProcessPurge(@Group:     purseq:
+                             purfrmfile: purfrmlib:  purtofile:
+                             purkeyfld1: purkeyfld2: purkeyfld3: purkeyfld4:
+                                         purandor2:  purandor3:  purandor4:
+                             purkeycnd1: purkeycnd2: purkeycnd3: purkeycnd4:
+                             puralwblk1: puralwblk2: puralwblk3: puralwblk4:
+                             purrjust1:  purrjust2:  purrjust3:  purrjust4:
+                             purzrfill1: purzrfill2: purzrfill3: purzrfill4:
+                             purflsize1: purflsize2: purflsize3: purflsize4:
+                             @Key1:      @Key2:      @Key3:      @Key4);
+
+e002         EndIf;
+
+x001      Else;
+
+             //‚get first purge record
+             Setll *Loval ritppurgl1;
+             Setll @Group ritppurgl1;
+             Reade @Group ritppurgl1;
+b002         Dow not %Eof(itppurgel1);
+
+                // Execute Process Purge routine
+                ProcessPurge(@Group:     purseq:
+                             purfrmfile: purfrmlib:  purtofile:
+                             purkeyfld1: purkeyfld2: purkeyfld3: purkeyfld4:
+                                         purandor2:  purandor3:  purandor4:
+                             purkeycnd1: purkeycnd2: purkeycnd3: purkeycnd4:
+                             puralwblk1: puralwblk2: puralwblk3: puralwblk4:
+                             purrjust1:  purrjust2:  purrjust3:  purrjust4:
+                             purzrfill1: purzrfill2: purzrfill3: purzrfill4:
+                             purflsize1: purflsize2: purflsize3: purflsize4:
+                             @Key1:      @Key2:      @Key3:      @Key4);
+
+                //‚get next purge record
+                Reade @Group ritppurgl1;
+
+e002         EndDo;
+e001      EndIf;
+
+      /end-free
+
+     P PurgeGroup      e
+
+      ************************************************************************
+      *‚ProcessPurge - Process Purge all files passed to procedure
+      ************************************************************************
+
+     P ProcessPurge    b
+
+     D ProcessPurge    pi
+     D  @Group                       +0    Const Like(purgroup)
+     D  @Seq                         +0    Const Like(purseq)
+     D  @FrmFile                     +0    Const Like(purfrmfile)
+     D  @FrmLib                      +0    Const Like(purfrmlib)
+     D  @ToFile                      +0    Const Like(purtofile)
+     D  @KeyFld1                     +0    Const Like(purkeyfld1)
+     D  @KeyFld2                     +0    Const Like(purkeyfld2)
+     D  @KeyFld3                     +0    Const Like(purkeyfld3)
+     D  @KeyFld4                     +0    Const Like(purkeyfld4)
+     D  @AndOr2                      +0    Const Like(purandor2)
+     D  @AndOr3                      +0    Const Like(purandor3)
+     D  @AndOr4                      +0    Const Like(purandor4)
+     D  @KeyCnd1                     +0    Const Like(purkeycnd1)
+     D  @KeyCnd2                     +0    Const Like(purkeycnd2)
+     D  @KeyCnd3                     +0    Const Like(purkeycnd3)
+     D  @KeyCnd4                     +0    Const Like(purkeycnd4)
+     D  @AlwBlk1                       n   Const
+     D  @AlwBlk2                       n   Const
+     D  @AlwBlk3                       n   Const
+     D  @AlwBlk4                       n   Const
+     D  @RJust1                        n   Const
+     D  @RJust2                        n   Const
+     D  @RJust3                        n   Const
+     D  @RJust4                        n   Const
+     D  @ZrFill1                       n   Const
+     D  @ZrFill2                       n   Const
+     D  @ZrFill3                       n   Const
+     D  @ZrFill4                       n   Const
+     D  @FlSize1                     +0    Const Like(purflsize1)
+     D  @FlSize2                     +0    Const Like(purflsize2)
+     D  @FlSize3                     +0    Const Like(purflsize3)
+     D  @FlSize4                     +0    Const Like(purflsize4)
+     D  @Key1                        +0    Const Like(keykeyfld1)
+     D  @Key2                        +0    Const Like(keykeyfld2)
+     D  @Key3                        +0    Const Like(keykeyfld3)
+     D  @Key4                        +0    Const Like(keykeyfld4)
+
+     D  @FileLib       s             25a   Inz(*Blanks)
+
+      /free
+
+b001      If purfrmlib <> @Libl;
+             @FileLib = %Trim(@FrmLib) + '/' + %Trim(@FrmFile);
+x001      Else;
+             @FileLib = %Trim(@FrmFile);
+e001      EndIf;
+
+          // Copy records from input file to output file
+b001      If CopyData(@MsgDta:  @FileLib: @ToFile:
+                      @KeyFld1: @KeyFld2: @KeyFld3: @KeyFld4:
+                                @AndOr2:  @AndOr3:  @AndOr4:
+                      @KeyCnd1: @KeyCnd2: @KeyCnd3: @KeyCnd4:
+                      @AlwBlk1: @AlwBlk2: @AlwBlk3: @AlwBlk4:
+                      @RJust1:  @RJust2:  @RJust3:  @RJust4:
+                      @ZrFill1: @ZrFill2: @ZrFill3: @ZrFill4:
+                      @FlSize1: @FlSize2: @FlSize3: @FlSize4:
+                      @Key1:    @Key2:    @Key3:    @Key4);
+
+             // print a line
+             PrintLine();
+
+             // Set status to copy complete
+             SetStatusForITPPURGEP(@Group: @CopyStatus: @Seq);
+
+             // Update member source
+             DeleteData(@MsgDta:  @FileLib:
+                        @KeyFld1: @KeyFld2: @KeyFld3: @KeyFld4:
+                                  @AndOr2:  @AndOr3:  @AndOr4:
+                        @KeyCnd1: @KeyCnd2: @KeyCnd3: @KeyCnd4:
+                        @AlwBlk1: @AlwBlk2: @AlwBlk3: @AlwBlk4:
+                        @RJust1:  @RJust2:  @RJust3:  @RJust4:
+                        @ZrFill1: @ZrFill2: @ZrFill3: @ZrFill4:
+                        @FlSize1: @FlSize2: @FlSize3: @FlSize4:
+                        @Key1:    @Key2:    @Key3:    @Key4);
+
+             // print a line
+             PrintLine();
+
+             // Set status to delete complete
+             SetStatusForITPPURGEP(@Group: @DeleteRStatus: @Seq);
+
+e001      EndIf;
+
+      /end-free
+
+     P ProcessPurge    e
+
+      ************************************************************************
+      *‚PrintLine - Print a line
+      ************************************************************************
+
+     P PrintLine       b
+
+     D PrintLine       pi
+
+      /free
+
+          // Check for overflow
+b001      If *InOa;
+
+             // Print First Page Heading
+             Except Heading;
+
+e001      EndIf;
+
+          // Print Detail line
+          Except Detail;
+
+          // Check for more to print
+b001      If @MsgDta2 <> *Blanks;
+
+             // Print Detail line
+             Except Detail2;
+
+e001      EndIf;
+
+      /end-free
+
+     P PrintLine       e
+

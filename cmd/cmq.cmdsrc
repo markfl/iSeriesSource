@@ -1,0 +1,15 @@
+             CMD        PROMPT('Change Message Queue')
+
+             PARM       KWD(MSGQ) TYPE(MSGQ) DFT(*USRPRF) +
+                          SNGVAL((*USRPRF) (*WRKSTN)) +
+                          PROMPT('Message queue')
+ MSGQ:       QUAL       TYPE(*NAME)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*CURLIB) (*USRLIBL) (*ALLUSR) (*ALL)) +
+                          CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(DLVRY) TYPE(*CHAR) LEN(7) RSTD(*YES) +
+                          DFT(*HOLD) VALUES(*SAVE *HOLD *BREAK +
+                          *NOTIFY *DFT) CHOICE(*NONE) +
+                          PROMPT('Delivery')
+

@@ -1,0 +1,86 @@
+             PGM        PARM(&PROGRAM &DSPPGMINF &OUTMBR)
+
+             DCLF       FILE(QADSPOBJ)
+
+             DCL        VAR(&PROGRAM) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&DSPPGMINF) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OUTMBR) TYPE(*CHAR) LEN(20)
+
+             DCL        VAR(&PRGFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PRGLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&PGMINFFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGMINFLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MBROPT) TYPE(*CHAR) LEN(8)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(DIAG))
+
+             CHGVAR     VAR(&PRGFILE) VALUE(%SST(&PROGRAM 1 10))
+             CHGVAR     VAR(&PRGLIB) VALUE(%SST(&PROGRAM 11 10))
+
+             CHGVAR     VAR(&PGMINFFILE) VALUE(%SST(&DSPPGMINF 1 10))
+             CHGVAR     VAR(&PGMINFLIB) VALUE(%SST(&DSPPGMINF 11 10))
+
+             CHGVAR     VAR(&MEMBER) VALUE(%SST(&OUTMBR 3 10))
+             CHGVAR     VAR(&MBROPT) VALUE(%SST(&OUTMBR 13 8))
+
+             DLTF       FILE(QTEMP/QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+
+             DSPOBJD    OBJ(&PRGLIB/&PRGFILE) OBJTYPE(*PGM) +
+                          OUTPUT(*OUTFILE) OUTFILE(QTEMP/QADSPOBJ)
+
+             DLTF       FILE(QTEMP/SPOOL132)
+             MONMSG     MSGID(CPF0000)
+
+             CRTPF      FILE(QTEMP/SPOOL132) RCDLEN(132)
+
+             OVRDBF     FILE(QADSPOBJ) TOFILE(QTEMP/QADSPOBJ)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* b01 */    DOWHILE    COND(&@MSGID *NE CPF0864)
+
+             DSPPGM     PGM(&ODLBNM/&ODOBNM) OUTPUT(*PRINT) +
+                          DETAIL(*MODULE)
+
+             CPYSPLF    FILE(QPDPGM) TOFILE(QTEMP/SPOOL132) +
+                          SPLNBR(*LAST)
+             MONMSG     MSGID(CPF0000)
+
+             DLTSPLF    FILE(QPDPGM) SPLNBR(*LAST)
+
+             DSPPGM     PGM(&ODLBNM/&ODOBNM) OUTPUT(*PRINT) +
+                          DETAIL(*SRVPGM)
+
+             CPYSPLF    FILE(QPDPGM) TOFILE(QTEMP/SPOOL132) +
+                          SPLNBR(*LAST) MBROPT(*ADD)
+             MONMSG     MSGID(CPF0000)
+
+             DLTSPLF    FILE(QPDPGM) SPLNBR(*LAST)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* e01 */    ENDDO
+
+             DLTF       FILE(QTEMP/QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/SPOOL132)
+             MONMSG     MSGID(CPF0000)
+
+             RMVMSG     CLEAR(*ALL)
+
+             GOTO       CMDLBL(END)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+ END:        ENDPGM

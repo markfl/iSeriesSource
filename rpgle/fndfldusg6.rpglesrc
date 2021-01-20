@@ -1,0 +1,275 @@
+          Ctl-opt Option(*NoDebugio) BndDir('MFLORES') DftActGrp(*No);
+
+     Fqadspffd  ip   e             Disk
+     Fqadsppgm  if   f  179    10aiDisk    KeyLoc(11)
+     Fqadsppgmi if   f  179    10aiDisk    KeyLoc(11)
+     Fqadspobj  if   f  690    10aiDisk    KeyLoc(24)
+     Fqrpglesrc if   e             Disk    Rename(qrpglesrc:rqrpglesrc) UsrOpn
+     Fqsysprt   o    f  198        Printer OflInd(*InOA)
+
+          Dcl-Ds @qadsppgmDs ExtName('QADSPPGM') Qualified;
+          End-Ds;
+          Dcl-Ds @qadsppgmiDs ExtName('QADSPPGM') Qualified;
+          End-Ds;
+          Dcl-Ds @qadspobjDs ExtName('QADSPOBJ');
+          End-Ds;
+
+          Dcl-Pr CheckSourceMbr;
+              char1 Const Like(@qadsppgmds.whfnam);
+              char1 Const Like(@qadsppgmds.whpnam);
+              char1 Const Like(@qadsppgmds.whlnam);
+              char1 Char(1) Const;
+              char1 Const Like(@qadsppgmds.whpnam);
+          End-Pr;
+
+          Dcl-Pr CheckNewData Ind;
+              char1 Like(@File);
+              char1 Like(@Lib);
+              char1 Like(@Field);
+          End-Pr;
+
+          Dcl-Ds @FldDs;
+             @File Char(10);
+             @Lib Char(10);
+             @Field Char(10);
+          End-Ds;
+
+          Dcl-s @Print Ind Inz(*Off);
+          Dcl-s @a Packed(3:0) Inz(*Zeros);
+          Dcl-s @Count Packed(5:0) Inz(*Zeros);
+
+          Dcl-s @Pwhfile like(whfile);
+          Dcl-s @Pwhpnam like(@qadsppgmds.whpnam);
+          Dcl-s @Pwhflde like(whflde);
+          Dcl-s @Podsrcf like(odsrcf);
+          Dcl-s @Podsrcl like(odsrcl);
+          Dcl-s @Podsrcm like(odsrcm);
+
+          // Get programs files uses
+          Setll *Loval qadsppgm;
+          Setll whfile qadsppgm;
+          Reade whfile qadsppgm @qadsppgmds;
+b001      Dow Not %Eof(qadsppgm);
+
+b002         If CheckNewData(whfile: @qadsppgmds.whpnam: whflde);
+
+                CheckSourceMbr(whfile: @qadsppgmds.whpnam:
+                                       @qadsppgmds.whlib: 'P':
+                                       @qadsppgmds.whpnam);
+
+                // Get programs files uses
+                Setll *Loval qadsppgmi;
+                Setll @qadsppgmds.whpnam qadsppgmi;
+                Reade @qadsppgmds.whpnam qadsppgmi @qadsppgmids;
+b003            Dow Not %Eof(qadsppgmi);
+
+                   // Check for a program object
+b004               If  @qadsppgmids.whobjt =  'P'
+                   And @qadsppgmids.whlnam <> 'QSYS';
+
+b005                  If CheckNewData(whfile: @qadsppgmids.whfnam: whflde);
+
+                         CheckSourceMbr(whfile: @qadsppgmids.whfnam:
+                                                @qadsppgmids.whlnam:
+                                           'P': @qadsppgmids.whfnam);
+
+e005                  EndIf;
+e004               EndIf;
+
+                   // Get next program files uses
+                   Reade @qadsppgmds.whpnam qadsppgmi @qadsppgmids;
+
+e003            EndDo;
+e002         EndIf;
+
+             Reset @Print;
+
+             // Get next program files uses
+             Reade whfile qadsppgm @qadsppgmds;
+
+e001      EndDo;
+
+     Oqsysprt   e            Heading       02     1
+     O          e            Detail1        1
+     O                                           +1 'Program Searched:'
+     O                       @Pwhfile            +1
+     O                       @Pwhpnam            +1
+     O                       @Pwhflde            +1
+     O                       @Podsrcf            +1
+     O                       @Podsrcl            +1
+     O                       @Podsrcm            +1
+     O          e            Detail2        1
+     O                       @Pwhpnam            +1
+     O                       whfile              +1
+     O                       whflde              +1
+     O                       odsrcf              +1
+     O                       odsrcl              +1
+     O                       odsrcm              +1
+     O                       srcseq        m     +1
+     O                       srcdta              +1
+
+š         Dcl-Proc CheckSourceMbr;
+
+          Dcl-Pi CheckSourceMbr;
+             @File  Const Like(@qadsppgmds.whfnam);
+             @Prog  Const Like(@qadsppgmds.whpnam);
+             @Lib  Const Like(@qadsppgmds.whlnam);
+             @PAtr Char(1) Const;
+             @WhpNam  Const Like(@qadsppgmds.whpnam);
+          End-Pi;
+
+          Dcl-s @SourceData Like(srcdta);
+
+          /define mflores003
+          /define mflores059
+          /copy qcpysrc,mflores
+          /undefine mflores003
+          /undefine mflores059
+
+          Dcl-c @Cmd1 'OVRDBF FILE(QRPGLESRC) TOFILE(';
+          Dcl-c @Cmd2 ') MBR(';
+          Dcl-c @Cmd3 'DLTOVR FILE(QRPGLESRC)';
+
+          // Get program source info
+          Setll *Loval qadspobj;
+          Setll @Prog qadspobj;
+          Reade @Prog qadspobj @qadspobjDs;
+b001      Dow Not %Eof(qadspobj);
+
+b002         If @PAtr = 'F'
+             And odsrcm = @Prog;
+                Reade @Prog qadspobj @qadspobjDs;
+                Iter;
+e002         EndIf;
+
+             Reset @Command;
+             @Command = @Cmd1 + %Trim(odsrcl) + '/' + %Trim(odsrcf)
+                          + @Cmd2 + %Trim(odsrcm) + ')';
+             @Length = %Len(%Trim(@Command));
+b002         Monitor;
+
+                @CallCmd(@Command: @Length);
+
+                Open qrpglesrc;
+
+                // Check for overflow
+b003         // If *InOA;
+
+                   // Print heading
+                // Except Heading;
+
+e003         // EndIf;
+
+                // Move file fields into print fields
+                @Pwhfile = @File;
+                @Pwhpnam = @Prog;
+                @Pwhflde = whflde;
+                @Podsrcf = odsrcf;
+                @Podsrcl = odsrcl;
+                @Podsrcm = odsrcm;
+
+                // Print a Line
+             // Except Detail1;
+
+                // Read first rpg source record
+                Read rqrpglesrc;
+b003            Dow Not %Eof(qrpglesrc);
+
+                   @SourceData = @ToUpper(srcdta);
+                   @a = %Scan(whflde: @SourceData);
+b004               If @a > *Zeros;
+
+                      // Check for overflow
+b005                  If *InOA;
+
+                         // Print heading
+                         Except Heading;
+
+e005                  EndIf;
+
+                      // Check for first time printing
+b005                  If Not @Print;
+
+                         // Print a Line
+                         Except Detail1;
+
+                         @Print = *On;
+
+e005                  EndIf;
+
+                      // Print a Line
+                      Except Detail2;
+
+e004               EndIf;
+
+                   // Read next rpg source record
+                   Read rqrpglesrc;
+
+e003            EndDo;
+
+                Close qrpglesrc;
+
+                Reset @Command;
+                @Command = @Cmd3;
+                @Length = %Len(%Trim(@Command));
+                @CallCmd(@Command: @Length);
+
+x002         On-Error;
+
+                Close qrpglesrc;
+
+e002         EndMon;
+
+b002         If @PAtr = 'P';
+                Leave;
+e002         EndIf;
+
+             // Get program source info
+             Reade @Prog qadspobj @qadspobjDs;
+
+e001      EndDo;
+
+š         End-Proc;
+
+š         Dcl-Proc CheckNewData;
+
+          Dcl-Pi CheckNewData  Ind;
+             @PFile  Like(@File);
+             @PLib  Like(@Lib);
+             @PField  Like(@Field);
+          End-Pi;
+
+          Dcl-s @FldDsA Char(30) Dim(9999) Static;
+          Dcl-Ds @FldDsKey LikeDs(@FldDs);
+          Dcl-s @a Packed(5:0) Inz(*Zeros);
+
+          // Set array key search data structure
+          @FldDsKey.@File  = @PFile;
+          @FldDsKey.@Lib   = @PLib;
+          @FldDsKey.@Field = @PField;
+
+          @a = %LookUp(@FldDsKey: @FldDsA);
+b001      If @a <> *Zeros;
+
+             // Field found exit
+             Return *Off;
+
+x001      Else;
+
+             @a = %LookUp(*Blanks: @FldDsA);
+b002         If @a <> *Zeros;
+
+                // Set array
+                @FldDsA(@a) = @FldDsKey;
+
+                // Field not found exit
+                Return *On;
+
+e002         EndIf;
+e001      EndIf;
+
+          // Field not found exit
+          Return *On;
+
+š         End-Proc;
+

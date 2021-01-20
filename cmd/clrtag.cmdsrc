@@ -1,0 +1,10 @@
+             CMD        PROMPT('Clear All Tags')
+
+             PARM       KWD(FILE) TYPE(FILE) PROMPT('File')
+ FILE:       QUAL       TYPE(*NAME) DFT(QRPGLESRC)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(MEMBER) TYPE(*NAME) DFT(*FIRST) +
+                          SPCVAL((*FIRST)) PROMPT('Member')

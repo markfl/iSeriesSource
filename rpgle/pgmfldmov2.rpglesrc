@@ -1,0 +1,683 @@
+          Ctl-opt BndDir('MFLORES') DftActGrp(*No) Option(*NoDebugio);
+
+     FInput     ip   f   92        Disk
+          Dcl-f qpgmfldrl1 Usage(*Input:*Output) Keyed;
+          Dcl-f qpgmfldml1 Usage(*Output) Keyed;
+
+          Dcl-Pi pgmfldmov2;
+             @PProgram  Like(program);
+             @PLibrary  Like(library);
+          End-Pi;
+
+          Dcl-Pr GetSize;
+              char1   Char(198) Const;
+              packed1 Packed(11:0);
+              packed1 Packed(3:0);
+          End-Pr;
+
+          Dcl-s @SaveRecordFmt Like(@IFormatName);
+          Dcl-s @Field         Like(extfield) Inz(*Blanks);
+          Dcl-s @Type          Like(Type)     Inz(*Blanks);
+          Dcl-s @Size          Like(Size)     Inz(*Zeros);
+          Dcl-s @Size1         Like(Size)     Inz(*Zeros);
+          Dcl-s @Size2         Like(Size)     Inz(*Zeros);
+          Dcl-s @Size3         Like(Size)     Inz(*Zeros);
+          Dcl-s @Dec           Like(Dec)      Inz(*Zeros);
+          Dcl-s @Dec1          Like(Dec)      Inz(*Zeros);
+          Dcl-s @Dec2          Like(Dec)      Inz(*Zeros);
+          Dcl-s @Dec3          Like(Dec)      Inz(*Zeros);
+          Dcl-s @a             Packed(5:0)    Inz(*Zeros);
+          Dcl-s @b             Packed(5:0)    Inz(*Zeros);
+          Dcl-s @c             Packed(5:0)    Inz(*Zeros);
+          Dcl-s @Found         Ind            Inz(*Off);
+          Dcl-s @InDs          Ind            Inz(*Off);
+          Dcl-s @srcseq        Like(srcseq)   Inz(*Zeros);
+
+          Dcl-Ds @KeyDs likerec(rpgmfldref : *key);
+
+          /define RPGSTRUCT01_36
+          /define RPGSTRUCT03_36
+          /define RPGSTRUCT04_36
+          /define RPGSTRUCT05_36
+          /copy qcpysrc,rpgilestrc
+          /undefine RPGSTRUCT01_36
+          /undefine RPGSTRUCT03_36
+          /undefine RPGSTRUCT04_36
+          /undefine RPGSTRUCT05_36
+
+          /define mflores003
+          /define mflores072
+          /copy qcpysrc,mflores
+          /undefine mflores003
+          /undefine mflores072
+
+          /define PGMFLDMOV01
+          /copy qcpysrc,pgmfldmov
+          /undefine PGMFLDMOV01
+
+     IInput     ns
+     I                                  1    6 2srcseq
+     I                                  7   12 0srcdat
+     I                                 13   92  srcdta
+     I          aa  **
+     I                                 13   92  @1srcdta
+
+          @_srcdta = @ToUpper(srcdta);
+          Clear @IspecDs;
+          Clear @CspecDs;
+          Reset @Size1;
+          Reset @Dec1;
+          Reset @Size2;
+          Reset @Dec2;
+          Reset @Size3;
+          Reset @Dec3;
+          MisMatch = *Off;
+
+b001      If  %Subst(@_srcdta:1:2) = '**';
+             *InLr = *On;
+             Return;
+e001      EndIf;
+
+b001      If  %Subst(@_srcdta:6:1) = 'E'
+          And %Subst(@_srcdta:7:1) <> '/'
+          And %Subst(@_srcdta:7:1) <> '*';
+
+             @EspecDsRPGIII = @_srcdta;
+             @IField1       = %Trim(@EspecDsRPGIII.@EArrayField1);
+             @IField2       = %Trim(@EspecDsRPGIII.@EArrayField2);
+
+b002         If @IField1 <> *Blanks;
+                @Field = @IField1;
+b003            If GetAttributes(@PProgram: @PLibrary: @Field:
+                                 @Type: @Size: @Dec);
+b004               If @Type <> %Trim('N');
+
+                      @IF1Atr  = %Char(@Size);
+b005                  If @Type = 'P'
+                      Or @Type = 'S';
+b006                     If @Dec > *Zeros;
+                            @IF1Atr = %Trim(@IF1Atr) + ',' + %Char(@Dec);
+x006                     Else;
+                            @IF1Atr = %Trim(@IF1Atr) + ',0';
+e006                     EndIf;
+e005                  EndIf;
+                      @IF1Atr = %Trim(@IF1Atr) + ',' + %Trim(@Type);
+
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+
+b002         If @IField2 <> *Blanks;
+                @Field = @IField2;
+b003            If GetAttributes(@PProgram: @PLibrary: @Field:
+                                 @Type: @Size: @Dec);
+b004               If @Type <> %Trim('N');
+
+                      @IF2Atr  = %Char(@Size);
+b005                  If @Type = 'P'
+                      Or @Type = 'S';
+b006                     If @Dec > *Zeros;
+                            @IF2Atr = %Trim(@IF2Atr) + ',' + %Char(@Dec);
+x006                     Else;
+                            @IF2Atr = %Trim(@IF2Atr) + ',0';
+e006                     EndIf;
+e005                  EndIf;
+                      @IF2Atr = %Trim(@IF2Atr) + ',' + %Trim(@Type);
+
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+
+             Program  = @PProgram;
+             Library  = @PLibrary;
+             SrcSeq   = srcseq;
+             SpecType = 'E';
+             MisMatch = *Off;
+             Free     = *Off;
+             DataLine = @IspecDs;
+
+             Write rpgmfldmov;
+
+e001      EndIf;
+
+b001      If  %Subst(@_srcdta:6:1) = 'I'
+          And %Subst(@_srcdta:7:1) <> '*'
+          And %Subst(@_srcdta:7:1) <> '/'
+          And %Subst(@_srcdta:7:6) <> *Blanks;
+
+             @IspecDsRPGIII = @_srcdta;
+             @SaveRecordFmt = %Trim(@IspecDsRPGIII.@IRcdfmt);
+
+b002         If @IspecDsRPGIII.@IDsId     = 'DS';
+
+                @InDs = *On;
+                @IFormatName = @SaveRecordFmt;
+
+b003            If %Trim(@IspecDsRPGIII.@IRcdfmt) <> *Blanks;
+                   @Field = %Trim(@IspecDsRPGIII.@IRcdfmt);
+b004               If GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+b005                  If @Type <> %Trim('N');
+
+                         @IF1Atr  = %Char(@Size);
+b006                     If @Type = 'P'
+                         Or @Type = 'S';
+b007                        If @Dec > *Zeros;
+                               @IF1Atr = %Trim(@IF1Atr) + ',' + %Char(@Dec);
+x007                        Else;
+                               @IF1Atr = %Trim(@IF1Atr) + ',0';
+e007                        EndIf;
+e006                     EndIf;
+                         @IF1Atr = %Trim(@IF1Atr) + ',' + %Trim(@Type);
+
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+
+                Program  = @PProgram;
+                Library  = @PLibrary;
+                SrcSeq   = srcseq;
+                SpecType = 'I';
+                MisMatch = *Off;
+                Free     = *Off;
+                DataLine = @IspecDs;
+
+                Write rpgmfldmov;
+
+e002         EndIf;
+e001      EndIf;
+
+b001      If  %Subst(@_srcdta:6:1) = 'I'
+          And %Subst(@_srcdta:7:6) =  *Blanks;
+
+             @InDs = *Off;
+
+             @IspecDsRPGIII  = @_srcdta;
+
+b002         If  @IspecDsRPGIII.@IConstant = *Blanks
+             And @IspecDsRPGIII.@IDsId     = *Blanks;
+
+                @IFormatName    = @SaveRecordFmt;
+                @Field          = @IspecDsRPGIII.@IInField;
+                @IField1        = @IspecDsRPGIII.@IInField;
+                @IField2        = @IspecDsRPGIII.@IOutField;
+
+b003            If @IField1 <> *Blanks;
+b004               If GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+b005                  If @Type <> %Trim('N');
+
+                         @IF1Atr  = %Char(@Size);
+b006                     If @Type = 'P'
+                         Or @Type = 'S';
+b007                        If @Dec > *Zeros;
+                               @IF1Atr = %Trim(@IF1Atr) + ',' + %Char(@Dec);
+x007                        Else;
+                               @IF1Atr = %Trim(@IF1Atr) + ',0';
+e007                        EndIf;
+e006                     EndIf;
+                         @IF1Atr = %Trim(@IF1Atr) + ',' + %Trim(@Type);
+
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+
+b003            If @IField2 <> *Blanks;
+                   @Field = @IspecDsRPGIII.@IOutField;
+b004               If GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+b005                  If @Type <> %Trim('N');
+
+                         @IF2Atr  = %Char(@Size);
+b006                     If @Type = 'P'
+                         Or @Type = 'S';
+b007                        If @Dec > *Zeros;
+                               @IF2Atr = %Trim(@IF2Atr) + ',' + %Char(@Dec);
+x007                        Else;
+                               @IF2Atr = %Trim(@IF2Atr) + ',0';
+e007                        EndIf;
+e006                     EndIf;
+                         @IF2Atr = %Trim(@IF2Atr) + ',' + %Trim(@Type);
+
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+
+                Program  = @PProgram;
+                Library  = @PLibrary;
+                SrcSeq   = srcseq;
+                SpecType = 'I';
+                MisMatch = *Off;
+                Free     = *Off;
+                DataLine = @IspecDs;
+
+                Write rpgmfldmov;
+
+e002         EndIf;
+
+b002         If @IspecDsRPGIII.@IConstant = 'C';
+
+                @IFormatName = @IspecDsRPGIII.@IOutField;
+                @IConstValue = @IspecDsRPGIII.@INamedConst;
+
+                Program  = @PProgram;
+                Library  = @PLibrary;
+                SrcSeq   = srcseq;
+                SpecType = 'I';
+                MisMatch = *Off;
+                Free     = *Off;
+                DataLine = @IspecDs;
+
+                Write rpgmfldmov;
+
+e002         EndIf;
+
+b002         If  @IspecDsRPGIII.@IConstant = *Blanks
+             And @IspecDsRPGIII.@IDsId     = 'DS';
+                Clear @SaveRecordFmt;
+                @SaveRecordFmt = @IspecDsRPGIII.@IExternal
+                               + @IspecDsRPGIII.@ISystem
+                               + @IspecDsRPGIII.@IDsid;
+e002         EndIf;
+e001      EndIf;
+
+          Clear @CspecDs;
+          Clear @CspecDsRPGIII;
+          Reset @Found;
+          Reset @a;
+          Reset @b;
+
+b001      If %Subst(@_srcdta:6:2) = 'C '
+          Or %Subst(@_srcdta:6:3) = 'CSR';
+
+             @CspecDsRPGIII = @_srcdta;
+
+b002         If @CspecDsRPGIII.@COption = 'Z-ADD '
+             Or @CspecDsRPGIII.@COption = 'Z-SUB '
+             Or @CspecDsRPGIII.@COption = 'MOVE  '
+             Or @CspecDsRPGIII.@COption = 'MOVEL ';
+
+                @COption = @CspecDsRPGIII.@COption;
+
+b003            If @CspecDsRPGIII.@CField1 <> *Blanks;
+
+                   @a = %Scan(',':@CspecDsRPGIII.@CField1);
+b004               If @a = *Zeros;
+                      @Field = %Trim(@CspecDsRPGIII.@CField1);
+x004               Else;
+                      @Field = %Subst(@CspecDsRPGIII.@CField1:1:@a-1);
+e004               EndIf;
+
+b004               If GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+                      @CField1 = @Field;
+b005                  If @Type <> %Trim('N');
+
+                         @Found   = *On;
+
+b006                     If @Type <> %Trim('CONST');
+
+                            @Size1   = @Size;
+                            @Dec1    = @Dec;
+                            @CF1Atr  = %Char(@Size);
+b007                        If @Type = 'P'
+                            Or @Type = 'S';
+b008                           If @Dec > *Zeros;
+                                  @CF1Atr = %Trim(@CF1Atr) + ',' + %Char(@Dec);
+x008                           Else;
+                                  @CF1Atr = %Trim(@CF1Atr) + ',0';
+e008                           EndIf;
+e007                        EndIf;
+                            @CF1Atr = %Trim(@CF1Atr) + ',' + %Trim(@Type);
+
+x006                     Else;
+                            @CF1Atr = %Trim(@Type);
+e006                     EndIf;
+e005                  EndIf;
+x004               Else;
+                      @CField1 = %Trim(@CspecDsRPGIII.@CField1);
+e004               EndIf;
+e003            EndIf;
+
+b003            If  @CspecDsRPGIII.@CField2 <> *Blanks;
+
+                   @a = %Scan(',':@CspecDsRPGIII.@CField2);
+b004               If @a = *Zeros;
+                      @Field = %Trim(@CspecDsRPGIII.@CField2);
+x004               Else;
+                      @Field = %Subst(@CspecDsRPGIII.@CField2:1:@a-1);
+e004               EndIf;
+
+b004               If  %Trim(@CspecDsRPGIII.@CField2) <> '*HIVAL'
+                   And %Trim(@CspecDsRPGIII.@CField2) <> '*LOVAL'
+                   And %Trim(@CspecDsRPGIII.@CField2) <> '*ZEROS'
+                   And %Trim(@CspecDsRPGIII.@CField2) <> '*BLANKS'
+                   And %Trim(@CspecDsRPGIII.@CField2) <> '*ALL'
+                   And GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+                      @CField2 = @Field;
+b005                  If @Type <> %Trim('N');
+
+                         @Found = *On;
+
+b006                     If @Type <> %Trim('CONST');
+
+                            @Size2 = @Size;
+                            @Dec2  = @Dec;
+                            @CF2Atr  = %Char(@Size);
+b007                        If @Type = 'P'
+                            Or @Type = 'S';
+b008                           If @Dec > *Zeros;
+                                  @CF2Atr = %Trim(@CF2Atr) + ',' + %Char(@Dec);
+x008                           Else;
+                                  @CF2Atr = %Trim(@CF2Atr) + ',0';
+e008                           EndIf;
+e007                        EndIf;
+                            @CF2Atr = %Trim(@CF2Atr) + ',' + %Trim(type);
+
+b007                        If  @CspecDsRPGIII.@CField1 <> *Blanks
+                            And @CF1Atr <> *Blanks
+                            And @CF2Atr <> *Blanks
+                            And @Size1  <> @Size2;
+                               MisMatch = *On;
+e007                        EndIf;
+x006                     Else;
+                            @CF2Atr = %Trim(@Type);
+e006                     EndIf;
+e005                  EndIf;
+x004               Else;
+                      @CField2 = %Trim(@CspecDsRPGIII.@CField2);
+e004               EndIf;
+e003            EndIf;
+
+b003            If @CspecDsRPGIII.@CResult <> *Blanks;
+
+                   @a = %Scan(',':@CspecDsRPGIII.@CResult);
+b004               If @a = *Zeros;
+                      @Field = %Trim(@CspecDsRPGIII.@CResult);
+x004               Else;
+                      @Field = %Subst(@CspecDsRPGIII.@CResult:1:@a-1);
+e004               EndIf;
+
+b004               If  %Trim(@CspecDsRPGIII.@CResult) <> '*HIVAL'
+                   And %Trim(@CspecDsRPGIII.@CResult) <> '*LOVAL'
+                   And GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+                      @CResult = @Field;
+b005                  If @Type <> %Trim('N');
+
+                         @Found = *On;
+
+                         @Size3 = @Size;
+                         @Dec3  = @Dec;
+                         @CRsAtr  = %Char(@Size);
+b006                     If @Type = 'P'
+                         Or @Type = 'S';
+b007                        If @Dec > *Zeros;
+                               @CRsAtr = %Trim(@CRsAtr) + ',' + %Char(@Dec);
+x007                        Else;
+                               @CRsAtr = %Trim(@CRsAtr) + ',0';
+e007                        EndIf;
+e006                     EndIf;
+                         @CRsAtr = %Trim(@CRsAtr) + ',' + %Trim(@Type);
+
+b006                     If  @CspecDsRPGIII.@CField1 <> *Blanks
+                         And @CF1Atr <> *Blanks
+                         And @CRsAtr <> *Blanks
+                         And @Size1  <> @Size3;
+                            MisMatch = *On;
+e006                     EndIf;
+
+b006                     If  @CspecDsRPGIII.@CField2 <> *Blanks
+                         And @CF2Atr <> *Blanks
+                         And @CRsAtr <> *Blanks
+                         And @Size2  <> @Size3;
+                            MisMatch = *On;
+e006                     EndIf;
+
+e005                  EndIf;
+x004               Else;
+                      @CResult = %Trim(@CspecDsRPGIII.@CResult);
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+
+b002         If @CspecDsRPGIII.@COption = 'EVAL '
+             Or @CspecDsRPGIII.@COption = 'EVALR';
+
+                @COption = @CspecDsRPGIII.@COption;
+
+                @a = %Scan('=':@CspecDsRPGIII.@CExtFact2);
+b003            If @a > *Zeros;
+
+                   @Field = %Subst(@CspecDsRPGIII.@CExtFact2:1:@a-1);
+
+b004               If GetAttributes(@PProgram: @PLibrary: @Field:
+                                    @Type: @Size: @Dec);
+b005                  If @Type <> %Trim('N');
+
+                         @Found = *On;
+
+                         @CField1 = @Field;
+                         @CF1Atr  = %Char(@Size);
+b006                     If @Type = 'P'
+                         Or @Type = 'S';
+b007                        If @Dec > *Zeros;
+                               @CF1Atr = %Trim(@CF1Atr) + ',' + %Char(@Dec);
+x007                        Else;
+                               @CF1Atr = %Trim(@CF1Atr) + ',0';
+e007                        EndIf;
+e006                     EndIf;
+
+                         @CF1Atr = %Trim(@CF1Atr) + ',' + %Trim(@Type);
+
+e005                  EndIf;
+e004               EndIf;
+
+b004               If  %Subst(@CspecDsRPGIII.@CExtFact2:@a+2:1) <> *Blanks
+                   And %Subst(@CspecDsRPGIII.@CExtFact2:@a+2:1) <> '*'
+                   And %Subst(@CspecDsRPGIII.@CExtFact2:@a+2:1) <> ''''
+                   And %Subst(@CspecDsRPGIII.@CExtFact2:@a+2:1) <> '%';
+                      @b = %Scan(' ':@CspecDsRPGIII.@CExtFact2:@a+2);
+b005                  If @b > *Zeros;
+                         @Field = %Subst(@CspecDsRPGIII.@CExtFact2:
+                                         @a+2:@b-(@a+2));
+
+b006                     If GetAttributes(@PProgram: @PLibrary: @Field:
+                                          @Type: @Size: @Dec);
+b007                        If @Type <> %Trim('N');
+
+                               @CField2 = @Field;
+                               @CF2Atr  = %Char(@Size);
+b008                           If @Type = 'P'
+                               Or @Type = 'S';
+b009                              If @Dec > *Zeros;
+                                     @CF2Atr = %Trim(@CF2Atr) + ','
+                                             + %Char(@Dec);
+x009                              Else;
+                                     @CF2Atr = %Trim(@CF2Atr) + ',0';
+e009                              EndIf;
+e008                           EndIf;
+
+                               @CF2Atr = %Trim(@CF2Atr) + ',' + %Trim(@Type);
+
+e007                        EndIf;
+e006                     EndIf;
+e005                  EndIf;
+x004               Else;
+
+                      @b = %Scan('= %SUBST(':@CspecDsRPGIII.@CExtFact2);
+b005                  If @b > *Zeros;
+
+                         @c = %Scan(':':@CspecDsRPGIII.@CExtFact2:@b+9);
+b006                     If @c > *Zeros;
+
+                            @Field = %Subst(@CspecDsRPGIII.@CExtFact2:@b+9:
+                                            @c-(@b+9));
+
+b007                        If GetAttributes(@PProgram: @PLibrary: @Field:
+                                             @Type: @Size: @Dec);
+
+b008                           If @Type <> %Trim('N');
+
+                                  @CField2 = @Field;
+                                  @CF2Atr  = %Char(@Size);
+b009                              If @Type = 'P'
+                                  Or @Type = 'S';
+b010                                 If @Dec > *Zeros;
+                                        @CF2Atr = %Trim(@CF2Atr) + ','
+                                                + %Char(@Dec);
+x010                                 Else;
+                                        @CF2Atr = %Trim(@CF2Atr) + ',0';
+e010                                 EndIf;
+e009                              EndIf;
+
+                                  @CF2Atr = %Trim(@CF2Atr) + ',' + %Trim(@Type);
+                                  @CExtFact3 = %Subst(@CspecDsRPGIII.@CExtFact2:
+                                                      @a+2:42-(@a+2));
+e008                           EndIf;
+e007                        EndIf;
+e006                     EndIf;
+x005                  Else;
+
+                         @b = %Scan('= %EDITC(':@CspecDsRPGIII.@CExtFact2);
+b006                     If @b > *Zeros;
+
+                            @c = %Scan(':':@CspecDsRPGIII.@CExtFact2:@b+9);
+b007                        If @c > *Zeros;
+
+                               @Field = %Subst(@CspecDsRPGIII.@CExtFact2:@b+9:
+                                               @c-(@b+9));
+
+b008                           If GetAttributes(@PProgram: @PLibrary: @Field:
+                                                @Type: @Size: @Dec);
+
+b009                              If @Type <> %Trim('N');
+
+                                     @CField2 = @Field;
+                                     @CF2Atr  = %Char(@Size);
+b010                                 If @Type = 'P'
+                                     Or @Type = 'S';
+b011                                    If @Dec > *Zeros;
+                                           @CF2Atr = %Trim(@CF2Atr) + ','
+                                                   + %Char(@Dec);
+x011                                    Else;
+                                           @CF2Atr = %Trim(@CF2Atr) + ',0';
+e011                                    EndIf;
+e010                                 EndIf;
+
+                                     @CF2Atr = %Trim(@CF2Atr) + ','
+                                             + %Trim(@Type);
+                                     @CExtFact3 =
+                                     %Subst(@CspecDsRPGIII.@CExtFact2:
+                                     @a+2:42-(@a+2));
+
+e009                              EndIf;
+e008                           EndIf;
+e007                        EndIf;
+x006                     Else;
+
+                            @CExtFact2 = %Trim(%Subst(@CspecDsRPGIII.@CExtFact2:
+                                                @a+1:42-(@a+1)));
+b007                        If CheckContinue(@CspecDsRPGIII.@CExtFact2);
+
+                               @CExtFact2 = %Trim(@CExtFact2) + ' '
+                                          + %Trim(%Subst(@1srcdta:36:44));
+
+e007                        EndIf;
+e006                     EndIf;
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+
+b002         If @Found;
+
+                Program  = @PProgram;
+                Library  = @PLibrary;
+                SrcSeq   = srcseq;
+                SpecType = 'C';
+                MisMatch = *Off;
+                Free     = *Off;
+                DataLine = @CspecDs;
+
+                Write rpgmfldmov;
+
+e002         EndIf;
+e001      EndIf;
+
+š         Dcl-Proc GetAttributes;
+
+          Dcl-Pi GetAttributes  Ind;
+             @_Program Like(program) Const;
+             @_Library Like(library) Const;
+             @_Field   Like(extField);
+             @_Type    Like(Type);
+             @_Size    Like(Size);
+             @_Dec     Like(Dec);
+          End-Pi;
+
+          Dcl-s  @a     Packed(3:0) Inz(*Zeros);
+          Dcl-Ds @KeyDs likerec(rpgmfldref : *key);
+
+          @KeyDs.program  = @_Program;
+          @KeyDs.library  = @_Library;
+          @KeyDs.intfield = @_Field;
+
+          Chain %Kds(@KeyDs) rpgmfldref;
+b001      If %Found(qpgmfldrl1);
+b002         If type <> %Trim('N');
+
+                @_Size = Size;
+                @_Type = type;
+                @_Dec  = dec;
+
+                Return *On;
+
+e002         EndIf;
+x001      Else;
+             @a = %Scan('(':@_Field);
+b002         If @a > *Zeros;
+                Clear @KeyDs.intfield;
+                @KeyDs.intfield = %Subst(@_Field:1:@a-1);
+
+                Chain %Kds(@KeyDs) rpgmfldref;
+b003            If %Found(qpgmfldrl1);
+b004               If type <> %Trim('N');
+
+                      @_Field = @KeyDs.intfield;
+                      @_Size  = Size;
+                      @_Type  = type;
+                      @_Dec   = dec;
+
+                      Return *On;
+
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          Return *Off;
+
+š         End-Proc;
+
+š         Dcl-Proc CheckContinue;
+
+          Dcl-Pi CheckContinue  Ind;
+             @ChkField  Const Like(@CspecDsRPGIII.@CExtFact2);
+          End-Pi;
+
+          Dcl-s @a         Packed(3:0)     Inz(*Zeros);
+          Dcl-s @TestField Like(@ChkField) Inz(*Blanks);
+
+          @TestField = %Trim(@ChkField) + '\';
+          @a = %Scan('\':@TestField);
+b001      If  @a > *Zeros
+          And %Subst(@TestField:@a-1:1) = '+';
+             Return *On;
+e001      EndIf;
+
+          Return *Off;
+
+š         End-Proc;
+

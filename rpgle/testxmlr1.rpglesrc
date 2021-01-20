@@ -1,0 +1,33 @@
+          Ctl-opt Option(*NoDebugio) DftActGrp(*No);
+
+          Dcl-f xmlmsgwebq Usage(*Input) Rename(xmlmsgwebq:rxmlmsgweb);
+
+          Dcl-pi testxmlr1;
+             @P_rrn Char(5);
+          End-pi;
+
+     DCreateOrder      Pr                  ExtPgm('RCVXMLORDR')
+     D                            32500a   Varying
+     D                            32500a   Varying
+     D                                3i 0
+
+     D @InDoc          s          32500a   Varying
+     D @OutDoc         s          32500a   Varying
+
+          Dcl-s @Rrn    Zoned(5:0) Inz(*Zeros);
+          Dcl-s @Status Int(3:0)   Inz(*Zeros);
+
+          Clear @InDoc;
+          Clear @OutDoc;
+
+          @Rrn = %Uns(@P_rrn);
+          Chain @Rrn rxmlmsgweb;
+b001      If %Found(xmlmsgwebq);
+             @InDoc = %Trim(xmlmsg);
+             @InDoc = %Trim(xmlmsg);
+             CreateOrder  (@InDoc:@OutDoc:@Status);
+e001      EndIf;
+
+          *Inlr = *On;
+          Return;
+

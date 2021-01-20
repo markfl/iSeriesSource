@@ -1,0 +1,34 @@
+          Ctl-opt Option(*NoDebugio);
+
+     Fqadspobj  up   f  690    10aiDisk    KeyLoc(14)
+
+     Iqadspobj  aa
+     I                                 14   23  odlbnm        l1
+     I                                 24   33  odobnm        l1
+     I                                 34   41  odobtp        l1
+     I                                 42   51  odobat
+     I                                275  284  odsrcm
+
+b001      Select;
+
+x001         When *Inl1;
+
+b002            If  odsrcm = *Blanks
+                Or  odobat <> 'RPG'
+                And odobat <> 'RPGLE';
+
+                   Delete qadspobj;
+
+e002            EndIf;
+
+x001         When odsrcm = *Blanks;
+
+                Delete qadspobj;
+
+x001         When odobat <> 'RPG'
+             And  odobat <> 'RPGLE';
+
+                Delete qadspobj;
+
+e001      EndSl;
+

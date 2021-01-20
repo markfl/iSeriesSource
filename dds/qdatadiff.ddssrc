@@ -1,0 +1,14 @@
+     A                                      UNIQUE
+     A                                      REF(QADSPFFD)
+     A          R RQDATADIFF
+     A            WHFLDE    R
+     A            WHFLDB    R
+     A            WHFLDB01  R               REFFLD(WHFLDB)
+     A            WHFLDT    R
+     A            WHFLDT01  R               REFFLD(WHFLDT)
+     A            WHFTXT    R
+     A            WHFILE    R
+     A            WHLIB     R
+     A          K WHFLDE
+     A          K WHFILE
+     A          K WHLIB

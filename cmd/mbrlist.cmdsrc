@@ -1,0 +1,14 @@
+             CMD        PROMPT('Member List')
+
+             PARM       KWD(FILE) TYPE(FILE) PROMPT('File')
+ FILE:       QUAL       TYPE(*GENERIC) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(OUTPUT) TYPE(*CHAR) LEN(6) RSTD(*YES) +
+                          DFT(*) VALUES(* *PRINT) PROMPT('Member')
+
+             PARM       KWD(FILEATR) TYPE(*CHAR) LEN(4) RSTD(*YES) +
+                          DFT(*ALL) VALUES(*ALL *PF *LF) +
+                          PROMPT('File attributes')

@@ -1,0 +1,36 @@
+             PGM        PARM(&DSPFD)
+
+             DCL        VAR(&DSPFD) TYPE(*CHAR) LEN(20)
+
+             DCL        VAR(&OBJDFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OBJDLIB) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&OBJDFILE) VALUE(%SST(&DSPFD 1 10))
+             CHGVAR     VAR(&OBJDLIB) VALUE(%SST(&DSPFD 11 10))
+             IF         COND(&OBJDLIB *EQ *CURLIB) THEN(CHGVAR +
+                          VAR(&OBJDLIB) VALUE(&CURLIB))
+
+             DSPFD      FILE(QSYS/QAFDBASI) TYPE(*BASATR) +
+                          OUTPUT(*OUTFILE) OUTFILE(&OBJDLIB/&OBJDFILE)
+             MONMSG     MSGID(CPF0000)
+
+             CLRPFM     FILE(&OBJDLIB/&OBJDFILE)
+             MONMSG     MSGID(CPF0000)
+
+             CHGPF      FILE(&OBJDLIB/&OBJDFILE) SIZE(*NOMAX) +
+                          TEXT('System supplied outfile for DSPFD')
+             MONMSG     MSGID(CPF0000)
+
+             DSPFD      FILE(*ALLUSR/*ALL) TYPE(*BASATR) +
+                          OUTPUT(*OUTFILE) OUTFILE(&OBJDLIB/&OBJDFILE)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(QDSPOBJD) TOFILE(&OBJDLIB/&OBJDFILE)
+             CALL       PGM(BLDDSPFDBR)
+             DLTOVR     FILE(*ALL)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

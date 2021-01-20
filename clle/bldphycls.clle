@@ -1,0 +1,125 @@
+             PGM        PARM(&LIBRARY &DATABASEIN)
+
+             DCLF       FILE(QAFDPHY)
+
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DATABASEIN) TYPE(*CHAR) LEN(15)
+
+             DCL        VAR(&DATABASE) TYPE(*CHAR) LEN(15)
+
+             DCL        VAR(&FILEMY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FILESI) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FILEOR) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+
+             CHGVAR     VAR(&DATABASE) VALUE(&DATABASEIN)
+/* b01 */    MONMSG     MSGID(CPF0000) EXEC(DO)
+             CHGVAR     VAR(&DATABASE) VALUE(*ALL)
+/* e01 */    ENDDO
+
+             DLTF       FILE(QTEMP/QAFDPHY)
+             MONMSG     MSGID(CPF0000)
+
+             DSPFD      FILE(&LIBRARY/*ALL) TYPE(*ATR) +
+                          OUTPUT(*OUTFILE) FILEATR(*PF) +
+                          OUTFILE(QTEMP/QAFDPHY)
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(END))
+
+             OVRDBF     FILE(QAFDPHY) TOFILE(QTEMP/QAFDPHY)
+
+             RMVMSG     CLEAR(*ALL)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+/* b01 */    DOWHILE    COND(&MSGID *NE CPF0864)
+
+/* b02 */    IF         COND(&PHFILE *NE ' ') THEN(DO)
+
+/* b03 */    IF         COND(&DATABASE = *ALL) THEN(DO)
+             CHGVAR     VAR(&FILEMY) VALUE(&PHFILE |< 'MY')
+             CHGVAR     VAR(&FILESI) VALUE(&PHFILE |< 'SI')
+             CHGVAR     VAR(&FILEOR) VALUE(&PHFILE |< 'OR')
+/* e03 */    ENDDO
+/* b03 */    ELSE       CMD(DO)
+             CHGVAR     VAR(&FILEMY) VALUE(&PHFILE)
+             CHGVAR     VAR(&FILESI) VALUE(&PHFILE)
+             CHGVAR     VAR(&FILEOR) VALUE(&PHFILE)
+/* e03 */    ENDDO
+
+/* b03 */    IF         COND(&PHACCP = K) THEN(DO)
+
+/* b04 */    IF         COND((&DATABASE = *ALL) *OR (&DATABASE = +
+                          *MSSQL)) THEN(DO)
+             SBMJOB     CMD(CRTJAVACLS FILE(&PHLIB/&PHFILE)) +
+                          JOB(&PHFILE) HOLD(*YES) MSGQ(*NONE)
+/* e04 */    ENDDO
+
+/* b04 */    IF         COND((&DATABASE = *ALL) *OR (&DATABASE = +
+                          *MYSQL)) THEN(DO)
+             SBMJOB     CMD(CRTJAVACLS FILE(&PHLIB/&PHFILE) +
+                          MEMBER(&FILEMY) TODATABASE(*MYSQL)) +
+                          JOB(&PHFILE) HOLD(*YES) MSGQ(*NONE)
+/* e04 */    ENDDO
+
+/* b04 */    IF         COND((&DATABASE = *ALL) *OR (&DATABASE = +
+                          *DB2)) THEN(DO)
+             SBMJOB     CMD(CRTJAVACLS FILE(&PHLIB/&PHFILE) +
+                          MEMBER(&FILESI) TODATABASE(*DB2)) +
+                          JOB(&PHFILE) HOLD(*YES) MSGQ(*NONE)
+/* e04 */    ENDDO
+
+/* b04 */    IF         COND((&DATABASE = *ALL) *OR (&DATABASE = +
+                          *ORACLE)) THEN(DO)
+             SBMJOB     CMD(CRTJAVACLS FILE(&PHLIB/&PHFILE) +
+                          MEMBER(&FILEOR) TODATABASE(*ORACLE)) +
+                          JOB(&PHFILE) HOLD(*YES) MSGQ(*NONE)
+/* e04 */    ENDDO
+/* e03 */    ENDDO
+
+/* b03 */    ELSE       CMD(DO)
+
+/* b04 */    IF         COND((&DATABASE = *ALL) *OR (&DATABASE = +
+                          *MSSQL)) THEN(DO)
+             SBMJOB     CMD(CRTJAVACLS FILE(&PHLIB/&PHFILE) +
+                          INDEXFILE(*NONE)) JOB(&PHFILE) HOLD(*YES) +
+                          MSGQ(*NONE)
+/* e04 */    ENDDO
+
+/* b04 */    IF         COND((&DATABASE = *ALL) *OR (&DATABASE = +
+                          *MYSQL)) THEN(DO)
+             SBMJOB     CMD(CRTJAVACLS FILE(&PHLIB/&PHFILE) +
+                          INDEXFILE(*NONE) MEMBER(&FILEMY) +
+                          TODATABASE(*MYSQL)) JOB(&PHFILE) +
+                          HOLD(*YES) MSGQ(*NONE)
+/* e04 */    ENDDO
+
+/* b04 */    IF         COND((&DATABASE = *ALL) *OR (&DATABASE = +
+                          *DB2)) THEN(DO)
+             SBMJOB     CMD(CRTJAVACLS FILE(&PHLIB/&PHFILE) +
+                          INDEXFILE(*NONE) MEMBER(&FILESI) +
+                          TODATABASE(*DB2)) JOB(&PHFILE) HOLD(*YES) +
+                          MSGQ(*NONE)
+/* e04 */    ENDDO
+
+/* b04 */    IF         COND((&DATABASE = *ALL) *OR (&DATABASE = +
+                          *ORACLE)) THEN(DO)
+             SBMJOB     CMD(CRTJAVACLS FILE(&PHLIB/&PHFILE) +
+                          INDEXFILE(*NONE) MEMBER(&FILEOR) +
+                          TODATABASE(*ORACLE)) JOB(&PHFILE) +
+                          HOLD(*YES) MSGQ(*NONE)
+/* e04 */    ENDDO
+/* e03 */    ENDDO
+/* e02 */    ENDDO
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+
+/* e01 */    ENDDO
+
+             DLTOVR     FILE(*ALL)
+
+ END:        ENDPGM

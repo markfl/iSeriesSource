@@ -1,0 +1,15 @@
+             PGM
+
+             DCL        VAR(&XML) TYPE(*CHAR) LEN(32000)
+
+             DBG        PGM(TSTFNDLOCR)
+
+             OVRDBF     FILE(QXMLSRC) MBR(ORDER1)
+             CALL       PGM(TESTXMLR) PARM(&XML)
+             DLTOVR     FILE(QXMLSRC)
+
+             CALL       PGM(TSTFNDLOCR) PARM(&XML)
+
+             ENDDBG
+
+ END:        ENDPGM

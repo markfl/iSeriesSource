@@ -1,0 +1,16 @@
+             PGM        PARM(&DIV &WHS &SHIPMENT &TYPE &LOAD)
+
+             DCL        VAR(&DIV) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&WHS) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&SHIPMENT) TYPE(*CHAR) LEN(12)
+             DCL        VAR(&TYPE) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&LOAD) TYPE(*CHAR) LEN(8)
+
+             DBG        PGM(TESTO2610R)
+
+             CALL       PGM(TESTO2610R) PARM(&DIV &WHS &SHIPMENT +
+                          &TYPE &LOAD)
+
+             ENDDBG
+
+ END:        ENDPGM

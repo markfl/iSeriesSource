@@ -1,0 +1,15 @@
+             PGM        PARM(&LIBRARY)
+
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+
+             CALL       PGM(SBMSQLALL) PARM(&LIBRARY *MSSQL)
+
+             CALL       PGM(SBMSQLALL) PARM(&LIBRARY *ORACLE)
+
+             CALL       PGM(SBMSQLALL) PARM(&LIBRARY *MYSQL)
+
+             CALL       PGM(SBMSQLALL) PARM(&LIBRARY *DB2)
+
+ END:        ENDPGM

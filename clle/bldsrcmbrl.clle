@@ -1,0 +1,144 @@
+             PGM        PARM(&FILELIB &DSPFD &OUTFILELIB &OUTMBR)
+
+             DCLPRCOPT  DFTACTGRP(*NO) ACTGRP(*NEW) BNDDIR(MFLORES)
+
+             DCLF       FILE(QAFDBASI)
+
+             DCL        VAR(&FILELIB) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&DSPFD) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OUTFILELIB) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OUTMBR) TYPE(*CHAR) LEN(20)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DSPFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DSPLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTLIBRARY) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MBROPT) TYPE(*CHAR) LEN(8)
+
+             DCL        VAR(&OBSOLETE) TYPE(*LGL)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&FILE) VALUE(%SST(&FILELIB 1 10))
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&FILELIB 11 10))
+
+             CHGVAR     VAR(&DSPFILE) VALUE(%SST(&DSPFD 1 10))
+             CHGVAR     VAR(&DSPLIB) VALUE(%SST(&DSPFD 11 10))
+             IF         COND(&DSPLIB *EQ *CURLIB) THEN(CHGVAR +
+                          VAR(&DSPLIB) VALUE(&CURLIB))
+
+             CHGVAR     VAR(&OUTFILE) VALUE(%SST(&OUTFILELIB 1 10))
+             CHGVAR     VAR(&OUTLIBRARY) VALUE(%SST(&OUTFILELIB 11 10))
+             IF         COND(&OUTLIBRARY *EQ *CURLIB) THEN(CHGVAR +
+                          VAR(&OUTLIBRARY) VALUE(&CURLIB))
+
+             CHGVAR     VAR(&MEMBER) VALUE(%SST(&OUTMBR 3 10))
+             CHGVAR     VAR(&MBROPT) VALUE(%SST(&OUTMBR 13 8))
+
+             CHKOBJ     OBJ(&DSPLIB/&DSPFILE) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(BLDDSPFDBA)
+
+             CHKOBJ     OBJ(&OUTLIBRARY/&OUTFILE) OBJTYPE(*FILE)
+/* b01 */    MONMSG     MSGID(CPF9801) EXEC(DO)
+             DSPFD      FILE(QRPGLESRC) TYPE(*MBRLIST) +
+                          OUTPUT(*OUTFILE) +
+                          OUTFILE(&OUTLIBRARY/&OUTFILE)
+             MONMSG     MSGID(CPF0000)
+             CHGPF      FILE(&OUTLIBRARY/&OUTFILE) SIZE(*NOMAX)
+             CHGPFM     FILE(&OUTLIBRARY/&OUTFILE) MBR(*FIRST) +
+                          TEXT('Outfile add with Build Source +
+                          Member List')
+             CLRPFM     FILE(&OUTLIBRARY/&OUTFILE)
+/* e01 */    ENDDO
+
+/* b01 */    SELECT
+/* b02 */    WHEN       COND(&MEMBER *EQ *FIRST) THEN(DO)
+             RTVMBRD    FILE(&OUTLIBRARY/&OUTFILE) RTNMBR(&MEMBER)
+             MONMSG     MSGID(CPF0000)
+/* e02 */    ENDDO
+
+/* b02 */    WHEN       COND(&MEMBER *EQ *FILE) THEN(DO)
+             RTVMBRD    FILE(&OUTLIBRARY/&OUTFILE) RTNMBR(&MEMBER)
+             MONMSG     MSGID(CPF0000)
+/* b03 */    IF         COND(&MEMBER *NE &OUTFILE) THEN(DO)
+             RNMM       FILE(&OUTLIBRARY/&OUTFILE) MBR(&MEMBER) +
+                          NEWMBR(&OUTFILE)
+/* e03 */    ENDDO
+/* e02 */    ENDDO
+
+/* b02 */    OTHERWISE  CMD(DO)
+             ADDPFM     FILE(&OUTLIBRARY/&OUTFILE) MBR(&MEMBER) +
+                          TEXT('Member add with Build Source Member +
+                          List')
+/* e02 */    ENDDO
+/* e01 */    ENDSELECT
+
+/* b01 */    IF         COND(&MBROPT *EQ *REPLACE) THEN(DO)
+             CLRPFM     FILE(&OUTLIBRARY/&OUTFILE) MBR(&MEMBER)
+             MONMSG     MSGID(CPF0000)
+/* e01 */    ENDDO
+
+/* b01 */    IF         COND(&LIBRARY = *USRLIBL) THEN(DO)
+             DLTF       FILE(QTEMP/QAFDBASI)
+             MONMSG     MSGID(CPF0000)
+             DSPFD      FILE(&LIBRARY/&FILE) TYPE(*BASATR) +
+                          OUTPUT(*OUTFILE) OUTFILE(QTEMP/QAFDBASI)
+/* e01 */    ENDDO
+
+             RMVMSG     CLEAR(*ALL)
+
+/* b01 */    IF         COND(&LIBRARY = *USRLIBL) THEN(DO)
+             OVRDBF     FILE(QAFDBASI) TOFILE(QTEMP/QAFDBASI) +
+                          SHARE(*YES)
+             OPNQRYF    FILE((QTEMP/QAFDBASI)) QRYSLT('ATDTAT = "S" +
+                          *AND ATFTYP = "P"') KEYFLD((ATLIB) (ATFILE))
+/* e01 */    ENDDO
+/* b01 */    ELSE       CMD(DO)
+             OVRDBF     FILE(QAFDBASI) TOFILE(&DSPLIB/&DSPFILE) +
+                          SHARE(*YES)
+             OPNQRYF    FILE((&DSPLIB/&DSPFILE)) QRYSLT('ATDTAT = +
+                          "S" *AND ATFTYP = "P"') KEYFLD((ATLIB) +
+                          (ATFILE))
+/* e01 */    ENDDO
+
+             RCVF
+             MONMSG     MSGID(CPF0864)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* b01 */    DOWHILE    COND(&@MSGID *NE CPF0864)
+
+             CALLPRC    PRC(CHECKOBSOLETE) PARM((&ATLIB)) +
+                          RTNVAL(&OBSOLETE)
+/* b02 */    IF         COND(&OBSOLETE) THEN(DO)
+
+/* b03 */    IF         COND(&ATDTAT = 'S') THEN(DO)
+
+/* b04 */    IF         COND(&LIBRARY = &CURLIB) THEN(DO)
+             IF         COND(&ATLIB *NE &LIBRARY) THEN(GOTO +
+                          CMDLBL(AGAIN))
+/* e04 */    ENDDO
+
+             DSPFD      FILE(&ATLIB/&ATFILE) TYPE(*MBRLIST) +
+                          OUTPUT(*OUTFILE) +
+                          OUTFILE(&OUTLIBRARY/&OUTFILE) +
+                          OUTMBR(*FIRST *ADD)
+
+/* e03 */    ENDDO
+/* e02 */    ENDDO
+
+ AGAIN:      RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* e01 */    ENDDO
+
+             CLOF       OPNID(&DSPFILE)
+             DLTOVR     FILE(*ALL)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

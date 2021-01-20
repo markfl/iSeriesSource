@@ -1,0 +1,27 @@
+     h DftActGrp(*NO)
+
+     D Testbookr       pr
+     D                               12a   Const
+     D                                9a   Const
+
+     D Testbookr       pi
+     D @Action                       12a   Const
+     D @Booking#                      9a   Const
+
+     D @xmlParser      pr                  extpgm('BOOKINGXML')
+     D                               +0    Like(@wXmlString)
+
+     D @wXmlString     s           1000a   Varying
+     D @PO#            s              9a   Inz('123456789')
+
+      /free
+
+          @wXmlString = '<Request><Action>' + %Trim(@Action) + '</Action>' +
+                        '<BookingNumber>' + @Booking# + '</BookingNumber>' +
+                        '<PONumber>' + @PO# + '</PONumber></Request>';
+
+          @xmlParser(@wXmlString);
+
+          *Inlr = *On;
+
+      /end-free

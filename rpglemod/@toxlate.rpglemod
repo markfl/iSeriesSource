@@ -1,0 +1,60 @@
+      //‚*******************************************************************************************
+
+      //‚Author.....: Mark Flores
+      //‚Date.......: 11-Nov-2015
+      //‚Description: API To Change Upper Case to Lower Case/Lower Case to Upper Case
+
+      //‚*******************************************************************************************
+      //‚Change Control Information
+      //‚-------------------------------------------------------------------------------------------
+      //‚Date     Task #  Description of Changes                     Pgmr ID
+      //‚-------- ------- ------------------------------------------ ----------
+      //‚11/11/05  42361      Program Creation                       Flores M
+      //‚*******************************************************************************************
+
+          Ctl-opt NoMain Option(*NoDebugio);
+
+          Dcl-Proc @ToUpper Export;
+
+          Dcl-pi @ToUpper Varchar(32767);
+             @Input  Varchar(32767)          Const;
+             @OffSet Int(3) Options(*NoPass) Const;
+          End-pi;
+
+          Dcl-s @Output Varchar(32767) Inz(*Blanks);
+
+         /DEFINE mflores072
+         /copy qcpysrc,mflores
+
+b001      If %Parms() > 1;
+             @Output = %Subst(@Input:1:@OffSet)
+                     + %Xlate(@Lo:@Up:%Trim(%Subst(@Input:@Offset+1)));
+             Return @Output;
+x001      Else;
+             Return %Xlate(@Lo:@Up:%Trimr(@Input));
+e001      EndIf;
+
+          End-Proc;
+
+          Dcl-Proc @ToLower Export;
+
+          Dcl-pi @ToLower Varchar(32767);
+             @Input  Varchar(32767)          Const;
+             @OffSet Int(3) Options(*NoPass) Const;
+          End-pi;
+
+          Dcl-s @Output Varchar(32767) Inz(*Blanks);
+
+         /copy qcpysrc,mflores
+         /UNDEFINE mflores72
+
+b001      If %Parms() > 1;
+             @Output = %Subst(@Input:1:@OffSet)
+                     + %Xlate(@Up:@Lo:%Trim(%Subst(@Input:@Offset+1)));
+             Return @Output;
+x001      Else;
+             Return %Xlate(@Up:@Lo:%Trimr(@Input));
+e001      EndIf;
+
+          End-Proc;
+

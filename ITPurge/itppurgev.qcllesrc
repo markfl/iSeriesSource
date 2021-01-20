@@ -1,0 +1,70 @@
+             PGM        PARM(&GROUP &SAVF &ARCLIB &DLTARCHIVE +
+                          &KEYFOPTION &KEY1 &KEY2 &KEY3 &KEY4)
+
+             DCL        VAR(&GROUP) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SAVF) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&ARCLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DLTARCHIVE) TYPE(*LGL)
+             DCL        VAR(&KEYFOPTION) TYPE(*LGL)
+             DCL        VAR(&KEY1) TYPE(*CHAR) LEN(50)
+             DCL        VAR(&KEY2) TYPE(*CHAR) LEN(50)
+             DCL        VAR(&KEY3) TYPE(*CHAR) LEN(50)
+             DCL        VAR(&KEY4) TYPE(*CHAR) LEN(50)
+
+             DCL        VAR(&SAVFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SAVLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&VALIDGROUP) TYPE(*LGL)
+
+             DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(256)
+
+             CHGVAR     VAR(&SAVFILE) VALUE(%SST(&SAVF 1 10))
+             CHGVAR     VAR(&SAVLIB) VALUE(%SST(&SAVF 11 10))
+
+             CALLPRC    PRC(VALIDATEGROUP) PARM((&GROUP)) +
+                          RTNVAL(&VALIDGROUP)
+             IF         COND(&VALIDGROUP) THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    GROUP is not valid')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             IF         COND(&SAVFILE *EQ ' ') THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    SAVEFILE is a +
+                          required parameter')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             IF         COND(&ARCLIB *EQ ' ') THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    ARCLIB is a required +
+                          parameter')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             IF         COND(&KEYFOPTION = '0') THEN(DO)
+
+             IF         COND(&KEY1 *EQ ' ') THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    FIRSTKEY is a +
+                          required parameter')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             IF         COND((&KEY3 *NE ' ') *AND (&KEY2 *EQ ' ')) +
+                          THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    SECONDKEY is +
+                          required parameter if THIRDKEY is entered')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             ENDDO
+
+ END:        ENDPGM

@@ -1,0 +1,24 @@
+             CMD        PROMPT('Program Module Reference')
+
+             PARM       KWD(OBJECT) TYPE(OBJECT) PROMPT('Program(s)')
+ OBJECT:     QUAL       TYPE(*GENERIC) DFT(*ALL) SPCVAL((*ALL))
+             QUAL       TYPE(*NAME) DFT(*ALLUSR) SPCVAL((*USRLIBL) +
+                          (*CURLIB) (*ALLUSR)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(OUTFILE) TYPE(OUTFILE) DFT(*DFT) +
+                          SNGVAL((*DFT 'QPGMMODREF*CURLIB')) +
+                          PROMPT('File to receive output')
+ OUTFILE:    QUAL       TYPE(*NAME)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*CURLIB)) CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(OUTMBR) TYPE(OUTMBR) CHOICE(*NONE) +
+                          PROMPT('Output member options')
+ OUTMBR:     ELEM       TYPE(*NAME) DFT(*FIRST) SPCVAL((*FIRST) +
+                          (*FILE)) PROMPT('Member to receive output')
+             ELEM       TYPE(*CHAR) LEN(8) RSTD(*YES) DFT(*ADD) +
+                          VALUES(*REPLACE *ADD) SPCVAL((*FIRST) +
+                          (*SRCFILE)) CHOICE(*NONE) PROMPT('Replace +
+                          or add records')
+

@@ -1,0 +1,16 @@
+     HOption(*NoDebugio) DftActGrp(*No)
+     Fqrpglesrc up   f  112        Disk
+     Dchgdatr          pr
+     D                                6a
+     D                                6a
+     Dchgdatr          pi
+     D  @InDate                       6a
+     D  @OutDate                      6a
+     Iqrpglesrc ns
+     I                                  7   12  srcdat
+b001 C                   If        srcdat = @InDate
+     C                   Move      @OutDate      srcdat
+     C                   Except    updsrc
+e001 C                   EndIf
+     Oqrpglesrc e            updsrc
+     O                       srcdat              12

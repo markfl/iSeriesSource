@@ -1,0 +1,122 @@
+          Ctl-opt NoMain Option(*NoDebugIO) BndDir('FLORESM');
+
+          /define fndfldusg01
+          /define fndfldusg02
+          /copy qcpysrc,fndfldusg
+          /undefine fndfldusg01
+          /undefine fndfldusg02
+
+š         Dcl-Proc SetFields Export;
+
+          Dcl-Pi SetFields LikeDs(@qadspffdDsOut);
+             @qadspffdDsI LikeDs(@qadspffdDsIn);
+          End-Pi;
+
+          Dcl-Ds @qadspffdDsO LikeDs(@qadspffdDsOut);
+
+          @qadspffdDsO.whfile = @qadspffdDsI.@whfile;
+          @qadspffdDsO.whlib  = @qadspffdDsI.@whlib;
+          @qadspffdDsO.whcrtd = @qadspffdDsI.@whcrtd;
+          @qadspffdDsO.whftyp = @qadspffdDsI.@whftyp;
+          @qadspffdDsO.whcnt  = @qadspffdDsI.@whcnt;
+          @qadspffdDsO.whdttm = @qadspffdDsI.@whdttm;
+          @qadspffdDsO.whname = @qadspffdDsI.@whname;
+          @qadspffdDsO.whseq  = @qadspffdDsI.@whseq;
+          @qadspffdDsO.whtext = @qadspffdDsI.@whtext;
+          @qadspffdDsO.whfldn = @qadspffdDsI.@whfldn;
+          @qadspffdDsO.whrlen = @qadspffdDsI.@whrlen;
+          @qadspffdDsO.whfldi = @qadspffdDsI.@whfldi;
+          @qadspffdDsO.whflde = @qadspffdDsI.@whflde;
+          @qadspffdDsO.whfobo = @qadspffdDsI.@whfobo;
+          @qadspffdDsO.whibo  = @qadspffdDsI.@whibo;
+          @qadspffdDsO.whfldb = @qadspffdDsI.@whfldb;
+          @qadspffdDsO.whfldd = @qadspffdDsI.@whfldd;
+          @qadspffdDsO.whfldp = @qadspffdDsI.@whfldp;
+          @qadspffdDsO.whftxt = @qadspffdDsI.@whftxt;
+          @qadspffdDsO.whrcde = @qadspffdDsI.@whrcde;
+          @qadspffdDsO.whrfil = @qadspffdDsI.@whrfil;
+          @qadspffdDsO.whrlib = @qadspffdDsI.@whrlib;
+          @qadspffdDsO.whrfmt = @qadspffdDsI.@whrfmt;
+          @qadspffdDsO.whrfld = @qadspffdDsI.@whrfld;
+          @qadspffdDsO.whchd1 = @qadspffdDsI.@whchd1;
+          @qadspffdDsO.whchd2 = @qadspffdDsI.@whchd2;
+          @qadspffdDsO.whchd3 = @qadspffdDsI.@whchd3;
+          @qadspffdDsO.whfldt = @qadspffdDsI.@whfldt;
+          @qadspffdDsO.whfiob = @qadspffdDsI.@whfiob;
+          @qadspffdDsO.whecde = @qadspffdDsI.@whecde;
+          @qadspffdDsO.whewrd = @qadspffdDsI.@whewrd;
+          @qadspffdDsO.whvcne = @qadspffdDsI.@whvcne;
+          @qadspffdDsO.whnfld = @qadspffdDsI.@whnfld;
+          @qadspffdDsO.whnind = @qadspffdDsI.@whnind;
+          @qadspffdDsO.whshft = @qadspffdDsI.@whshft;
+          @qadspffdDsO.whalty = @qadspffdDsI.@whalty;
+          @qadspffdDsO.whalis = @qadspffdDsI.@whalis;
+          @qadspffdDsO.whjref = @qadspffdDsI.@whjref;
+          @qadspffdDsO.whdftl = @qadspffdDsI.@whdftl;
+          @qadspffdDsO.whdft  = @qadspffdDsI.@whdft;
+          @qadspffdDsO.whchri = @qadspffdDsI.@whchri;
+          @qadspffdDsO.whctnt = @qadspffdDsI.@whctnt;
+          @qadspffdDsO.whfont = @qadspffdDsI.@whfont;
+          @qadspffdDsO.whcswd = @qadspffdDsI.@whcswd;
+          @qadspffdDsO.whcshi = @qadspffdDsI.@whcshi;
+          @qadspffdDsO.whbcnm = @qadspffdDsI.@whbcnm;
+          @qadspffdDsO.whbchi = @qadspffdDsI.@whbchi;
+          @qadspffdDsO.whmap  = @qadspffdDsI.@whmap;
+          @qadspffdDsO.whmaps = @qadspffdDsI.@whmaps;
+          @qadspffdDsO.whmapl = @qadspffdDsI.@whmapl;
+          @qadspffdDsO.whsysn = @qadspffdDsI.@whsysn;
+          @qadspffdDsO.whres1 = @qadspffdDsI.@whres1;
+          @qadspffdDsO.whsqlt = @qadspffdDsI.@whsqlt;
+          @qadspffdDsO.whhex  = @qadspffdDsI.@whhex;
+          @qadspffdDsO.whpnts = @qadspffdDsI.@whpnts;
+          @qadspffdDsO.whcsid = @qadspffdDsI.@whcsid;
+          @qadspffdDsO.whfmt  = @qadspffdDsI.@whfmt;
+          @qadspffdDsO.whsep  = @qadspffdDsI.@whsep;
+          @qadspffdDsO.whvarl = @qadspffdDsI.@whvarl;
+          @qadspffdDsO.whallc = @qadspffdDsI.@whallc;
+          @qadspffdDsO.whnull = @qadspffdDsI.@whnull;
+          @qadspffdDsO.whfcsn = @qadspffdDsI.@whfcsn;
+          @qadspffdDsO.whfcsl = @qadspffdDsI.@whfcsl;
+          @qadspffdDsO.whfcpn = @qadspffdDsI.@whfcpn;
+          @qadspffdDsO.whfcpl = @qadspffdDsI.@whfcpl;
+          @qadspffdDsO.whcdfn = @qadspffdDsI.@whcdfn;
+          @qadspffdDsO.whcdfl = @qadspffdDsI.@whcdfl;
+          @qadspffdDsO.whdcdf = @qadspffdDsI.@whdcdf;
+          @qadspffdDsO.whdcdl = @qadspffdDsI.@whdcdl;
+          @qadspffdDsO.whtxrt = @qadspffdDsI.@whtxrt;
+          @qadspffdDsO.whfldg = @qadspffdDsI.@whfldg;
+          @qadspffdDsO.whfdsl = @qadspffdDsI.@whfdsl;
+          @qadspffdDsO.whfsps = @qadspffdDsI.@whfsps;
+          @qadspffdDsO.whcfps = @qadspffdDsI.@whcfps;
+          @qadspffdDsO.whifps = @qadspffdDsI.@whifps;
+          @qadspffdDsO.whdbll = @qadspffdDsI.@whdbll;
+          @qadspffdDsO.whdbun = @qadspffdDsI.@whdbun;
+          @qadspffdDsO.whdbul = @qadspffdDsI.@whdbul;
+          @qadspffdDsO.whdbfc = @qadspffdDsI.@whdbfc;
+          @qadspffdDsO.whdbfi = @qadspffdDsI.@whdbfi;
+          @qadspffdDsO.whdbrp = @qadspffdDsI.@whdbrp;
+          @qadspffdDsO.whdbwp = @qadspffdDsI.@whdbwp;
+          @qadspffdDsO.whdbrc = @qadspffdDsI.@whdbrc;
+          @qadspffdDsO.whdbou = @qadspffdDsI.@whdbou;
+          @qadspffdDsO.whpsud = @qadspffdDsI.@whpsud;
+          @qadspffdDsO.whbcuh = @qadspffdDsI.@whbcuh;
+          @qadspffdDsO.whfpsw = @qadspffdDsI.@whfpsw;
+          @qadspffdDsO.whfspw = @qadspffdDsI.@whfspw;
+          @qadspffdDsO.whcfpw = @qadspffdDsI.@whcfpw;
+          @qadspffdDsO.whifpw = @qadspffdDsI.@whifpw;
+          @qadspffdDsO.whrwid = @qadspffdDsI.@whrwid;
+          @qadspffdDsO.whidc  = @qadspffdDsI.@whidc;
+          @qadspffdDsO.whdrow = @qadspffdDsI.@whdrow;
+          @qadspffdDsO.whdcol = @qadspffdDsI.@whdcol;
+          @qadspffdDsO.whali2 = @qadspffdDsI.@whali2;
+          @qadspffdDsO.whalch = @qadspffdDsI.@whalch;
+          @qadspffdDsO.whnrml = @qadspffdDsI.@whnrml;
+          @qadspffdDsO.whjrf2 = @qadspffdDsI.@whjrf2;
+        @qadspffdDsO.whhdncol = @qadspffdDsI.@whhdncol;
+          @qadspffdDsO.whrcts = @qadspffdDsI.@whrcts;
+          @qadspffdDsO.whfppn = @qadspffdDsI.@whfppn;
+          @qadspffdDsO.whfpln = @qadspffdDsI.@whfpln;
+
+          Return @qadspffdDsO;
+
+š         End-Proc;

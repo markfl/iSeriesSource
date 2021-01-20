@@ -1,0 +1,97 @@
+          Ctl-opt Option(*NoDebugio) DftActGrp(*No);
+
+          Dcl-f xmlmsgwebq Usage(*Input) Rename(xmlmsgwebq:rxmlmsgweb);
+          Dcl-f vndvndml00 Usage(*Input) Keyed;
+
+          Dcl-pi testcarcr4;
+             @P_rrn Char(5);
+          End-pi;
+
+     DCreateCarrier    Pr                  ExtPgm('TPSCARCRT')
+     D                            32500a   Varying
+     D                            32500a   Varying
+     D                                3i 0
+
+     D @InDoc          s          32500a   Varying
+     D @OutDoc         s          32500a   Varying
+
+     D Carrier         ds                  likeds(CarrierDS)
+
+     D CarrierDS       ds                  qualified
+     D  DomainName                   10a   varying
+     D  Flag                         10a   varying
+     D  Status                        1a   varying
+     D  PartyID                      30a   varying
+     D  CarrierID                    30a   varying
+     D  CarrierName                  30a   varying
+     D  CarrierType                  30a   varying
+     D  CarrierNumber                30a   varying
+     D  SysconNumber                  5a   varying
+     D  Scac                          5a   varying
+     D  Hazmat                        1a   varying
+     D  HighSecurity                  1a   varying
+     D  CTPAT                        40a   varying
+     D  Addresses                          likeds(AddressesDS)
+     D  CarrierProNumber...
+     D                               30a   varying
+     D  MCNumber                     30a   varying
+     D  DOTNumber                    30a   varying
+     D
+     D AddressesDS     ds                  qualified
+     D  Address                            likeds(AddressDS)
+     D                                     dim(999) inz
+
+     D AddressDS       ds                  qualified
+     D  AddressType                  30a   varying
+     D  Name                         30a   varying
+     D  Address1                     30a   varying
+     D  Address2                     30a   varying
+     D  City                         30a   varying
+     D  State                        30a   varying
+     D  PostalCode                   30a   varying
+     D  PostalPlus4Code...
+     D                               30a   varying
+     D  CountryCode                  30a   varying
+     D  Latitude                     30a   varying
+     D  Longitude                    30a   varying
+     D  PhoneNumber                  30a   varying
+     D  FaxNumber                    30a   varying
+     D  Sites                              likeds(SitesDS)
+
+     D SitesDS         ds                  qualified
+     D  Site                               likeds(SiteDS)
+     D                                     dim(99) inz
+
+     D SiteDS          ds                  qualified
+     D  SiteID                       30a   varying
+     D  SiteCode                     30a   varying
+     D  PaymentInfo                        likeds(PaymentDS)
+
+     D PaymentDS       ds                  qualified
+     D  InvoiceCurrencyCode...
+     D                                3a
+     D  PaymentCurrencyCode...
+     D                                3a
+     D  PaymentTerm                  10a
+
+     D  @SysconNumber  s              5s 0 Inz(*Zeros)
+     D  @Found         s               n   Inz(*Off)
+     D  @Options       s           1024a   Inz(*Blanks)
+     D @CarrierStatus  s              1a   Inz(*Blanks)
+
+          Dcl-s @Rrn    Zoned(5:0) Inz(*Zeros);
+          Dcl-s @Status Int(3:0)   Inz(*Zeros);
+
+          Clear @InDoc;
+          Clear @OutDoc;
+
+          @Rrn = %Uns(@P_rrn);
+          Chain @Rrn rxmlmsgweb;
+b001      If %Found(xmlmsgwebq);
+             @InDoc = %Trim(xmlmsg);
+             CreateCarrier(@InDoc:@OutDoc:@Status);
+e001      EndIf;
+
+          *Inlr = *On;
+          Return;
+

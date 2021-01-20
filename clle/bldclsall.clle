@@ -1,0 +1,9 @@
+             PGM
+
+             SBMJOB     CMD(CALL PGM(BLDPHYCLS) PARM(TPSDTA50)) +
+                          JOB(TPSDTA50) LOGCLPGM(*YES) HOLD(*YES)
+
+ NEXT1:      SBMJOB     CMD(CALL PGM(BLDPHYCLS) PARM(HGI2RL52)) +
+                          JOB(HGI2RL52) LOGCLPGM(*YES) HOLD(*YES)
+
+             ENDPGM

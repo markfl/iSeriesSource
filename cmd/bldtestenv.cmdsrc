@@ -1,0 +1,26 @@
+             CMD        PROMPT('Build Test Environment')
+
+             PARM       KWD(PROGRAM) TYPE(PROGRAM) MIN(1) +
+                          PROMPT('Program name')
+ PROGRAM:    QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(FRMDATALIB) TYPE(*NAME) MIN(1) +
+                          PROMPT('From data library')
+
+             PARM       KWD(FROMFILE) TYPE(FROMFILE) PROMPT('Data +
+                          base source file')
+ FROMFILE:   QUAL       TYPE(*NAME) DFT(QDDSSRC)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(OUTLIB) TYPE(*NAME) DFT(*CURLIB) +
+                          SPCVAL((*CURLIB)) PROMPT('Output library')
+
+             PARM       KWD(PHYONLY) TYPE(*CHAR) LEN(4) RSTD(*YES) +
+                          DFT(*NO) SPCVAL((*YES '1') (*NO '0')) +
+                          PROMPT('Build physical files only')
+

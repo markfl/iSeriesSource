@@ -1,0 +1,420 @@
+      **************************************************************************
+      *                                                                        *
+      *   H U B   G R O U P ,   I N C .                                        *
+      *                                                                        *
+      **************************************************************************
+      *                                                                        *
+      *  Program Title: Purge Files Shared Modules                             *
+      *                                                                        *
+      *  Date Written:  08/28/2015                                             *
+      *                                                                        *
+      *  Input:                                                                *
+      *                                                                        *
+      *  Output:                                                               *
+      *                                                                        *
+      **************************************************************************
+      *            Design                                                      *
+      * Date       Request Mod Pgmr Description                                *
+      * ---------- ------- --- ---- ------------------------------------------ *
+      * 08-28-15   42268       MF   Initial Creation                           *
+      *                                                                        *
+      **************************************************************************
+
+     D/IF DEFINED(ITPSHARE01)
+
+     D               e ds                  ExtName(itppurgep)
+     D               e ds                  ExtName(itppurkey)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE02)
+
+     D CopyData        pr              n
+     D                              256a
+     D                               25a   Const
+     D                               25a   Const
+     D                               +0    Const Like(purkeyfld1)
+     D                               +0    Const Like(purkeyfld2)
+     D                               +0    Const Like(purkeyfld3)
+     D                               +0    Const Like(purkeyfld4)
+     D                               +0    Const Like(purandor2)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purandor3)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purandor4)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purkeycnd1)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purkeycnd2)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purkeycnd3)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purkeycnd4)
+     D                                     Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                               +0    Const Like(purflsize1)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purflsize2)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purflsize3)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purflsize4)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(keykeyfld1)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(keykeyfld2)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(keykeyfld3)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(keykeyfld4)
+     D                                     Options(*NoPass)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE03)
+
+     D DeleteData      pr
+     D                              256a
+     D                               25a   Const
+     D                               +0    Const Like(purkeyfld1)
+     D                               +0    Const Like(purkeyfld2)
+     D                               +0    Const Like(purkeyfld3)
+     D                               +0    Const Like(purkeyfld4)
+     D                               +0    Const Like(purandor2)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purandor3)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purandor4)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purkeycnd1)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purkeycnd2)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purkeycnd3)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purkeycnd4)
+     D                                     Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                                 n   Const Options(*NoPass)
+     D                               +0    Const Like(purflsize1)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purflsize2)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purflsize3)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(purflsize4)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(keykeyfld1)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(keykeyfld2)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(keykeyfld3)
+     D                                     Options(*NoPass)
+     D                               +0    Const Like(keykeyfld4)
+     D                                     Options(*NoPass)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE04)
+
+     D BuildSelect     pr              n
+     D                               25a   Const
+     D                               +0    Const Like(purkeyfld1)
+     D                               +0    Const Like(purkeyfld2)
+     D                               +0    Const Like(purkeyfld3)
+     D                               +0    Const Like(purkeyfld4)
+     D                               +0    Const Like(purandor2)
+     D                               +0    Const Like(purandor3)
+     D                               +0    Const Like(purandor4)
+     D                               +0    Const Like(purkeycnd1)
+     D                               +0    Const Like(purkeycnd2)
+     D                               +0    Const Like(purkeycnd3)
+     D                               +0    Const Like(purkeycnd4)
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                               +0    Const Like(purflsize1)
+     D                               +0    Const Like(purflsize2)
+     D                               +0    Const Like(purflsize3)
+     D                               +0    Const Like(purflsize4)
+     D                               +0    Const Like(keykeyfld1)
+     D                               +0    Const Like(keykeyfld2)
+     D                               +0    Const Like(keykeyfld3)
+     D                               +0    Const Like(keykeyfld4)
+     D                              256a
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE05)
+
+     D BuildWhere...
+     D Clause          pr              n
+     D                               +0    Const Like(purkeyfld1)
+     D                               +0    Const Like(purkeyfld2)
+     D                               +0    Const Like(purkeyfld3)
+     D                               +0    Const Like(purkeyfld4)
+     D                               +0    Const Like(purandor2)
+     D                               +0    Const Like(purandor3)
+     D                               +0    Const Like(purandor4)
+     D                               +0    Const Like(purkeycnd1)
+     D                               +0    Const Like(purkeycnd2)
+     D                               +0    Const Like(purkeycnd3)
+     D                               +0    Const Like(purkeycnd4)
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                                 n   Const
+     D                               +0    Const Like(purflsize1)
+     D                               +0    Const Like(purflsize2)
+     D                               +0    Const Like(purflsize3)
+     D                               +0    Const Like(purflsize4)
+     D                               +0    Const Like(keykeyfld1)
+     D                               +0    Const Like(keykeyfld2)
+     D                               +0    Const Like(keykeyfld3)
+     D                               +0    Const Like(keykeyfld4)
+     D                              256a
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE06)
+
+     D* Purge Master Driver File
+     D @PurgeFile      c                   Const('ITPPURGEP ')
+     D @KeyFile        c                   Const('ITPPURKEY ')
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE07)
+
+     D UpdateStatus    pr                  ExtPgm('ITPSTSSET')
+     D                               +0    Const Like(purfrmfile)
+     D                               +0    Const Like(purgroup)
+     D                               +0    Const Like(purstatus)
+     D                               +0    Const Like(purseq)
+     D                                     Options(*NoPass)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE08)
+
+     DResequence       pr                  ExtPgm('ITPRESEQCL')
+     D                               10a   Const
+     D                               10a   Const
+     D                               10a   Const
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE09)
+
+     DRetrieveObject...
+     DDescription      pr              n
+     D                               10a   Const
+     D                               10a   Options(*NoPass)
+     D                                7a   Options(*NoPass)
+     D                               20a   Options(*NoPass)
+     D                               50a   Options(*NoPass)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE10)
+
+     DRetrieveField...
+     DDescription      pr              n
+     D                               10a   Const
+     D                               10a   Const
+     D                               10a   Const
+     D                                 n
+     D                                1a
+     D                                5p 0
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE11)
+
+     DRtvMsgD          pr            80a
+     D                                7a   Const
+     D                               20a   Const Options(*NoPass)
+     D                               78a   Const Options(*NoPass)
+     D                               10u 0 Const Options(*NoPass)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE12)
+
+     D SndPgmMsg       pr
+     D                                7a   Const
+     D                               20a   Const
+     D                               10a   Const
+     D                            32767a   Const Options(*VarSize)
+     D                               10i 0 Const
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE13)
+
+     D ValidateGroup   pr              n
+     D                               +0    Const Like(purgroup)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE14)
+
+     D RightJustify    pr            +0          Like(keykeyfld1)
+     D                               +0    Const Like(keykeyfld1)
+     D                               +0    Const Like(purflsize1)
+     D                                 n   Const
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE15)
+
+     D@RunCommand      pr                  ExtPgm('QCMDEXC')
+     D                              256a
+     D                               15p 5
+     D  @Command       s            256a   Inz(*Blanks)
+     D  @Length        s             15p 5 Inz(*Zeros)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE16)
+
+     D GetTimeStamp    pr              z
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE17)
+
+     D@FileLibDs       ds
+     D                               10a   Inz('QCPFMSG   ')
+     D                               10a   Inz('QSYS      ')
+
+     D  @MsgId         s              7a   Inz(*Blanks)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE18)
+
+     D@ToLower         pr          3000a   Varying
+     D                             3000a   Varying Const
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE19)
+
+     D  @Libl          s             10a   Inz('*LIBL     ')
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE20)
+
+      * Program Status Data Structure
+     D                sds
+     D QProg             *Proc
+     D QUser                 254    263
+
+     D  @MsgDta        s          32767a   Varying Inz(*Blanks)
+     D  @a             s              3p 0 Inz(*Zeros)
+     D  @Sts           s              1    Dim(7) ctdata perrcd(1) ascend
+     D  @StsDesc       s             30a   Dim(7) Alt(@Sts)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE21)
+
+     D SetStatusFor...
+     D ITPPURGEP       pr
+     D                               +0    Const Like(purgroup)
+     D                               +0    Const Like(purstatus)
+     D                               +0    Const Like(purseq)
+     D                                     Options(*NoPass)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE22)
+
+     D Update...
+     D ITPPURGEP       pr
+     D                               +0    Const Like(purgroup)
+     D                               +0    Const Like(purseq)
+     D                               +0    Const Like(purstatus)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE23)
+
+     D SetStatusFor...
+     D ITPPURKEY       pr
+     D                               +0    Const Like(keygroup)
+     D                               +0    Const Like(keystatus)
+     D                               +0    Const Like(keyseq)
+     D                                     Options(*NoPass)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE24)
+
+     D Update...
+     D ITPPURKEY       pr
+     D                               +0    Const Like(keygroup)
+     D                               +0    Const Like(keyseq)
+     D                               +0    Const Like(keystatus)
+
+     D/ENDIF
+
+     D/IF DEFINED(ITPSHARE25)
+
+     D* 0=Initialization
+     D @InitStatus     s                   Like(purstatus) Inz('0')
+     D* 1=Create Output File Complete
+     D @CreateStatus   s                   Like(purstatus) Inz('1')
+     D* 2=Copy Records Complete
+     D @CopyStatus     s                   Like(purstatus) Inz('2')
+     D* 3=Delete Records Complete
+     D @DeleteRStatus  s                   Like(purstatus) Inz('3')
+     D* 4=Save Output File Complete
+     D @SaveStatus     s                   Like(purstatus) Inz('4')
+     D* 5=Delete Output File Complete
+     D @DeleteFStatus  s                   Like(purstatus) Inz('5')
+     D* 9=Run Complete
+     D @RunStatus      s                   Like(purstatus) Inz('9')
+
+     D/ENDIF
+

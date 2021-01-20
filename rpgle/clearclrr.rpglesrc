@@ -1,0 +1,51 @@
+          Ctl-opt Option(*NoDebugIo) DftActGrp(*No) BndDir('MFLORES');
+
+          Dcl-f qrpglesrc Disk(112) Usage(*Update);
+
+          /define mflores003
+          /copy qcpysrc,mflores
+          /undefine mflores003
+
+          /define RPGSTRUCT01
+          /copy qcpysrc,rpgilestrc
+          /undefine RPGSTRUCT01
+
+          Dcl-s @srcwork  Like(@_srcdta) Inz(*Blanks);
+          Dcl-s @a        Int(10);
+          Dcl-s @b        Int(10);
+
+          Read qrpglesrc @SourceDs;
+b001      Dow Not %Eof(qrpglesrc);
+
+             @srcwork = @ToUpper(@_srcdta);
+
+             @a = %Scan('** ': %Subst(@_srcdta:1:3));
+b002         If @a > *Zeros;
+                Leave;
+e002         EndIf;
+
+             @a = %Scan('DCL-PROC': @srcwork);
+b002         If @a = *Zeros;
+                @a = %Scan('END-PROC': @srcwork);
+e002         EndIf;
+b002         If @a > *Zeros;
+                @b = %Scan(';': @_srcdta);
+                %SubSt(@_srcdta:@a-1:1) = *Blanks;
+                %SubSt(@_srcdta:@b+1:1) = *Blanks;
+e002         EndIf;
+
+b002         If %Subst(@_srcdta:2:1) = *Blanks;
+                %Subst(@_srcdta:1:1) = *Blanks;
+                %Subst(@_srcdta:5:1) = *Blanks;
+x002         Else;
+                %Subst(@_srcdta:5:1) = *Blanks;
+e002         EndIf;
+
+             Update qrpglesrc @SourceDs;
+
+             Read qrpglesrc @SourceDs;
+e001      EndDo;
+
+          *Inlr = *On;
+          Return;
+

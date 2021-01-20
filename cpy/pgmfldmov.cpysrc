@@ -1,0 +1,92 @@
+
+         /IF DEFINED(PGMFLDMOV01)
+
+         Dcl-Ds @DspecDs Len(100);
+            @DSName      Char(15) Pos(1);
+            @DField      Char(15) Pos(17);
+            @DFAtr       Char(8)  Pos(33);
+            @DFrom       Char(5)  Pos(42);
+            @DTo         Char(5)  Pos(48);
+            @DConstValue Char(31) Pos(38);
+            @DKeyWord    Char(47) Pos(54);
+         End-Ds;
+
+         Dcl-Ds @IspecDs Len(100);
+            @IFormatName Char(10) Pos(1);
+            @IField1     Char(15) Pos(12);
+            @IF1Atr      Char(8)  Pos(28);
+            @IField2     Char(15) Pos(37);
+            @IF2Atr      Char(8)  Pos(53);
+            @IConstValue Char(73) Pos(28);
+         End-Ds;
+
+         Dcl-Ds @CspecDs Len(100);
+            @COption   Char(7)  Pos(1);
+            @CField1   Char(15) Pos(10);
+            @CF1Atr    Char(8)  Pos(25);
+            @CField2   Char(15) Pos(34);
+            @CF2Atr    Char(8)  Pos(50);
+            @CResult   Char(15) Pos(59);
+            @CRsAtr    Char(15) Pos(75);
+            @CExtFact2 Char(69) Pos(32);
+            @CExtFact3 Char(46) Pos(55);
+         End-Ds;
+
+         Dcl-Ds @CspecFreeDs Len(100);
+            @CFOption   Char(7)  Pos(1);
+            @CFField1   Char(15) Pos(9);
+            @CFF1Atr    Char(8)  Pos(25);
+            @CFField2   Char(15) Pos(34);
+            @CFF2Atr    Char(8)  Pos(50);
+            @CFResult   Char(15) Pos(59);
+            @CFRsAtr    Char(8)  Pos(75);
+            @CFExtFact2 Char(67) Pos(34);
+            @CFExtFact3 Char(42) Pos(59);
+         End-Ds;
+
+         Dcl-Ds @PspecDs Len(100);
+            @PProcedure  Char(9)  Inz('Procedure') Pos(1);
+            @PFormatName Char(25) Pos(11);
+            @PBeginEnd   Char(1)  Pos(38);
+            @PKeywords   Char(37) Pos(40);
+         End-Ds;
+
+         Dcl-Ds @OspecDs Len(100);
+            @OFieldName  Char(15) Pos(1);
+            @OFAtr       Char(9)  Pos(18);
+            @OEdtCde     Char(1)  Pos(29);
+            @OFEndPos    Char(4)  Pos(32);
+            @OFormat     Char(1)  Pos(38);
+            @OConstValue Char(26) Pos(41);
+         End-Ds;
+
+         /ENDIF
+
+         /IF DEFINED(PGMFLDMOV02)
+
+         Dcl-Ds *N ExtName('QPGMFLDREF') End-Ds;
+
+         Dcl-Pr GetAttributes Ind;
+             char1 Like(program) Const;
+             char1 Like(library) Const;
+             char1 Like(extField);
+             char1 Like(Type);
+             char1 Like(Size);
+             char1 Like(Dec);
+         End-Pr;
+
+         /ENDIF
+
+         /IF DEFINED(PGMFLDMOV03)
+
+         Dcl-Pr SetAttributes Ind;
+             *n Like(extField) Const;
+             *n Like(Type)     Const;
+             *n Like(Size)     Const;
+             *n Like(Dec)      Const;
+             *n Char(15);
+             *n Char(8);
+         End-Pr;
+
+         /ENDIF
+

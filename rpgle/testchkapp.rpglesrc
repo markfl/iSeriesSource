@@ -1,0 +1,254 @@
+     h
+
+     d TESTCHKAPP      pr                  extpgm('TESTCHKAPP')
+     d  @rTestNo                      2a   const
+
+     d TESTCHKAPP      pi
+     d  @rTestNo                      2a   const
+
+     d @rCallIt        pr                  extpgm('TMACHKAPP')
+     d  @rBigAssXml                1000    varying
+
+     d @wXmlString     s           1000    varying
+
+      /free
+
+       select;
+          when @rTestNo = '01';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>09:00</FromApptTime>' +
+                           '<ToApptTime>10:00</ToApptTime>' +
+                           '<AppointmentNo>0</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '02';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>09:00</FromApptTime>' +
+                           '<ToApptTime>11:00</ToApptTime>' +
+                           '<AppointmentNo>0</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '03';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>10:00</FromApptTime>' +
+                           '<ToApptTime>11:00</ToApptTime>' +
+                           '<AppointmentNo>0</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '04';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>12:00</FromApptTime>' +
+                           '<ToApptTime>13:00</ToApptTime>' +
+                           '<AppointmentNo>0</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '05';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>10:00</FromApptTime>' +
+                           '<ToApptTime>13:00</ToApptTime>' +
+                           '<AppointmentNo>0</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '06';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>11:00</FromApptTime>' +
+                           '<ToApptTime>15:00</ToApptTime>' +
+                           '<AppointmentNo>0</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '07';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>13:00</FromApptTime>' +
+                           '<ToApptTime>15:00</ToApptTime>' +
+                           '<AppointmentNo>0</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '11';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>09:00</FromApptTime>' +
+                           '<ToApptTime>10:00</ToApptTime>' +
+                           '<AppointmentNo>8161</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '12';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>09:00</FromApptTime>' +
+                           '<ToApptTime>11:00</ToApptTime>' +
+                           '<AppointmentNo>8161</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '13';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>10:00</FromApptTime>' +
+                           '<ToApptTime>11:00</ToApptTime>' +
+                           '<AppointmentNo>8161</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '14';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>12:00</FromApptTime>' +
+                           '<ToApptTime>13:00</ToApptTime>' +
+                           '<AppointmentNo>8161</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '15';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>10:00</FromApptTime>' +
+                           '<ToApptTime>13:00</ToApptTime>' +
+                           '<AppointmentNo>8161</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '16';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>11:00</FromApptTime>' +
+                           '<ToApptTime>15:00</ToApptTime>' +
+                           '<AppointmentNo>8161</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '17';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>13:00</FromApptTime>' +
+                           '<ToApptTime>15:00</ToApptTime>' +
+                           '<AppointmentNo>8161</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '21';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>09:00</FromApptTime>' +
+                           '<ToApptTime>10:00</ToApptTime>' +
+                           '<AppointmentNo>8220</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '22';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>09:00</FromApptTime>' +
+                           '<ToApptTime>11:00</ToApptTime>' +
+                           '<AppointmentNo>8220</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '23';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>10:00</FromApptTime>' +
+                           '<ToApptTime>11:00</ToApptTime>' +
+                           '<AppointmentNo>8220</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '24';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>12:00</FromApptTime>' +
+                           '<ToApptTime>13:00</ToApptTime>' +
+                           '<AppointmentNo>8220</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '25';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>10:00</FromApptTime>' +
+                           '<ToApptTime>13:00</ToApptTime>' +
+                           '<AppointmentNo>8220</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '26';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>11:00</FromApptTime>' +
+                           '<ToApptTime>15:00</ToApptTime>' +
+                           '<AppointmentNo>8220</AppointmentNo>' +
+                           '</Input>';
+          when @rTestNo = '27';
+             @wXmlString = '<Input>' +
+                           '<LocationId>174594</LocationId>' +
+                           '<AppType>D</AppType>' +
+                           '<Door>01</Door>' +
+                           '<FromApptDate>2012-09-27</FromApptDate>' +
+                           '<ToApptDate>2012-09-27</ToApptDate>' +
+                           '<FromApptTime>13:00</FromApptTime>' +
+                           '<ToApptTime>15:00</ToApptTime>' +
+                           '<AppointmentNo>8220</AppointmentNo>' +
+                           '</Input>';
+       endsl;
+
+       @rCallIt(@wXmlString);
+
+       *inlr = *on;
+
+      /end-free

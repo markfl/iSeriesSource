@@ -1,0 +1,4110 @@
+      //‚*******************************************************************************************
+
+      //‚Author.....: Mark Flores
+      //‚Date.......: 05-Jan-2018
+      //‚Description: API To Get Display File Information
+
+      //‚*******************************************************************************************
+      //‚Change Control Information
+      //‚-------------------------------------------------------------------------------------------
+      //‚Date     Task #  Description of Changes                     Pgmr ID
+      //‚-------- ------- ------------------------------------------ ----------
+      //‚01/05/18         Program Creation                           Flores M
+      //‚*******************************************************************************************
+
+          Ctl-opt NoMain Option(*NoDebugio);
+
+          /define mflores082
+          /copy qcpysrc,mflores
+          /undefine mflores082
+
+          Dcl-Ds FldDtaDs LikeDs(@FieldDataDS) Occurs(1000) Based(p_FldDtaDs);
+
+          Dcl-s  @NumFlds Int(10)   Inz(1);
+          Dcl-s  @FldIdx  Packed(3) Inz(*Zeros);
+          Dcl-s  @Run     Ind       Inz(*Off);
+
+          Dcl-Proc @GetScreenInfo;
+
+          Dcl-pi @GetScreenInfo Ind;
+             @DisplayFileRcd Char(30) Const;
+             FileBase        Pointer;                   // QDFFBASE
+             FileHeader      Pointer Options(*NoPass);  // QDFFINFO
+             RecordWhrUsd    Pointer Options(*NoPass);  // QDFWRCDI
+             FileLvlDvc      Pointer Options(*NoPass);  // QDFFDPDD
+             NameTable       Pointer Options(*NoPass);  // QDFFNTBL
+             CatDspString    Pointer Options(*NoPass);  // QDFFCOSA
+             FormatHeader    Pointer Options(*NoPass);  // QDFARFTE
+             FileWhrUsd      Pointer Options(*NoPass);  // QDFWFLEI
+             IndicatorTable  Pointer Options(*NoPass);  // QDFWITBE
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+dpdd      /define QDFRTVFD005
+rfte      /define QDFRTVFD006
+cosa      /define QDFRTVFD030
+flei      /define QDFRTVFD142
+rcdi      /define QDFRTVFD143
+itbe      /define QDFRTVFD145
+ntbl      /define QDFRTVFD152
+          /define QDFRTVFD153
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+dpdd      /undefine QDFRTVFD005
+rfte      /undefine QDFRTVFD006
+cosa      /undefine QDFRTVFD030
+flei      /undefine QDFRTVFD142
+rcdi      /undefine QDFRTVFD143
+itbe      /undefine QDFRTVFD145
+ntbl      /undefine QDFRTVFD152
+          /undefine QDFRTVFD153
+
+          /define QUSEC01
+          /copy qcpysrc,qusec
+          /undefine QUSEC01
+
+          /define mflores084
+          /define mflores087
+          /copy qcpysrc,mflores
+          /undefine mflores084
+          /undefine mflores087
+
+          Dcl-Ds Ds_QUSEC LikeDs(QUSEC);
+
+          @DisplayFileRcdDs = @DisplayFileRcd;
+
+          RTVDspFd(InlRcvVar:%Size(InlRcvVar):
+                   'DSPF0100': @DisplayFileRcdDs.@DisplayFile:Ds_QusEc);
+
+          p_QDFFBASE = %Alloc(InlRcvVar.BytAvl);
+
+          RTVDspFd(Ds_QDFFBASE:InlRcvVar.BytAvl:
+                   'DSPF0100': @DisplayFileRcdDs.@DisplayFile:Ds_QusEc);
+
+          FileBase = p_QDFFBASE;
+
+b001      If %Parms() >= 3;
+
+             p_QDFFINFO = p_QDFFBASE + Ds_QDFFBASE.QDFFINOF;
+             FileHeader = p_QDFFINFO;
+
+b002         If %Parms() >= 4;
+
+                p_QDFWFLEI   = p_QDFFINFO + Ds_QDFFINFO.QDFFWUOF;
+                p_QDFWRCDI   = p_QDFWFLEI + Ds_QDFWFLEI.QDFWXLEN;
+                RecordWhrUsd = p_QDFWRCDI;
+
+b003            If %Parms() >= 5;
+
+                   p_QDFFDPDD = p_QDFFINFO + Ds_QDFFINFO.QDFFXDOF;
+                   FileLvlDvc = p_QDFFDPDD;
+
+b004               If %Parms() >= 6;
+
+                      p_QDFFNTBL = p_QDFWFLEI + Ds_QDFWFLEI.QDFWNTBO;
+                      NameTable  = p_QDFFNTBL;
+
+b005                  If %Parms() >= 7;
+
+                         p_QDFFCOSA = p_QDFFINFO + Ds_QDFFDPDD.QDFFXDOC;
+                         CatDspString = p_QDFFCOSA;
+
+b006                     If %Parms() >= 8;
+
+                            p_QDFARFTE   = FileHeader + Ds_QDFFINFO.QDFFDFLO;
+                            FormatHeader = p_QDFARFTE;
+
+b007                        If %Parms() >= 9;
+
+                               FileWhrUsd = p_QDFWFLEI;
+
+b008                           If %Parms() >= 10;
+
+                                  p_QDFWITBE     = %Addr(Ds_QDFWFLEI.QDFWINDX);
+                                  IndicatorTable = p_QDFWITBE;
+
+e008                           EndIf;
+e007                        EndIf;
+e006                     EndIf;
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;
+
+          Return *On;
+
+          End-Proc;
+
+          Dcl-Proc @GetRecordFormatTable;
+
+          Dcl-pi @GetRecordFormatTable Ind;
+             @DisplayFileRcd Char(30) Const;
+             DSPFBase     Pointer;                      // QDFFBASE
+             FileHeader   Pointer;                      // QDFFINFO
+             FormatHeader Pointer;                      // QDFARFTE
+             RecordHeader Pointer Options(*NoPass);     // QDFFRINF
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+
+          /define mflores084
+          /copy qcpysrc,mflores
+          /undefine mflores084
+
+          Dcl-s @RcdFmtIndx Int(10) Inz(*Zeros);
+
+          @DisplayFileRcdDs = @DisplayFileRcd;
+
+b001      If @GetScreenInfo(@DisplayFileRcd: p_QDFFBASE: p_QDFFINFO);
+
+              DSPFBase   = p_QDFFBASE;
+              FileHeader = p_QDFFINFO;
+
+              p_QDFARFTE = p_QDFFINFO + Ds_QDFFINFO.QDFFDFLO;
+
+b002          For @RcdFmtIndx = 1 to Ds_QDFFBASE.QDFFFRCS;
+
+b003             If Ds_QDFARFTE.QDFARFNM = @DisplayFileRcdDs.@Format;
+
+                    Leave;
+
+x003             Else;
+
+                    p_QDFARFTE += %Size(Ds_QDFARFTE);
+
+e003             EndIf;
+e002          EndFor;
+
+              FormatHeader = p_QDFARFTE;
+
+b002          If %Parms() >= 5;
+
+                 p_QDFFRINF   = FileHeader + Ds_QDFARFTE.QDFARFOF;
+                 RecordHeader = p_QDFFRINF;
+
+e002         EndIf;
+e001      EndIf;
+
+          Return *On;
+
+          End-Proc;
+
+          Dcl-Proc @GetCurrentRecord;
+
+          Dcl-pi @GetCurrentRecord Ind;
+             @DisplayFileRcd Char(30) Const;
+             DSPFBase        Pointer;                   // QDFFBASE
+             FileHeader      Pointer;                   // QDFFINFO
+             RecordWhrUsd    Pointer;                   // QDFWRCDI
+             FormatHeader    Pointer;                   // QDFARFTE
+             FileLvlDvc      Pointer Options(*NoPass);  // QDFFDPDD
+             NameTable       Pointer Options(*NoPass);  // QDFFNTBL
+             RecordHeader    Pointer Options(*NoPass);  // QDFFRINF
+             RecordLvlDvc    Pointer Options(*NoPass);  // QDFFRDPD
+             CatDspString    Pointer Options(*NoPass);  // QDFFCOSA
+             IndicatorTable  Pointer Options(*NoPass);  // QDFWITBE
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+dpdd      /define QDFRTVFD005
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+rdpd      /define QDFRTVFD009
+cosa      /define QDFRTVFD030
+rcdi      /define QDFRTVFD143
+itbe      /define QDFRTVFD145
+ntbl      /define QDFRTVFD152
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+dpdd      /undefine QDFRTVFD005
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+rdpd      /undefine QDFRTVFD009
+cosa      /undefine QDFRTVFD030
+rcdi      /undefine QDFRTVFD143
+itbe      /undefine QDFRTVFD145
+ntbl      /undefine QDFRTVFD152
+
+          /define mflores084
+          /copy qcpysrc,mflores
+          /undefine mflores084
+
+          Dcl-s @RcdFmtIndx Int(10) Inz(*Zeros);
+          Dcl-s @Return     Ind     Inz(*Off);
+
+          @DisplayFileRcdDs = @DisplayFileRcd;
+
+b001      If @GetScreenInfo(@DisplayFileRcd: p_QDFFBASE: p_QDFFINFO:
+                                             p_QDFWRCDI: p_QDFFDPDD:
+                                             p_QDFFNTBL);
+
+             DSPFBase     = p_QDFFBASE;
+             FileHeader   = p_QDFFINFO;
+
+             p_QDFARFTE = %Addr(Ds_QDFFINFO) + Ds_QDFFINFO.QDFFDFLO;
+
+             //  process record formats
+b002         For @RcdFmtIndx = 1 To Ds_QDFFBASE.QDFFFRCS;
+
+b003            If %Trim(Ds_QDFARFTE.QDFARFNM) = @DisplayFileRcdDs.@Format;
+
+                   //  record header
+                   p_QDFFRINF = %Addr(Ds_QDFFINFO) + Ds_QDFARFTE.QDFARFOF;
+
+                   //  record dev dept
+                   p_QDFFRDPD = p_QDFFRINF + Ds_QDFFRINF.QDFFRAOF;
+
+                   RecordWhrUsd = p_QDFWRCDI;
+                   FormatHeader = p_QDFARFTE;
+                   p_QDFFCOSA   = p_QDFFRINF + Ds_QDFFRDPD.QDFFRDOC;
+                   p_QDFWITBE   = %Addr(Ds_QDFWRCDI.QDFWINDR);
+
+b004               If %Parms() >= 6;
+
+                      FileLvlDvc = p_QDFFDPDD;
+
+b005                  If %Parms() >= 7;
+
+                         NameTable = p_QDFFNTBL;
+
+b006                     If %Parms() >= 8;
+
+                            RecordHeader = p_QDFFRINF;
+
+b007                        If %Parms() >= 9;
+
+                               RecordLvlDvc = p_QDFFRDPD;
+
+b008                           If %Parms() >= 10;
+
+                                  CatDspString = p_QDFFCOSA;
+
+b009                              If %Parms() >= 11;
+
+                                     IndicatorTable = p_QDFWITBE;
+
+e009                              EndIf;
+e008                           EndIf;
+e007                        EndIf;
+e006                     EndIf;
+e005                  EndIf;
+e004               EndIf;
+
+                   @Return = *On;
+
+                   Leave;
+
+e003            EndIf;
+
+                //  record format
+                p_QDFARFTE += %Size(Ds_QDFARFTE);
+
+                p_QDFWRCDI += Ds_QDFWRCDI.QDFWNXTR;
+
+e002         EndFor;
+e001      EndIf;
+
+          Return @Return;
+
+          End-Proc;
+
+          Dcl-Proc @CheckForSubfileControl;
+
+          Dcl-pi @CheckForSubfileControl Ind;
+             @DisplayFileRcd Char(30) Const;
+             DSPFBase     Pointer Options(*NoPass);     // QDFFBASE
+             RecordHeader Pointer Options(*NoPass);     // QDFFRINF
+             SFLCtlRecord Pointer Options(*NoPass);     // QDFFSFCR
+             SFLCtlEntry  Pointer Options(*NoPass);     // QDFFSFHR
+             RecordLvlDvc Pointer Options(*NoPass);     // QDFFRDPD
+             CatDspString Pointer Options(*NoPass);     // QDFFCOSA
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+rdpd      /define QDFRTVFD009
+sfcr      /define QDFRTVFD011
+sfhr      /define QDFRTVFD015
+cosa      /define QDFRTVFD030
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+rdpd      /undefine QDFRTVFD009
+sfcr      /undefine QDFRTVFD011
+sfhr      /undefine QDFRTVFD015
+cosa      /undefine QDFRTVFD030
+
+          /define mflores103
+          /copy qcpysrc,mflores
+          /undefine mflores103
+
+          Dcl-s @RcdFmtIndx Int(10) Inz(*Zeros);
+          Dcl-s @Return     Ind     Inz(*Off);
+
+b001      If @GetRecordFormatTable(@DisplayFileRcd:
+                                   p_QDFFBASE: p_QDFFINFO:
+                                   p_QDFARFTE: p_QDFFRINF);
+
+b002         If %Parms() >= 2;
+
+                DSPFBase     = p_QDFFBASE;
+
+b003            If %Parms() >= 3;
+
+                   RecordHeader = p_QDFFRINF;
+
+e003            EndIf;
+e002         EndIf;
+
+b002         If @RcdFmtIndx <= Ds_QDFFBASE.QDFFFRCS;
+
+b003            If %BitAnd(%Subst(Ds_QDFFRINF.QDFBITS09 :1 :1) :SFLCtlDsp) =
+                       SFLCtlDsp;
+
+                   @Return = *On;
+
+b004               If %Parms() >= 4;
+
+                      p_QDFFSFCR   = %Addr(Ds_QDFFRINF) + Ds_QDFFRINF.QDFFRAOF;
+
+                      SFLCtlRecord = p_QDFFSFCR;
+
+b005                  If %Parms() >= 5;
+
+                         p_QDFFSFHR  = %Addr(Ds_QDFFSFCR.QDFFSFPM);
+                         SFLCtlEntry = p_QDFFSFHR;
+
+b006                     If %Parms() >= 6;
+
+                            p_QDFFRDPD   = %Addr(Ds_QDFFSFCR.QDFFSFLG);
+                            RecordLvlDvc = p_QDFFRDPD;
+
+b007                        If %Parms() >= 7;
+
+                               p_QDFFCOSA = %Addr(Ds_QDFFRINF)
+                                          + Ds_QDFFRDPD.QDFFRDOC;
+                               CatDspString = p_QDFFCOSA;
+
+e007                        EndIf;
+e006                     EndIf;
+e005                  EndIf;
+e004               EndIf;
+e003            EndIf;
+e002         EndIf;
+e001      Endif;
+
+b001      If %Parms() = 1;
+
+             Dealloc p_QDFFBASE;
+
+e001      Endif;
+
+          Return @Return;
+
+          End-Proc;
+
+          Dcl-Proc @CheckForWindow Export;
+
+          Dcl-pi @CheckForWindow Ind;
+             @DisplayFileRcd Char(30) Const;
+             @Default        Char(4);
+             @StartLine      Int(10);
+             @StartPosition  Int(10);
+             @WindowLine     Int(10);
+             @WindowPosition Int(10);
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+dpdd      /define QDFRTVFD005
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+rdpd      /define QDFRTVFD009
+cosa      /define QDFRTVFD030
+ccoa      /define QDFRTVFD031
+mrpr      /define QDFRTVFD064
+mrwp      /define QDFRTVFD065
+linu      /define QDFRTVFD077
+wdta      /define QDFRTVFD078
+rcdi      /define QDFRTVFD143
+ntbl      /define QDFRTVFD152
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+dpdd      /undefine QDFRTVFD005
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+rdpd      /undefine QDFRTVFD009
+cosa      /undefine QDFRTVFD030
+ccoa      /undefine QDFRTVFD031
+mrpr      /undefine QDFRTVFD064
+mrwp      /undefine QDFRTVFD065
+linu      /undefine QDFRTVFD077
+wdta      /undefine QDFRTVFD078
+rcdi      /undefine QDFRTVFD143
+ntbl      /undefine QDFRTVFD152
+
+          Dcl-s @SizeIndx Int(10) Inz(*Zeros);
+          Dcl-s @KeyWIndx Int(10) Inz(*Zeros);
+
+b001      If @GetCurrentRecord(@DisplayFileRcd:
+                               p_QDFFBASE: p_QDFFINFO: p_QDFWRCDI:
+                               p_QDFARFTE: p_QDFFDPDD: p_QDFFNTBL:
+                               p_QDFFRINF: p_QDFFRDPD: p_QDFFCOSA);
+
+             TestBit(%SubSt(Ds_QDFFRDPD.QDFBITS15:2:1));
+
+b002         If *In03;
+
+                p_QDFFCCOA = %Addr(Ds_QDFFCOSA.QDFFCCOS);
+
+b003            For @SizeIndx = 1 To Ds_QDFFCOSA.QDFFFCCT;
+
+                   p_QDFKMRPR = p_QDFFRINF + Ds_QDFFCCOA.QDFFCAOF;
+
+b004               For @KeyWIndx = 1 To Ds_QDFKMRPR.QDFFKRPS;
+
+                      p_QDFKMRWP = %Addr(Ds_QDFKMRPR.QDFKRPKW);
+b005                  If Ds_QDFKMRWP.QDFKMPID = x'08';
+
+                         p_QDFKWDTA = %Addr(Ds_QDFKMRWP.QDFKMPEX);
+
+                         TestBit(%SubSt(Ds_QDFKWDTA.QDFBITS35:1:1));
+
+b006                     If *In08;
+
+                            @Default        = '*DFT';
+                            @StartLine      = *Zeros;
+                            @StartPosition  = *Zeros;
+                            @WindowLine     = Ds_QDFKWDTA.QDFKLINW00;
+                            @WindowPosition = Ds_QDFKWDTA.QDFKPOSW00;
+
+x006                     Else;
+
+                            Clear @Default;
+                            @StartLine      = Ds_QDFKWDTA.QDFFKLIN00;
+                            @StartPosition  = Ds_QDFKWDTA.QDFFKPOS00;
+                            @WindowLine     = Ds_QDFKWDTA.QDFKLINW00;
+                            @WindowPosition = Ds_QDFKWDTA.QDFKPOSW00;
+
+e006                     EndIf;
+e005                  EndIf;
+e004               EndFor;
+e003            EndFor;
+
+                Return *On;
+
+e002         EndIf;
+e001      EndIf;
+
+          Return *Off;
+
+          End-Proc;
+
+          Dcl-Proc @GetScreenSize Export;
+
+          Dcl-pi @GetScreenSize Ind;
+             @DisplayFileRcd Char(30) Const;
+             @ReturnValuesDs Like(@ReturnValueDs);
+          End-pi;
+
+base      /define QDFRTVFD001
+scra      /define QDFRTVFD002
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+scra      /undefine QDFRTVFD002
+
+          /define mflores080
+          /copy qcpysrc,mflores
+          /undefine mflores080
+
+          Dcl-s @SizeIdx Int(10) Inz(*Zeros);
+          Dcl-s @Return  Ind     Inz(*Off);
+
+b001      If @GetScreenInfo(@DisplayFileRcd: p_QDFFBASE);
+
+             p_QDFFSCRA = %Addr(Ds_QDFFBASE.QDFFSCRS);
+
+b002         For @SizeIdx = 1 To Ds_QDFFBASE.QDFFFSCR;
+
+                // *DS3 = X'03'   *DS4  = X'04'
+b003            If Ds_QDFFSCRA.QDFFSCIA = x'03';
+
+                   @Return = *On;
+b004               If @ReturnValue1 = *Blanks;
+
+                      @Dimension1 = '24 80';
+                      @Size1      = '*DS3';
+
+x004               Else;
+
+                      @Dimension2 = '24 80';
+                      @Size2      = '*DS3';
+
+e004               EndIf;
+
+x003            ElseIf Ds_QDFFSCRA.QDFFSCIA = x'04';
+
+                   @Return = *On;
+b004               If @ReturnValue1 = *Blanks;
+
+                      @Dimension1 = '27 132';
+                      @Size1      = '*DS4';
+
+x004               Else;
+
+                      @Dimension2 = '27 132';
+                      @Size2      = '*DS4';
+
+e004               EndIf;
+e003            EndIf;
+
+                p_QDFFSCRA += %Size(Ds_QDFFSCRA);
+
+e002         EndFor;
+
+             @ReturnValuesDs = @ReturnValueDs;
+
+             Dealloc p_QDFFBASE;
+
+e001      EndIf;
+
+          Return @Return;
+
+          End-Proc;
+
+          Dcl-Proc @GetFileLevelIndicators Export;
+
+          Dcl-pi @GetFileLevelIndicators Ind;
+             @DisplayFileRcd Char(30) Const;
+             @ReturnValue    Char(99);
+             @ReturnValueOff Int(5) Dim(99);
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+dpdd      /define QDFRTVFD005
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+rdpd      /define QDFRTVFD009
+xrdp      /define QDFRTVFD010
+ntb       /define QDFRTVFD019
+fitb      /define QDFRTVFD021
+finf      /define QDFRTVFD022
+fnam      /define QDFRTVFD024
+fdpd      /define QDFRTVFD025
+fdic      /define QDFRTVFD026
+cosa      /define QDFRTVFD030
+ccoa      /define QDFRTVFD031
+sasa      /define QDFRTVFD092
+sapm      /define QDFRTVFD093
+flei      /define QDFRTVFD142
+rcdi      /define QDFRTVFD143
+fldi      /define QDFRTVFD144
+itbe      /define QDFRTVFD145
+atyp      /define QDFRTVFD149
+rstr      /define QDFRTVFD151
+ntbl      /define QDFRTVFD152
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+dpdd      /undefine QDFRTVFD005
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+rdpd      /undefine QDFRTVFD009
+xrdp      /undefine QDFRTVFD010
+ntb       /undefine QDFRTVFD019
+fitb      /undefine QDFRTVFD021
+finf      /undefine QDFRTVFD022
+fnam      /undefine QDFRTVFD024
+fdpd      /undefine QDFRTVFD025
+fdic      /undefine QDFRTVFD026
+cosa      /undefine QDFRTVFD030
+ccoa      /undefine QDFRTVFD031
+sasa      /undefine QDFRTVFD092
+sapm      /undefine QDFRTVFD093
+flei      /undefine QDFRTVFD142
+rcdi      /undefine QDFRTVFD143
+fldi      /undefine QDFRTVFD144
+itbe      /undefine QDFRTVFD145
+atyp      /undefine QDFRTVFD149
+rstr      /undefine QDFRTVFD151
+ntbl      /undefine QDFRTVFD152
+
+          /define indds02b
+          /define indds02_AllInd
+          /define indds02c
+          /copy qcpysrc,indds
+          /undefine indds02b
+          /undefine indds02_AllInd
+          /undefine indds02c
+
+          /define mflores104
+          /copy qcpysrc,mflores
+          /undefine mflores104
+
+     D                 Ds
+     D  @Dec                          4b 0
+     D  @Char                  2      2a
+
+          Dcl-s @Return      Ind       Inz(*Off);
+          Dcl-s @IndIdx      Int(10)   Inz(*Zeros);
+          Dcl-s @Ind#        Int(10)   Inz(*Zeros);
+          Dcl-s @AtrIdx      Int(10)   Inz(*Zeros);
+          Dcl-s @FAtrIdx     Int(10)   Inz(*Zeros);
+          Dcl-s @ReturnField Char(10)  Inz(*Blanks) Dim(1000);
+          Dcl-s @ReturnAttr  Char(1)   Inz(*Blanks) Dim(1000);
+          Dcl-s @ReturnLen   Packed(5) Inz(*Blanks) Dim(1000);
+
+b001      If @GetCurrentRecord(@DisplayFileRcd:
+                               p_QDFFBASE: p_QDFFINFO: p_QDFWRCDI:
+                               p_QDFARFTE: p_QDFFDPDD: p_QDFFNTBL:
+                               p_QDFFRINF: p_QDFFRDPD: p_QDFFCOSA:
+                               p_QDFWITBE);
+
+             p_QDFWFLDI = p_QDFWRCDI + Ds_QDFWRCDI.QDFWRLEN;
+
+             @AllInd_01_99   = *Off;
+             @ReturnValueOff = *Zeros;
+
+             p_QDFWATYP = p_QDFWRCDI + Ds_QDFWITBE.QDFWITXT;
+             p_QDFWRSTR = %Addr(Ds_QDFWATYP.QDFWAPRM);
+
+b002         For @IndIdx = 1 To Ds_QDFWRCDI.QDFFWRIN;
+
+b003            Monitor;
+                   @Dec      = *Zeros;
+                   @Char     = Ds_QDFWITBE.QDFWINBR;
+                   *In(@Dec) = *On;
+                   @ReturnValueOff(@Dec) = Ds_QDFWRSTR.QDFWRFEI;
+x003            On-Error;
+e003            EndMon;
+
+                p_QDFWATYP += Ds_QDFWATYP.QDFWALEN;
+                p_QDFWRSTR =  %Addr(Ds_QDFWATYP.QDFWAPRM);
+
+                p_QDFWITBE += %Size(Ds_QDFWITBE);
+
+e002         EndFor;
+
+             p_QDFFFITB = p_QDFFRINF + Ds_QDFFRINF.QDFFOFIT;
+             p_QDFFXRDP = p_QDFFRINF + Ds_QDFFRDPD.QDFFXRDO;
+             p_QDFFNTB  = %Addr(Ds_QDFFNTBL.QDFFNMES) +
+                        + 10 * (Ds_QDFWFLDI.QDFWNMEI - 1);
+
+b002         For @IndIdx = 1 To Ds_QDFFRINF.QDFFFFLD;
+
+                p_QDFFFINF = p_QDFFRINF + Ds_QDFFFITB.QDFFFOFS;
+                @ReturnAttr(@IndIdx) = SetIO(Ds_QDFFFINF.QDFFFIOA);
+
+                p_QDFFFNAM = %Addr(Ds_QDFFFINF.QDFFFTBE);
+                p_QDFFFDPD = p_QDFFFINF + Ds_QDFFFNAM.QDFFFAOF;
+                p_QDFFCOSA = %Addr(Ds_QDFFFINF) + Ds_QDFFFDPD.QDFFFDOC;
+                p_QDFFCCOA = %Addr(Ds_QDFFCOSA.QDFFCCOS);
+
+b003            For @AtrIdx = 1 To Ds_QDFFCOSA.QDFFFCCT;
+b004               If Ds_QDFFCCOA.QDFFCAID = Category20;
+                      p_QDFKSASA =  p_QDFFFINF + Ds_QDFFCCOA.QDFFCAOF;
+                      p_QDFKSAPM =  %Addr(Ds_QDFKSASA.QDFKSASE);
+b005                  For @FAtrIdx = 1 To Ds_QDFKSASA.QDFFKSAS;
+                         p_QDFKSAPM += %Size(Ds_QDFKSAPM);
+e005                  EndFor;
+e004               EndIf;
+                   p_QDFFCCOA += %Size(Ds_QDFFCCOA);
+e003            EndFor;
+
+b003            If @ReturnAttr(@IndIdx) = 'B'
+                Or @ReturnAttr(@IndIdx) = 'I';
+                   p_QDFFFDIC = %Addr(Ds_QDFFFDPD.QDFFFICE);
+e003            EndIf;
+
+                @ReturnField(@IndIdx) = Ds_QDFFNTB.QDFFFNAM;
+                @ReturnLen(@IndIdx)   = Ds_QDFFFNAM.QDFFPLEN;
+
+                p_QDFFNTB  += %Size(Ds_QDFFNTB);
+                p_QDFFFITB += %Size(Ds_QDFFFITB);
+
+e002         EndFor;
+
+             @ReturnValue = @AllInd_01_99;
+
+             Dealloc p_QDFFBASE;
+
+e001      EndIf;
+
+          Return @Return;
+
+          End-Proc;
+
+          Dcl-Proc @GetSubfileSize Export;
+
+          Dcl-pi @GetSubfileSize Ind;
+             @DisplayFileRcd Char(30) Const;
+             @ReturnValue    Int(10)  Dim(2);
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+sfcr      /define QDFRTVFD011
+sfhr      /define QDFRTVFD015
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+sfcr      /undefine QDFRTVFD011
+sfhr      /undefine QDFRTVFD015
+
+          Dcl-s @Return Ind Inz(*Off);
+
+b001      If @CheckForSubfileControl(@DisplayFileRcd:
+                                     p_QDFFBASE: p_QDFFRINF:
+                                     p_QDFFSFCR: p_QDFFSFHR);
+
+             @ReturnValue(1) = Ds_QDFFSFHR.QDFFSFSZ;
+
+b002         If Ds_QDFFBASE.QDFFFSCR > 1;
+
+                p_QDFFSFHR += %Size(Ds_QDFFSFHR);
+
+                @ReturnValue(2) = Ds_QDFFSFHR.QDFFSFSZ;
+
+e002         Endif;
+
+             @Return = *On;
+
+             Dealloc p_QDFFBASE;
+
+x001      Else;
+
+             @ReturnValue = -1;
+
+             @Return      = *Off;
+
+e001      Endif;
+
+          Return @Return;
+
+          End-Proc;
+
+          Dcl-Proc @GetSubfilePage Export;
+
+          Dcl-pi @GetSubfilePage Ind;
+             @DisplayFileRcd Char(30) Const;
+             @ReturnValue    Int(10)  Dim(2);
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+sfcr      /define QDFRTVFD011
+sfhr      /define QDFRTVFD015
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+sfcr      /undefine QDFRTVFD011
+sfhr      /undefine QDFRTVFD015
+
+          Dcl-s @Return Ind Inz(*Off);
+
+b001      If @CheckForSubfileControl(@DisplayFileRcd:
+                                     p_QDFFBASE: p_QDFFRINF:
+                                     p_QDFFSFCR: p_QDFFSFHR);
+
+             @ReturnValue(1) = Ds_QDFFSFHR.QDFFSFPG;
+
+b002         If Ds_QDFFBASE.QDFFFSCR > 1;
+
+                p_QDFFSFHR += %Size(Ds_QDFFSFHR);
+
+                @ReturnValue(2) = Ds_QDFFSFHR.QDFFSFPG;
+
+e002         Endif;
+
+             @Return = *On;
+
+             Dealloc p_QDFFBASE;
+
+x001      Else;
+
+             @ReturnValue = -1;
+             @Return      = *Off;
+
+e001      Endif;
+
+          Return @Return;
+
+          End-Proc;
+
+          Dcl-Proc @GetSubfileDrop Export;
+
+          Dcl-pi @GetSubfileDrop Ind;
+             @DisplayFileRcd Char(30) Const;
+             @ReturnValueDs  LikeDs(@SFLDROPReturnDs);
+          End-pi;
+
+base      /define QDFRTVFD001
+rinf      /define QDFRTVFD008
+sfcr      /define QDFRTVFD011
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+rinf      /undefine QDFRTVFD008
+sfcr      /undefine QDFRTVFD011
+
+          /define mflores081
+          /define mflores100
+          /copy qcpysrc,mflores
+          /undefine mflores081
+          /undefine mflores100
+
+b001      If @CheckForSubfileControl(@DisplayFileRcd:
+                                     p_QDFFBASE: p_QDFFRINF:
+                                     p_QDFFSFCR);
+
+b002         If Ds_QDFFSFCR.QDFFSFDR <> X'00';
+
+b003            Select;
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command01a;
+
+                      @ReturnValueDs.@CMDKey = 'CA01';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command02b;
+
+                      @ReturnValueDs.@CMDKey = 'CA02';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command03c;
+
+                      @ReturnValueDs.@CMDKey = 'CA03';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command04d;
+
+                      @ReturnValueDs.@CMDKey = 'CA04';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command05e;
+
+                      @ReturnValueDs.@CMDKey = 'CA05';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command06f;
+
+                      @ReturnValueDs.@CMDKey = 'CA06';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command07g;
+
+                      @ReturnValueDs.@CMDKey = 'CA07';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command08h;
+
+                      @ReturnValueDs.@CMDKey = 'CA08';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command09i;
+
+                      @ReturnValueDs.@CMDKey = 'CA09';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command10j;
+
+                      @ReturnValueDs.@CMDKey = 'CA10';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command11k;
+
+                      @ReturnValueDs.@CMDKey = 'CA11';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command12l;
+
+                      @ReturnValueDs.@CMDKey = 'CA12';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command13c;
+
+                      @ReturnValueDs.@CMDKey = 'CA13';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command14;
+
+                      @ReturnValueDs.@CMDKey = 'CA14';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command15;
+
+                      @ReturnValueDs.@CMDKey = 'CA15';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command16 ;
+
+                      @ReturnValueDs.@CMDKey = 'CA16';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command17 ;
+
+                      @ReturnValueDs.@CMDKey = 'CA17';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command18 ;
+
+                      @ReturnValueDs.@CMDKey = 'CA18';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command19 ;
+
+                      @ReturnValueDs.@CMDKey = 'CA19';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command20 ;
+
+                      @ReturnValueDs.@CMDKey = 'CA20';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command21 ;
+
+                      @ReturnValueDs.@CMDKey = 'CA21';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command22 ;
+
+                      @ReturnValueDs.@CMDKey = 'CA22';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command23 ;
+
+                      @ReturnValueDs.@CMDKey = 'CA23';
+
+x003               When Ds_QDFFSFCR.QDFFSFDR = @Command24 ;
+
+                      @ReturnValueDs.@CMDKey = 'CA24';
+
+x003               Other;
+
+                      @ReturnValueDs = Ds_QDFFSFCR.QDFFSFDR;
+
+e003            EndSl;
+
+e002         EndIf;
+
+             Dealloc p_QDFFBASE;
+
+x001      Else;
+
+             @ReturnValueDs.@CMDKey = '-001';
+
+e001      Endif;
+
+b001      If  @ReturnValueDs.@CMDKey <> *Blanks
+          And @ReturnValueDs.@CMDKey <> '-001';
+
+             Return *On;
+
+x001      Else;
+
+             Return *Off;
+
+e001      Endif;
+
+          End-Proc;
+
+          Dcl-Proc @GetSubfileSFLEnd Export;
+
+          Dcl-pi @GetSubfileSFLEnd Ind;
+             @DisplayFileRcd Char(30) Const;
+             @ReturnValue    Char(20) Dim(16);
+             @ReturnSize     Int(10)  Dim(16);
+             @ReturnOffset   Int(10)  Dim(16);
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+sfcr      /define QDFRTVFD011
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+sfcr      /undefine QDFRTVFD011
+
+          Dcl-s @a          Packed(3) Inz(*Zeros);
+          Dcl-s @SaveSFLCHC Packed(3) Inz(*Zeros);
+          Dcl-s @Return     Ind       Inz(*Off);
+
+          Clear @ReturnSize;
+
+b001      If @CheckForSubfileControl(@DisplayFileRcd:
+                                     p_QDFFBASE: p_QDFFRINF:
+                                     p_QDFFSFCR);
+
+             TestBit(Ds_QDFFSFCR.QDFBITS19);
+
+b002         If *In01;
+                @a += 1;
+                @ReturnValue(@a) = 'SFLSNGCHC';
+                @ReturnSize(@a)  = *Zeros;
+                @SaveSFLCHC      = @a;
+                @Return          = *On;
+e002         EndIf;
+
+b002         If *In02;
+                @a += 1;
+                @ReturnValue(@a) = 'SFLMLTCHC';
+                @ReturnSize(@a)  = *Zeros;
+                @SaveSFLCHC      = @a;
+                @Return          = *On;
+e002         EndIf;
+
+b002         If *In03;
+                @ReturnValue(@a) = %Trim(@ReturnValue(@a)) + '(*RSTCSR)';
+                @ReturnSize(@a)  = *Zeros;
+                @Return          = *On;
+e002         EndIf;
+
+b002         If *In04;
+                @ReturnValue(@a) = %Trim(@ReturnValue(@a)) + '(*SLTIND)';
+                @ReturnSize(@a)  = *Zeros;
+                @Return          = *On;
+e002         EndIf;
+
+b002         If *In05;
+                @ReturnValue(@a) = %Trim(@ReturnValue(@a)) + '(*AUTOSLT)';
+                @ReturnSize(@a)  = *Zeros;
+                @Return          = *On;
+e002         EndIf;
+
+b002         If *In06;
+             // @a += 1;
+             // @ReturnValue(@a) = 'SFLEND(*SCRBAR)';
+             // @ReturnSize(@a)  = *Zeros;
+             // @Return          = *On;
+e002         EndIf;
+
+b002         If *In07;
+                @a += 1;
+                @ReturnValue(@a) = 'SFLRTNSEL';
+                @ReturnSize(@a)  = *Zeros;
+                @Return          = *On;
+e002         EndIf;
+
+b002         If *In08;
+                @a += 1;
+                @ReturnValue(@a) = 'SFLSCROLL';
+                @ReturnSize(@a)  = *Zeros;
+                @Return          = *On;
+e002         EndIf;
+
+             TestBit(Ds_QDFFSFCR.QDFBITS20);
+             Reset @a;
+
+b002         If *In01;
+                @a += 1;
+                @ReturnValue(@a) = 'SFLRNA';
+                @ReturnSize(@a)  = *Zeros;
+                @Return          = *On;
+e002         EndIf;
+
+b002         If *In02;
+                @a += 1;
+                @ReturnValue(@a)  = 'SFLRCDNBR(CURSOR)';
+                @ReturnSize(@a)   = Ds_QDFFSFCR.QDFFFSFL01;
+                @ReturnOffSet(@a) = Ds_QDFFSFCR.QDFFFSFO;
+                @Return           = *On;
+e002         EndIf;
+
+b002         If *In03;
+             // @a += 1;
+             // @ReturnValue(@a) = 'DSPMOD';
+             // @ReturnSize(@a)  = *Zeros;
+             // @Return          = *On;
+e002         EndIf;
+
+b002         If *In06;
+             // @a += 1;
+             // @ReturnValue(@a) = 'SFLEND(*MORE)';
+             // @ReturnSize(@a)  = *Zeros;
+             // @Return          = *On;
+e002         EndIf;
+
+b002         If *In07;
+                @a += 1;
+                @ReturnValue(@a) = 'SFLRCDNBR(*TOP)';
+                @ReturnSize(@a)  = *Zeros;
+                @Return          = *On;
+e002         EndIf;
+
+b002         If *In08;
+                @ReturnValue(@SaveSFLCHC) =
+                %Trim(@ReturnValue(@SaveSFLCHC)) + '(*AUTOSLTENH)';
+                @ReturnSize(@a)  = *Zeros;
+                @Return          = *On;
+e002         Endif;
+
+             Dealloc p_QDFFBASE;
+
+e001      Endif;
+
+          Return @Return;
+
+          End-Proc;
+
+          Dcl-Proc @GetSubfileCSRRRN Export;
+
+          Dcl-pi @GetSubfileCSRRRN Ind;
+             @DisplayFileRcd Char(30) Const;
+             @ReturnValue    Char(20) Dim(16);
+             @ReturnOffset   Int(10)  Dim(16);
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+rdpd      /define QDFRTVFD009
+sfcr      /define QDFRTVFD011
+sfhr      /define QDFRTVFD015
+cosa      /define QDFRTVFD030
+ccoa      /define QDFRTVFD031
+scsf      /define QDFRTVFD084
+sccp      /define QDFRTVFD085
+sflm      /define QDFRTVFD088
+sfls      /define QDFRTVFD089
+rrrn      /define QDFRTVFD090
+mode      /define QDFRTVFD091
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+rdpd      /undefine QDFRTVFD009
+sfcr      /undefine QDFRTVFD011
+sfhr      /undefine QDFRTVFD015
+cosa      /undefine QDFRTVFD030
+ccoa      /undefine QDFRTVFD031
+scsf      /undefine QDFRTVFD084
+sccp      /undefine QDFRTVFD085
+sflm      /undefine QDFRTVFD088
+sfls      /undefine QDFRTVFD089
+rrrn      /undefine QDFRTVFD090
+mode      /undefine QDFRTVFD091
+
+          /define indds02b
+          /define indds02_AllInd
+          /define indds02c
+          /copy qcpysrc,indds
+          /undefine indds02b
+          /undefine indds02_AllInd
+          /undefine indds02c
+
+          Dcl-s @SizeIndx    Int(10) Inz(*Zeros);
+          Dcl-s @KeyWordIndx Int(10) Inz(*Zeros);
+          Dcl-s @a           Int(10) Inz(*Zeros);
+          Dcl-s @b           Int(10) Inz(*Zeros);
+
+b001      If @CheckForSubfileControl(@DisplayFileRcd:
+                                     p_QDFFBASE: p_QDFFRINF:
+                                     p_QDFFSFCR:  p_QDFFSFHR:
+                                     p_QDFFRDPD:  p_QDFFCOSA);
+
+b002         If Ds_QDFFRDPD.QDFFRDOC > *Zeros;
+
+                TestBit(%SubSt(Ds_QDFFRINF.QDFBITS09:1:1));
+                TestBit(%SubSt(Ds_QDFFRINF.QDFBITS09:2:1));
+                TestBit(%SubSt(Ds_QDFFRINF.QDFBITS09:3:1));
+
+b003            If *In02;
+
+                   @a += 1;
+                   @ReturnValue(@a) = 'RTNCSRLOC';
+
+e003            EndIf;
+
+                TestBit(%SubSt(Ds_QDFFRINF.QDFBITS09:4:1));
+
+                p_QDFFCCOA = %Addr(Ds_QDFFCOSA.QDFFCCOS);
+
+b003            For @SizeIndx = 1 To Ds_QDFFCOSA.QDFFFCCT;
+
+                   p_QDFKSCSF = p_QDFFRINF + Ds_QDFFCCOA.QDFFCAOF;
+
+b004               Select;
+
+x004                  When Ds_QDFFCCOA.QDFFCAID  = x'18';
+
+                         p_QDFKSCCP = %Addr(Ds_QDFKSCSF.QDFKSCSE);
+
+b005                     For @KeyWordIndx = 1 To Ds_QDFKSCSF.QDFFKSCS;
+
+                            @AllInd_01_99 = *Off;
+
+b006                        Select;
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'01';
+
+                                  *In01 = *On;
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'02';
+
+                                  *In02 = *On;
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'03';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'SFLINZ';
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'04';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'SFLDLT';
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'05';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'SFLCLR';
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'06';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'SFLEND';
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'07';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'SFLNXTCHG';
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'08';
+
+                                  *In03 = *On;
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'09';
+
+                                  *In04 = *On;
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'10';
+
+                                  p_QDFSRRRN =
+                                  %Addr(Ds_QDFKSCCP.QDFKSCEX);
+
+                                  @a += 1;
+                                  @ReturnValue(@a)  = 'SFLCSRRRN';
+
+                                  @ReturnOffset(@a) =
+                                  Ds_QDFSRRRN.QDFCSRNO + 1;
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'11';
+
+                                  p_QDFKMODE =
+                                  %Addr(Ds_QDFKSCCP.QDFKSCEX);
+
+                                  @a += 1;
+                                  @ReturnValue(@a)  = 'SFLMODE';
+
+                                  @ReturnOffset(@a) =
+                                  Ds_QDFKMODE.QDFSCMDO + 1;
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'12';
+
+                                  p_QDFKSFLS =
+                                  %Addr(Ds_QDFKSCCP.QDFKSCEX);
+
+                                  @a += 1;
+b007                              If     Ds_QDFKSFLS.QDFNDSPM = x'00';
+
+                                     @ReturnValue(@a) = 'SFLEND(*SCRBAR)';
+
+x007                              ElseIf Ds_QDFKSFLS.QDFNDSPM = x'01';
+
+                                     @ReturnValue(@a) =
+                                     'SFLEND(*SCRBAR *MORE)';
+
+x007                              ElseIf Ds_QDFKSFLS.QDFNDSPM = x'02';
+
+                                     @ReturnValue(@a) =
+                                     'SFLEND(*SCRBAR *PLUS)';
+
+e007                              EndIf;
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'0D';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'SFLMSG';
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'0E';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'SFLMSGID';
+
+x006                           When Ds_QDFKSCCP.QDFKSCID = x'0F';
+
+                                  p_QDFKSFLM =
+                                  %Addr(Ds_QDFKSCCP.QDFKSCEX);
+
+                                  @a += 1;
+
+                                  @b = %Scan('More.':
+                                       Ds_QDFKSFLM.QDFKMORE);
+
+b007                              If @b = *Zeros;
+                                     @ReturnValue(@a) = 'SFLEND';
+x007                              Else;
+                                     @ReturnValue(@a) = 'SFLEND(*MORE)';
+e007                              EndIf;
+
+x008                           Other;
+
+                                  p_QDFSRRRN =
+                                  %Addr(Ds_QDFKSCCP.QDFKSCEX);
+
+                                  p_QDFKMODE =
+                                  %Addr(Ds_QDFKSCCP.QDFKSCEX);
+
+                                  p_QDFKSFLS =
+                                  %Addr(Ds_QDFKSCCP.QDFKSCEX);
+
+                                  p_QDFKSFLM =
+                                  %Addr(Ds_QDFKSCCP.QDFKSCEX);
+
+e006                        EndSl;
+
+                            p_QDFKSCCP +=
+                                     %Size(Ds_QDFKSCCP) * @KeyWordIndx;
+
+e005                     EndFor;
+
+x004                  When Ds_QDFFCCOA.QDFFCAID  = x'20';
+                         @a += 1;
+                         @ReturnValue(@a) = 'Cat 20 Found';
+                         @a += 1;
+                         @ReturnValue(@a) = %Trim(Ds_QDFARFTE.QDFARFNM);
+e004               EndSl;
+
+                   p_QDFFCCOA += %Size(Ds_QDFFCCOA);
+
+e003            EndFor;
+e002         EndIf;
+
+             Dealloc p_QDFFBASE;
+
+e001      Endif;
+
+b001      If @a > *Zeros;
+             Return *On;
+x001      Else;
+             Return *Off;
+e001      Endif;
+
+          End-Proc;
+
+          Dcl-Proc @GetRecordLevelCmdKeys Export;
+
+          Dcl-pi @GetRecordLevelCmdKeys Ind;
+             @DisplayFileRcd Char(30) Const;
+             @ReturnValue    Char(99);
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+dpdd      /define QDFRTVFD005
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+rdpd      /define QDFRTVFD009
+flei      /define QDFRTVFD142
+rcdi      /define QDFRTVFD143
+ntbl      /define QDFRTVFD152
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+dpdd      /undefine QDFRTVFD005
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+rdpd      /undefine QDFRTVFD009
+flei      /undefine QDFRTVFD142
+rcdi      /undefine QDFRTVFD143
+ntbl      /undefine QDFRTVFD152
+
+          /define indds02b
+          /define indds02_AllInd
+          /define indds02c
+          /copy qcpysrc,indds
+          /undefine indds02b
+          /undefine indds02_AllInd
+          /undefine indds02c
+
+          Dcl-s @a        Int(10) Inz(*Zeros);
+          Dcl-s @CheckBit Char(1) Inz(*Blanks);
+
+          Clear @ReturnValue;
+
+b001      If @GetCurrentRecord(@DisplayFileRcd:
+                               p_QDFFBASE: p_QDFFINFO: p_QDFWRCDI:
+                               p_QDFARFTE: p_QDFFDPDD: p_QDFFNTBL:
+                               p_QDFFRINF: p_QDFFRDPD);
+
+                @AllInd_01_99 = *Off;
+
+                @CheckBit = Ds_QDFFRDPD.QDFBITS10;
+
+     C                   Testb     '0'           @CheckBit                01
+     C                   Testb     '1'           @CheckBit                02
+     C                   Testb     '2'           @CheckBit                03
+     C                   Testb     '3'           @CheckBit                04
+     C                   Testb     '4'           @CheckBit                05
+     C                   Testb     '5'           @CheckBit                06
+     C                   Testb     '6'           @CheckBit                07
+     C                   Testb     '7'           @CheckBit                08
+
+                @CheckBit = Ds_QDFFRDPD.QDFBITS11;
+
+     C                   Testb     '0'           @CheckBit                09
+     C                   Testb     '1'           @CheckBit                10
+     C                   Testb     '2'           @CheckBit                11
+     C                   Testb     '3'           @CheckBit                12
+     C                   Testb     '4'           @CheckBit                13
+     C                   Testb     '5'           @CheckBit                14
+     C                   Testb     '6'           @CheckBit                15
+     C                   Testb     '7'           @CheckBit                16
+
+                @CheckBit = Ds_QDFFRDPD.QDFBITS12;
+
+     C                   Testb     '0'           @CheckBit                17
+     C                   Testb     '1'           @CheckBit                18
+     C                   Testb     '2'           @CheckBit                19
+     C                   Testb     '3'           @CheckBit                20
+     C                   Testb     '4'           @CheckBit                21
+     C                   Testb     '5'           @CheckBit                22
+     C                   Testb     '6'           @CheckBit                23
+     C                   Testb     '7'           @CheckBit                24
+
+                @CheckBit = Ds_QDFFDPDD.QDFBITS06;
+
+     C                   Testb     '7'           @CheckBit                31
+     C                   Testb     '6'           @CheckBit                32
+     C                   Testb     '5'           @CheckBit                33
+     C                   Testb     '4'           @CheckBit                34
+     C                   Testb     '3'           @CheckBit                35
+     C                   Testb     '2'           @CheckBit                36
+     C                   Testb     '1'           @CheckBit                37
+     C                   Testb     '0'           @CheckBit                38
+
+                @CheckBit = Ds_QDFFDPDD.QDFBITS05;
+
+     C                   Testb     '7'           @CheckBit                39
+     C                   Testb     '6'           @CheckBit                40
+     C                   Testb     '5'           @CheckBit                41
+     C                   Testb     '4'           @CheckBit                42
+     C                   Testb     '3'           @CheckBit                43
+     C                   Testb     '2'           @CheckBit                44
+     C                   Testb     '1'           @CheckBit                45
+     C                   Testb     '0'           @CheckBit                46
+
+                @CheckBit = Ds_QDFFDPDD.QDFBITS04;
+
+     C                   Testb     '7'           @CheckBit                47
+     C                   Testb     '6'           @CheckBit                48
+     C                   Testb     '5'           @CheckBit                49
+     C                   Testb     '4'           @CheckBit                50
+     C                   Testb     '3'           @CheckBit                51
+     C                   Testb     '2'           @CheckBit                52
+     C                   Testb     '1'           @CheckBit                53
+     C                   Testb     '0'           @CheckBit                54
+
+                @CheckBit = Ds_QDFFDPDD.QDFBITS07;
+
+     C                   Testb     '0'           @CheckBit                71
+     C                   Testb     '1'           @CheckBit                72
+     C                   Testb     '2'           @CheckBit                73
+     C                   Testb     '3'           @CheckBit                74
+     C                   Testb     '4'           @CheckBit                75
+     C                   Testb     '5'           @CheckBit                76
+     C                   Testb     '6'           @CheckBit                77
+     C                   Testb     '7'           @CheckBit                78
+
+                @ReturnValue = @AllInd_01_99;
+
+             Dealloc p_QDFFBASE;
+
+e001     EndIf;
+
+          @a = %Scan('1':@ReturnValue);
+b001      If @a > *Zeros;
+             Return *On;
+x001      Else;
+             Return *Off;
+e001      EndIf;
+
+          End-Proc;
+
+          Dcl-Proc @GetSpecialKeys Export;
+
+          Dcl-pi @GetSpecialKeys Ind;
+             @DisplayFileRcd Char(30) Const;
+             @CommandKey     Char(8)  Const;
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+dpdd      /define QDFRTVFD005
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+rdpd      /define QDFRTVFD009
+flei      /define QDFRTVFD142
+rcdi      /define QDFRTVFD143
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+dpdd      /undefine QDFRTVFD005
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+rdpd      /undefine QDFRTVFD009
+flei      /undefine QDFRTVFD142
+rcdi      /undefine QDFRTVFD143
+
+          /define mflores101
+          /copy qcpysrc,mflores
+          /undefine mflores101
+
+b001      If @GetCurrentRecord(@DisplayFileRcd:
+                               p_QDFFBASE: p_QDFFINFO: p_QDFWRCDI:
+                               p_QDFWRCDI: p_QDFARFTE: p_QDFFDPDD:
+                               p_QDFFRINF: p_QDFFRDPD);
+
+             TestBit(Ds_QDFFRDPD.QDFBITS13);
+
+b002         Select;
+
+x002            When @CommandKey = @RollUp;
+
+                   Return *In01;
+
+x002            When @CommandKey = @RollDown;
+
+                   Return *In02;
+
+x002            When @CommandKey = @Print;
+
+                   Return *In03;
+
+x002            When @CommandKey = @Home;
+
+                   Return *In04;
+
+x002            When @CommandKey = @Clear;
+
+                   Return *In05;
+
+x002            When @CommandKey = @Help;
+
+                   Return *In06;
+
+e002         EndSl;
+
+             Dealloc p_QDFFBASE;
+
+e001      EndIf;
+
+          Return *Off;
+
+          End-Proc;
+
+          Dcl-Proc @GetRecordCommandKeys Export;
+
+          Dcl-pi @GetRecordCommandKeys Ind;
+             @DisplayFileRcd Char(30) Const;
+             @ReturnValue    Char(10) Dim(30);
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+dpdd      /define QDFRTVFD005
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+rdpd      /define QDFRTVFD009
+cosa      /define QDFRTVFD030
+ccoa      /define QDFRTVFD031
+filk      /define QDFRTVFD032
+flpm      /define QDFRTVFD033
+flpp      /define QDFRTVFD034
+ckkw      /define QDFRTVFD045
+ckke      /define QDFRTVFD046
+msk1      /define QDFRTVFD055
+msk2      /define QDFRTVFD056
+msk3      /define QDFRTVFD057
+scln      /define QDFRTVFD058
+rcdi      /define QDFRTVFD143
+msrl      /define QDFRTVFD052
+msap      /define QDFRTVFD053
+mscp      /define QDFRTVFD054
+ntbl      /define QDFRTVFD152
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+dpdd      /undefine QDFRTVFD005
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+rdpd      /undefine QDFRTVFD009
+cosa      /undefine QDFRTVFD030
+ccoa      /undefine QDFRTVFD031
+filk      /undefine QDFRTVFD032
+flpm      /undefine QDFRTVFD033
+flpp      /undefine QDFRTVFD034
+ckkw      /undefine QDFRTVFD045
+ckke      /undefine QDFRTVFD046
+msk1      /undefine QDFRTVFD055
+msk2      /undefine QDFRTVFD056
+msk3      /undefine QDFRTVFD057
+scln      /undefine QDFRTVFD058
+rcdi      /undefine QDFRTVFD143
+msrl      /undefine QDFRTVFD052
+msap      /undefine QDFRTVFD053
+mscp      /undefine QDFRTVFD054
+ntbl      /undefine QDFRTVFD152
+          /copy qcpysrc,qdfrtvfd
+
+          /define mflores102
+          /define mflores104
+          /copy qcpysrc,mflores
+          /undefine mflores102
+          /undefine mflores104
+
+          /define indds02b
+          /define indds02_AllInd
+          /define indds02c
+          /copy qcpysrc,indds
+          /undefine indds02b
+          /undefine indds02_AllInd
+          /undefine indds02c
+
+          Dcl-s @CatIndx  Int(10)   Inz(*Zeros);
+          Dcl-s @KeywIdx  Int(10)   Inz(*Zeros);
+          Dcl-s @ParmIdx  Int(10)   Inz(*Zeros);
+          Dcl-s @CatDpIdx Int(10)   Inz(*Zeros);
+          Dcl-s @EntIdx   Int(10)   Inz(*Zeros);
+          Dcl-s @KeyMWIdx Int(10)   Inz(*Zeros);
+          Dcl-s @a        Packed(3) Inz(*Zeros);
+          Dcl-s @b        Packed(3) Inz(*Zeros);
+          Dcl-s @Return   Ind       Inz(*Off);
+
+b001      If @GetCurrentRecord(@DisplayFileRcd:
+                               p_QDFFBASE: p_QDFFINFO: p_QDFWRCDI:
+                               p_QDFARFTE: p_QDFFDPDD: p_QDFFNTBL:
+                               p_QDFFRINF: p_QDFFRDPD);
+
+b002         If Ds_QDFFDPDD.QDFFXDOC > *Zeros;
+
+                p_QDFFCOSA = p_QDFFINFO + Ds_QDFFDPDD.QDFFXDOC;
+
+                p_QDFFCCOA  = %Addr(Ds_QDFFCOSA.QDFFCCOS);
+
+b003            For @CatIndx = 1 To Ds_QDFFCOSA.QDFFFCCT;
+
+b004               If Ds_QDFFCCOA.QDFFCAID  = Category01;
+
+                      p_QDFKFILK = p_QDFFINFO + Ds_QDFFCCOA.QDFFCAOF;
+                      p_QDFKFLPM  = %Addr(Ds_QDFKFILK.QDFKFILE);
+
+b005                  For @KeywIdx = 1 to Ds_QDFKFILK.QDFFKFIL;
+
+                         p_QDFKFLPP = %Addr(Ds_QDFKFLPM.QDFKFLEX);
+
+b006                     For @ParmIdx = 1 To Ds_QDFKFLPM.QDFFKFLP;
+
+                            @AllInd_01_99 = *Off;
+
+b007                        Select;
+
+x007                           When Ds_QDFKFLPM.QDFKFLID = x'01';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'PASSRCD';
+                                  @Return = *On;
+
+x007                           When Ds_QDFKFLPM.QDFKFLID = x'02';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'MSGLOC';
+                                  @Return = *On;
+
+x007                           When Ds_QDFKFLPM.QDFKFLID = x'03';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'PRINT';
+                                  @Return = *On;
+
+x007                           When Ds_QDFKFLPM.QDFKFLID = x'04';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'IGCCNV';
+                                  @Return = *On;
+
+x007                           When Ds_QDFKFLPM.QDFKFLID = x'05';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'HLPRCD';
+                                  @Return = *On;
+
+x007                           When Ds_QDFKFLPM.QDFKFLID = x'06';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'HLPRCDGRP';
+                                  @Return = *On;
+
+x007                           When Ds_QDFKFLPM.QDFKFLID = x'07';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'HLPDOC';
+                                  @Return = *On;
+
+x007                           When Ds_QDFKFLPM.QDFKFLID = x'08';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'HLPSCHIDX';
+                                  @Return = *On;
+
+x007                           When Ds_QDFKFLPM.QDFKFLID = x'08';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'HLPTITLE';
+                                  @Return = *On;
+
+x007                           When Ds_QDFKFLPM.QDFKFLID = x'0A';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'ALTNAME';
+                                  @Return = *On;
+
+x007                           When Ds_QDFKFLPM.QDFKFLID = x'0B';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'ERRSFL';
+                                  @Return = *On;
+
+x007                           When Ds_QDFKFLPM.QDFKFLID = x'0C';
+
+                                  @a += 1;
+                                  @ReturnValue(@a) = 'WDWBORDER';
+                                  @Return = *On;
+
+e007                        EndSl;
+
+                            p_QDFKFLPP = p_QDFKFLPP + (Ds_QDFKFLPP.QDFKFLLN);
+
+e006                     EndFor;
+
+                         p_QDFKFLPM += %Size(Ds_QDFKFLPM);
+
+e005                  EndFor;
+e004               EndIf;
+
+                   p_QDFFCCOA += %Size(Ds_QDFFCCOA);
+
+e003            EndFor;
+e002         EndIf;
+
+b002         If Ds_QDFFRDPD.QDFFRDOC > *Zeros;
+
+                p_QDFFCOSA = p_QDFFRINF + Ds_QDFFRDPD.QDFFRDOC;
+                p_QDFFCCOA = %Addr(Ds_QDFFCOSA.QDFFCCOS);
+                p_QDFKFILK = p_QDFFINFO + Ds_QDFFCCOA.QDFFCAOF;
+                p_QDFKFLPM = %Addr(Ds_QDFKFILK.QDFKFILE);
+
+b003            For @CatDpIdx = 1 To Ds_QDFFCOSA.QDFFFCCT;
+
+
+                   // Miscellaneous record-level keywords (uses (QDFKMSAP))
+                   // no structures for  IDs X'01', X'02', X'03',
+                   // X'04', X'05', X'06', X'07',
+                   // ID  Keyword ID  Keyword
+                   // X'01'   LOCK    X'09'   RMVWDW
+                   // X'02'   ALARM   X'0F'   DSPMOD
+                   // X'03'   BLINK   X'10'   CSRLOC
+                   // X'04'   LOGOUT  X'11'   INDARA
+                   // X'05'   ALWGPH  X'13'   SETOFF
+                   // X'06'   MSGALARM    X'15'   RTNCSRLOC
+                   // X'07'   RETLCKSTS   X'16'   MNUBARDSP
+                   // X'08'   USRRSTDSP
+
+b004               If Ds_QDFFCCOA.QDFFCAID  = Category04;
+
+                      p_QDFKMSRL = p_QDFFRINF + Ds_QDFFCCOA.QDFFCAOF;
+
+                      p_QDFKMSAP = %Addr(Ds_QDFKMSRL.QDFKMSKW);
+
+b005                  For @KeyMWIdx = 1 To Ds_QDFKMSRL.QDFFKMSS;
+
+b006                     If Ds_QDFKMSAP.QDFKMSAD =  x'0F'
+                         Or Ds_QDFKMSAP.QDFKMSAD =  x'10'
+                         Or Ds_QDFKMSAP.QDFKMSAD =  x'11'
+                         Or Ds_QDFKMSAP.QDFKMSAD =  x'13';
+
+                            p_QDFKMSCP = p_QDFFRINF + Ds_QDFFRINF.QDFFINDO;
+
+e006                     EndIf;
+
+b006                     Select;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'01';
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'LOCK';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'02';
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'ALARM';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'03';
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'BLINK';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'04';
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'LOGOUT';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'05';
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'ALWGPH';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'06';
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'MSGALARM';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'07';
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'RETLCKSTS';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'08';
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'USRRSTDSP';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'09';
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'RMVWDW';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'10';
+
+                               p_QDFKMSK1 = %Addr(Ds_QDFKMSCP.QDFKMSEX);
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'CSRLOC';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'11';
+
+                               p_QDFKMSK2 = %Addr(Ds_QDFKMSCP.QDFKMSEX);
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'INDARA';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'13';
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'SETOFF';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'15';
+
+                               p_QDFMSCLN = %Addr(Ds_QDFKMSCP.QDFKMSEX);
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'RTNCSRLOC';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'16';
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'MNUBARDSP';
+                               @Return = *On;
+
+x006                        When Ds_QDFKMSAP.QDFKMSAD =  x'0F';
+
+                               p_QDFKMSK3 = %Addr(Ds_QDFKMSCP.QDFKMSEX);
+
+                               @a += 1;
+                               @ReturnValue(@a) = 'DSPMOD';
+                               @Return = *On;
+
+e006                     EndSl;
+
+                         p_QDFKMSAP += %Size(Ds_QDFKMSAP);
+
+e005                  EndFor;
+e004               EndIf;
+
+                   // Command Key Keyword Structure (QDFKCKKW)  (uses (QDFKCKKE))
+                   // Use structure QDFKCKKE for category 2 keyword IDs X'01' through X'25'
+                   // ID  Keyword ID  Keyword ID  Keyword
+                   // X'01'   CA/CF01 X'0E'   CA/CF14 X'1A'   ROLLDOWN
+                   //
+                   // X'03'   CA/CF03 X'10'   CA/CF16 X'1C'   HOME
+                   // X'04'   CA/CF04 X'11'   CA/CF17 X'1D'   CLEAR
+                   // X'05'   CA/CF05 X'12'   CA/CF18 X'1E'   HELP
+                   // X'06'   CA/CF06 X'13'   CA/CF19 X'20'   HLPRTN
+                   // X'07'   CA/CF07 X'14'   CA/CF20 X'21'   VLDCMDKEY
+                   // X'08'   CA/CF08 X'15'   CA/CF21 X'22'   ALTHELP
+                   // X'09'   CA/CF09 X'16'   CA/CF22 X'23'   ALTPAGEUP
+                   // X'0A'   CA/CF10 X'17'   CA/CF23 X'24'   ALTPAGEDWN
+                   // X'0B'   CA/CF11 X'18'   CA/CF24 X'25'   MNUBARSW
+                   // X'0C'   CA/CF12 X'19'   ROLLUP  X'30'   MNUCNL
+                   // X'0D'   CA/CF13
+                   p_QDFKCKKW = p_QDFFRINF + Ds_QDFFCCOA.QDFFCAOF;
+
+b004               For @EntIdx = 1 to Ds_QDFKCKKW.QDFFKCKS;
+
+b005                  If @EntIdx = 1;
+                         p_QDFKCKKE = %Addr(Ds_QDFKCKKW.QDFKCKCM);
+x005                  Else;
+                         p_QDFKCKKE += %Size(Ds_QDFKCKKE);
+e005                  EndIf;
+
+                      @AllInd_01_99 = *Off;
+
+                      TestBit(%SubSt(Ds_QDFKCKKE.QDFKCKMA:1:1));
+                      TestBit(%SubSt(Ds_QDFKCKKE.QDFKCKMA:2:1));
+                      TestBit(%SubSt(Ds_QDFKCKKE.QDFKCKMA:3:1));
+
+                      @AllInd_01_99 = *Off;
+
+b005                  Select;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'80000000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA01';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'40000000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA02';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'20000000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA03';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'10000000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA04';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'08000000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA05';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'04000000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA06';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'02000000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA07';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'01000000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA08';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00800000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA09';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                                 = X'00400000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA10';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00200000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA11';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00100000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA12';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00080000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA13';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00040000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA14';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00020000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA15';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00010000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA16';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00008000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA17';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00004000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA18';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00002000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA19';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00001000';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA20';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00000800';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA21';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00000400';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA22';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00000200';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA23';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00000100';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CA24';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00000080';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'ROLLUP';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00000040';
+
+                            @b = %LookUp('ROLLDOWN': @ReturnValue);
+                            If @b = *Zeros;
+                               @a += 1;
+                               @ReturnValue(@a) = 'ROLLDOWN';
+                               @Return = *On;
+                            EndIf;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00080020';
+
+                           @a += 1;
+                           @ReturnValue(@a) = 'PRINT';
+                           @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00000010';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'HOME';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00000008';
+
+                            @a += 1;
+                            @ReturnValue(@a) = 'CLEAR';
+                            @Return = *On;
+
+x005                     When %SubSt(Ds_QDFKCKKE.QDFKCKMA:1:3)
+                              = X'00000004';
+
+                             @a += 1;
+                             @ReturnValue(@a) = 'HELP';
+                             @Return = *On;
+
+e005                  EndSl;
+
+b005                  If Ds_QDFFDPDD.QDFFXDOC > *Zeros;
+
+                         p_QDFKFLPP = %Addr(Ds_QDFKFLPM.QDFKFLEX);
+
+b006                  // For @ParmIdx = 1 to Ds_QDFKFLPM.QDFFKFLP;
+
+                            // this is unfinished
+                         // p_QDFKFLPP += (Ds_QDFKFLPP.QDFKFLLN);
+
+e006                  // EndFor;
+e005                  EndIf;
+e004               EndFor;
+
+                   p_QDFFCCOA += %Size(Ds_QDFFCCOA);
+
+e003            EndFor;
+e002         EndIf;
+
+             Dealloc p_QDFFBASE;
+
+e001      EndIf;
+
+          Return @Return;
+
+          End-Proc;
+
+          Dcl-Proc @GetFieldNamesAndConstants Export;
+
+          Dcl-pi @GetFieldNamesAndConstants Ind;
+             @DisplayFileRcd Char(30) Const;
+             @Field#         Int(10);
+             @FldDtaDs       Like(FldDtaDs);
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+dpdd      /define QDFRTVFD005
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+cosa      /define QDFRTVFD030
+flpm      /define QDFRTVFD033
+flei      /define QDFRTVFD142
+rcdi      /define QDFRTVFD143
+ntbl      /define QDFRTVFD152
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+dpdd      /undefine QDFRTVFD005
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+cosa      /undefine QDFRTVFD030
+flpm      /undefine QDFRTVFD033
+flei      /undefine QDFRTVFD142
+rcdi      /undefine QDFRTVFD143
+ntbl      /undefine QDFRTVFD152
+
+          /copy qcpysrc,qdfrtvfd
+
+          /define mflores084
+          /define mflores102
+          /copy qcpysrc,mflores
+          /undefine mflores084
+          /undefine mflores102
+
+          Dcl-s @RcdFmtIndx Int(10) Inz(*Zeros);
+
+     D*QDFK_DATTIMFmat  DS                  Based  (p_QDFK_DATTIMFmat) qualified
+     D*WDFK_DATTIM             1      2B 0
+
+     D*QDFK_DATTIM_Sep  DS                  Based  (p_QDFK_DATTIM_Sep ) qualified
+     D*WDFK_DATTIMSep          1      1A
+
+     D*QDFK_DATEP      DS                  Based  (p_QDFK_DATEP) qualified
+      // 0   BIT(1)  WDFK_DATE_SYS   If on, the *SYS parameter is specified on th
+      // 1   BIT(1)  WDFK_DATE_YY    If on, the *YY parameter is specified on the
+      // 2   BIT(1)  WDFK_DATE_EDTCDEY   If on, the EDTCDE(Y) keyword was specifi
+     D*WDFK_DATE               1      1A
+
+      // Length of this structure is
+      //  is WDFK_MAPVAL_C * WDFK_MAPVAL_L
+      //     p_QDFK_MAPVAL = %ADDR(QDFKMFDP.WDFKMFEX)
+      //   Number of MAPVAL keyword parameters.
+      //   Length of each MAPVAL keyword parameter.
+      //   MAPVAL parameter
+     D*QDFK_MAPVAL     DS                  Based  (p_QDFK_MAPVAL) qualified
+     D*WDFK_MAPVAL_C           1      2B 0
+     D*WDFK_MAPVAL_L           3      4B 0
+     D*WDFK_MAPVAL             1      1A
+
+          @DisplayFileRcdDs = @DisplayFileRcd;
+
+          @DisplayFileRcdDs = @DisplayFileRcd;
+
+b001      If @GetScreenInfo(@DisplayFileRcd: p_QDFFBASE: p_QDFFINFO:
+                                             p_QDFWRCDI: p_QDFFDPDD:
+                                             p_QDFFNTBL);
+
+             p_FldDtaDs = %Addr(@FldDtaDs);
+
+             Reset @NumFlds;
+             Reset @FldIdx;
+             Reset @Run;
+             %Occur(FldDtaDs) = @NumFlds;
+
+             @Process_File_Keywords(Ds_QDFFINFO: Ds_QDFFDPDD: p_QDFKFLPM);
+
+             // record format
+             p_QDFARFTE = p_QDFFINFO + Ds_QDFFINFO.QDFFDFLO;
+
+             //  process record formats
+b002         For @RcdFmtIndx = 1 To Ds_QDFFBASE.QDFFFRCS;
+
+b003            If %Subst(Ds_QDFARFTE.QDFARFNM:1:1) <> '*';
+
+                    @Process_Record_Format(@DisplayFileRcd:
+                                           Ds_QDFFBASE: Ds_QDFFINFO:
+                                           Ds_QDFFDPDD: Ds_QDFARFTE:
+                                           Ds_QDFKFLPM: Ds_QDFWRCDI:
+                                           Ds_QDFFNTBL);
+
+e003            EndIf;
+
+                // record format
+                p_QDFARFTE = p_QDFFINFO + Ds_QDFFINFO.QDFFDFLO
+                           + (%Size(Ds_QDFARFTE) * @RcdFmtIndx);
+
+                p_QDFWRCDI = p_QDFWRCDI + Ds_QDFWRCDI.QDFWNXTR;
+
+e002         EndFor;
+
+b002         If @NumFlds > *Zeros;
+                %Occur(FldDtaDs) = 1;
+                @Field#          = @NumFlds;
+e002         EndIf;
+
+             Dealloc p_QDFFBASE;
+
+e001      EndIf;
+
+b001      If @NumFlds > *Zeros;
+             %Occur(FldDtaDs) = 1;
+             @Field#          = @NumFlds;
+             Return *On;
+x001      Else;
+             Return *Off;
+e001      EndIf;
+
+          End-Proc;
+
+          Dcl-Proc @Process_Record_Format;
+
+          Dcl-pi @Process_Record_Format;
+             @DisplayFileRcd Char(30) Const;
+             DSPFBase     LikeDs(QDFFBASE);
+             FileHeader   LikeDs(QDFFINFO);
+             FileLvlDvc   LikeDs(QDFFDPDD);
+             RecordFormat LikeDs(QDFARFTE);
+             FileLvlKeyWd LikeDs(QDFKFLPM);
+             RecordWhrUsd LikeDs(QDFWRCDI);
+             NameTable    LikeDs(QDFFNTBL);
+          End-pi;
+
+base      /define QDFRTVFD001
+info      /define QDFRTVFD004
+dpdd      /define QDFRTVFD005
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+rdpd      /define QDFRTVFD009
+sfcr      /define QDFRTVFD011
+flpm      /define QDFRTVFD033
+rcdi      /define QDFRTVFD143
+ntbl      /define QDFRTVFD152
+          /copy qcpysrc,qdfrtvfd
+base      /undefine QDFRTVFD001
+info      /undefine QDFRTVFD004
+dpdd      /undefine QDFRTVFD005
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+rdpd      /undefine QDFRTVFD009
+sfcr      /undefine QDFRTVFD011
+flpm      /undefine QDFRTVFD033
+rcdi      /undefine QDFRTVFD143
+ntbl      /undefine QDFRTVFD152
+
+          /define mflores103
+          /copy qcpysrc,mflores
+          /undefine mflores103
+
+          Dcl-s @SubFileControl Ind Inz(*Off);
+
+          //  record header
+          p_QDFFRINF  = %Addr(FileHeader) + RecordFormat.QDFARFOF;
+
+b001      If @CheckForSubfileControl(@DisplayFileRcd);
+
+             @SubFileControl = *On;
+
+e001      EndIf;
+
+          //  record dev dept
+          p_QDFFRDPD  = p_QDFFRINF + Ds_QDFFRINF.QDFFRAOF;
+
+          //  Record Keywords
+          @Process_Record_Keywords(FileLvlDvc:  Ds_QDFFRINF:
+                                   Ds_QDFFRDPD: FileLvlKeyWd);
+
+          @Process_Record_Field(RecordFormat: Ds_QDFFRINF: Ds_QDFFRDPD:
+                                RecordWhrUsd: NameTable);
+
+          End-Proc;
+
+          Dcl-Proc @Process_Record_Field;
+
+          Dcl-pi @Process_Record_Field;
+             RecordFormat LikeDs(QDFARFTE);
+             RecordHeader LikeDs(QDFFRINF);
+             RecordLvlDvc LikeDs(QDFFRDPD);
+             RecordWhrUsd LikeDs(QDFWRCDI);
+             NameTable    LikeDs(QDFFNTBL);
+          End-pi;
+
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+rdpd      /define QDFRTVFD009
+fitb      /define QDFRTVFD021
+finf      /define QDFRTVFD022
+fdpd      /define QDFRTVFD025
+rcdi      /define QDFRTVFD143
+fldi      /define QDFRTVFD144
+ntbl      /define QDFRTVFD152
+          /copy qcpysrc,qdfrtvfd
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+rdpd      /undefine QDFRTVFD009
+fitb      /undefine QDFRTVFD021
+finf      /undefine QDFRTVFD022
+fdpd      /undefine QDFRTVFD025
+rcdi      /undefine QDFRTVFD143
+fldi      /undefine QDFRTVFD144
+ntbl      /undefine QDFRTVFD152
+
+          Dcl-s @FldIndx Int(10) Inz(*Zeros);
+
+          // Field Where Used
+          p_QDFWFLDI = %Addr(RecordWhrUsd) + RecordWhrUsd.QDFWRLEN;
+          p_QDFFFITB = %Addr(RecordHeader) + RecordHeader.QDFFOFIT;
+
+b001      For @FldIndx = 1 To RecordHeader.QDFFFFLD;
+
+             @Get_Field_Information(RecordFormat: RecordHeader: NameTable:
+                                    Ds_QDFFFITB:  RecordLvlDvc: Ds_QDFWFLDI:
+                                    p_QDFFFINF:   p_QDFFFDPD);
+
+             @Process_Field_Keywords(Ds_QDFFFINF: Ds_QDFFFDPD);
+
+             p_QDFWFLDI = p_QDFWFLDI + Ds_QDFWFLDI.QDFWFLDL;
+
+             // Field Indexing Table (QDFFFITB) for next Field
+             p_QDFFFITB += %Size(Ds_QDFFFITB);
+
+             Reset @FldIdx;
+             Reset @Run;
+             @NumFlds += 1;
+             %Occur(FldDtaDs) = @NumFlds;
+
+             Clear FldDtaDs.@FmtNam;
+             Clear FldDtaDs.@FldNam;
+             Clear FldDtaDs.@FldDTUS;
+             Clear FldDtaDs.@FldEdt;
+             Clear FldDtaDs.@FldLen;
+             Clear FldDtaDs.@FldPlen;
+             Clear FldDtaDs.@FldIBuf;
+             Clear FldDtaDs.@FldOBuf;
+             Clear FldDtaDs.@FldDec;
+             Clear FldDtaDs.@FldAtr;
+             Clear FldDtaDs.@FldRow;
+             Clear FldDtaDs.@FldCol;
+             Clear FldDtaDs.@FldSpcKeys;
+             Clear FldDtaDs.@FldCom;
+
+e001      EndFor;
+
+          End-Proc;
+
+          Dcl-Proc @Process_File_Keywords;
+
+          Dcl-pi @Process_File_Keywords;
+             FileHeader  LikeDs(QDFFINFO);
+             FileLvlDvc  LikeDs(QDFFDPDD);
+             FileLvlKeyW Pointer;                       // QDFKFLPM
+          End-pi;
+
+info      /define QDFRTVFD004
+dpdd      /define QDFRTVFD005
+cosa      /define QDFRTVFD030
+ccoa      /define QDFRTVFD031
+filk      /define QDFRTVFD032
+flpm      /define QDFRTVFD033
+flpp      /define QDFRTVFD034
+flsz      /define QDFRTVFD035
+icvp      /define QDFRTVFD036
+hard      /define QDFRTVFD037
+hxps      /define QDFRTVFD038
+hdoc      /define QDFRTVFD039
+sidx      /define QDFRTVFD040
+falx      /define QDFRTVFD041
+esfl      /define QDFRTVFD043
+bodr      /define QDFRTVFD044
+          /copy qcpysrc,qdfrtvfd
+info      /undefine QDFRTVFD004
+dpdd      /undefine QDFRTVFD005
+cosa      /undefine QDFRTVFD030
+ccoa      /undefine QDFRTVFD031
+filk      /undefine QDFRTVFD032
+flpm      /undefine QDFRTVFD033
+flpp      /undefine QDFRTVFD034
+flsz      /undefine QDFRTVFD035
+icvp      /undefine QDFRTVFD036
+hard      /undefine QDFRTVFD037
+hxps      /undefine QDFRTVFD038
+hdoc      /undefine QDFRTVFD039
+sidx      /undefine QDFRTVFD040
+falx      /undefine QDFRTVFD041
+esfl      /undefine QDFRTVFD043
+bodr      /undefine QDFRTVFD044
+
+          Dcl-s @CatIndx  Int(10) Inz(*Zeros);
+          Dcl-s @KeywIdx  Int(10) Inz(*Zeros);
+          Dcl-s @ParmIdx  Int(10) Inz(*Zeros);
+
+b001      If FileLvlDvc.QDFFXDOC > *Zeros;
+
+             p_QDFFCOSA = %Addr(FileHeader) + FileLvlDvc.QDFFXDOC;
+
+             p_QDFFCCOA = %Addr(Ds_QDFFCOSA.QDFFCCOS);
+
+b002         For @CatIndx = 1 To Ds_QDFFCOSA.QDFFFCCT;
+
+                p_QDFKFILK = %Addr(FileHeader) + Ds_QDFFCCOA.QDFFCAOF;
+                p_QDFKFLPM = %Addr(Ds_QDFKFILK.QDFKFILE);
+
+b003            For @KeywIdx = 1 to Ds_QDFKFILK.QDFFKFIL;
+
+                   p_QDFKFLPP = %Addr(Ds_QDFKFLPM.QDFKFLEX);
+
+b004               For @ParmIdx = 1 To Ds_QDFKFLPM.QDFFKFLP;
+
+b005                  Select;
+
+x005                     When Ds_QDFKFLPM.QDFKFLID = x'02';
+
+                            p_QDFKFLSZ = %Addr(Ds_QDFKFLPP.QDFKFLNM);
+
+x005                     When Ds_QDFKFLPM.QDFKFLID = x'04';
+
+                            p_QDFKICVP = %Addr(Ds_QDFKFLPP.QDFKFLNM);
+
+x005                     When Ds_QDFKFLPM.QDFKFLID = x'05';
+
+                            p_QDFKHARD = %Addr(Ds_QDFKFLPP.QDFKFLNM);
+
+x005                     When Ds_QDFKFLPM.QDFKFLID = x'06';
+
+                            p_QDFKHXPS = %Addr(Ds_QDFKFLPP.QDFKFLNM);
+
+x005                     When Ds_QDFKFLPM.QDFKFLID = x'07';
+
+                            p_QDFKHDOC = %Addr(Ds_QDFKFLPP.QDFKFLNM);
+
+x005                     When Ds_QDFKFLPM.QDFKFLID = x'08';
+
+                            p_QDFKSIDX = %Addr(Ds_QDFKFLPP.QDFKFLNM);
+
+x005                     When Ds_QDFKFLPM.QDFKFLID = x'0A';
+
+                            p_QDFKFALX = %Addr(Ds_QDFKFLPP.QDFKFLNM);
+
+x005                     When Ds_QDFKFLPM.QDFKFLID = x'0B';
+
+                            p_QDFKESFL = %Addr(Ds_QDFKFLPP.QDFKFLNM);
+
+                         When Ds_QDFKFLPM.QDFKFLID = x'0C';
+
+                            p_QDFKBODR = %Addr(Ds_QDFKFLPP.QDFKFLNM);
+
+e005                  EndSl;
+
+                      p_QDFKFLPP = p_QDFKFLPP + (Ds_QDFKFLPP.QDFKFLLN);
+
+e004               EndFor;
+
+                   p_QDFKFLPM = p_QDFKFLPM + %Size(Ds_QDFKFLPM);
+
+e003            EndFor;
+
+                p_QDFFCCOA += %Size(Ds_QDFFCCOA);
+
+e002         Endfor;
+e001      EndIf;
+
+          FileLvlKeyW = p_QDFKFLPM;
+
+          End-Proc;
+
+          Dcl-Proc @Process_Field_Keywords;
+
+          Dcl-pi @Process_Field_Keywords;
+             FieldHdr    LikeDs(QDFFFINF);
+             FieldLvlDvc LikeDs(QDFFFDPD);
+          End-pi;
+
+finf      /define QDFRTVFD022
+fdpd      /define QDFRTVFD025
+cosa      /define QDFRTVFD030
+ccoa      /define QDFRTVFD031
+          /copy qcpysrc,qdfrtvfd
+finf      /undefine QDFRTVFD022
+pdpd      /undefine QDFRTVFD025
+cosa      /undefine QDFRTVFD030
+ccoa      /undefine QDFRTVFD031
+
+          /define mflores104
+          /copy qcpysrc,mflores
+          /undefine mflores104
+
+          Dcl-s @CatDpIdx Int(10) Inz(*Zeros);
+
+b001      If FieldLvlDvc.QDFFFDOC > *Zeros;
+
+             p_QDFFCOSA = %Addr(FieldHdr) + FieldLvlDvc.QDFFFDOC;
+
+             p_QDFFCCOA = %Addr(Ds_QDFFCOSA.QDFFCCOS);
+
+b002         For @CatDpIdx = 1 To Ds_QDFFCOSA.QDFFFCCT;
+
+b003            Select;
+
+x003               When Ds_QDFFCCOA.QDFFCAID = Category20;
+
+                      @Category_20(FieldHdr: Ds_QDFFCCOA:
+                                   FldDtaDs.@FldSpcKeys: @FldIdx: @Run);
+
+x003               When Ds_QDFFCCOA.QDFFCAID = Category21;
+
+                      @Category_21(FieldHdr: Ds_QDFFCCOA:
+                                   FldDtaDs.@FldSpcKeys: @FldIdx:
+                                   FldDtaDs.@FldIO);
+
+x003               When Ds_QDFFCCOA.QDFFCAID = Category22;
+
+                      @Category_22(FieldHdr: Ds_QDFFCCOA);
+
+x003               When Ds_QDFFCCOA.QDFFCAID = Category23;
+
+                      @Category_23(FieldHdr: Ds_QDFFCCOA:
+                                   FldDtaDs.@FldLen:
+                                   FldDtaDs.@FldCom:
+                                   FldDtaDs.@FldIO);
+
+x003               When Ds_QDFFCCOA.QDFFCAID = Category24;
+
+                      @Category_24(FieldHdr: Ds_QDFFCCOA:
+                                   FldDtaDs.@FldEdt:
+                                   FldDtaDs.@FldLen:
+                                   FldDtaDs.@FldIO);
+
+x003               When Ds_QDFFCCOA.QDFFCAID = Category25;
+
+                      @Category_25(FieldHdr: Ds_QDFFCCOA:
+                                   FldDtaDs.@FldSpcKeys: @FldIdx);
+
+e003            EndSl;
+
+                p_QDFFCCOA += %Size(Ds_QDFFCCOA);
+
+e002         EndFor;
+e001      EndIf;
+
+          End-Proc;
+
+          Dcl-Proc @Process_Constants;
+
+          Dcl-pi @Process_Constants;
+             FieldHdr    LikeDs(QDFFFINF);
+             FieldLvlDvc LikeDs(QDFFFDPD);
+          End-pi;
+
+finf      /define QDFRTVFD022
+fdpd      /define QDFRTVFD025
+cosa      /define QDFRTVFD030
+ccoa      /define QDFRTVFD031
+          /copy qcpysrc,qdfrtvfd
+finf      /undefine QDFRTVFD022
+pdpd      /undefine QDFRTVFD025
+cosa      /undefine QDFRTVFD030
+ccoa      /undefine QDFRTVFD031
+
+          /define mflores104
+          /copy qcpysrc,mflores
+          /undefine mflores104
+
+          Dcl-s @ConstIndx Int(10) Inz(*Zeros);
+
+b001      If FieldLvlDvc.QDFFFDOC > *Zeros;
+
+             p_QDFFCOSA = %Addr(FieldHdr) + FieldLvlDvc.QDFFFDOC;
+
+             p_QDFFCCOA = %Addr(Ds_QDFFCOSA.QDFFCCOS);
+
+b002         For @ConstIndx = 1 To Ds_QDFFCOSA.QDFFFCCT;
+
+b003            Select;
+
+x003               When Ds_QDFFCCOA.QDFFCAID = Category20;
+
+                      @Category_20(FieldHdr: Ds_QDFFCCOA:
+                                   FldDtaDs.@FldSpcKeys: @FldIdx: @Run);
+
+x003               When Ds_QDFFCCOA.QDFFCAID = Category21;
+
+                      @Category_21(FieldHdr: Ds_QDFFCCOA:
+                                   FldDtaDs.@FldSpcKeys: @FldIdx:
+                                   FldDtaDs.@FldIO);
+
+x003               When Ds_QDFFCCOA.QDFFCAID = Category22;
+
+                      @Category_22(FieldHdr: Ds_QDFFCCOA);
+
+x003               When Ds_QDFFCCOA.QDFFCAID = Category23;
+
+                      @Category_23(FieldHdr: Ds_QDFFCCOA:
+                                   FldDtaDs.@FldLen:
+                                   FldDtaDs.@FldCom:
+                                   FldDtaDs.@FldIO);
+
+x003               When Ds_QDFFCCOA.QDFFCAID = Category24;
+
+                      @Category_24(FieldHdr: Ds_QDFFCCOA:
+                                   FldDtaDs.@FldEdt:
+                                   FldDtaDs.@FldLen:
+                                   FldDtaDs.@FldIO);
+
+x003               When Ds_QDFFCCOA.QDFFCAID = Category25;
+
+                      @Category_25(FieldHdr: Ds_QDFFCCOA:
+                                   FldDtaDs.@FldSpcKeys: @FldIdx);
+
+e003            EndSl;
+
+                p_QDFFCCOA += %Size(Ds_QDFFCCOA);
+
+e002         EndFor;
+e001      EndIf;
+
+          End-Proc;
+
+          Dcl-Proc @Get_Field_Information;
+
+          Dcl-pi @Get_Field_Information;
+             RecordFormat LikeDs(QDFARFTE);
+             RecordHeader LikeDs(QDFFRINF);
+             NameTable    LikeDs(QDFFNTBL);
+             FieldIdx     LikeDs(QDFFFITB);
+             RecordLvlDvc LikeDs(QDFFRDPD);
+             FieldWhrUsd  LikeDs(QDFWFLDI);
+             FieldHeader  Pointer;                      // QDFFFINF
+             FieldLVLDvc  Pointer;                      // QDFFFDPD
+          End-pi;
+
+rfte      /define QDFRTVFD006
+rinf      /define QDFRTVFD008
+rdpd      /define QDFRTVFD009
+rctb      /define QDFRTVFD017
+rcte      /define QDFRTVFD018
+ntb       /define QDFRTVFD019
+fitb      /define QDFRTVFD021
+finf      /define QDFRTVFD022
+fcon      /define QDFRTVFD023
+fnam      /define QDFRTVFD024
+fdpd      /define QDFRTVFD025
+fdic      /define QDFRTVFD026
+xfdp      /define QDFRTVFD027
+fldi      /define QDFRTVFD144
+kwda      /define QDFRTVFD146
+attr      /define QDFRTVFD148
+atyp      /define QDFRTVFD149
+ntbl      /define QDFRTVFD152
+          /copy qcpysrc,qdfrtvfd
+rfte      /undefine QDFRTVFD006
+rinf      /undefine QDFRTVFD008
+rdpd      /undefine QDFRTVFD009
+rctb      /undefine QDFRTVFD017
+rcte      /undefine QDFRTVFD018
+ntb       /undefine QDFRTVFD019
+fitb      /undefine QDFRTVFD021
+finf      /undefine QDFRTVFD022
+fcon      /undefine QDFRTVFD023
+fnam      /undefine QDFRTVFD024
+fdpd      /undefine QDFRTVFD025
+fdic      /undefine QDFRTVFD026
+xfdp      /undefine QDFRTVFD027
+fldi      /undefine QDFRTVFD144
+kwda      /undefine QDFRTVFD146
+attr      /undefine QDFRTVFD148
+atyp      /undefine QDFRTVFD149
+ntbl      /undefine QDFRTVFD152
+
+          /define mflores102
+          /copy qcpysrc,mflores
+          /undefine mflores102
+
+     D                 Ds
+     D  hx1                    1      1a
+     D  hx2                    2      2a
+     D  wBin                   1      2b 0
+
+          Dcl-s @Col Packed(30) Inz(*Zeros);
+          Dcl-s @Row Packed(30) Inz(*Zeros);
+
+          FldDtaDs.@FmtNam = %Trim(RecordFormat.QDFARFNM);
+          p_QDFWKWDA       = %Addr(FieldWhrUsd) + FieldWhrUsd.QDFWFOKW;
+          p_QDFWATTR       = %Addr(Ds_QDFWKWDA.QDFWKWDS);
+          P_QDFWATYP       = %Addr(Ds_QDFWATTR.QDFWPRMS);
+
+          p_QDFFFINF  = %Addr(RecordHeader) + FieldIdx.QDFFFOFS;
+b001      If Ds_QDFFFINF.QDFFFIOA = x'01';
+
+             // Constants
+             p_QDFFFCON = %Addr(Ds_QDFFFINF.QDFFFTBE);
+             p_QDFFFDPD = p_QDFFFINF + Ds_QDFFFCON.QDFFFAOC;
+
+x001      Else;
+
+             // Variable
+             p_QDFFFNAM = %Addr(Ds_QDFFFINF.QDFFFTBE);
+             p_QDFFFDPD = p_QDFFFINF + Ds_QDFFFNAM.QDFFFAOF;
+             p_QDFFFDIC = %Addr(Ds_QDFFFDPD.QDFFFICE);
+
+e001      EndIf;
+
+          TestBit(Ds_QDFFFDPD.QDFBITS25);
+
+b001      If *In01;
+             @FldIdx += 1;
+             FldDtaDs.@FldSpcKeys(@FldIdx) = 'DSPATR(PC)';
+e001      EndIf;
+
+b001      If *In02;
+             @FldIdx += 1;
+             FldDtaDs.@FldSpcKeys(@FldIdx) = 'DSPATR(ND)';
+e001      EndIf;
+
+b001      If *In03;
+             @FldIdx += 1;
+             FldDtaDs.@FldSpcKeys(@FldIdx) = 'FLTFIXDEC';
+e001      EndIf;
+
+b001      If *In04;
+             @FldIdx += 1;
+             FldDtaDs.@FldSpcKeys(@FldIdx) = 'IGCANKCNV';
+e001      EndIf;
+
+b001      If  *In05;
+             @FldIdx += 1;
+             FldDtaDs.@FldSpcKeys(@FldIdx) = 'CHRID';
+e001      EndIf;
+
+b001      If *In06;
+             @FldIdx += 1;
+             FldDtaDs.@FldSpcKeys(@FldIdx) = 'MSGID';
+e001      EndIf;
+
+b001      If *In07;
+             @FldIdx += 1;
+             FldDtaDs.@FldSpcKeys(@FldIdx) = 'DUP';
+e001      EndIf;
+
+b001      If      *In08;
+e001      EndIf;
+
+          TestBit(Ds_QDFFFDPD.QDFBITS26);
+
+b001      If *In04;
+             @FldIdx += 1;
+             FldDtaDs.@FldSpcKeys(@FldIdx) = 'DSPATR(CS)';
+e001      EndIf;
+
+b001      If  *In05
+          And *In06
+          And *In07
+          And *In08;
+             @FldIdx += 1;
+             FldDtaDs.@FldSpcKeys(@FldIdx) = 'DSPATR(ND)';
+x001      ElseIf *In05;
+             @FldIdx += 1;
+             FldDtaDs.@FldSpcKeys(@FldIdx) = 'DSPATR(BL)';
+e001      EndIf;
+
+b001      If *In06;
+             @FldIdx += 1;
+             FldDtaDs.@FldSpcKeys(@FldIdx) = 'DSPATR(UL)';
+e001      EndIf;
+
+b001      If *In07;
+             @FldIdx += 1;
+             FldDtaDs.@FldSpcKeys(@FldIdx) = 'DSPATR(HI)';
+e001      EndIf;
+
+b001      If      *In08;
+             @FldIdx += 1;
+             FldDtaDs.@FldSpcKeys(@FldIdx) = 'DSPATR(RI)';
+e002      EndIf;
+
+          // Field Extension
+          p_QDFFXFDP = p_QDFFFINF + Ds_QDFFFDPD.QDFFXFDO;
+          // Row Column
+          p_QDFFRCTB =  %Addr(RecordHeader) + RecordLvlDvc.QDFFDRCO
+                     + (FieldWhrUsd.QDFWRRDX - 1) * 2;
+
+          p_QDFFRCTE = %Addr(Ds_QDFFRCTB.QDFDFFRC);
+
+          FldDtaDs.@FldIO = SetIO(Ds_QDFFFINF.QDFFFIOA);
+b001      If FldDtaDs.@FldIO = 'H';
+             Clear FldDtaDs.@FldRow;
+             Clear FldDtaDs.@FldCol;
+x001      Else;
+
+             hx1 = x'00';
+             hx2 = Ds_QDFFRCTE.QDFFSROW;
+b002         Monitor;
+                @Row = wBin;
+x002         On-Error;
+                Clear @Row;
+e002         EndMon;
+
+             hx1 = x'00';
+             hx2 = Ds_QDFFRCTE.QDFFSCOL;
+b002         Monitor;
+                @Col = wBin;
+x002         On-Error;
+                Clear @Col;
+e002         EndMon;
+
+             FldDtaDs.@FldRow = @Row;
+             FldDtaDs.@FldCol = @Col + 1;
+
+e001      EndIf;
+
+          // date time flags
+b001      If %BitAnd(Ds_QDFFFINF.QDFBITS23 : Bit0) = Bit0;
+             FldDtaDs.@FldCom  = 'DATE';
+             FldDtaDs.@FldDTUS = 'D';
+e001      EndIf;
+
+b001      If %BitAnd(Ds_QDFFFINF.QDFBITS23 : Bit1) = Bit1;
+             FldDtaDs.@FldDTUS = 'Y';
+e001      EndIf;
+
+b001      If %BitAnd(Ds_QDFFFINF.QDFBITS23 : Bit2) = Bit2;
+             FldDtaDs.@FldDTUS = 'T';
+e001      EndIf;
+
+b001      If %BitAnd(Ds_QDFFFINF.QDFBITS23 : Bit4) = Bit4;
+             FldDtaDs.@FldDTUS = 'U';
+e001      EndIf;
+
+b001      If %BitAnd(Ds_QDFFFINF.QDFBITS23 : Bit5) = Bit5;
+             FldDtaDs.@FldDTUS = 'S';
+e001      EndIf;
+
+          // CONSTANTS
+b001      If Ds_QDFFFINF.QDFFFIOA = x'01';
+             @Process_Constants(Ds_QDFFFINF: Ds_QDFFFDPD);
+x001      Else;
+
+             // Field Name
+             p_QDFFNTB = %Addr(NameTable.QDFFNMES) +
+                       + 10 * (FieldWhrUsd.QDFWNMEI - 1);
+
+             FldDtaDs.@FldIBuf = Ds_QDFFFNAM.QDFFINPO;
+             FldDtaDs.@FldOBuf = Ds_QDFFFNAM.QDFFOUTO;
+
+             // QDFFFINF.QDFFFIOA
+             // Field attribute.
+             // X'01' indicates Constant (see structure QDFFFCON, Constant Field Header
+             // X'02' indicates Output (O),
+             // X'03' indicates Message (M), h (B),
+             // X'04' indicates Input (I),  (P)
+             // X'05' indicates Both (B),
+             // X'06' indicates Hidden (H), and
+             // X'07' indicates Program to System (P)
+             // FldDtaDs.@FldIO = Ds_QDFFFINF.QDFFFIOA;
+             // QDFFKBDT
+             // Keyboard shift and data type.
+             // X'00' indicates Alpha shift/character (A),
+             // X'01' indicates Alpha only (X),
+             // X'02' indicates Numeric shift (N),
+             // X'03' indicates Numeric only (Y),
+             // X'04' indicates Katakana (K),
+             // X'05' indicates Digits only (D),
+             // X'06' indicates Inhibit keyboard (I),
+             // X'07' indicates Signed numeric/zoned (S),
+             // X'08' indicates Binary (B), X'09' indicates Packed (P),
+             // X'0A' indicates Floating (F),
+             // X'0B' indicates DBCS (J),
+             // X'0C' indicates Open (O), X'0D' indicates Either (E),
+             // X'0E' indicates Numeric-only character (M),
+             // X'0F' indicates Graphic (G),
+             // X'10' indicates Date (L),
+             // X'11' indicates Time (T), and
+             // X'12' indicates Timestamp (Z)
+             FldDtaDs.@FldAtr  = SetFieldAttribute(Ds_QDFFFNAM.QDFFKBDT);
+
+             FldDtaDs.@FldNam  = Ds_QDFFNTB.QDFFFNAM;
+
+b002         If  FldDtaDs.@FldIO = 'B'
+             And FldDtaDs.@FldNam <> *Blanks
+             Or  FldDtaDs.@FldIO = 'I'
+             And FldDtaDs.@FldNam <> *Blanks;
+
+                TestBit(%SubSt(Ds_QDFFFDIC.QDFBITS27:1:1));
+
+b003            If *In03;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'DSPATR(PR)';
+e003            EndIf;
+
+b003            If *In04;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'DUP';
+e003            EndIf;
+
+b003            If *In05;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'DSPATR(MDT)';
+e003            EndIf;
+
+b003            If      *In06
+                And Not *In07
+                And Not *In08;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'CHECK(RL)';
+e003            EndIf;
+
+b003            If      *In06
+                And     *In07
+                And Not *In08;
+e003            EndIf;
+
+b003            If  *In06
+                And *In07
+                And *In08;
+e003            EndIf;
+
+                TestBit(%SubSt(Ds_QDFFFDIC.QDFBITS27:2:1));
+
+b003            If *In01;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'AUTO(RA)';
+e003            EndIf;
+
+b003            If *In02;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'CHECK(FE)';
+e003            EndIf;
+
+b003            If Not *In03;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'CHECK(LC)';
+e003            EndIf;
+
+b003            If *In04;
+e003            EndIf;
+
+b003            If *In05;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'CHECK(ME)';
+e003            EndIf;
+
+b003            If      *In06
+                And Not *In07
+                And Not *In08;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'AUTO(RAZ)';
+e003            EndIf;
+
+b003            If      *In06
+                And     *In07
+                And Not *In08;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'AUTO(RAB)';
+e003            EndIf;
+
+b003            If      *In06
+                And     *In07
+                And     *In08;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'CHECK(MF)';
+e003            EndIf;
+
+                TestBit(Ds_QDFFFDIC.QDFBITS28);
+
+b003            If *In01;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'BLANKS';
+e003            EndIf;
+
+b003            If *In02;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'CHANGE';
+e003            EndIf;
+
+b003            If *In03;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'DUP';
+e003            EndIf;
+
+b003            If *In04;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'DUP';
+e003            EndIf;
+
+b003            If *In05;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'CHECK(AB)';
+e003            EndIf;
+
+b003            If      *In06;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'DSPATR(OID)';
+e003            EndIf;
+
+b003            If      *In07;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'DSPATR(SP)';
+e003            EndIf;
+
+b003            If      *In08;
+e003            EndIf;
+
+                TestBit(Ds_QDFFFDIC.QDFBITS29);
+
+b003            If *In01;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'CHECK(M10)';
+e003            EndIf;
+
+b003            If *In02;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'CHECK(M11)';
+e003            EndIf;
+
+b003            If *In03;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'CHECK(M10F)';
+e003            EndIf;
+
+b003            If *In04;
+                   @FldIdx += 1;
+                   FldDtaDs.@FldSpcKeys(@FldIdx) = 'CHECK(M11F)';
+e003            EndIf;
+e002         EndIf;
+
+             FldDtaDs.@FldCom  = *Blanks;
+             FldDtaDs.@FldPlen = Ds_QDFFFNAM.QDFFPLEN;
+b002         Monitor;
+
+b003            Select;
+
+x003              When Ds_QDFFFNAM.QDFFFDEC = x'00'
+                  Or   Ds_QDFFFNAM.QDFFFDEC = x'FF';
+
+                     FldDtaDs.@FldDec  = *Zeros;
+
+x003              When Ds_QDFFFNAM.QDFFFDEC = x'01';
+
+                     FldDtaDs.@FldDec  = '1';
+
+x003              When Ds_QDFFFNAM.QDFFFDEC = x'02';
+
+                     FldDtaDs.@FldDec  = '2';
+
+x003              When Ds_QDFFFNAM.QDFFFDEC = x'03';
+
+                     FldDtaDs.@FldDec  = '3';
+
+x003              When Ds_QDFFFNAM.QDFFFDEC = x'04';
+
+                     FldDtaDs.@FldDec  = '4';
+
+x003              When Ds_QDFFFNAM.QDFFFDEC = x'05';
+
+                     FldDtaDs.@FldDec  = '5';
+
+x003              When Ds_QDFFFNAM.QDFFFDEC = x'06';
+
+                     FldDtaDs.@FldDec  = '6';
+
+x003              When Ds_QDFFFNAM.QDFFFDEC = x'07';
+
+                     FldDtaDs.@FldDec  = '7';
+
+x003              When Ds_QDFFFNAM.QDFFFDEC = x'08';
+
+                     FldDtaDs.@FldDec  = '8';
+
+x003              When Ds_QDFFFNAM.QDFFFDEC = x'09';
+
+                     FldDtaDs.@FldDec  = '9';
+
+e003            EndSl;
+x002         On-Error;
+                FldDtaDs.@FldDec = *Zeros;
+e002         EndMon;
+e001      EndIf;
+
+          FieldHeader = p_QDFFFINF;
+          FieldLVLDvc = p_QDFFFDPD;
+
+          End-Proc;
+
+          Dcl-Proc @Process_Record_Keywords;
+
+          Dcl-pi @Process_Record_Keywords;
+             FileLvlDvc   LikeDs(QDFFDPDD);
+             RecordHeader LikeDs(QDFFRINF);
+             RecordLvlDvc LikeDs(QDFFRDPD);
+             FileLvlKeyWd LikeDs(QDFKFLPM);
+          End-pi;
+
+dpdd      /define QDFRTVFD005
+rinf      /define QDFRTVFD008
+rdpd      /define QDFRTVFD009
+selt      /define QDFRTVFD028
+stbl      /define QDFRTVFD029
+cosa      /define QDFRTVFD030
+ccoa      /define QDFRTVFD031
+flpm      /define QDFRTVFD033
+flpp      /define QDFRTVFD034
+ckkw      /define QDFRTVFD045
+ckke      /define QDFRTVFD046
+          /copy qcpysrc,qdfrtvfd
+dpdd      /undefine QDFRTVFD005
+rinf      /undefine QDFRTVFD008
+rdpd      /undefine QDFRTVFD009
+selt      /undefine QDFRTVFD028
+stbl      /undefine QDFRTVFD029
+cosa      /undefine QDFRTVFD030
+ccoa      /undefine QDFRTVFD031
+flpm      /undefine QDFRTVFD033
+flpp      /undefine QDFRTVFD034
+ckkw      /undefine QDFRTVFD045
+ckke      /undefine QDFRTVFD046
+
+          Dcl-s @CatDpIdx Int(10) Inz(*Zeros);
+          Dcl-s @EntIdx   Int(10) Inz(*Zeros);
+          Dcl-s @KeywIdx  Int(10) Inz(*Zeros);
+
+b001      If RecordLvlDvc.QDFFRDOC > *Zeros;
+
+             p_QDFFCOSA = %Addr(RecordHeader) + RecordLvlDvc.QDFFRDOC;
+
+             p_QDFFCCOA = %Addr(Ds_QDFFCOSA.QDFFCCOS);
+
+b002         For @CatDpIdx = 1 To Ds_QDFFCOSA.QDFFFCCT;
+
+                // Miscellaneous record-level keywords (uses (QDFKMSAP))
+                // no structures for  IDs X'01', X'02', X'03', X'04', X'05', X'06', X'07',
+                // ID  Keyword ID  Keyword
+                // X'01'   LOCK    X'09'   RMVWDW
+                // X'02'   ALARM   X'0F'   DSPMOD
+                // X'03'   BLINK   X'10'   CSRLOC
+                // X'04'   LOGOUT  X'11'   INDARA
+                // X'05'   ALWGPH  X'13'   SETOFF
+                // X'06'   MSGALARM    X'15'   RTNCSRLOC
+                // X'07'   RETLCKSTS   X'16'   MNUBARDSP
+                // X'08'   USRRSTDSP
+
+                // Command Key Keyword Structure (QDFKCKKW)  (uses (QDFKCKKE))
+                // Use structure QDFKCKKE for category 2 keyword IDs X'01' through X'25' an
+                // ID  Keyword ID  Keyword ID  Keyword
+                // X'01'   CA/CF01 X'0E'   CA/CF14 X'1A'   ROLLDOWN
+                //
+                // X'03'   CA/CF03 X'10'   CA/CF16 X'1C'   HOME
+                // X'04'   CA/CF04 X'11'   CA/CF17 X'1D'   CLEAR
+                // X'05'   CA/CF05 X'12'   CA/CF18 X'1E'   HELP
+                // X'06'   CA/CF06 X'13'   CA/CF19 X'20'   HLPRTN
+                // X'07'   CA/CF07 X'14'   CA/CF20 X'21'   VLDCMDKEY
+                // X'08'   CA/CF08 X'15'   CA/CF21 X'22'   ALTHELP
+                // X'09'   CA/CF09 X'16'   CA/CF22 X'23'   ALTPAGEUP
+                // X'0A'   CA/CF10 X'17'   CA/CF23 X'24'   ALTPAGEDWN
+                // X'0B'   CA/CF11 X'18'   CA/CF24 X'25'   MNUBARSW
+                // X'0C'   CA/CF12 X'19'   ROLLUP  X'30'   MNUCNL
+                // X'0D'   CA/CF13
+                p_QDFKCKKW = %Addr(RecordHeader) + Ds_QDFFCCOA.QDFFCAOF;
+                p_QDFKCKKE = %Addr(Ds_QDFKCKKW.QDFKCKCM);
+
+b003            For @EntIdx = 1 to Ds_QDFKCKKW.QDFFKCKS;
+
+b004               If FileLvlDvc.QDFFXDOC > *Zeros;
+                      p_QDFKFLPP = %Addr(FileLvlKeyWd.QDFKFLEX);
+b005                  For @KeyWIdx = 1 to FileLvlKeyWd.QDFFKFLP;
+
+                         // this is unfinished
+                         p_QDFKFLPP = p_QDFKFLPP + (Ds_QDFKFLPP.QDFKFLLN);
+
+e005                  EndFor;
+e004               EndIf;
+
+                   p_QDFKCKKE += %Size(Ds_QDFKCKKE);
+
+e003            EndFor;
+
+                p_QDFFCCOA += %Size(Ds_QDFFCCOA);
+
+e002         EndFor;
+e001      EndIf;
+
+          p_QDFFSELT = %Addr(RecordHeader) + RecordHeader.QDFFSTBO;
+          p_QDFFSTBL = %Addr(Ds_QDFFSELT.QDFFFSTE);
+
+b001      For @EntIdx = 1 to Ds_QDFFSELT.QDFFFSTT;
+
+             *In01 = *Off;
+             *In02 = *Off;
+
+             If Ds_QDFFSTBL.QDFFSELM(1) = x'F0';
+                *In01 = *On;
+             EndIf;
+
+             If Ds_QDFFSTBL.QDFFSELM(1) = x'F1';
+                *In02 = *On;
+             EndIf;
+
+             p_QDFFSTBL += %Size(Ds_QDFFSTBL);
+
+e001      EndFor;
+
+          End-Proc;
+
+          Dcl-Proc SetIO;
+
+          Dcl-pi SetIO Char(1);
+             @IOA Char(1) Const;
+          End-pi;
+
+b001      Select;
+
+x001         When @IOA = x'01';
+
+                Return 'C';
+
+x001         When @IOA = x'02';
+
+                Return 'O';
+
+x001         When @IOA = x'03';
+
+                Return 'M';
+
+x001         When @IOA = x'04';
+
+                Return 'I';
+
+x001         When @IOA = x'05';
+
+                Return 'B';
+
+x001         When @IOA = x'06';
+
+                Return 'H';
+
+x001         When @IOA = x'07';
+
+                Return 'P';
+
+e001      EndSl;
+
+          End-Proc;
+
+          Dcl-Proc SetFieldAttribute;
+
+          Dcl-pi SetFieldAttribute Char(1);
+             @FATR Char(1) Const;
+          End-pi;
+
+          // X'00' indicates Alpha shift/character (A),
+          // X'01' indicates Alpha only (X),
+          // X'02' indicates Numeric shift (N),
+          // X'03' indicates Numeric only (Y),
+          // X'04' indicates Katakana (K),
+          // X'05' indicates Digits only (D),
+          // X'06' indicates Inhibit keyboard (I),
+          // X'07' indicates Signed numeric/zoned (S),
+          // X'08' indicates Binary (B),
+          // X'09' indicates Packed (P),
+          // X'0A' indicates Floating (F),
+          // X'0B' indicates DBCS (J),
+          // X'0C' indicates Open (O),
+          // X'0D' indicates Either (E),
+          // X'0E' indicates Numeric-only character (M),
+          // X'0F' indicates Graphic (G),
+          // X'10' indicates Date (L),
+          // X'11' indicates Time (T), and
+          // X'12' indicates Timestamp (Z)
+          Dcl-c @AlphaShift        Const(x'00');
+          Dcl-c @Alpha             Const(x'01');
+          Dcl-c @NumericShift      Const(x'02');
+          Dcl-c @NumericOnly       Const(x'03');
+          Dcl-c @Katakana          Const(x'04');
+          Dcl-c @Digits            Const(x'05');
+          Dcl-c @InhibitKeyboard   Const(x'06');
+          Dcl-c @SignedNumericChar Const(x'07');
+          Dcl-c @Binary            Const(x'08');
+          Dcl-c @Packed            Const(x'09');
+          Dcl-c @Date              Const(x'10');
+          Dcl-c @Time              Const(x'11');
+          Dcl-c @Timestamp         Const(x'12');
+          Dcl-c @Floating          Const(x'0A');
+          Dcl-c @DBCS              Const(x'0B');
+          Dcl-c @Open              Const(x'0C');
+          Dcl-c @Either            Const(x'0D');
+          Dcl-c @NumericOnlyChar   Const(x'0E');
+          Dcl-c @Graphic           Const(x'0F');
+
+b001      Select;
+
+x001         When @FATR = @AlphaShift;
+
+                Return 'A';
+
+x001         When @FATR = @Alpha;
+
+                Return 'X';
+
+x001         When @FATR = @NumericShift;
+
+                Return 'N';
+
+x001         When @FATR = @NumericOnly;
+
+                Return 'Y';
+
+x001         When @FATR = @Katakana;
+
+                Return 'K';
+
+x001         When @FATR = @Digits;
+
+                Return 'D';
+
+x001         When @FATR = @InhibitKeyboard;
+
+                Return 'I';
+
+x001         When @FATR = @SignedNumericChar;
+
+                Return 'S';
+
+x001         When @FATR = @Binary;
+
+                Return 'B';
+
+x001         When @FATR = @Packed;
+
+                Return 'P';
+
+x001         When @FATR = @Date;
+
+                Return 'L';
+
+x001         When @FATR = @Time;
+
+                Return 'T';
+
+x001         When @FATR = @Timestamp;
+
+                Return 'Z';
+
+x001         When @FATR = @Floating;
+
+                Return 'F';
+
+x001         When @FATR = @DBCS;
+
+                Return 'J';
+
+x001         When @FATR = @Open;
+
+                Return 'O';
+
+x001         When @FATR = @Either;
+
+                Return 'E';
+
+x001         When @FATR = @NumericOnlyChar;
+
+                Return 'M';
+
+x001         When @FATR = @Graphic;
+
+                Return 'G';
+
+e001      EndSl;
+
+          End-Proc;
+
+          Dcl-Proc TestBit;
+
+          Dcl-pi TestBit;
+             @Bit Char(1) Const;
+          End-pi;
+
+          /define mflores102
+          /copy qcpysrc,mflores
+          /undefine mflores102
+
+          /define indds02b
+          /define IndDs02_TestBit
+          /define indds02c
+          /copy qcpysrc,indds
+          /undefine indds02b
+          /undefine IndDs02_TestBit
+          /undefine indds02c
+
+          Dcl-s @TestBit Char(1) Inz(*Blanks);
+
+          @BintInd_01_08 = *Off;
+          @TestBit = @Bit;
+
+     C                   Testb     '0'           @TestBit                 01
+     C                   Testb     '1'           @TestBit                 02
+     C                   Testb     '2'           @TestBit                 03
+     C                   Testb     '3'           @TestBit                 04
+     C                   Testb     '4'           @TestBit                 05
+     C                   Testb     '5'           @TestBit                 06
+     C                   Testb     '6'           @TestBit                 07
+     C                   Testb     '7'           @TestBit                 08
+
+          End-Proc;
+
+          Dcl-Proc @Category_20;
+
+          Dcl-pi @Category_20;
+             FieldHdr    LikeDs(QDFFFINF);
+             KeyWdCat    LikeDs(QDFFCCOA);
+             @FldSpcKeys Char(15) Dim(30);
+             @FldIdx     Packed(3);
+             @Run        Ind;
+          End-pi;
+
+finf      /define QDFRTVFD022
+ccoa      /define QDFRTVFD031
+sasa      /define QDFRTVFD092
+sapm      /define QDFRTVFD093
+          /copy qcpysrc,qdfrtvfd
+finf      /undefine QDFRTVFD022
+ccoa      /undefine QDFRTVFD031
+sasa      /undefine QDFRTVFD092
+sapm      /undefine QDFRTVFD093
+
+          Dcl-s @KeyIdx Int(10) Inz(*Zeros);
+
+          p_QDFKSASA = %Addr(FieldHdr) + KeyWdCat.QDFFCAOF;
+
+          p_QDFKSAPM = %Addr(Ds_QDFKSASA.QDFKSASE);
+
+b001      For @KeyIdx = 1 To Ds_QDFKSASA.QDFFKSAS;
+
+b002         Select;
+
+x002            When Ds_QDFKSAPM.QDFKSAIA = x'01'
+                And  Not @Run;
+
+                   @FldIdx += 1;
+
+b003               Select;
+
+x003                  When Ds_QDFKSAPM.QDFKSAOA = x'20';
+
+                         @FldSpcKeys(@FldIdx) = 'COLOR(GRN)';
+
+x003                  When Ds_QDFKSAPM.QDFKSAOA = x'22';
+
+                         @FldSpcKeys(@FldIdx) = 'COLOR(WHT)';
+
+x003                  When Ds_QDFKSAPM.QDFKSAOA = x'28';
+
+                         @FldSpcKeys(@FldIdx) = 'COLOR(RED)';
+
+x003                  When Ds_QDFKSAPM.QDFKSAOA = x'30';
+
+                         @FldSpcKeys(@FldIdx) = 'COLOR(TRQ)';
+
+x003                  When Ds_QDFKSAPM.QDFKSAOA = x'32';
+
+                         @FldSpcKeys(@FldIdx) = 'COLOR(YLW)';
+
+x003                  When Ds_QDFKSAPM.QDFKSAOA = x'38';
+
+                         @FldSpcKeys(@FldIdx) = 'COLOR(PNK)';
+
+x003                  When Ds_QDFKSAPM.QDFKSAOA = x'3A';
+
+                         @FldSpcKeys(@FldIdx) = 'COLOR(BLU)';
+
+e003               EndSl;
+
+                   @Run = *On;
+
+x002            When Ds_QDFKSAPM.QDFKSAIA = x'04';
+
+                   @FldIdx += 1;
+                   @FldSpcKeys(@FldIdx) = 'DSPATR(CS)';
+
+x002            When Ds_QDFKSAPM.QDFKSAIA = x'05';
+
+                   @FldIdx += 1;
+                   @FldSpcKeys(@FldIdx) = 'DSPATR(BL)';
+
+x002            When Ds_QDFKSAPM.QDFKSAIA = x'06';
+
+                   @FldIdx += 1;
+                   @FldSpcKeys(@FldIdx) = 'DSPATR(UL)';
+
+x002            When Ds_QDFKSAPM.QDFKSAIA = x'07';
+
+                   @FldIdx += 1;
+                   @FldSpcKeys(@FldIdx) = 'DSPATR(HI)';
+
+x002            When Ds_QDFKSAPM.QDFKSAIA = x'08';
+
+                   @FldIdx += 1;
+                   @FldSpcKeys(@FldIdx) = 'DSPATR(RI)';
+
+x002            When Ds_QDFKSAPM.QDFKSAIA = x'09';
+
+                   @FldIdx += 1;
+                   @FldSpcKeys(@FldIdx) = 'DSPATR(ND)';
+
+x002            When Ds_QDFKSAPM.QDFKSAIA = x'0A';
+
+                   @FldIdx += 1;
+                   @FldSpcKeys(@FldIdx) = 'DSPATR(PC)';
+
+e002         EndSl;
+
+             p_QDFKSAPM += %Size(Ds_QDFKSAPM);
+
+e001      EndFor;
+
+          End-Proc;
+
+          Dcl-Proc @Category_21;
+
+          Dcl-pi @Category_21;
+             FieldHdr    LikeDs(QDFFFINF);
+             KeyWdCat    LikeDs(QDFFCCOA);
+             @FldSpcKeys Char(15) Dim(30);
+             @FldIdx     Packed(3);
+             @FldIO      Char(1);
+          End-pi;
+
+finf      /define QDFRTVFD022
+ccoa      /define QDFRTVFD031
+ffwr      /define QDFRTVFD094
+chkp      /define QDFRTVFD095
+          /copy qcpysrc,qdfrtvfd
+finf      /undefine QDFRTVFD022
+ccoa      /undefine QDFRTVFD031
+ffwr      /undefine QDFRTVFD094
+chkp      /undefine QDFRTVFD095
+
+          Dcl-s @KeyIdx Int(10) Inz(*Zeros);
+
+          p_QDFKFFWR = %Addr(FieldHdr) + KeyWdCat.QDFFCAOF;
+
+          p_QDFKCHKP = %Addr(Ds_QDFKFFWR.QDFKFWEN);
+
+b001      For @KeyIdx = 1 To Ds_QDFKFFWR.QDFFKFWS;
+
+             TestBit(Ds_QDFKCHKP.QDFKFWID);
+
+b002         Select;
+
+x002            When Ds_QDFKCHKP.QDFKFWID = x'01'
+                And  Ds_QDFKCHKP.QDFKFWOV = x'6000';
+
+b003               If @FldIO = 'B'
+                   Or @FldIO = 'I';
+                         @FldIdx += 1;
+                         @FldSpcKeys(@FldIdx) = 'DSPATR(PR)';
+e003               EndIf;
+
+x002            When Ds_QDFKCHKP.QDFKFWID = x'02';
+
+                   @FldIdx += 1;
+                   @FldSpcKeys(@FldIdx) = 'DUP';
+
+x002            When Ds_QDFKCHKP.QDFKFWID = x'03';
+
+                   @FldIdx += 1;
+                   @FldSpcKeys(@FldIdx) = 'DSPATR(MDT)';
+
+x002            When Ds_QDFKCHKP.QDFKFWID = x'04';
+
+                   @FldIdx += 1;
+                   @FldSpcKeys(@FldIdx) = 'AUTO(RA)';
+
+x002            When Ds_QDFKCHKP.QDFKFWID = x'05';
+
+                   @FldIdx += 1;
+                   @FldSpcKeys(@FldIdx) = 'CHECK(ME)';
+
+e002         EndSl;
+
+             p_QDFKCHKP += %Size(Ds_QDFKCHKP);
+
+e001      EndFor;
+
+          End-Proc;
+
+          Dcl-Proc @Category_22;
+
+          Dcl-pi @Category_22;
+             FieldHdr    LikeDs(QDFFFINF);
+             KeyWdCat    LikeDs(QDFFCCOA);
+          End-pi;
+
+finf      /define QDFRTVFD022
+ccoa      /define QDFRTVFD031
+mfdk      /define QDFRTVFD096
+mfdp      /define QDFRTVFD097
+mfrs      /define QDFRTVFD098
+mfem      /define QDFRTVFD099
+mfsi      /define QDFRTVFD100
+mfmv      /define QDFRTVFD101
+dfld      /define QDFRTVFD104
+          /copy qcpysrc,qdfrtvfd
+finf      /undefine QDFRTVFD022
+ccoa      /undefine QDFRTVFD031
+mfdk      /undefine QDFRTVFD096
+mfdp      /undefine QDFRTVFD097
+mfrs      /undefine QDFRTVFD098
+mfem      /undefine QDFRTVFD099
+mfsi      /undefine QDFRTVFD100
+mfmv      /undefine QDFRTVFD101
+dfld      /undefine QDFRTVFD104
+
+          /define indds02b
+          /define indds02_AllInd
+          /define indds02c
+          /copy qcpysrc,indds
+          /undefine indds02b
+          /undefine indds02_AllInd
+          /undefine indds02c
+
+          Dcl-s @KeyIdx Int(10) Inz(*Zeros);
+
+          p_QDFKMFDK = %Addr(FieldHdr) + KeyWdCat.QDFFCAOF;
+
+          p_QDFKMFDP = %Addr(Ds_QDFKMFDK.QDFKMFEN);
+          p_QDFKMFRS = %Addr(Ds_QDFKMFDP.QDFKMFEX);
+          p_QDFKMFEM = %Addr(Ds_QDFKMFRS.QDFKMFEE);
+
+          @AllInd_01_99 = *Off;
+
+b001      For @KeyIdx = 1 To Ds_QDFKMFDK.QDFFKMFS;
+
+b002         Select;
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'01';
+
+                   *In01 = *On;
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'02';
+
+                   *In02 = *On;
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'03';
+
+                   *In03 = *On;
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'04';
+
+                   *In04 = *On;
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'05';
+
+                   *In05 = *On;
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'06';
+
+                   *In06 = *On;
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'07';
+
+                   *In07 = *On;
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'10';
+
+                   p_QDFKMFMV = %Addr(Ds_QDFKMFDP.QDFKMFEX);
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'15';
+
+                   p_QDFKMFRS = %Addr(Ds_QDFKMFDP.QDFKMFEX);
+                   p_QDFKMFEM = %Addr(Ds_QDFKMFRS.QDFKMFEE);
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'16';
+
+                   p_QDFKMFRS = %Addr(Ds_QDFKMFDP.QDFKMFEX);
+                   p_QDFKMFEM = %Addr(Ds_QDFKMFRS.QDFKMFEE);
+                   p_QDFKMFSI = %Addr(Ds_QDFKMFEM.QDFKMFTX);
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'17';
+
+                   p_QDFKDFLD = %Addr(Ds_QDFKMFDP.QDFKMFEX);
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'18';
+
+                // p_QDFK_DATTIMFmat  = %Addr(Ds_QDFKMFDP.QDFKMFEX);
+
+                   *In08 = *On;
+                   // WDFK_DATTIMwh
+                   // Format usedenor a field with the date or time data type.
+                   // X'01' indicQDes *JOB,
+                   // X'02' indicates *MDY,
+                   // X'03' indicates *DMY,
+                   // X'04' indicates *YMD,
+                   // X'05' indicates *JUL,
+                   // X'06' indicates *ISO,
+                   // X'07' indicates *USA,
+                   // X'08' indicates *EUR,
+                   // X'09' indicates *JIS,
+                   // X'0A' indicates *H
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'19';
+
+                   *In09 = *On;
+                // p_QDFK_DATTIM_Sep = %Addr(Ds_QDFKMFDP.QDFKMFEX);
+                // QDFK_DATTIM_Sep.WDFK_DATTIMSep =
+                // QDFK_DATTIM_Sep.WDFK_DATTIMSep;
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'1A';
+
+                   *In10 = *On;
+                // p_QDFK_DATEP = %Addr(Ds_QDFKMFDP.QDFKMFEX);
+                // QDFK_DATEP.WDFK_DATE = QDFK_DATEP.WDFK_DATE;
+
+                // 0   BIT(1)  WDFK_DATE_SYS   If on, the *SYS parameter is specified
+                // 1   BIT(1)  WDFK_DATE_YY    If on, the *YY parameter is specified
+                // 2   BIT(1)  WDFK_DATE_EDTCDEY  If on, the EDTCDE(Y) keyword was specify
+                //     If        %Bitand(WDFK_DATE:Bit0) = Bit0
+                //     If        %Bitand(WDFK_DATE:Bit1) = Bit1
+                //     If        %Bitand(WDFK_DATE:Bit2) = Bit2
+
+x002            When Ds_QDFKMFDP.QDFKMFID = x'1B';
+
+                   *In11 = *On;
+
+e002         EndSl;
+
+             p_QDFKMFDP += %Size(Ds_QDFKMFDP);
+
+e001      EndFor;
+
+          End-Proc;
+
+          Dcl-Proc @Category_23;
+
+          Dcl-pi @Category_23;
+             FieldHdr LikeDs(QDFFFINF);
+             KeyWdCat LikeDs(QDFFCCOA);
+             @FldLen  Int(5);
+             @FldCom  VarChar(4000);
+             @FldIO   Char(1);
+          End-pi;
+
+finf      /define QDFRTVFD022
+ccoa      /define QDFRTVFD031
+dft       /define QDFRTVFD109
+dfpm      /define QDFRTVFD110
+          /copy qcpysrc,qdfrtvfd
+finf      /undefine QDFRTVFD022
+ccoa      /undefine QDFRTVFD031
+dft       /undefine QDFRTVFD109
+dfpm      /undefine QDFRTVFD110
+
+     D KwdData         s           3564A   varying based(p_KwdData)
+
+          Dcl-s @KeyIdx Int(10) Inz(*Zeros);
+          Dcl-c dft             Const(x'01');
+          Dcl-s temp    Like(KwdData) Inz(*Blanks);
+
+          p_QDFKDFT = %Addr(FieldHdr) + KeyWdCat.QDFFCAOF;
+
+          p_QDFKDFPM = %Addr(Ds_QDFKDFT.QDFKDFPE);
+
+b001      For @KeyIdx = 1 to Ds_QDFKDFT.QDFFKDFS;
+
+b002         If Ds_QDFKDFPM.QDFKDFID = DFT;
+
+                p_KwdData = p_QDFKDFPM + %Size(Ds_QDFKDFPM) - 2;
+
+                Temp = KwdData;
+
+                @FldLen = Ds_QDFKDFPM.QDFKDFLN;
+                @FldCom = Temp;
+                @FldIO  = SetIO(FieldHdr.QDFFFIOA);
+
+e002         EndIf;
+
+             p_QDFKDFPM += %Size(Ds_QDFKDFPM);
+
+e001      EndFor;
+
+          End-Proc;
+
+          Dcl-Proc @Category_24;
+
+          Dcl-pi @Category_24;
+             FieldHdr LikeDs(QDFFFINF);
+             KeyWdCat LikeDs(QDFFCCOA);
+             @FldEdt  Char(20);
+             @FldLen  Int(5);
+             @FldIO   Char(1);
+          End-pi;
+
+finf      /define QDFRTVFD022
+ccoa      /define QDFRTVFD031
+edtr      /define QDFRTVFD113
+          /copy qcpysrc,qdfrtvfd
+finf      /undefine QDFRTVFD022
+ccoa      /undefine QDFRTVFD031
+edtr      /undefine QDFRTVFD113
+
+edtp      /define QDFRTVFD114
+          /copy qcpysrc,qdfrtvfd
+edtp      /undefine QDFRTVFD114
+     D QDFKEDMSx               6     40A
+
+          Dcl-s @KeyIdx Int(10) Inz(*Zeros);
+
+          p_QDFKEDTR = %Addr(FieldHdr) + KeyWdCat.QDFFCAOF;
+
+          p_QDFKEDTP = %Addr(Ds_QDFKEDTR.QDFKEDKW);
+
+b001      For @KeyIdx = 1 to Ds_QDFKEDTR.QDFFKEDS;
+
+             // EDIT Keyword Structure (QDFKEDTP)
+             // Use this structure for category 24 keywords that
+             // have keyword IDs of X'01' and X'02'.
+
+             // Type    Variable Name   Field
+             // CHAR(1) WDFKEDID    Keyword ID.
+             // CHAR(1) WDFKEDSY    Zero suppress or fill character for the EDTCDE k
+             // BIN(15) WDFKEDML    Length of the edit mask.
+             // CHAR(1) *   Reserved.
+             // CHAR(*) WDFKEDMS    The edit mask for the EDTCDE and EDTWRD keywords
+
+             @FldEdt = %Subst(Ds_QDFKEDTP.QDFKEDMSX: 1:
+                              Ds_QDFKEDTP.QDFKEDML);
+
+             @FldLen = Ds_QDFKEDTP.QDFKEDML;
+             @FldIO  = SetIO(FieldHdr.QDFFFIOA);
+
+             p_QDFKEDTP += %Size(QDFKEDTP);
+
+e001      EndFor;
+
+          End-Proc;
+
+          Dcl-Proc @Category_25;
+
+          Dcl-pi @Category_25;
+             FieldHdr    LikeDs(QDFFFINF);
+             KeyWdCat    LikeDs(QDFFCCOA);
+             @FldSpcKeys Char(15) Dim(30);
+             @FldIdx     Packed(3);
+          End-pi;
+
+finf      /define QDFRTVFD022
+ccoa      /define QDFRTVFD031
+vakw      /define QDFRTVFD115
+varl      /define QDFRTVFD116
+          /copy qcpysrc,qdfrtvfd
+finf      /undefine QDFRTVFD022
+ccoa      /undefine QDFRTVFD031
+vakw      /undefine QDFRTVFD115
+varl      /undefine QDFRTVFD116
+
+          p_QDFKVAKW = %Addr(FieldHdr) + KeyWdCat.QDFFCAOF;
+          p_QDFKVARL = %Addr(Ds_QDFKVAKW.QDFKVACK);
+
+          TestBit(Ds_QDFKVARL.QDFBITS38);
+
+b001      Select;
+
+x001         When *In01;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'CHECK(M10F)';
+
+x001         When *In02;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'CHECK(M11F)';
+
+x001         When *In03;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'CHECK(VN)';
+
+x001         When *In04;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'CHECK(VNE)';
+
+x001         When *In05;
+
+x001         When *In06;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'CHECK(M10)';
+
+x001         When *In07;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'CHECK(M11)';
+
+e001      EndSl;
+
+          TestBit(Ds_QDFKVARL.QDFBITS39);
+
+b001      Select;
+
+x001         When Not *In01
+             And  Not *In02
+             And  Not *In03
+             And      *In04;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'RANGE(';
+
+x001         When Not *In01
+             And  Not *In02
+             And      *In03
+             And  Not *In04;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'VALUES(';
+
+x001         When Not *In01
+             And  Not *In02
+             And      *In03
+             And      *In04;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'CMP(GT';
+
+x001         When Not *In01
+             And      *In02
+             And  Not *In03
+             And  Not *In04;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'CMP(GE';
+
+x001         When Not *In01
+             And      *In02
+             And  Not *In03
+             And      *In04;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'CMP(EQ';
+
+x001         When Not *In01
+             And      *In02
+             And      *In03
+             And  Not *In04;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'CMP(NE';
+
+x001         When Not *In01
+             And      *In02
+             And      *In03
+             And      *In04;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'CMP(LE';
+
+x001         When     *In01
+             And  Not *In02
+             And  Not *In03
+             And  Not *In04;
+
+                @FldIdx += 1;
+                @FldSpcKeys(@FldIdx) = 'CMP(LT';
+
+e001      EndSl;
+
+          End-Proc;
+

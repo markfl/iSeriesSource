@@ -1,0 +1,48 @@
+             PGM        PARM(&FRMOBJLIB)
+
+             DCLPRCOPT  DFTACTGRP(*NO) ACTGRP(*NEW) BNDDIR(MFLORES)
+
+             DCL        VAR(&FRMOBJLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&INIT) TYPE(*CHAR) LEN(28) +
+                          VALUE(ABCDEFGHIJKLMNOPQRSTUVWXYZ$#)
+             DCL        VAR(&INDEX) TYPE(*DEC) LEN(2 0) VALUE(0)
+             DCL        VAR(&JOBNAME) TYPE(*CHAR) LEN(10) +
+                          VALUE(PGMFLDREF)
+             DCL        VAR(&PROGRAM) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&JOB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&USER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&NUMBER) TYPE(*CHAR) LEN(6)
+
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(256)
+
+             RMVMSG     CLEAR(*ALL)
+
+/* b01 */    DOWHILE    COND(&INDEX *LT 28)
+
+             CHGVAR     VAR(&INDEX) VALUE(&INDEX + 1)
+
+             CHGVAR     VAR(%SST(&JOBNAME 10 1)) VALUE(%SST(&INIT +
+                          &INDEX 1))
+             CHGVAR     VAR(&PROGRAM) VALUE(%SST(&INIT &INDEX 1) || +
+                          '*')
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(&FRMOBJLIB) +
+                          SRCFILE(&FRMOBJLIB/QRPGLESRC) +
+                          MBR(&PROGRAM)) JOB(&JOBNAME) HOLD(*YES)
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(&FRMOBJLIB) +
+                          SRCFILE(&FRMOBJLIB/QCLLESRC) +
+                          MBR(&PROGRAM)) JOB(&JOBNAME) HOLD(*YES)
+
+             RCVMSG     MSGTYPE(*COMP) MSGDTA(&MSGDTA) MSGID(&MSGID)
+             CHGVAR     VAR(&JOB) VALUE(%SST(&MSGDTA 1 10))
+             CHGVAR     VAR(&USER) VALUE(%SST(&MSGDTA 11 10))
+             CHGVAR     VAR(&NUMBER) VALUE(%SST(&MSGDTA 21 6))
+             CHGJOB     JOB(&NUMBER/&USER/&JOB) RUNPTY(61)
+
+/* e01 */    ENDDO
+
+ END:        ENDPGM

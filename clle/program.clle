@@ -1,0 +1,36 @@
+             PGM        PARM(&PROGRAM &SRCLIB &FILE &LOGFILE)
+
+             DCL        VAR(&PROGRAM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SRCLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&LOGFILE) TYPE(*CHAR) LEN(20)
+
+             DCL        VAR(&FILENAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FILELIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&LFILENAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LFILELIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&TEXT) TYPE(*CHAR) LEN(50)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&FILENAME) VALUE(%SST(&FILE 1 10))
+             CHGVAR     VAR(&FILELIB) VALUE(%SST(&FILE 11 10))
+
+             CHGVAR     VAR(&LFILENAME) VALUE(%SST(&LOGFILE 1 10))
+             CHGVAR     VAR(&LFILELIB) VALUE(%SST(&LOGFILE 11 10))
+
+             IF         COND(&SRCLIB *EQ *CURLIB) THEN(RTVJOBA +
+                          CURLIB(&SRCLIB))
+
+             OVRDBF     FILE(QPGMFLDREF) TOFILE(&FILELIB/&FILENAME)
+             OVRDBF     FILE(QPGMFLDRL1) TOFILE(&LFILELIB/&LFILENAME)
+
+             CALL       PGM(PROGRAMR) PARM(&PROGRAM &SRCLIB &TEXT)
+
+             DLTOVR     FILE(*ALL)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

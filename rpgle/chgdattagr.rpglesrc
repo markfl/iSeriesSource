@@ -1,0 +1,64 @@
+     HOption(*NoDebugio) DftActGrp(*No)
+     Fqrpglesrc up   f  112        Disk
+
+     Dchgdattagr       pr
+     D                                5a
+     D                                6a
+     D                                5a
+
+     Dchgdattagr       pi
+     D  @InTag                        5a
+     D  @OutDate                      6a
+     D  @Srctype                      5a
+     D @a              s              3p 0 Inz(*Zeros)
+
+     D  @Up            c                   'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+     D  @Lo            c                   'abcdefghijklmnopqrstuvwxyz'
+     D  @UpperTag      s              5a   Inz(*Blanks)
+     D  @LowerTag      s              5a   Inz(*Blanks)
+
+     Iqrpglesrc ns
+     I                                  7   12  srcdat
+     I                                 13   21  srctag
+     I                                 13  112  @Source
+
+     C/free
+
+          Reset @a;
+          @a = %Scan(%Trim(@LowerTag): @Source);
+b001      If @a = *Zeros;
+             @a = %Scan(%Trim(@UpperTag): @Source);
+e001      EndIf;
+
+b001      Select;
+x001         When @a > *Zeros;
+                srcdat = @OutDate;
+                Except updsrc;
+x001         When @Srctype = 'RPGLE'
+             Or   @Srctype = 'RPG'
+             Or   @Srctype = 'DDS'
+             Or   @Srctype = 'CMD';
+b002            If %SubSt(srctag:1:5) = %SubSt(@InTag:1:5);
+                   srcdat = @OutDate;
+                   Except updsrc;
+e002            EndIf;
+x001         When @Srctype = 'CLLE'
+             Or   @Srctype = 'CLP';
+b002            If srctag = @InTag;
+                   srcdat = @OutDate;
+                   Except updsrc;
+e002            EndIf;
+x001      Other;
+e001      EndSl;
+
+          BegSr *Inzsr;
+
+             @LowerTag = %Xlate(@Up:@Lo:@InTag);
+             @UpperTag = %Xlate(@Lo:@Up:@InTag);
+
+          EndSr;
+
+      /end-free
+
+     Oqrpglesrc e            updsrc
+     O                       srcdat              12

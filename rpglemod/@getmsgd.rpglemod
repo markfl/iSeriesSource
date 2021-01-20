@@ -1,0 +1,269 @@
+          Ctl-opt Option(*Nodebugio) Nomain;
+     H/Title Get Message
+
+          Dcl-Pr GetOffsetData VarChar(65535);
+              char1 VarChar(65535) Const;
+              integer1 Int(10) Const;
+              integer1 Int(10) Const;
+          End-Pr;
+
+š         Dcl-Proc GetMessage Export;
+
+          Dcl-Pi GetMessage  Ind;
+             @Message VarChar(512);
+             @MessageHelpData VarChar(512);
+             HelpData VarChar(512);
+             @MessageFile Char(10) Const;
+             @MessageFileLibrary Char(10) Const;
+             Library Char(10) Const;
+             @MessageID Char(7) Const;
+             @Format Char(8) Const   Options(*NoPass);
+             @SubstitutionVariableFormats VarChar(512) Options(*NoPass);
+             Formats VarChar(512) Options(*NoPass);
+          End-Pi;
+
+          Dcl-c @Format1 Const('RTVM0100');
+          Dcl-c @Format2 Const('RTVM0200');
+          Dcl-c @Format3 Const('RTVM0300');
+          Dcl-c @Format4 Const('RTVM0400');
+
+          /define mflores053
+          /define mflores054
+          /define mflores055
+          /define mflores056
+          /define mflores057
+          /copy qcpysrc,mflores
+          /undefine mflores053
+          /undefine mflores054
+          /undefine mflores055
+          /undefine mflores056
+          /undefine mflores057
+
+          Dcl-Pr GetMessageData ExtPgm('QMHRTVM');
+              char1 Char(65535) Options(*VarSize);
+              integer1 Int(10) Const;
+              char1 Char(8) Const;
+              char1 Char(7) Const;
+              char1 Char(20) Const;
+              char1 Char(65535) Const Options(*VarSize);
+              integer1 Int(10) Const;
+              char1 Char(10) Const;
+              char1 Char(10);
+              char1 Char(65535) Options(*VarSize);
+              char1 Char(10) Options(*NoPass);
+              char1 Char(10) Options(*NoPass);
+              integer1 Int(10) Options(*NoPass);
+              integer1 Int(10) Options(*NoPass);
+          End-Pr;
+
+          Dcl-s @LengthOfMessageInfo Int(10) Inz(512);
+          Dcl-s @FormatName Like(@Format) Inz(@Format1);
+          Dcl-s @QualifiedMessageFileName Char(20) Inz(*Blanks);
+          Dcl-s @ReplacementData VarChar(65535);
+          Dcl-s @LengthOfReplacementData Int(10) Inz(*Zeros);
+          Dcl-s @ReplaceSubstitutionValues Char(10) Inz('*NO');
+          Dcl-s @ReturnFormatControlCharacters Char(10) Inz('*NO');
+          Dcl-s @ErrorCode VarChar(65535) Inz(*Blanks);
+          Dcl-s @MaxMsgLen Int(10) Inz(%Size(@Message));
+
+     C/Free
+
+          Clear @Message;
+          Clear @MessageHelpData;
+          Clear @SubstitutionVariableFormats;
+
+b001      Monitor;
+
+b002         If %Parms() >= 5;
+
+                // set format var
+                @FormatName = @Format;
+
+e002         EndIf;
+
+b002         If @MessageFileLibrary = *Blanks;
+
+                @QualifiedMessageFileName = @MessageFile + '*LIBL';
+
+x002         Else;
+
+                @QualifiedMessageFileName = @MessageFile + @MessageFileLibrary;
+
+e002         EndIf;
+
+             // Seed Excecption datastructure with bytes provided
+             ERRC0100Ds.@BytesProvided = %Size(ERRC0100Ds);
+
+             // Start data structure select
+b002         Select;
+
+                // Check for format 1 to use
+x002            When @FormatName = @Format1;
+
+                   GetMessageData(RTVM0100Ds: %Size(RTVM0100Ds):
+                                  @FormatName:
+                                  @MessageID:
+                                  @QualifiedMessageFileName:
+                                  @ReplacementData:
+                                  @LengthOfReplacementData:
+                                  @ReplaceSubstitutionValues:
+                                  @ReturnFormatControlCharacters:
+                                  ERRC0100Ds);
+
+b003               If (RTVM0100Ds.@LengthOfMessageReturned > *Zeros);
+b004                  If (RTVM0100Ds.@LengthOfMessageReturned > @MaxMsgLen);
+                         RTVM0100Ds.@LengthOfMessageReturned = @MaxMsgLen;
+e004                  EndIf;
+
+                      @Message = GetOffsetData(RTVM0100Ds:
+                      25:
+                      RTVM0100Ds.@LengthOfMessageReturned);
+
+                      @MessageHelpData = GetOffsetData(RTVM0100Ds:
+                      25 + RTVM0100Ds.@LengthOfMessageReturned:
+                      RTVM0100Ds.@LengthOfMessageHelpReturned);
+
+x003               Else;
+                      @Message = *Blanks;
+e003               EndIf;
+
+                // Check for format 2 to use
+x002            When @FormatName = @Format2;
+
+                   GetMessageData(RTVM0200Ds: %Size(RTVM0200Ds):
+                                  @FormatName:
+                                  @MessageID:
+                                  @QualifiedMessageFileName:
+                                  @ReplacementData:
+                                  @LengthOfReplacementData:
+                                  @ReplaceSubstitutionValues:
+                                  @ReturnFormatControlCharacters:
+                                  ERRC0100Ds);
+
+b003               If (RTVM0200Ds.@LengthOfMessageReturned > *Zeros);
+b004                  If (RTVM0200Ds.@LengthOfMessageReturned > @MaxMsgLen);
+                         RTVM0200Ds.@LengthOfMessageReturned = @MaxMsgLen;
+e004                  EndIf;
+
+                      @Message = GetOffsetData(RTVM0200Ds:
+                      53 + RTVM0200Ds.@LengthOfDefaultReplyReturned:
+                      RTVM0200Ds.@LengthOfMessageReturned);
+
+                      @MessageHelpData = GetOffsetData(RTVM0200Ds:
+                      53 + RTVM0200Ds.@LengthOfDefaultReplyReturned
+                         + RTVM0200Ds.@LengthOfMessageReturned:
+                      RTVM0200Ds.@LengthOfMessageHelpReturned);
+x003               Else;
+                      @Message = *Blanks;
+e003               EndIf;
+
+                // Check for format 3 to use
+x002            When @FormatName = @Format3;
+
+                   GetMessageData(RTVM0300Ds: %Size(RTVM0300Ds):
+                                  @FormatName:
+                                  @MessageID:
+                                  @QualifiedMessageFileName:
+                                  @ReplacementData:
+                                  @LengthOfReplacementData:
+                                  @ReplaceSubstitutionValues:
+                                  @ReturnFormatControlCharacters:
+                                  ERRC0100Ds);
+
+b003               If (RTVM0300Ds.@LengthOfMessageReturned > *Zeros);
+b004                  If (RTVM0300Ds.@LengthOfMessageReturned > @MaxMsgLen);
+                         RTVM0300Ds.@LengthOfMessageReturned = @MaxMsgLen;
+e004                  EndIf;
+
+                      @Message = %Subst(RTVM0300Ds.@MsgData:
+                                        1:RTVM0300Ds.@LengthOfMessageReturned);
+
+                      @Message = GetOffsetData(RTVM0300Ds:
+                      RTVM0300Ds.@OffsetOfMessage +1:
+                      RTVM0300Ds.@LengthOfMessageReturned);
+
+b004                  If RTVM0300Ds.@LengthOfMessageHelpReturned > *Zeros;
+
+                         @MessageHelpData = GetOffsetData(RTVM0300Ds:
+                         RTVM0300Ds.@OffsetOfMessageHelp + 1:
+                         RTVM0300Ds.@LengthOfMessageHelpReturned);
+
+e004                  EndIf;
+
+b004                  If RTVM0300Ds.@LengthOfSubstitutionVariableFormatsReturned
+                         > *Zeros;
+
+                         @SubstitutionVariableFormats =
+                         GetOffsetData(RTVM0300Ds:
+                         RTVM0300Ds.@OffsetOfMessage +
+                         RTVM0300Ds.@LengthOfMessageReturned +
+                         RTVM0300Ds.@LengthOfMessageHelpReturned + 1:
+                      RTVM0300Ds.@LengthOfSubstitutionVariableFormatsReturned);
+
+e004                  EndIf;
+e003               EndIf;
+
+                // Check for format 4 to use
+x002            When @FormatName = @Format4;
+
+                   GetMessageData(RTVM0400Ds: %Size(RTVM0400Ds):
+                                  @FormatName:
+                                  @MessageID:
+                                  @QualifiedMessageFileName:
+                                  @ReplacementData:
+                                  @LengthOfReplacementData:
+                                  @ReplaceSubstitutionValues:
+                                  @ReturnFormatControlCharacters:
+                                  ERRC0100Ds);
+
+b003               If (RTVM0400Ds.@LengthOfMessageReturned > *Zeros);
+
+b004                  If (RTVM0400Ds.@LengthOfMessageReturned > @MaxMsgLen);
+                         RTVM0400Ds.@LengthOfMessageReturned = @MaxMsgLen;
+e004                  EndIf;
+
+                      @Message = GetOffsetData(RTVM0400Ds:
+                      RTVM0400Ds.@OffsetOfMessage +1:
+                      RTVM0400Ds.@LengthOfMessageReturned);
+
+                      @MessageHelpData = GetOffsetData(RTVM0400Ds:
+                      RTVM0400Ds.@OffsetOfMessageHelp + 1:
+                      RTVM0400Ds.@LengthOfMessageHelpReturned);
+
+                      @SubstitutionVariableFormats = GetOffsetData(RTVM0400Ds:
+                      RTVM0400Ds.@OffsetOfMessage +
+                      RTVM0400Ds.@LengthOfMessageReturned +
+                      RTVM0400Ds.@LengthOfMessageHelpReturned + 1:
+                      RTVM0400Ds.@LengthOfSubstitutionVariableFormatsReturned);
+
+x003               Else;
+                      @Message = *Blanks;
+e003               EndIf;
+
+e002         EndSl;
+
+             Return *On;
+
+          On-Error;
+
+             Return *Off;
+
+          EndMon;
+      /end-free
+
+š         End-Proc;
+
+š         Dcl-Proc GetOffsetData;
+
+          Dcl-Pi GetOffsetData VarChar(65535);
+             @Data VarChar(65535) Const;
+             @StartPosition Int(10) Const;
+             @Length Int(10) Const;
+          End-Pi;
+     C/Free
+
+          Return %Subst(@Data: @StartPosition: @Length);
+
+      /end-free
+
+š         End-Proc;

@@ -1,0 +1,22 @@
+             CMD        PROMPT('Build Data Dictionary')
+
+             PARM       KWD(DSPFFD) TYPE(DSPFFD) DFT(*DFT) +
+                          SNGVAL((*DFT 'QDBASEDICT*CURLIB')) +
+                          PROMPT('Data Dictionary File')
+ DSPFFD:     QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(DSPOBJD) TYPE(DSPOBJD) DFT(*DFT) +
+                          SNGVAL((*DFT 'QDSPOBJD  *CURLIB')) +
+                          PROMPT('Display Object Description')
+ DSPOBJD:    QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(REBUILDOBJ) TYPE(*CHAR) LEN(4) +
+                          RSTD(*YES) DFT(*NO) SPCVAL((*YES '1') +
+                          (*NO '0')) PROMPT('Rebuild Object +
+                          Description')

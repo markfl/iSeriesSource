@@ -1,0 +1,46 @@
+             PGM        PARM(&DATABASEIN)
+
+             DCL        VAR(&DATABASEIN) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&SRCFILEIN) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&DATABASE) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&SRCFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SINGLEDTAB) TYPE(*LGL) VALUE('0')
+
+             CHGVAR     VAR(&DATABASE) VALUE(&DATABASEIN)
+/* b01 */    MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&SINGLEDTAB) VALUE('1')
+/* e01 */    ENDDO
+
+/* b01 */    IF         COND(&SINGLEDTAB) THEN(DO)
+
+             SBMJOB     CMD(CALL PGM(BLDSQL) PARM(*USRLIBL *CREATE +
+                          CREATE DROP)) JOB(BLDBASCRT) LOGCLPGM(*YES)
+
+             SBMJOB     CMD(CALL PGM(BLDSQL) PARM(*USRLIBL *VIEW +
+                          VIEW DROPVIEW)) JOB(BLDBASVIEW) +
+                          LOGCLPGM(*YES)
+
+             SBMJOB     CMD(CALL PGM(BLDSQL) PARM(*USRLIBL *INDEX +
+                          INDEX DROPINDX)) JOB(BLDBASINDX) +
+                          LOGCLPGM(*YES)
+
+/* e01 */    ENDDO
+
+/* b01 */    ELSE       CMD(DO)
+
+             SBMJOB     CMD(CALL PGM(BLDSQL) PARM(*USRLIBL *CREATE +
+                          CREATE DROP &DATABASE)) JOB(BLDBASCRT) +
+                          LOGCLPGM(*YES)
+
+             SBMJOB     CMD(CALL PGM(BLDSQL) PARM(*USRLIBL *VIEW +
+                          VIEW DROPVIEW &DATABASE)) JOB(BLDBASVIEW) +
+                          LOGCLPGM(*YES)
+
+             SBMJOB     CMD(CALL PGM(BLDSQL) PARM(*USRLIBL *INDEX +
+                          INDEX DROPINDX &DATABASE)) +
+                          JOB(BLDBASINDX) LOGCLPGM(*YES)
+
+/* e01 */    ENDDO
+
+             ENDPGM

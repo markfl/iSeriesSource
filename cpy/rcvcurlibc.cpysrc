@@ -1,0 +1,34 @@
+
+             DLTF       FILE(QTEMP/QCURLIBL1)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QCURLIBL2)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/QCURLIBL)
+             MONMSG     MSGID(CPF0000)
+
+             CRTPF      FILE(QTEMP/QCURLIBL) +
+                          SRCFILE(&CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST) MAXMBRS(*NOMAX) SIZE(*NOMAX) +
+                          LVLCHK(*NO)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(QTEMP/QCURLIBL1) +
+                          SRCFILE(&CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST) MAXMBRS(*NOMAX) LVLCHK(*NO)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(QTEMP/QCURLIBL2) +
+                          SRCFILE(&CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST) MAXMBRS(*NOMAX) LVLCHK(*NO)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(QCURLIBL) TOFILE(QTEMP/QCURLIBL)
+
+             CALL       PGM(CURLIBLAR) PARM(&USRLIBL &CURLIB)
+
+             DLTOVR     FILE(QCURLIBL)
+
+             CHGVAR     VAR(&QCURLIB) VALUE('1')
+

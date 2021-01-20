@@ -1,0 +1,8 @@
+             CMD        PROMPT('Display Stored Procedure')
+
+             PARM       KWD(PROC) TYPE(*CHAR) LEN(128) DFT(*ALL) +
+                          SPCVAL((*ALL)) PROMPT('Procedure name')
+
+             PARM       KWD(SCHEMA) TYPE(*CHAR) LEN(128) DFT(*ALL) +
+                          SPCVAL((*ALL)) PROMPT('Schema/Library name')
+

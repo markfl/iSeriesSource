@@ -1,0 +1,42 @@
+             PGM        PARM(&LIBRARY &DATABASEIN)
+
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DATABASEIN) TYPE(*CHAR) LEN(15)
+
+             DCL        VAR(&DATABASE) TYPE(*CHAR) LEN(15)
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+
+             CHGVAR     VAR(&DATABASE) VALUE(&DATABASEIN)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+/* b01 */    IF         COND(&MSGID *NE ' ') THEN(DO)
+
+/*           SBMJOB     CMD(CALL PGM(BLDSQL) PARM(&LIBRARY *CREATE +
+                          CREATE DROP)) JOB(BLDBASCRT) +
+                          LOGCLPGM(*YES) HOLD(*YES)    */
+
+             SBMJOB     CMD(CALL PGM(BLDSQL) PARM(&LIBRARY *VIEW +
+                          VIEW DROPVIEW)) JOB(BLDBASVIEW) +
+                          LOGCLPGM(*YES) HOLD(*YES)
+
+/*           SBMJOB     CMD(CALL PGM(BLDSQL) PARM(&LIBRARY *INDEX +
+                          INDEX DROPINDX)) JOB(BLDBASINDX) +
+                          LOGCLPGM(*YES) HOLD(*YES)        */
+/* e01 */    ENDDO
+/* b01 */    ELSE       CMD(DO)
+
+/*           SBMJOB     CMD(CALL PGM(BLDSQL) PARM(&LIBRARY *CREATE +
+                          CREATE DROP &DATABASE)) JOB(BLDBASCRT) +
+                          LOGCLPGM(*YES) HOLD(*YES)              */
+
+             SBMJOB     CMD(CALL PGM(BLDSQL) PARM(&LIBRARY *VIEW +
+                          VIEW DROPVIEW &DATABASE)) JOB(BLDBASVIEW) +
+                          LOGCLPGM(*YES) HOLD(*YES)
+
+/*           SBMJOB     CMD(CALL PGM(BLDSQL) PARM(&LIBRARY *INDEX +
+                          INDEX DROPINDX &DATABASE)) +
+                          JOB(BLDBASINDX) LOGCLPGM(*YES) HOLD(*YES) */
+
+/* e01 */    ENDDO
+
+ END:        ENDPGM

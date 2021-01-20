@@ -1,0 +1,58 @@
+             PGM
+
+             SBMJOB     CMD(CPYF FROMFILE(NADNADMPMF) +
+                          TOFILE(ISFLORESM/NADNADMP) FROMMBR(*ALL) +
+                          TOMBR(*FROMMBR) MBROPT(*REPLACE)) +
+                          JOB(NADNADMP)
+
+             SBMJOB     CMD(CPYF FROMFILE(CTRCRMTPMF) +
+                          TOFILE(ISFLORESM/CTRCRMTP) FROMMBR(*ALL) +
+                          TOMBR(*FROMMBR) MBROPT(*REPLACE)) +
+                          JOB(CTRCRMTP)
+
+             SBMJOB     CMD(CPYF FROMFILE(VNDVIDDPMF) +
+                          TOFILE(ISFLORESM/VNDVIDDP) FROMMBR(*ALL) +
+                          TOMBR(*FROMMBR) MBROPT(*REPLACE)) +
+                          JOB(VNDVIDDP)
+
+             SBMJOB     CMD(CPYF FROMFILE(VNDVNDMPMF) +
+                          TOFILE(ISFLORESM/VNDVNDMP) FROMMBR(*ALL) +
+                          TOMBR(*FROMMBR) MBROPT(*REPLACE)) +
+                          JOB(VNDVNDMP)
+
+             SBMJOB     CMD(CPYF FROMFILE(VNDVAXXPMF) +
+                          TOFILE(ISFLORESM/VNDVAXXP) FROMMBR(*ALL) +
+                          TOMBR(*FROMMBR) MBROPT(*REPLACE)) +
+                          JOB(VNDVAXXP)
+
+             SBMJOB     CMD(CPYF FROMFILE(VNDVPRMPMF) +
+                          TOFILE(ISFLORESM/VNDVPRMP) FROMMBR(*ALL) +
+                          TOMBR(*FROMMBR) MBROPT(*REPLACE)) +
+                          JOB(VNDVPRMP)
+
+             SBMJOB     CMD(CPYF FROMFILE(VNDVAEXPMF) +
+                          TOFILE(ISFLORESM/VNDVAEXP) FROMMBR(*ALL) +
+                          TOMBR(*FROMMBR) MBROPT(*REPLACE)) +
+                          JOB(VNDVAEXP)
+
+             SBMJOB     CMD(CPYF FROMFILE(CONCONMPMF) +
+                          TOFILE(ISFLORESM/CONCONMP) FROMMBR(*ALL) +
+                          TOMBR(*FROMMBR) MBROPT(*REPLACE)) +
+                          JOB(CONCONMP)
+
+             SBMJOB     CMD(CPYF FROMFILE(CONCPLDPMF) +
+                          TOFILE(ISFLORESM/CONCPLDP) FROMMBR(*ALL) +
+                          TOMBR(*FROMMBR) MBROPT(*REPLACE)) +
+                          JOB(CONCPLDP)
+
+             SBMJOB     CMD(CPYF FROMFILE(CONMELDPMF) +
+                          TOFILE(ISFLORESM/CONMELDP) FROMMBR(*ALL) +
+                          TOMBR(*FROMMBR) MBROPT(*REPLACE)) +
+                          JOB(CONMELDP)
+
+             SBMJOB     CMD(CPYF FROMFILE(CONCALDPMF) +
+                          TOFILE(ISFLORESM/CONCALDP) FROMMBR(*ALL) +
+                          TOMBR(*FROMMBR) MBROPT(*REPLACE)) +
+                          JOB(CONCALDP)
+
+ END:        ENDPGM

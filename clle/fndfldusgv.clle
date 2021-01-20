@@ -1,0 +1,101 @@
+             PGM        PARM(&REFFIELD &DSPFFD &DSPOBJD &DSPPGMREF +
+                          &FNDFLDUSG &OUTMBR &PRTREPORT)
+
+             DCL        VAR(&REFFIELD) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DSPFFD) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&DSPOBJD) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&DSPPGMREF) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&FNDFLDUSG) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&OUTMBR) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&PRTREPORT) TYPE(*CHAR) LEN(4)
+
+             DCL        VAR(&FFDFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FFDLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&OBJDFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OBJDLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&PGMREFFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGMREFLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&FNDFLDFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FNDFLDLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(256)
+
+             CHGVAR     VAR(&FFDFILE) VALUE(%SST(&DSPFFD 1 10))
+             CHGVAR     VAR(&FFDLIB) VALUE(%SST(&DSPFFD 11 10))
+
+             CHGVAR     VAR(&OBJDFILE) VALUE(%SST(&DSPOBJD 1 10))
+             CHGVAR     VAR(&OBJDLIB) VALUE(%SST(&DSPOBJD 11 10))
+
+             CHGVAR     VAR(&PGMREFFILE) VALUE(%SST(&DSPPGMREF 1 10))
+             CHGVAR     VAR(&PGMREFLIB) VALUE(%SST(&DSPPGMREF 11 10))
+
+             CHGVAR     VAR(&FNDFLDFILE) VALUE(%SST(&FNDFLDUSG 1 10))
+             CHGVAR     VAR(&FNDFLDLIB) VALUE(%SST(&FNDFLDUSG 11 10))
+
+             IF         COND(&FFDFILE *NE *NEW) THEN(DO)
+
+             CHKOBJ     OBJ(&FFDLIB/&FFDFILE) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    File' |> &FFDFILE |> +
+                          'in library' |> &FFDLIB |> 'not found')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             MONMSG     MSGID(CPF9810) EXEC(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    Library' |> &FFDLIB +
+                          |> 'not found')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             ENDDO
+
+             IF         COND(&OBJDFILE *NE *NEW) THEN(DO)
+
+             CHKOBJ     OBJ(&OBJDLIB/&OBJDFILE) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    File' |> &OBJDFILE +
+                          |> 'in library' |> &OBJDLIB |> 'not found')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             MONMSG     MSGID(CPF9810) EXEC(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    Library' |> &OBJDLIB +
+                          |> 'not found')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             ENDDO
+
+             IF         COND(&PGMREFFILE *NE *NEW) THEN(DO)
+
+             CHKOBJ     OBJ(&PGMREFLIB/&PGMREFFILE) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    File' |> &PGMREFFILE +
+                          |> 'in library' |> &PGMREFLIB |> 'not found')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             MONMSG     MSGID(CPF9810) EXEC(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    Library' |> +
+                          &PGMREFLIB |> 'not found')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             ENDDO
+
+             ENDPGM

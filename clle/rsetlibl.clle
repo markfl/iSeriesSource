@@ -1,0 +1,23 @@
+             PGM        PARM(&USRLIBL)
+
+             DCL        VAR(&USRLIBL) TYPE(*CHAR) LEN(2750)
+
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&INDEX) TYPE(*DEC) LEN(5 0) VALUE(1)
+
+             CHGLIBL    LIBL(*NONE)
+
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&USRLIBL &INDEX 11))
+
+/* b01 */    DOUNTIL    COND(&LIBRARY = ' ')
+
+             ADDLIBLE   LIB(&LIBRARY) POSITION(*LAST)
+
+             CHGVAR     VAR(&INDEX) VALUE(&INDEX + 11)
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&USRLIBL &INDEX 11))
+
+/* e01 */    ENDDO
+
+             RMVMSG     CLEAR(*ALL)
+
+             ENDPGM

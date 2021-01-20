@@ -1,0 +1,72 @@
+             PGM
+
+             DCL        VAR(&RTNLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&EXIT) TYPE(*CHAR) LEN(4)
+
+             DCL        VAR(&SYSNAME) TYPE(*CHAR) LEN(8) +
+                          VALUE('        ')
+             DCL        VAR(&PROCNAME) TYPE(*CHAR) LEN(10) +
+                          VALUE(SYSDICT)
+             DCL        VAR(&PROCKEY) TYPE(*CHAR) LEN(20) +
+                          VALUE(LOCKMONITOR)
+             DCL        VAR(&SUBPROC) TYPE(*CHAR) LEN(10) VALUE(DELAY)
+             DCL        VAR(&VALUE) TYPE(*CHAR) LEN(1024)
+             DCL        VAR(&DELAY) TYPE(*DEC) LEN(5 0) VALUE(00005)
+             DCL        VAR(&DELAYC) TYPE(*CHAR) LEN(5)
+             DCL        VAR(&FOUND) TYPE(*LGL)
+
+             RTVOBJD    OBJ(CNVACTSTSC) OBJTYPE(*PGM) RTNLIB(&RTNLIB)
+
+             CRTDTAARA  DTAARA(&RTNLIB/CNVACTSTSC) TYPE(*CHAR) LEN(4)
+             MONMSG     MSGID(CPF0000)
+
+             CHGDTAARA  DTAARA(&RTNLIB/CNVACTSTSC (1 4)) VALUE('    ')
+
+             CALL       PGM(GETSYPSPRR) PARM(&FOUND &SYSNAME +
+                          &PROCNAME &PROCKEY &SUBPROC &VALUE)
+             CHGVAR     VAR(&DELAYC) VALUE(%SST(&VALUE 1 5))
+             IF         COND(&FOUND) THEN(CHGVAR VAR(&DELAY) +
+                          VALUE(&DELAYC))
+
+             CLRPFM     FILE(LOCKJOBSP)
+             MONMSG     MSGID(CPF0000)
+             CLRPFM     FILE(LOCKMSGP)
+             MONMSG     MSGID(CPF0000)
+             CLRPFM     FILE(LOCKPSTKP)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/CNVACTSTS)
+             MONMSG     MSGID(CPF0000)
+
+             CRTPF      FILE(QTEMP/CNVACTSTS) RCDLEN(132) SIZE(*NOMAX)
+
+ RERUN:
+
+             CLRPFM     FILE(QTEMP/CNVACTSTS)
+
+             WRKACTJOB  OUTPUT(*PRINT) SEQ(*STS)
+
+             CPYSPLF    FILE(QPDSPAJB) TOFILE(QTEMP/CNVACTSTS)
+             DLTSPLF    FILE(QPDSPAJB) SPLNBR(*LAST)
+
+             OVRDBF     FILE(INPUT) TOFILE(QTEMP/CNVACTSTS)
+
+             CALL       PGM(CNVACTSTS)
+
+             DLTOVR     FILE(INPUT)
+
+             CALL       PGM(CNVCLEAN)
+
+             DLYJOB     DLY(&DELAY)
+
+             RTVDTAARA  DTAARA(&RTNLIB/CNVACTSTSC (1 4)) RTNVAR(&EXIT)
+             IF         COND(&EXIT = EXIT) THEN(DO)
+             CHGDTAARA  DTAARA(&RTNLIB/CNVACTSTSC (1 4)) VALUE('    ')
+             DLTF       FILE(QTEMP/CNVACTSTS)
+             MONMSG     MSGID(CPF0000)
+             GOTO       CMDLBL(END)
+             ENDDO
+
+             GOTO       CMDLBL(RERUN)
+
+ END:        ENDPGM

@@ -1,0 +1,39 @@
+             PGM        PARM(&LIBRARY)
+
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&PREFIX) TYPE(*CHAR) +
+                          VALUE('$#ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+             DCL        VAR(&IND) TYPE(*DEC) LEN(2) VALUE(1)
+             DCL        VAR(&PROGRAM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&JOBNAME) TYPE(*CHAR) LEN(10)
+
+/* b01 */    DOWHILE    COND(&IND < 29)
+
+             CHGVAR     VAR(&PROGRAM) VALUE(%SST(&PREFIX &IND 1) || +
+                          '*')
+             CHGVAR     VAR(&JOBNAME) VALUE(&LIBRARY |< %SST(&PREFIX +
+                          &IND 1))
+
+             /* Start of RPGLE Section  */
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(&LIBRARY) +
+                          SRCFILE(&LIBRARY/QRPGLESRC) +
+                          MBR(&PROGRAM)) JOB(&JOBNAME) HOLD(*YES)
+
+             /* End of RPGLE Section  */
+
+             /* Start of CLLE Section  */
+
+             SBMJOB     CMD(PGMFLDREF FRMOBJLIB(&LIBRARY) +
+                          SRCFILE(&LIBRARY/QCLLESRC) MBR(&PROGRAM)) +
+                          JOB(&JOBNAME) HOLD(*YES)
+
+
+             /* End of CLLE Section  */
+
+             CHGVAR     VAR(&IND) VALUE(&IND + 1)
+
+             ENDDO
+
+ END:        ENDPGM

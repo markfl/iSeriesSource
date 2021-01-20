@@ -1,0 +1,78 @@
+     H/title    Order Split
+     H Option(*NoDebugio) DftActGrp(*No)
+     H copyright ('(C) Copyright Hub Group, Inc. 2015')
+
+      ***********************************************************************
+      *                                                                     *
+      *   H U B   G R O U P ,   I N C .                                     *
+      *                                                                     *
+      ***********************************************************************
+      *                                                                     *
+      * Program Name:  ‚Program Shell                                 *     *
+      *                                                                     *
+      * Author.....: Mark Flores                                            *
+      * Date.......: 14-May-2015                                            *
+      * Description: Program Shell                                          *
+      *                                                                     *
+      ***********************************************************************
+      * Change Control Information
+      *----------------------------------------------------------------------
+      * Date     Task #  Description of Changes                    Pgmr ID
+      * -------- ------- ----------------------------------------- ----------
+      * 05/04/14 41869   Initial create                            MF
+      ***********************************************************************
+     F
+
+      *
+      * Function Prototypes
+      * -------------------
+      *
+
+     DFunction         pr
+
+     Dshellr           pi
+
+      * --- Program data structure.
+     D                sds
+     D QProg             *Proc
+     D QJob                  244    253
+     D QUser                 254    263
+
+      *
+      * Work fields
+      * -------------------
+      *
+
+      ****************************************************************
+      *‚Main
+      ****************************************************************
+     C/free
+
+          xml-into @dxmllnp %xml(
+          *Inlr = *On;
+
+      /end-free
+
+      *
+      * Subroutines
+      * -------------------
+      *
+
+      *
+      * Functions
+      * -------------------
+      *
+
+      ****************************************************************
+      *‚Function
+      ****************************************************************
+
+     PFunction         b
+
+     DFunction         pi
+
+     C/free
+
+      /end-free
+
+     PFunction         e

@@ -1,0 +1,66 @@
+          Ctl-opt DftActGrp(*No) Option(*NoDebugio);
+
+     Fspoolfile ip   f  198        Disk
+
+          Dcl-Pi dltsplfsr;
+             @PFile Char(10) Const;
+             @PJob  Char(10) Const;
+             @PUser Char(10) Const;
+             @PNbr  Char(6)  Const;
+          End-Pi;
+
+      /define mflores059
+      /copy qcpysrc,mflores
+      /undefine mflores059
+
+          Dcl-c @Cmd1 Const('DLTSPLF FILE(');
+          Dcl-c @Cmd2 Const(') JOB(');
+          Dcl-c @Cmd3 Const(') SPLNBR(');
+
+          Dcl-s @splfnbr  Zoned(6:0) Inz(*Zeros);
+
+     Ispoolfile ns
+     I                                  1  198  spoolfiledta
+     I                                  2   11  @Splf
+     I                                 13   22  @User
+     I                                 22   26  @End
+     I                                101  106  @Splfnbrc
+     I                                108  117  @Job
+     I                                117  120  @Page
+     I                                119  124  @jobnbr
+
+b001      If  @Splf <> *Blanks
+          And @Splf <> 'File      '
+          And @Splf <> '  (No spoo'
+          And @End  <> 'E N D'
+          And @Page <> 'Page';
+
+             @splfnbr = %Dec(%Trim(@Splfnbrc):6:0);
+
+b002         If  %Trim(@PFile) = '*ALL';
+
+                @Command = @Cmd1 + %Trim(@Splf) + @Cmd2 + @Jobnbr + '/'
+                                 + %Trim(@User)  + '/' + %Trim(@Job)  + @Cmd3
+                                 + %Trim(@splfnbrc) + ')';
+
+                @Length = %Len(%Trim(@Command));
+b003            Monitor;
+                   @CallCmd(@Command: @Length);
+x003            On-Error;
+e003            EndMon;
+x002         Else;
+b003            If  %Trim(@PFile) <> '*ALL'
+                And %Trim(@PFile) =  %Trim(@Splf);
+
+                   @Command = @Cmd1 + %Trim(@Splf) + @Cmd2 + @Jobnbr + '/'
+                                    + %Trim(@User)  + '/' + %Trim(@Job)  + @Cmd3
+                                    + %Trim(@splfnbrc) + ')';
+
+                   @Length = %Len(%Trim(@Command));
+b004               Monitor;
+                      @CallCmd(@Command: @Length);
+x004               On-Error;
+e004               EndMon;
+e003            EndIf;
+e002         EndIf;
+e001      EndIf;

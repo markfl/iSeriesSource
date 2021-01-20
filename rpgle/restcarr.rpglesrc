@@ -1,0 +1,41 @@
+
+          Dcl-Pi restcarr;
+             @Vendor  Char(5);
+             @Contact Char(9);
+          End-Pi;
+
+          Dcl-Ds @VndVndDs ExtName('VNDVNDMP');
+          End-Ds;
+
+          Dcl-Ds @ConConDs ExtName('CONCONMP');
+          End-Ds;
+
+          Dcl-s @Vendor#  Like(vndmstvnd) Inz(*Zeros);
+          Dcl-s @Contact# Like(conconkey) Inz(*Zeros);
+
+          @Vendor#  = %Dec(@Vendor:5:0);
+          @Contact# = %Dec(@Contact:9:0);
+
+          Exec SQL delete from vndvndml00 where vndmstvnd = :@Vendor;
+          dsply sqlcod;
+          Exec SQL delete from vndvprml00 where vprmstvnd = :@Vendor;
+          dsply sqlcod;
+          Exec SQL delete from vndviddl00 where vidmstvnd = :@Vendor;
+          dsply sqlcod;
+          Exec SQL delete from vndglvtl00 where glvmstvnd = :@Vendor;
+          dsply sqlcod;
+          Exec SQL delete from vndvaexl00 where vaemstvnd = :@Vendor;
+          dsply sqlcod;
+
+          Exec SQL delete from conconml01 where conconkey = :@Contact#;
+          dsply sqlcod;
+          Exec SQL delete from concaldl00 where calconkey = :@Contact#;
+          dsply sqlcod;
+          Exec SQL delete from concpldl04 where cplconkey = :@Contact#;
+          dsply sqlcod;
+          Exec SQL delete from conmeldl00 where melconkey = :@Contact#;
+          dsply sqlcod;
+
+          *Inlr = *On;
+          Return;
+

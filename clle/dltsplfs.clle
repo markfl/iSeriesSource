@@ -1,0 +1,120 @@
+             PGM        PARM(&FILE &JOBNAME)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&JOBNAME) TYPE(*CHAR) LEN(26)
+
+             DCL        VAR(&JOB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&USER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&NBR) TYPE(*CHAR) LEN(6)
+
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(256)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&JOB) VALUE(%SST(&JOBNAME 1 10))
+             CHGVAR     VAR(&USER) VALUE(%SST(&JOBNAME 11 10))
+             CHGVAR     VAR(&NBR) VALUE(%SST(&JOBNAME 21 6))
+
+/* b01 */    IF         COND(&JOB *NE '*') THEN(DO)
+             IF         COND((&JOB *NE *ALL) *AND (&USER *EQ ' ')) +
+                          THEN(CHGVAR VAR(&USER) VALUE(*ALL))
+             IF         COND((&USER *NE *ALL) *AND (&NBR *EQ ' ')) +
+                          THEN(CHGVAR VAR(&NBR) VALUE(*ALL))
+/* e01 */    ENDDO
+/* b03 */    ELSE       CMD(DO)
+             RTVJOBA    JOB(&JOB) USER(&USER) NBR(&NBR)
+/* e01 */    ENDDO
+
+/* b01 */    SELECT
+
+/* b02 */    WHEN       COND((&FILE *NE *ALL) *AND (&NBR *EQ ' ')) +
+                          THEN(DO)
+
+/* b03 */    IF         COND(&JOB *NE '*') THEN(DO)
+             DLTSPLF    FILE(&FILE) JOB(&USER/&JOB) SPLNBR(*LAST)
+             MONMSG     MSGID(CPF0000)
+/* e03 */    ENDDO
+/* b03 */    ELSE       CMD(DO)
+             DLTSPLF    FILE(&FILE) SPLNBR(*LAST)
+             MONMSG     MSGID(CPF0000)
+/* e03 */    ENDDO
+ AGAIN1:     RCVMSG     MSGTYPE(*DIAG) MSGDTA(&MSGDTA) MSGID(&MSGID)
+/* b03 */    IF         COND(&MSGID *EQ CPF0906) THEN(DO)
+             CHGVAR     VAR(&NBR) VALUE(%SST(&MSGDTA 21 6))
+             DLTSPLF    FILE(&FILE) JOB(&NBR/&USER/&JOB) +
+                          SPLNBR(*LAST)
+             MONMSG     MSGID(CPF0000)
+             GOTO       CMDLBL(AGAIN1)
+/* e03 */    ENDDO
+/* b03 */    IF         COND(&MSGID *EQ ' ') THEN(DO)
+             GOTO       CMDLBL(AGAIN1)
+/* e03 */    ENDDO
+/* e02 */    ENDDO
+
+/* b02 */    WHEN       COND((&FILE *NE *ALL) *AND (&NBR *NE *ALL)) +
+                          THEN(DO)
+
+ AGAIN:      DLTSPLF    FILE(&FILE) JOB(&NBR/&USER/&JOB) +
+                          SPLNBR(*LAST)
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&MSGID)
+             IF         COND(&MSGID = ' ') THEN(GOTO CMDLBL(AGAIN))
+/* e02 */    ENDDO
+
+             OTHERWISE  CMD(CALLSUBR SUBR(DELETE))
+/* e01 */    ENDSELECT
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             SUBR       SUBR(DELETE)
+
+             DLTF       FILE(QTEMP/SPOOLFILE)
+             MONMSG     MSGID(CPF0000)
+
+             CRTPF      FILE(QTEMP/SPOOLFILE) RCDLEN(198) SIZE(*NOMAX)
+
+/* b01 */    IF         COND(&JOB *EQ '*') THEN(DO)
+             RTVJOBA    JOB(&JOB) USER(&USER) NBR(&NBR)
+/* e01 */    ENDDO
+
+/* b02 */    SELECT
+/* b03 */    WHEN       COND((&JOB *NE *ALL) *AND (&USER *EQ +
+                          *ALL)) THEN(DO)
+             WRKSPLF    SELECT(*ALL) JOB(&JOB) OUTPUT(*PRINT)
+/* e03 */    ENDDO
+/* b03 */    WHEN       COND((&JOB *NE *ALL) *AND (&USER *NE +
+                          *ALL) *AND (&NBR *EQ *ALL)) THEN(DO)
+             WRKSPLF    SELECT(*ALL) JOB(&USER/&JOB) OUTPUT(*PRINT)
+/* e03 */    ENDDO
+/* b03 */    WHEN       COND((&JOB *NE *ALL) *AND (&USER *NE *ALL) +
+                          *AND (&NBR *NE *ALL)) THEN(DO)
+             IF         COND(&USER *EQ ' ') THEN(CHGVAR VAR(&USER) +
+                          VALUE(*ALL))
+             IF         COND(&NBR *EQ ' ') THEN(CHGVAR VAR(&NBR) +
+                          VALUE(*ALL))
+             WRKSPLF    SELECT(*ALL) JOB(&NBR/&USER/&JOB) +
+                          OUTPUT(*PRINT)
+/* e03 */    ENDDO
+/* b03 */    OTHERWISE  CMD(DO)
+             WRKSPLF    OUTPUT(*PRINT)
+/* e03 */    ENDDO
+/* e02 */    ENDSELECT
+
+             CPYSPLF    FILE(QPRTSPLF) TOFILE(QTEMP/SPOOLFILE) +
+                          SPLNBR(*LAST)
+             DLTSPLF    FILE(QPRTSPLF) SPLNBR(*LAST)
+
+             OVRDBF     FILE(SPOOLFILE) TOFILE(QTEMP/SPOOLFILE) +
+                          OVRSCOPE(*CALLLVL)
+
+             CALL       PGM(DLTSPLFSR) PARM(&FILE &JOB &USER &NBR)
+
+             DLTOVR     FILE(*ALL) LVL(*)
+
+             DLTF       FILE(QTEMP/SPOOLFILE)
+             MONMSG     MSGID(CPF0000)
+
+             ENDSUBR
+
+ AROUND:     ENDPGM

@@ -1,0 +1,68 @@
+             PGM        PARM(&DSPOBJD)
+
+             DCL        VAR(&DSPOBJD) TYPE(*CHAR) LEN(20)
+
+             DCL        VAR(&OBJDFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OBJDLIB) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&OBJDFILE) VALUE(%SST(&DSPOBJD 1 10))
+             CHGVAR     VAR(&OBJDLIB) VALUE(%SST(&DSPOBJD 11 10))
+             IF         COND(&OBJDLIB *EQ *CURLIB) THEN(CHGVAR +
+                          VAR(&OBJDLIB) VALUE(&CURLIB))
+
+             DLTF       FILE(&OBJDLIB/QDSPOBJDL1)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(&OBJDLIB/QDSPOBJDL2)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(&OBJDLIB/QDSPOBJDL3)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(&OBJDLIB/&OBJDFILE)
+             MONMSG     MSGID(CPF0000)
+
+             DSPOBJD    OBJ(&CURLIB/BLDDSPOBJ) OBJTYPE(*PGM) +
+                          DETAIL(*FULL) OUTPUT(*OUTFILE) +
+                          OUTFILE(&OBJDLIB/&OBJDFILE) OUTMBR(*FIRST +
+                          *REPLACE)
+             MONMSG     MSGID(CPF0000)
+
+             CLRPFM     FILE(&OBJDLIB/&OBJDFILE)
+             MONMSG     MSGID(CPF0000)
+
+             CHGPF      FILE(&OBJDLIB/&OBJDFILE) SIZE(*NOMAX) +
+                          TEXT('System supplied outfile for DSPOBJD')
+             MONMSG     MSGID(CPF0000)
+
+             DSPOBJD    OBJ(*ALLUSR/*ALL) OBJTYPE(*ALL) +
+                          DETAIL(*FULL) OUTPUT(*OUTFILE) +
+                          OUTFILE(&OBJDLIB/&OBJDFILE)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(QDSPOBJD) TOFILE(&OBJDLIB/&OBJDFILE)
+             CALL       PGM(BLDDSPOBJR)
+             DLTOVR     FILE(*ALL)
+
+             RGZPFM     FILE(&OBJDLIB/&OBJDFILE)
+
+             CRTLF      FILE(&OBJDLIB/QDSPOBJDL1) +
+                          SRCFILE(*CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(&OBJDLIB/QDSPOBJDL2) +
+                          SRCFILE(*CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(&OBJDLIB/QDSPOBJDL3) +
+                          SRCFILE(*CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST)
+             MONMSG     MSGID(CPF0000)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

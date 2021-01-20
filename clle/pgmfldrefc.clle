@@ -1,0 +1,71 @@
+             PGM
+
+             DCLPRCOPT  DFTACTGRP(*NO) ACTGRP(*NEW) BNDDIR(MFLORES)
+
+             DCLF       FILE(QDSPPGMREF)
+
+             DCL        VAR(&CURLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&USRLIBL) TYPE(*CHAR) LEN(2750)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             RTVJOBA    CURLIB(&CURLIB) USRLIBL(&USRLIBL)
+
+             DLTF       FILE(QTEMP/QDSPPGMREF)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/DSPPGMREFQ)
+             MONMSG     MSGID(CPF0000)
+
+             CRTDUPOBJ  OBJ(QDSPPGMREF) FROMLIB(*CURLIB) +
+                          OBJTYPE(*FILE) TOLIB(QTEMP) CST(*NO) TRG(*NO)
+
+             RUNQRY     QRY(QDSPPGMREQ)
+
+             OVRDBF     FILE(DSPPGMREFQ) TOFILE(QTEMP/DSPPGMREFQ) +
+                          OVRSCOPE(*CALLLVL)
+             CALL       PGM(PGMFLDREF5)
+             DLTOVR     FILE(DSPPGMREFQ)
+
+             CPYF       FROMFILE(QTEMP/DSPPGMREFQ) +
+                          TOFILE(QTEMP/QDSPPGMREF) MBROPT(*REPLACE) +
+                          FMTOPT(*MAP)
+
+             OVRDBF     FILE(QDSPPGMREF) TOFILE(QTEMP/QDSPPGMREF) +
+                          OVRSCOPE(*CALLLVL)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* b01 */    DOWHILE    COND(&@MSGID *NE CPF0864)
+
+             IF         COND(&WHLIB *NE ' ') THEN(DO)
+             PGMFLDREF  FRMOBJLIB(&WHLIB) SRCFILE(&WHLIB/QRPGLESRC) +
+                          MBR(&WHPNAM)
+/* e01 */    ENDDO
+
+ AGAIN:      RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* e01 */    ENDDO
+
+             DLTOVR     FILE(*ALL) LVL(*)
+
+             DLTF       FILE(QTEMP/QDSPPGMREF)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(QTEMP/DSPPGMREFQ)
+             MONMSG     MSGID(CPF0000)
+
+             RMVLIBLE   LIB(&CURLIB)
+             MONMSG     MSGID(CPF0000)
+             CHGCURLIB  CURLIB(&CURLIB)
+             MONMSG     MSGID(CPF0000)
+             RSETLIBL   USRLIBL(&USRLIBL)
+             MONMSG     MSGID(CPF0000)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

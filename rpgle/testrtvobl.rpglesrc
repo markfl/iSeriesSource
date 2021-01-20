@@ -1,0 +1,36 @@
+     H DftActGrp(*No) BndDir('MFLORES')
+
+     Dtestrtvobl       pi
+     D  @PObject                     10a
+     D  @PLibrary                    10a
+     D  @PType                       10a   Options(*NoPass)
+     D  @PFormat                     10a   Options(*NoPass)
+
+      /define mflores037
+      /copy qcpysrc,mflores
+
+      /free
+
+b001      Select;
+
+x001         When %Parms = 4;
+
+b002            If RetrieveObjectList(@PObject: @PLibrary: @PType: @PFormat);
+
+e002            EndIf;
+
+x001         When %Parms = 3;
+
+b002            If RetrieveObjectList(@PObject: @PLibrary: @PType);
+e002            EndIf;
+
+x001         When %Parms < 3;
+
+b002            If RetrieveObjectList(@PObject: @PLibrary: '*ALL');
+e002            EndIf;
+e001      EndSl;
+
+          *InLr = *On;
+          Return;
+
+      /end-free

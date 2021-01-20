@@ -1,0 +1,21 @@
+     D @ERR            S              2    DIM(4) CTDATA PERRCD(1) ASCEND
+     D @DSC            S             50    DIM(4) ALT(@ERR)
+     D @ERR1           S             50    DIM(4) CTDATA PERRCD(1)
+     C                   MOVE      @ERR(1)       @ERROR            2
+     C                   MOVE      @DSC(1)       @DESC            50
+     C                   DSPLY                   @ERROR
+     C                   DSPLY                   @DESC
+     C                   MOVE      @ERR1(1)      @DESC
+     C                   DSPLY                   @DESC
+     C                   MOVE      *ON           *INLR
+     C                   RETURN
+**
+01Postal Code Invalid
+02State Invalid
+03City Invalid
+04Country Invalid
+**
+Postal Code Invalid
+State Invalid
+City Invalid
+Country Invalid

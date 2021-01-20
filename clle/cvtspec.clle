@@ -1,0 +1,79 @@
+             PGM        PARM(&FRMSRCFILE &TOSRCFILE &MBR &TOMBR)
+
+             DCL        VAR(&FRMSRCFILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&TOSRCFILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&MBR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TOMBR) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TOFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TOLIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SRCTYPE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TEXT) TYPE(*CHAR) LEN(50)
+             DCL        VAR(&NBRCURRCD) TYPE(*DEC) LEN(10 0)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&FILE) VALUE(%SST(&FRMSRCFILE 1 10))
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&FRMSRCFILE 11 10))
+
+/* b01 */    IF         COND(%SST(&TOSRCFILE 1 10) *EQ *FROMFILE) +
+                          THEN(DO)
+             CHGVAR     VAR(&TOFILE) VALUE(&FILE)
+             CHGVAR     VAR(&TOLIBRARY) VALUE(&LIBRARY)
+/* e01 */    ENDDO
+/* b01 */    ELSE       CMD(DO)
+             CHGVAR     VAR(&TOFILE) VALUE(%SST(&TOSRCFILE 1 10))
+             CHGVAR     VAR(&TOLIBRARY) VALUE(%SST(&TOSRCFILE 11 10))
+/* e01 */    ENDDO
+
+/* b01 */    IF         COND(&TOMBR *EQ *FROMMBR) THEN(DO)
+             CHGVAR     VAR(&TOMBR) VALUE(&MBR)
+/* e01 */    ENDDO
+
+             RTVMBRD    FILE(&LIBRARY/&FILE) MBR(&MBR) +
+                          SRCTYPE(&SRCTYPE) TEXT(&TEXT)
+             MONMSG     MSGID(CPF9815) EXEC(GOTO CMDLBL(DIAG))
+
+             CLRPFM     FILE(&TOLIBRARY/&TOFILE) MBR(&TOMBR)
+             MONMSG     MSGID(CPF3141) EXEC(DO)
+             ADDPFM     FILE(&TOLIBRARY/&TOFILE) MBR(&TOMBR) +
+                          TEXT(&TEXT) SRCTYPE(&SRCTYPE)
+             ENDDO
+
+             OVRDBF     FILE(QRPGLESRC) TOFILE(&LIBRARY/&FILE) +
+                          MBR(&MBR)
+             OVRDBF     FILE(OUTPUT) TOFILE(&TOLIBRARY/&TOFILE) +
+                          MBR(&TOMBR)
+             OVRDBF     FILE(QPGMFLDREF) TOFILE(*CURLIB/QPGMFLDREF)
+             OVRDBF     FILE(QPGMFLDRL2) TOFILE(*CURLIB/QPGMFLDRL2)
+
+             CALL       PGM(CVTSPECR) PARM(&MBR)
+
+             DLTOVR     FILE(*ALL)
+
+             RTVMBRD    FILE(&TOLIBRARY/&TOFILE) MBR(&TOMBR) +
+                          NBRCURRCD(&NBRCURRCD)
+
+             SELECT
+             WHEN       COND(&NBRCURRCD *LT 10000) THEN(DO)
+             RGZPFM     FILE(&TOLIBRARY/&TOFILE) MBR(&TOMBR) +
+                          SRCOPT(*SEQNBR)
+             MONMSG     MSGID(CPF0000)
+             ENDDO
+             WHEN       COND(&NBRCURRCD *LT 110000) THEN(DO)
+             RGZPFM     FILE(&TOLIBRARY/&TOFILE) MBR(&TOMBR) +
+                          SRCOPT(*SEQNBR) SRCSEQ(1.00 0.10)
+             MONMSG     MSGID(CPF0000)
+             ENDDO
+             OTHERWISE  CMD(DO)
+             RGZPFM     FILE(&TOLIBRARY/&TOFILE) MBR(&TOMBR) +
+                          SRCOPT(*SEQNBR) SRCSEQ(1.00 0.01)
+             MONMSG     MSGID(CPF0000)
+             ENDDO
+             ENDSELECT
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

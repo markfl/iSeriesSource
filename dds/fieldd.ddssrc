@@ -1,0 +1,71 @@
+     A*%%TS  SD  20150716  125007  ISFLORESM   REL-V7R1M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/QADSPFFD)
+     A          R SFL01                     SFL
+     A*%%TS  SD  20150716  125007  ISFLORESM   REL-V7R1M0  5770-WDS
+     A            WHFLDE    R        O  6  2REFFLD(WHFLDE)
+     A                                      COLOR(WHT)
+     A            @WHFLDB   R        O  6 13REFFLD(WHFLDB)
+     A                                      COLOR(BLU)
+     A                                      EDTCDE(Z)
+     A            @WHFLDT        3A  O  6 19COLOR(WHT)
+     A            @WHFLDP        2A  O  6 23COLOR(BLU)
+     A            @KEY           2Y 0O  6 26COLOR(WHT)
+     A                                      EDTCDE(Z)
+     A            @FROM          5Y 0O  6 29COLOR(BLU)
+     A                                      EDTCDE(Z)
+     A            @TO            5Y 0O  6 35COLOR(WHT)
+     A                                      EDTCDE(Z)
+     A            @WHFTXT   R  -10   O  6 41REFFLD(WHFTXT)
+     A                                      COLOR(BLU)
+     A          R CTL01                     SFLCTL(SFL01)
+     A*%%TS  SD  20150716  125007  ISFLORESM   REL-V7R1M0  5770-WDS
+     A                                      SFLSIZ(0017)
+     A                                      SFLPAG(0016)
+     A                                      CA03
+     A N03                                  ROLLUP
+     A                                      BLINK
+     A                                      OVERLAY
+     A                                      SFLCSRRRN(&CURSOR)
+     A  01                                  SFLDSP
+     A  02                                  SFLDSPCTL
+     A N01                                  SFLCLR
+     A  01                                  SFLEND(*MORE)
+     A            CURSOR         5S 0H
+     A            SFLRCD         4S 0H      SFLRCDNBR
+     A            QPROG         10A  O  1  2COLOR(BLU)
+     A                                  1 26'Display File Field Definition'
+     A                                      COLOR(WHT)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                      COLOR(BLU)
+     A            QUSER         10A  O  2  2COLOR(BLU)
+     A            CTLACT        20A  O  2 31COLOR(WHT)
+     A                                  2 73TIME
+     A                                      COLOR(BLU)
+     A                                  3  2'File Name:'
+     A                                      COLOR(BLU)
+     A            @1FILE        10A  B  3 13COLOR(WHT)
+     A            ODOBTX    R        O  3 24REFFLD(ODOBTX DSPOBJD)
+     A                                      COLOR(PNK)
+     A                                  4  4'Library:'
+     A                                      COLOR(BLU)
+     A            @1LIBRARY     10A  B  4 13COLOR(WHT)
+     A                                  4 30'From'
+     A                                  4 38'To'
+     A                                  4 41'Record Format:'
+     A                                      COLOR(BLU)
+     A            @RNAME    R        O  4 56REFFLD(WHNAME)
+     A                                      COLOR(WHT)
+     A                                  5  2'Field     Length Atr Dc Ky   Pos  -
+     A                                       Pos Description                   -
+     A                                             '
+     A                                      DSPATR(UL)
+     A          R CMD01
+     A*%%TS  SD  20070212  161844  JOHNSONJ    REL-V5R4M0  5722-WDS
+     A                                 23  6'F3=Exit'
+     A                                      COLOR(BLU)
+     A            ERRMSG        75A  O 24  5
+     A N12                                  DSPATR(ND)
+     A                                      COLOR(RED)

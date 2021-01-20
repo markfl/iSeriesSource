@@ -1,0 +1,8 @@
+
+             RMVLIBLE   LIB(&CURLIB)
+             MONMSG     MSGID(CPF0000)
+             CHGCURLIB  CURLIB(&CURLIB)
+             MONMSG     MSGID(CPF0000)
+             RSETLIBL   USRLIBL(&USRLIBL)
+             MONMSG     MSGID(CPF0000)
+

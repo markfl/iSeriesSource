@@ -1,0 +1,19 @@
+             PGM        PARM(&VENDOR)
+
+             DCL        VAR(&VENDOR) TYPE(*CHAR) LEN(5)
+
+             IF         COND(&VENDOR = '60289') THEN(DO)
+             ADDPFM     FILE(WEBSVCTP) MBR(V60289B)
+             OVRDBF     FILE(WEBSVCTP) MBR(V60289B)
+             ENDDO
+
+             IF         COND(&VENDOR = '00290') THEN(DO)
+             ADDPFM     FILE(WEBSVCTP) MBR(V290B)
+             OVRDBF     FILE(WEBSVCTP) MBR(V290B)
+             ENDDO
+
+             CALL       PGM(@WEBSELR2) PARM(&VENDOR)
+
+             DLTOVR     FILE(*ALL)
+
+ END:        ENDPGM

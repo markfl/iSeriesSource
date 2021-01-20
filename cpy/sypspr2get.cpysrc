@@ -1,0 +1,714 @@
+      *                                                                     *
+      ***********************************************************************
+      * Change Control Information
+      *----------------------------------------------------------------------
+      * Date     Task #  Description of Changes                    Pgmr ID
+      * -------- ------- ----------------------------------------- ----------
+      * 11/13/15 42361   Made Return attribute optional            MF   m01
+      ***********************************************************************
+
+     D/IF DEFINED(SYPSPR01)
+
+     DGetSyspp2pL1     pr              n
+     D                               30a   Const
+/m01 D*                            1024a
+/m01 D                             1024a   Options(*NoPass)
+
+     D sp2prckey1      s             30a   Inz(*Blanks)
+     D sp2prcval       s           1024a   Inz(*Blanks)
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR02)
+
+     DGetSyspp2pL2     pr              n
+     D                               30a   Const
+     D                               30a   Const
+/m01 D*                            1024a
+/m01 D                             1024a   Options(*NoPass)
+
+     D/IF NOT DEFINED(SYPSPR01)
+     D sp2prckey1      s             30a   Inz(*Blanks)
+     D sp2prcval       s           1024a   Inz(*Blanks)
+     D/ENDIF
+
+     D sp2prckey2      s             30a   Inz(*Blanks)
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR03)
+
+     DGetSyspp2pL3     pr              n
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+/m01 D*                            1024a
+/m01 D                             1024a   Options(*NoPass)
+
+     D/IF NOT DEFINED(SYPSPR01)
+     D/IF NOT DEFINED(SYPSPR02)
+     D sp2prckey1      s             30a   Inz(*Blanks)
+     D sp2prcval       s           1024a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR02)
+     D sp2prckey2      s             30a   Inz(*Blanks)
+     D/ENDIF
+
+     D sp2prckey3      s             30a   Inz(*Blanks)
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR04)
+
+     DGetSyspp2pL4     pr              n
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+/m01 D*                            1024a
+/m01 D                             1024a   Options(*NoPass)
+
+     D/IF NOT DEFINED(SYPSPR01)
+     D/IF NOT DEFINED(SYPSPR02)
+     D/IF NOT DEFINED(SYPSPR03)
+     D sp2prckey1      s             30a   Inz(*Blanks)
+     D sp2prcval       s           1024a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR02)
+     D/IF NOT DEFINED(SYPSPR03)
+     D sp2prckey2      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR03)
+     D sp2prckey3      s             30a   Inz(*Blanks)
+     D/ENDIF
+
+     D sp2prckey4      s             30a   Inz(*Blanks)
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR05)
+
+     DGetSyspp2pL5     pr              n
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+/m01 D*                            1024a
+/m01 D                             1024a   Options(*NoPass)
+
+     D/IF NOT DEFINED(SYPSPR01)
+     D/IF NOT DEFINED(SYPSPR02)
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D sp2prckey1      s             30a   Inz(*Blanks)
+     D sp2prcval       s           1024a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR02)
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D sp2prckey2      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D sp2prckey3      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR04)
+     D sp2prckey4      s             30a   Inz(*Blanks)
+     D/ENDIF
+
+     D sp2prckey5      s             30a   Inz(*Blanks)
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR06)
+
+     DGetSyspp2pL6     pr              n
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+/m01 D*                            1024a
+/m01 D                             1024a   Options(*NoPass)
+
+     D/IF NOT DEFINED(SYPSPR01)
+     D/IF NOT DEFINED(SYPSPR02)
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D sp2prckey1      s             30a   Inz(*Blanks)
+     D sp2prcval       s           1024a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR02)
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D sp2prckey2      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D sp2prckey3      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D sp2prckey4      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR05)
+     D sp2prckey5      s             30a   Inz(*Blanks)
+     D/ENDIF
+
+     D sp2prckey6      s             30a   Inz(*Blanks)
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR07)
+
+     DGetSyspp2pL7     pr              n
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+/m01 D*                            1024a
+/m01 D                             1024a   Options(*NoPass)
+
+     D/IF NOT DEFINED(SYPSPR01)
+     D/IF NOT DEFINED(SYPSPR02)
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D/IF NOT DEFINED(SYPSPR06)
+     D sp2prckey1      s             30a   Inz(*Blanks)
+     D sp2prcval       s           1024a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR02)
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D/IF NOT DEFINED(SYPSPR06)
+     D sp2prckey2      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D/IF NOT DEFINED(SYPSPR06)
+     D sp2prckey3      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D/IF NOT DEFINED(SYPSPR06)
+     D sp2prckey4      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR05)
+     D/IF NOT DEFINED(SYPSPR06)
+     D sp2prckey5      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR06)
+     D sp2prckey6      s             30a   Inz(*Blanks)
+     D/ENDIF
+
+     D sp2prckey7      s             30a   Inz(*Blanks)
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR08)
+
+     DGetSyspp2pL8     pr              n
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+     D                               30a   Const
+/m01 D*                            1024a
+/m01 D                             1024a   Options(*NoPass)
+
+     D/IF NOT DEFINED(SYPSPR01)
+     D/IF NOT DEFINED(SYPSPR02)
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D/IF NOT DEFINED(SYPSPR06)
+     D/IF NOT DEFINED(SYPSPR07)
+     D sp2prckey1      s             30a   Inz(*Blanks)
+     D sp2prcval       s           1024a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR02)
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D/IF NOT DEFINED(SYPSPR06)
+     D/IF NOT DEFINED(SYPSPR07)
+     D sp2prckey2      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D/IF NOT DEFINED(SYPSPR06)
+     D/IF NOT DEFINED(SYPSPR07)
+     D sp2prckey3      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D/IF NOT DEFINED(SYPSPR06)
+     D/IF NOT DEFINED(SYPSPR07)
+     D sp2prckey4      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR05)
+     D/IF NOT DEFINED(SYPSPR06)
+     D/IF NOT DEFINED(SYPSPR07)
+     D sp2prckey5      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR06)
+     D/IF NOT DEFINED(SYPSPR07)
+     D sp2prckey6      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR07)
+     D sp2prckey7      s             30a   Inz(*Blanks)
+     D/ENDIF
+     D/IF NOT DEFINED(SYPSPR01)
+     D/IF NOT DEFINED(SYPSPR02)
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D/IF NOT DEFINED(SYPSPR06)
+     D/IF NOT DEFINED(SYPSPR07)
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+
+     D sp2prckey8      s             30a   Inz(*Blanks)
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR00)
+
+     DGetSyspp2pL0     pr              n
+     D                             1024a
+     D                                1a   Const
+     D                               30a   Const
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+
+     D/IF NOT DEFINED(SYPSPR01)
+     D/IF NOT DEFINED(SYPSPR02)
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D/IF NOT DEFINED(SYPSPR06)
+     D/IF NOT DEFINED(SYPSPR07)
+     D/IF NOT DEFINED(SYPSPR08)
+
+     D sp2prckey1      s             30a   Inz(*Blanks)
+     D sp2prckey2      s             30a   Inz(*Blanks)
+     D sp2prckey3      s             30a   Inz(*Blanks)
+     D sp2prckey4      s             30a   Inz(*Blanks)
+     D sp2prckey5      s             30a   Inz(*Blanks)
+     D sp2prckey6      s             30a   Inz(*Blanks)
+     D sp2prckey7      s             30a   Inz(*Blanks)
+     D sp2prckey8      s             30a   Inz(*Blanks)
+     D sp2prcval       s           1024a   Inz(*Blanks)
+
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+
+     D/ENDIF
+
+     D/IF NOT DEFINED(SYPSPR00)
+     D/IF NOT DEFINED(SYPSPR01)
+     D/IF NOT DEFINED(SYPSPR02)
+     D/IF NOT DEFINED(SYPSPR03)
+     D/IF NOT DEFINED(SYPSPR04)
+     D/IF NOT DEFINED(SYPSPR05)
+     D/IF NOT DEFINED(SYPSPR06)
+     D/IF NOT DEFINED(SYPSPR07)
+     D/IF NOT DEFINED(SYPSPR08)
+
+     D sp2prckey1      s             30a   Inz(*Blanks)
+     D sp2prckey2      s             30a   Inz(*Blanks)
+     D sp2prckey3      s             30a   Inz(*Blanks)
+     D sp2prckey4      s             30a   Inz(*Blanks)
+     D sp2prckey5      s             30a   Inz(*Blanks)
+     D sp2prckey6      s             30a   Inz(*Blanks)
+     D sp2prckey7      s             30a   Inz(*Blanks)
+     D sp2prckey8      s             30a   Inz(*Blanks)
+     D sp2prcval       s           1024a   Inz(*Blanks)
+
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR09)
+
+/m01 D/IF NOT DEFINED(SYPSPR18)
+     D @SysParms     e ds                  extname(sysspp2p) Qualified
+     D @P_Ds           ds                  LikeDs(@SysParms)
+/m01 D/ENDIF
+
+     DReadESyspp2pL1   pr              n
+     D                               +0    LikeDs(@SysParms)
+/m01 D                                 n
+     D                               30a   Const
+/m01
+/m01 D @FirstRead      s               n   Inz(*Off)
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR10)
+
+     D/IF NOT DEFINED(SYPSPR09)
+/m01 D/IF NOT DEFINED(SYPSPR18)
+     D @SysParms     e ds                  extname(sysspp2p) Qualified
+     D @P_Ds           ds                  LikeDs(@SysParms)
+     D/ENDIF
+/m01 D/ENDIF
+
+     DReadESyspp2pL2   pr              n
+     D                               +0    LikeDs(@SysParms)
+/m01 D                                 n
+     D                               30a   Const
+     D                               30a   Const Options(*NoPass)
+/m01
+/m01 D/IF NOT DEFINED(SYPSPR09)
+/m01 D @FirstRead      s               n   Inz(*Off)
+/m01 D/ENDIF
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR11)
+
+     D/IF NOT DEFINED(SYPSPR09)
+     D/IF NOT DEFINED(SYPSPR10)
+/m01 D/IF NOT DEFINED(SYPSPR18)
+     D @SysParms     e ds                  extname(sysspp2p) Qualified
+     D @P_Ds           ds                  LikeDs(@SysParms)
+     D/ENDIF
+     D/ENDIF
+/m01 D/ENDIF
+
+     DReadESyspp2pL3   pr              n
+     D                               +0    LikeDs(@SysParms)
+/m01 D                                 n
+     D                               30a   Const
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+/m01
+/m01 D/IF NOT DEFINED(SYPSPR09)
+/m01 D/IF NOT DEFINED(SYPSPR10)
+/m01 D @FirstRead      s               n   Inz(*Off)
+/m01 D/ENDIF
+/m01 D/ENDIF
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR12)
+
+     D/IF NOT DEFINED(SYPSPR09)
+     D/IF NOT DEFINED(SYPSPR10)
+     D/IF NOT DEFINED(SYPSPR11)
+/m01 D/IF NOT DEFINED(SYPSPR18)
+     D @SysParms     e ds                  extname(sysspp2p) Qualified
+     D @P_Ds           ds                  LikeDs(@SysParms)
+/m01 D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+
+     DReadESyspp2pL4   pr              n
+     D                               +0    LikeDs(@SysParms)
+/m01 D                                 n
+     D                               30a   Const
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+/m01
+/m01 D/IF NOT DEFINED(SYPSPR09)
+/m01 D/IF NOT DEFINED(SYPSPR10)
+/m01 D/IF NOT DEFINED(SYPSPR11)
+/m01 D @FirstRead      s               n   Inz(*Off)
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR13)
+
+     D/IF NOT DEFINED(SYPSPR09)
+     D/IF NOT DEFINED(SYPSPR10)
+     D/IF NOT DEFINED(SYPSPR11)
+     D/IF NOT DEFINED(SYPSPR12)
+/m01 D/IF NOT DEFINED(SYPSPR18)
+     D @SysParms     e ds                  extname(sysspp2p) Qualified
+     D @P_Ds           ds                  LikeDs(@SysParms)
+/m01 D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+
+     DReadESyspp2pL5   pr              n
+     D                               +0    LikeDs(@SysParms)
+/m01 D                                 n
+     D                               30a   Const
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+/m01
+/m01 D/IF NOT DEFINED(SYPSPR09)
+/m01 D/IF NOT DEFINED(SYPSPR10)
+/m01 D/IF NOT DEFINED(SYPSPR11)
+/m01 D/IF NOT DEFINED(SYPSPR12)
+/m01 D @FirstRead      s               n   Inz(*Off)
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR14)
+
+     D/IF NOT DEFINED(SYPSPR09)
+     D/IF NOT DEFINED(SYPSPR10)
+     D/IF NOT DEFINED(SYPSPR11)
+     D/IF NOT DEFINED(SYPSPR12)
+     D/IF NOT DEFINED(SYPSPR13)
+/m01 D/IF NOT DEFINED(SYPSPR18)
+     D @SysParms     e ds                  extname(sysspp2p) Qualified
+     D @P_Ds           ds                  LikeDs(@SysParms)
+/m01 D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+
+     DReadESyspp2pL6   pr              n
+     D                               +0    LikeDs(@SysParms)
+/m01 D                                 n
+     D                               30a   Const
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+/m01
+/m01 D/IF NOT DEFINED(SYPSPR09)
+/m01 D/IF NOT DEFINED(SYPSPR10)
+/m01 D/IF NOT DEFINED(SYPSPR11)
+/m01 D/IF NOT DEFINED(SYPSPR12)
+/m01 D/IF NOT DEFINED(SYPSPR13)
+/m01 D @FirstRead      s               n   Inz(*Off)
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR15)
+
+     D/IF NOT DEFINED(SYPSPR09)
+     D/IF NOT DEFINED(SYPSPR10)
+     D/IF NOT DEFINED(SYPSPR11)
+     D/IF NOT DEFINED(SYPSPR12)
+     D/IF NOT DEFINED(SYPSPR13)
+     D/IF NOT DEFINED(SYPSPR14)
+/m01 D/IF NOT DEFINED(SYPSPR18)
+     D @SysParms     e ds                  extname(sysspp2p) Qualified
+     D @P_Ds           ds                  LikeDs(@SysParms)
+/m01 D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+
+     DReadESyspp2pL7   pr              n
+     D                               +0    LikeDs(@SysParms)
+/m01 D                                 n
+     D                               30a   Const
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+/m01
+/m01 D/IF NOT DEFINED(SYPSPR09)
+/m01 D/IF NOT DEFINED(SYPSPR10)
+/m01 D/IF NOT DEFINED(SYPSPR11)
+/m01 D/IF NOT DEFINED(SYPSPR12)
+/m01 D/IF NOT DEFINED(SYPSPR13)
+/m01 D/IF NOT DEFINED(SYPSPR14)
+/m01 D @FirstRead      s               n   Inz(*Off)
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR16)
+
+     D/IF NOT DEFINED(SYPSPR09)
+     D/IF NOT DEFINED(SYPSPR10)
+     D/IF NOT DEFINED(SYPSPR11)
+     D/IF NOT DEFINED(SYPSPR12)
+     D/IF NOT DEFINED(SYPSPR13)
+     D/IF NOT DEFINED(SYPSPR14)
+     D/IF NOT DEFINED(SYPSPR15)
+/m01 D/IF NOT DEFINED(SYPSPR18)
+     D @SysParms     e ds                  extname(sysspp2p) Qualified
+     D @P_Ds           ds                  LikeDs(@SysParms)
+/m01 D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+     D/ENDIF
+
+     DReadESyspp2pL8   pr              n
+     D                               +0    LikeDs(@SysParms)
+/m01 D                                 n
+     D                               30a   Const
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+/m01
+/m01 D/IF NOT DEFINED(SYPSPR09)
+/m01 D/IF NOT DEFINED(SYPSPR10)
+/m01 D/IF NOT DEFINED(SYPSPR11)
+/m01 D/IF NOT DEFINED(SYPSPR12)
+/m01 D/IF NOT DEFINED(SYPSPR13)
+/m01 D/IF NOT DEFINED(SYPSPR14)
+/m01 D/IF NOT DEFINED(SYPSPR15)
+/m01 D @FirstRead      s               n   Inz(*Off)
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+/m01 D/ENDIF
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR17)
+
+     DSetKeysFields    pr             3p 0
+     D                              240a
+     D                               30a   Const
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+     D                               30a   Const Options(*NoPass)
+
+     D/ENDIF
+
+     D/IF DEFINED(SYPSPR18)
+
+     D @SysParms     e ds                  extname(sysspp2p) Qualified
+     D @P_Ds           ds                  LikeDs(@SysParms)
+
+     D/ENDIF
+

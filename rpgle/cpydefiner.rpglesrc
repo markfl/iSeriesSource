@@ -1,0 +1,16 @@
+     Fqcpysrc   ip   e             Disk    Rename(qcpysrc:rqcpysrc)
+     Fqcpysrco  o    f  112        Disk
+
+     D@cpyds         e ds                  ExtName(qcpysrc) Prefix(X_)
+     D@a               s              3p 0 Inz(*Zeros)
+
+          x_srcseq = srcseq;
+          x_srcdat = srcdat;
+          Clear x_srcdta;
+          Reset @a;
+          @a = %Scan('/define': srcdta);
+          If @a > *Zeros;
+             x_srcdta = %Scanrpl('/define': '/undefine': srcdta);
+             Write qcpysrco @cpyds;
+          EndIf;
+

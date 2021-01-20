@@ -1,0 +1,31 @@
+             PGM        PARM(&PNAMESPACE &PEVENTS)
+
+             DCL        VAR(&PNAMESPACE) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&PEVENTS) TYPE(*CHAR) LEN(1)
+
+             DCL        VAR(&NAMESPACE) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&EVENTS) TYPE(*CHAR) LEN(1)
+
+             DCL        VAR(&USER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&XML) TYPE(*CHAR) LEN(32000)
+             RTVJOBA    USER(&USER)
+
+             CHGVAR     VAR(&NAMESPACE) VALUE(&PNAMESPACE)
+             MONMSG     MSGID(CPF0000) EXEC(DO)
+             CHGVAR     VAR(&NAMESPACE) VALUE(N)
+             ENDDO
+
+             CHGVAR     VAR(&EVENTS) VALUE(&PEVENTS)
+             MONMSG     MSGID(CPF0000) EXEC(DO)
+             CHGVAR     VAR(&EVENTS) VALUE(1)
+             ENDDO
+
+             DBG        PGM(CARRIEREVT)
+
+             CALL       PGM(TESTEVENTX) PARM(&NAMESPACE &EVENTS &XML)
+
+             CALL       PGM(CARRIEREVT) PARM(&USER &XML)
+
+             ENDDBG
+
+ END:        ENDPGM

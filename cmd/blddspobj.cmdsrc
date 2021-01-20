@@ -1,0 +1,9 @@
+             CMD        PROMPT('Build QDSPOBJD File')
+
+             PARM       KWD(DSPOBJD) TYPE(DSPOBJD) DFT(*DFT) +
+                          SNGVAL((*DFT 'QDSPOBJD  *CURLIB')) +
+                          PROMPT('Display Object Description')
+ DSPOBJD:    QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')

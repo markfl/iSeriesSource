@@ -1,0 +1,8 @@
+             CMD        PROMPT('Copy Saved files to Test')
+
+             PARM       KWD(FROMLIB) TYPE(*NAME) DFT(*CURLIB) +
+                          SPCVAL((*CURLIB)) PROMPT('From library')
+
+             PARM       KWD(TOLIB) TYPE(*NAME) DFT(*CURLIB) +
+                          SPCVAL((*CURLIB)) PROMPT('To library')
+

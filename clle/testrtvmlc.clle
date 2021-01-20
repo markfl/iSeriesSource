@@ -1,0 +1,34 @@
+             PGM        PARM(&POBJECT &PLIBRARY &PFORMAT)
+
+             DCL        VAR(&POBJECT) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PLIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PFORMAT) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&FORMAT) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PARMS) TYPE(*DEC) LEN(1 0) VALUE(3)
+
+             CHGVAR     VAR(&FORMAT) VALUE(&PFORMAT)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&PARMS) VALUE(2)
+             ENDDO
+
+             DBG        PGM(TESTRTVMBL)
+
+             SELECT
+
+             WHEN       COND(&PARMS = 3) THEN(DO)
+
+             CALL       PGM(TESTRTVMBL) PARM(&POBJECT &PLIBRARY +
+                          &FORMAT)
+             ENDDO
+
+             WHEN       COND(&PARMS = 2) THEN(DO)
+
+             CALL       PGM(TESTRTVMBL) PARM(&POBJECT &PLIBRARY)
+             ENDDO
+
+             ENDSELECT
+
+             ENDDBG
+
+ END:        ENDPGM

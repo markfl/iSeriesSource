@@ -1,0 +1,9 @@
+             PGM        PARM(&LOG &DROP &ENDCNN)
+
+             DCL        VAR(&LOG) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&DROP) TYPE(*CHAR) LEN(5)
+             DCL        VAR(&ENDCNN) TYPE(*CHAR) LEN(4)
+
+             SIGNOFF    LOG(&LOG) DROP(&DROP) ENDCNN(&ENDCNN)
+
+ END:        ENDPGM

@@ -1,0 +1,15 @@
+             PGM
+
+/*           ADDLIBLE   LIB(TPSTST50)   +
+             MONMSG     MSGID(CPF0000)  */
+
+             DBG        PGM(TESTCUER)
+
+             CALL       PGM(TESTCUER)
+
+             ENDDBG
+
+/*           RMVLIBLE   LIB(TPSTST50)  +
+             MONMSG     MSGID(CPF0000) */
+
+ END:        ENDPGM

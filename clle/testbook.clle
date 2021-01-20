@@ -1,0 +1,25 @@
+             PGM        PARM(&PACTION &PBOOKING)
+
+             DCL        VAR(&PACTION) TYPE(*CHAR) LEN(12)
+             DCL        VAR(&PBOOKING) TYPE(*CHAR) LEN(9)
+
+             DCL        VAR(&ACTION) TYPE(*CHAR) LEN(12)
+             DCL        VAR(&BOOKING) TYPE(*CHAR) LEN(9)
+
+             CHGVAR     VAR(&ACTION) VALUE(&PACTION)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&ACTION) VALUE(RETRIGGER)
+             ENDDO
+
+             CHGVAR     VAR(&BOOKING) VALUE(&PBOOKING)
+             MONMSG     MSGID(MCH3601) EXEC(DO)
+             CHGVAR     VAR(&BOOKING) VALUE('700009655')
+             ENDDO
+
+             DBG        PGM(BOOKINGXML)
+
+             CALL       PGM(TESTBOOKR) PARM(&ACTION &BOOKING)
+
+             ENDDBG
+
+ END:        ENDPGM

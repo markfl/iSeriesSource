@@ -1,0 +1,92 @@
+     HOption(*NoDebugio) BndDir('MFLORES') DftActGrp(*No)
+
+     Fqadsppgm  up   e           k Disk
+     Fqadsppgmi if   f  179    10aiDisk    KeyLoc(11)
+
+          Dcl-Ds @qadsppgmDs ExtName('QADSPPGM');
+          End-Ds;
+
+     Iqwhdrppr
+     I                                          whpnam        l1
+
+b001      If *Inl1;
+
+             GetObjD(whpnam: whlib);
+
+             // Get programs files uses
+             Setll *Loval qadsppgmi;
+             Setll whpnam qadsppgmi;
+             Reade whpnam qadsppgmi @qadsppgmds;
+b002         Dow Not %Eof(qadsppgmi);
+
+                // Check for a program object
+b003            If  whobjt =  'P';
+
+                   GetObjD(whfnam: whlnam);
+
+e003            EndIf;
+
+                // Get next program files uses
+                Reade whpnam qadsppgmi @qadsppgmds;
+
+e002         EndDo;
+
+e001      EndIf;
+
+          Dcl-Proc GetObjD;
+
+          Dcl-Pi GetObjD;
+             @Prog Char(10) Const;
+             @Lib  Char(10) Const;
+          End-Pi GetObjD;
+
+      /define mflores059
+      /copy qcpysrc,mflores
+      /undefine mflores059
+
+          Dcl-c @Cmd1 Const('DSPOBJD OBJ(');
+          Dcl-c @Cmd2 Const(') OBJTYPE(*MODULE) DETAIL(*FULL)');
+          Dcl-c @Cmd3 Const(') OBJTYPE(*SRVPGM) DETAIL(*FULL)');
+          Dcl-c @Cmd4 Const(') OBJTYPE(*PGM) DETAIL(*FULL)');
+          Dcl-c @Cmd5 Const(' OUTPUT(*OUTFILE)');
+          Dcl-c @Cmd6 Const(' OUTFILE(QTEMP/QADSPOBJ)');
+          Dcl-c @Cmd7 Const(' OUTMBR(*FIRST *ADD)');
+
+          // Check for a program object
+b001      If  whfnam <> 'QCMDEXC'
+          And whfnam <> 'QMHSNDPM'
+          And whfnam <> 'QMHRMVPM'
+          And whfnam <> 'QRCVDTAQ'
+          And whfnam <> 'QSNDDTAQ'
+          And whfnam <> 'QUSCMDLN'
+          And whfnam <> '*VARIABLE'
+          And whlnam <> 'QSYS';
+
+             Reset @Command;
+b002         Monitor;
+                @Command = @Cmd1 + %Trim(@Lib) + '/' + %Trim(@Prog)
+                                 + @Cmd2 + @Cmd5 + @Cmd6 + @Cmd7;
+                @Length = %Len(%Trim(@Command));
+                @CallCmd(@Command: @Length);
+x002         On-Error;
+b003            Monitor;
+                   Reset @Command;
+                   @Command = @Cmd1 + %Trim(@Lib) + '/' + %Trim(@Prog)
+                                    + @Cmd3 + @Cmd5 + @Cmd6 + @Cmd7;
+                   @Length = %Len(%Trim(@Command));
+                   @CallCmd(@Command: @Length);
+x003            On-Error;
+b004               Monitor;
+                      Reset @Command;
+                      @Command = @Cmd1 + %Trim(@Lib) + '/' + %Trim(@Prog)
+                                       + @Cmd4 + @Cmd5 + @Cmd6 + @Cmd7;
+                      @Length = %Len(%Trim(@Command));
+                      @CallCmd(@Command: @Length);
+x004               On-Error;
+e004               EndMon;
+e003            EndMon;
+e002         EndMon;
+e001      EndIf;
+
+          End-Proc;
+

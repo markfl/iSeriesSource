@@ -1,0 +1,152 @@
+             PGM        PARM(&FILE &SRCFILE &MEMBER &RPGTYPE +
+                          &PREPARED &TYPE &DSPEC &CSPEC &SQLSPEC +
+                          &INDENT &PREFIXSRC &PREFIXDST &CHECKNULL +
+                          &CASE &COMPARE &SKIP)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&SRCFILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&RPGTYPE) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&PREPARED) TYPE(*CHAR) LEN(9)
+             DCL        VAR(&TYPE) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&DSPEC) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&CSPEC) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&SQLSPEC) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&INDENT) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&PREFIXSRC) TYPE(*CHAR) LEN(5)
+             DCL        VAR(&PREFIXDST) TYPE(*CHAR) LEN(5)
+             DCL        VAR(&CHECKNULL) TYPE(*LGL)
+             DCL        VAR(&CASE) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&COMPARE) TYPE(*CHAR) LEN(15)
+             DCL        VAR(&SKIP) TYPE(*LGL)
+
+             DCL        VAR(&FROMFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FROMLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&TOSRCFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TOSRCLIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(256)
+
+             CHGVAR     VAR(&FROMFILE) VALUE(%SST(&FILE 1 10))
+             CHGVAR     VAR(&FROMLIB) VALUE(%SST(&FILE 11 10))
+
+             CHGVAR     VAR(&TOSRCFILE) VALUE(%SST(&SRCFILE 1 10))
+             CHGVAR     VAR(&TOSRCLIB) VALUE(%SST(&SRCFILE 11 10))
+
+             IF         COND(&MEMBER = *FILE) THEN(CHGVAR +
+                          VAR(&MEMBER) VALUE(&FROMFILE))
+
+/* b01 */    IF         COND(&FROMFILE *EQ ' ') THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('File is a required +
+                          parameter')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+/* e01 */    ENDDO
+
+             CHKOBJ     OBJ(&FROMLIB/&FROMFILE) OBJTYPE(*FILE)
+/* b01 */    MONMSG     MSGID(CPF9801) EXEC(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    File' |> &FROMFILE +
+                          |> 'in library' |> &FROMLIB |> 'not found')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+/* e01 */    ENDDO
+/* b01 */    MONMSG     MSGID(CPF9810) EXEC(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    Library' |> &FROMLIB +
+                          |> 'not found')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+/* e01 */    ENDDO
+
+/* b01 */    IF         COND(&TYPE *EQ IX) THEN(DO)
+/* b02 */    IF         COND(&DSPEC *NE ' ') THEN(DO)
+/* b03 */    IF         COND(&DSPEC *NE *RENAME) THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    Operation Not +
+                          Allowed For IX Spec')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+/* e03 */    ENDDO
+/* e02 */    ENDDO
+/* e01 */    ENDDO
+
+/* b01 */    IF         COND(&TYPE *EQ D) THEN(DO)
+/* b02 */    IF         COND((&DSPEC *NE ' ') *AND (&DSPEC *NE +
+                          *LIKE)) THEN(DO)
+/* b03 */    IF         COND((&DSPEC *NE *RENAME) *AND (&DSPEC *NE +
+                          *DS)) THEN(DO)
+/* b04 */    IF         COND(&DSPEC *NE *DSLIKE) THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    Operation Not +
+                          Allowed For D Spec')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+/* e04 */    ENDDO
+/* e03 */    ENDDO
+/* e02 */    ENDDO
+/* e01 */    ENDDO
+
+/* b01 */    IF         COND((&TYPE *EQ D) *OR (&TYPE *EQ IX)) THEN(DO)
+/* b02 */    IF         COND((&DSPEC *EQ *LIKE) *OR (&DSPEC *EQ +
+                          *RENAME) *OR (&DSPEC *EQ *DSLIKE)) THEN(DO)
+/* b03 */    IF         COND(&PREFIXSRC = *NONE) THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    Prefix Required For +
+                          Spec')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+/* e03 */    ENDDO
+/* e02 */    ENDDO
+/* e01 */    ENDDO
+
+/* b01 */    IF         COND(&TYPE *EQ C) THEN(DO)
+/* b02 */    IF         COND(&CSPEC *EQ ' ') THEN(DO)
+/* b03 */    IF         COND(&SQLSPEC *EQ ' ') THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    Operation Required +
+                          if Spec type = C')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+/* e03 */    ENDDO
+/* e02 */    ENDDO
+/* e01 */    ENDDO
+
+/* b01 */    IF         COND(&DSPEC *EQ *RENAME) THEN(DO)
+/* b02 */    IF         COND((&TYPE *NE D) *AND (&TYPE *NE IX)) +
+                          THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    Operation Only +
+                          Allowed with IX or D Specs')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+/* e02 */    ENDDO
+/* e01 */    ENDDO
+
+/* b01 */    IF         COND(&RPGTYPE *EQ *RPGSQL) THEN(DO)
+/* b02 */    IF         COND((&SQLSPEC *NE *INSERT) *AND (&SQLSPEC +
+                          *NE *UPDATE) *AND (&SQLSPEC *NE *DELETE)) +
+                          THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    Operation Not +
+                          Allowed with SQL Specs')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+/* e02 */    ENDDO
+/* e01 */    ENDDO
+
+/* b01 */    IF         COND(&RPGTYPE *NE *RPGSQL) THEN(DO)
+/* b02 */    IF         COND((&SQLSPEC *EQ *INSERT) *OR (&SQLSPEC +
+                          *EQ *UPDATE) *OR (&SQLSPEC *EQ *DELETE)) +
+                          THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE('    Operation Only +
+                          Allowed with SQL Specs')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          TOPGMQ(*PRV) MSGTYPE(*DIAG)
+             SNDPGMMSG  MSGID(CPF0002) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)
+/* e02 */    ENDDO
+/* e01 */    ENDDO
+
+             ENDPGM

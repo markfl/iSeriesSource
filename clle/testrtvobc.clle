@@ -1,0 +1,15 @@
+             PGM        PARM(&OBJECT &LIBRARY &TYPE &FORMAT)
+
+             DCL        VAR(&OBJECT) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TYPE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FORMAT) TYPE(*CHAR) LEN(10)
+
+             DBG        PGM(TESTRTVOBJ)
+
+             CALL       PGM(TESTRTVOBJ) PARM(&OBJECT &LIBRARY &TYPE +
+                          &FORMAT)
+
+             ENDDBG
+
+ END:        ENDPGM

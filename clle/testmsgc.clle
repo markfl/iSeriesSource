@@ -1,0 +1,9 @@
+             PGM
+
+             DBG        PGM(TESTMSGP)
+
+             CALL       PGM(TESTMSGP)
+
+             ENDDBG
+
+ END:        ENDPGM

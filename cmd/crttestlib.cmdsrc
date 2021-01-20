@@ -1,0 +1,11 @@
+             CMD        PROMPT('Create Duplicate Test Library')
+
+             PARM       KWD(FRMLIB) TYPE(*NAME) MIN(1) PROMPT('From +
+                          Library')
+
+             PARM       KWD(TOLIB) TYPE(*NAME) MIN(1) PROMPT('To +
+                          Library')
+
+             PARM       KWD(FILEATR) TYPE(*CHAR) LEN(3) RSTD(*YES) +
+                          DFT(*PF) VALUES(*PF *LF) PROMPT('File +
+                          attributes')

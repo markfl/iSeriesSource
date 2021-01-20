@@ -1,0 +1,282 @@
+      /IF DEFINED(RPGSTRUCT01)
+
+          Dcl-Ds @SourceDs ExtName('QRPGLESRC')  Prefix(@_) End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT01_36)
+
+          Dcl-Ds @SourceDs ExtName('QRPGSRC')  Prefix(@_) End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT01_CL)
+
+          Dcl-Ds @SourceDs ExtName('QCLSRC') Prefix(@_) End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT01_CLLE)
+
+          Dcl-Ds @SourceDs ExtName('QCLLESRC') Prefix(@_) End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT01_DDS)
+
+          Dcl-Ds @SourceDs ExtName('QDDSSRC') Prefix(@_) End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT01_TXT)
+
+          Dcl-Ds @SourceDs ExtName('QTXTSRC') Prefix(@_) End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT01E)
+
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT01_36E)
+
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT01_CLE)
+
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT01_CLLEE)
+
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT01_DDSE)
+
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT01_TXTE)
+
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT02)
+
+          Dcl-Ds @FspecDsRPGILE Qualified;
+             @FTag      Char(5);
+             @FOutspecd Char(1);
+             @FFileName Char(10);
+             @FUsage    Char(1);
+             @FFunction Char(1);
+             @FAdd      Char(1)  Pos(20);
+             @FWidth    Char(4)  Pos(24);
+             @FKeyed    Char(1)  Pos(34);
+             @FDevice   Char(7)  Pos(36);
+             @FKeywords Char(37) Pos(44);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT03)
+
+          Dcl-Ds @DspecDsRPGILE Qualified;
+             @DTag         Char(5);
+             @DOutspecd    Char(1);
+             @DFieldName   Char(15);
+             @DCommentMark Char(1)  Pos(7);
+             @DExternal    Char(1)  Pos(22);
+             @DSystem      Char(1);
+             @DDsId        Char(2);
+             @DFrom        Char(7);
+             @DTo          Char(7);
+             @DType        Char(1);
+             @DDec         Char(2);
+             @DKeywords    Char(37) Pos(44);
+             @DConstant    Char(32) Pos(50);
+             @DProcPrefix  Char(74) Pos(7);
+             @DComment     Char(20) Pos(81);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT03_36)
+
+          Dcl-Ds @EspecDsRPGIII Qualified;
+             @ETag         Char(5);
+             @EOutspecd    Char(1);
+             @EArrayField1 Char(6)    Pos(27);
+             @ESize1       Zoned(3:0) Pos(40);
+             @EArrayField2 Char(6)    Pos(46);
+             @ESize2       Zoned(3:0) Pos(52);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT04)
+
+          Dcl-Ds @IspecDsRPGILE Qualified;
+             @ITag      Char(5);
+             @IOutspecd Char(1);
+             @IRcdfmt   Char(10);
+             @IFrom     Char(5)  Pos(37);
+             @ITo       Char(5)  Pos(42);
+             @IDec      Char(2)  Pos(47);
+             @IInField  Char(10) Pos(21);
+             @IAtr      Char(1)  Pos(36);
+             @IOutField Char(10) Pos(49);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT04_36)
+
+          Dcl-Ds @IspecDsRPGIII Qualified;
+             @ITag        Char(5);
+             @IOutspecd   Char(1);
+             @IRcdfmt     Char(10);
+             @IExternal   Char(1)  Pos(17);
+             @ISystem     Char(1)  Pos(18);
+             @IDsId       Char(2)  Pos(19);
+             @IInField    Char(10) Pos(21);
+             @IOutField   Char(6)  Pos(53);
+             @INamedConst Char(22) Pos(21);
+             @IConstant   Char(1)  Pos(43);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT05)
+
+          Dcl-Ds @CspecDsRPGILE Qualified;
+             @CTag        Char(5);
+             @COutspecd   Char(1);
+             @CLvlInd     Char(2);
+             @CInd        Char(3);
+             @CField1     Char(14);
+             @COption     Char(10);
+             @CField2     Char(14);
+             @CResult     Char(14);
+             @CSize       Char(5);
+             @CDigit      Char(2);
+             @CRInd1      Char(2);
+             @CRInd2      Char(2);
+             @CRInd3      Char(2);
+             @CExtFact2   Char(45) Pos(36);
+             @CComments   Char(20);
+             @COptionIf   Char(2)  Pos(26);
+             @COptionDow  Char(3)  Pos(26);
+             @COptionWhen Char(4)  Pos(26);
+             @CFree       Char(58) Pos(11);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT05_36)
+
+          Dcl-Ds @CspecDsRPGIII Qualified;
+             @CTag      Char(5);
+             @COutspecd Char(1);
+             @CLvlInd   Char(2);
+             @CAInd1    Char(3);
+             @CAInd2    Char(3);
+             @CAInd3    Char(3);
+             @CField1   Char(10);
+             @COption   Char(5);
+             @CField2   Char(10);
+             @CResult   Char(6);
+             @CSize     Char(3);
+             @CDigit    Char(1);
+             @CAdjust   Char(1);
+             @CRInd1    Char(2);
+             @CRInd2    Char(2);
+             @CRInd3    Char(2);
+             @CComments Char(14);
+             @CExtFact2 Char(42) Pos(33);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT06)
+
+          Dcl-Ds @OspecDsRPGILE Qualified;
+             @OTag      Char(5);
+             @OOutspecd Char(1);
+             @OExcept   Char(1)  Pos(17);
+             @OInd1     Char(5)  Pos(21);
+             @OInd2     Char(3);
+             @OInd3     Char(3);
+             @OEName    Char(10) Pos(30);
+             @OFname    Char(14) Pos(30);
+             @OEdtcde   Char(1);
+             @OBA       Char(1);
+             @OEndPos   Char(5)  Pos(47);
+             @OFormat   Char(1)  Pos(52);
+             @OConstant Char(28) Pos(53);
+             @OComments Char(20) Pos(81);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT06_36)
+          Dcl-Ds @OspecDsRPGIII Qualified;
+             @OTag      Char(5);
+             @OOutspecd Char(1);
+             @OInd1     Char(3)  Pos(23);
+             @OInd2     Char(3);
+             @OInd3     Char(3);
+             @OFname    Char(6)  Pos(32);
+             @OEdtcde   Char(1)  Pos(38);
+             @OBA       Char(1);
+             @OEndPos   Char(4)  Pos(40);
+             @OConstant Char(26) Pos(45);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT07)
+
+          Dcl-Ds @PspecDsRPGILE Qualified;
+             @PTag        Char(5);
+             @POutspecd   Char(1);
+             @PName       Char(15);
+             @PBegEnd     Char(1)  Pos(24);
+             @PKeyword    Char(37) Pos(44);
+             @PComments   Char(20) Pos(81);
+             @PProcPrefix Char(74) Pos(7);
+          End-Ds;
+
+      /ENDIF
+
+      /IF DEFINED(RPGSTRUCT08)
+
+          Dcl-s @Offset1 Int(5) Inz(7);
+          Dcl-s @Offset2 Int(5) Inz(10);
+          Dcl-s @Offset3 Int(5) Inz(13);
+          Dcl-s @Offset4 Int(5) Inz(16);
+          Dcl-s @Offset5 Int(5) Inz(19);
+          Dcl-s @Offset6 Int(5) Inz(22);
+          Dcl-s @Offset7 Int(5) Inz(25);
+          Dcl-s @Offset8 Int(5) Inz(28);
+          Dcl-s @Offset9 Int(5) Inz(31);
+          Dcl-s @Offset10 Int(5) Inz(34);
+          Dcl-s @Offset11 Int(5) Inz(37);
+          Dcl-s @Offset12 Int(5) Inz(40);
+          Dcl-s @Offset13 Int(5) Inz(43);
+          Dcl-s @Offset14 Int(5) Inz(46);
+          Dcl-s @Offset15 Int(5) Inz(49);
+          Dcl-s @Offset16 Int(5) Inz(52);
+          Dcl-s @Offset17 Int(5) Inz(55);
+          Dcl-s @Offset18 Int(5) Inz(58);
+          Dcl-s @Offset19 Int(5) Inz(61);
+
+      /ENDIF

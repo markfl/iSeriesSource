@@ -1,0 +1,37 @@
+             CMD        PROMPT('Find File Usage')
+
+             PARM       KWD(FILE) TYPE(FILE) MIN(1) PROMPT('File')
+ FILE:       QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB) (*ALL) (*ALLUSR)) +
+                          CHOICE(*NONE) PROMPT('Library')
+
+             PARM       KWD(OBJLIB) TYPE(*NAME) DFT(*ALL) +
+                          SPCVAL((*CURLIB) (*ALL)) PROMPT('Object +
+                          Library')
+
+             PARM       KWD(DSPPGMREF) TYPE(DSPPGMREF) DFT(*DFT) +
+                          SNGVAL((*DFT 'QDSPPGMREF*CURLIB') (*NEW)) +
+                          PROMPT('Display Program Reference File')
+ DSPPGMREF:  QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(FNDFILUSG) TYPE(FNDFILUSG) DFT(*DFT) +
+                          SNGVAL((*DFT 'QFNDFILUSG*CURLIB') (*NEW)) +
+                          PROMPT('Find File Usage File')
+ FNDFILUSG:  QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(OUTMBR) TYPE(OUTMBR) SNGVAL((*NEW)) +
+                          PROMPT('Output member options:')
+ OUTMBR:     ELEM       TYPE(*CHAR) LEN(10) DFT(*FIRST) +
+                          SPCVAL((*FIRST)) PROMPT('Member to +
+                          receive output')
+             ELEM       TYPE(*CHAR) LEN(8) RSTD(*YES) DFT(*ADD) +
+                          VALUES(*REPLACE *ADD) CHOICE(*NONE) +
+                          PROMPT('Replace or add records')
+

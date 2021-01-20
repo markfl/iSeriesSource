@@ -1,0 +1,6 @@
+     A*         R RPGMMODREF                PFILE(QPGMMODREF)
+     A          R RPGMMODREF                PFILE(QTEMP/QPGMMODREF)
+     A          K OBJECT
+     A          K LIBRARY
+     A          K MODULE
+     A          K EXPORTPROC

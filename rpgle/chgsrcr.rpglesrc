@@ -1,0 +1,28 @@
+          Ctl-opt BndDir('MFLORES') DftActGrp(*No) Option(*NoDebugio);
+
+     FInput     ip   f  112        Disk
+          Dcl-f qrpglesrc Usage(*Output) Rename(qrpglesrc:rqrpglesrc);
+
+          Dcl-s @a Packed(5:0) Inz(*Zeros);
+
+     IInput     ns
+     I                             s    1    6 2@srcseq
+     I                             s    7   12 0@srcdat
+     I                                 13  112  @srcdta
+
+          srcseq = @srcseq;
+          srcdat = @srcdat;
+          @a = %Scan('isfloresm':@srcdta);
+b001      If @a > *Zeros;
+             srcdta = %ScanRpl('isflorem':'mflores':@srcdta);
+x001      Else;
+             @a = %Scan('ISFLORESM':@srcdta);
+b002         If @a > *Zeros;
+                srcdta = %ScanRpl('ISFLORESM':'MFLORES':@srcdta);
+x002         Else;
+                srcdta = @srcdta;
+e002         EndIf;
+e001      EndIf;
+
+          Write rqrpglesrc;
+

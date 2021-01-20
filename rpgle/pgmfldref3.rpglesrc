@@ -1,0 +1,107 @@
+          Ctl-opt DftActGrp(*No) Option(*NoDebugio);
+
+     Fspoolfile ip   f  198        Disk
+
+          Dcl-f qadspffdq Usage(*Input) Keyed;
+          Dcl-f qpgmfldref Usage(*Output);
+
+          Dcl-Pi pgmfldref3;
+             @PProgram    Like(program);
+             @PLibrary    Like(library);
+             @PSourceFile Like(srcfile);
+             @PSourceType Like(srctype);
+          End-Pi;
+
+          Dcl-s @found       Ind         Inz(*Off);
+          Dcl-s @FieldsFound Packed(3:0) Inz(*Zeros);
+          Dcl-s @Sequence     Like(Sequence) Inz(*Zeros);
+
+          /define mflores074
+          /copy qcpysrc,mflores
+          /undefine mflores074
+
+     Ispoolfile ns
+     I                                  1  198  spoolfiledta
+     I                                  1    5  @Error
+     I                                  2   15  @FieldName
+     I                                 42   49  @Type
+     I                                 58   62  @Size
+     I                                 64   64  @Dec
+     I                                 72   76  @NotUsed
+     I                                122  125  @Page
+
+b001      If not @Found;
+             @FieldsFound = %Scan('Declared Variables': spoolfiledta);
+b002         If @FieldsFound > *Zeros;
+                @Found = *On;
+e002         EndIf;
+x001      Else;
+
+             @FieldsFound = %Scan('E N D   O F   C R O S S   R E F E R E N C E':
+                                   spoolfiledta);
+b002         If @FieldsFound > *Zeros;
+                *Inlr = *On;
+                Return;
+e002         EndIf;
+
+             @FieldsFound = %Scan('Defined Labels': spoolfiledta);
+b002         If @FieldsFound > *Zeros;
+                *Inlr = *On;
+                Return;
+e002         EndIf;
+
+b002         If  @FieldName  <> 'Name   '
+             And @FieldName  <> *Blanks
+             And @Error      <> '* CPD'
+             And @Page       <> 'Page';
+
+                Clear rpgmfldref;
+
+                program  = @PProgram;
+                library  = @Plibrary;
+                srcfile  = @PSourceFile;
+                srctype  = @PSourceType;
+                extfield = @FieldName;
+                intfield = extfield;
+
+b003            Select;
+x003               When @Type = '*CHAR';
+                      type = 'A';
+x003               When @Type = '*DEC';
+                      type = 'S';
+x003               When @Type = '*LGL';
+                      type = 'N';
+x003               When @Type = '*INT';
+                      type = 'S';
+e003            EndSl;
+
+b003            If %Trim(@Size) <> *Blanks;
+                   size = %Uns(%Trim(@Size));
+e003            EndIf;
+b003            If %Trim(@Dec) <> *Blanks;
+                   dec = %Uns(%Trim(@Dec));
+e003            EndIf;
+
+b003            If @NotUsed <> *Blanks;
+                   UsedinPgm = @Yes;
+x003            Else;
+                   UsedinPgm = @No;
+e003            EndIf;
+
+                intext  = @No;
+                whfldi = @FieldName;
+                Chain whfldi qwhdrffd;
+b003            If %Found(qadspffdq);
+                   extfield  = whflde;
+                   intext    = @Yes;
+                   extfile   = whfile;
+                   fielddesc = whftxt;
+e003            EndIf;
+
+                @Sequence += 1;
+                Sequence = @Sequence;
+
+                Write rpgmfldref;
+
+e002         EndIf;
+e001      EndIf;

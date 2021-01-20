@@ -1,0 +1,8 @@
+
+          Dcl-c @dspmod1 Const('DSPMOD MODULE(');
+          Dcl-c @dspmod2 Const(') DETAIL(*EXPORT) OUTPUT(*OUTFILE) -
+                               OUTFILE(QTEMP/QABNDMEX)');
+          Dcl-c @ovrdbf  Const('OVRDBF FILE(QABNDMEX) TOFILE(QTEMP/QABNDMEX)');
+          Dcl-c @dltovr  Const('DLTOVR FILE(QABNDMEX)');
+          Dcl-c @dltf    Const('DLTF FILE(QTEMP/QABNDMEX)');
+

@@ -1,0 +1,81 @@
+          Ctl-opt NoMain Option(*NoDebugio);
+     H/Title Retrieve Member Description
+
+      /define mflores022
+      /define mflores023
+      /define mflores024
+      /define mflores036
+      /copy qcpysrc,mflores
+
+          Dcl-proc RetrieveMemberDescription Export;
+
+          Dcl-pi RetrieveMemberDescription Ind;
+             @PFile    Char(10) Const;
+             @PLibrary Char(10) Const;
+             @PMember  Char(10) Const Options(*NoPass);
+             @PFormat  Char(10) Const Options(*NoPass);
+          End-pi;
+
+          Dcl-c @Format0100 Const('MBRD0100');
+          Dcl-c @Format0200 Const('MBRD0200');
+          Dcl-c @Format0300 Const('MBRD0300');
+
+     DRtvMbrD          pr                  ExtPgm('QUSRMBRD')
+     D                            32767a   Options(*VarSize)
+     D                               10i 0 Const
+     D                                8a   Const
+     D                               20a   Const
+     D                               10a   Const
+     D                                1a   Const
+     D                            32767a   Options(*VarSize : *NoPass)
+     D                                1a   Const Options(*NoPass)
+
+          Dcl-s @Member Char(10) Inz('*First');
+          Dcl-s @Format Char(10) Inz(@Format0100);
+
+b001      If  %Parms()  > 2
+          And @PMember <> *Blanks;
+
+             @Member = @PMember;
+
+e001      EndIf;
+
+b001      If  %Parms()  > 3
+          And @PFormat <> *Blanks;
+
+             @Format = @PFormat;
+
+e001      EndIf;
+
+b001      Select;
+
+x001         When @Format = @Format0100;
+
+                RtvMbrD(Mbrd0100Ds: %Size(Mbrd0100Ds): @Format:
+                        @PFile + @PLibrary: @Member: '0': ApiErrorDs);
+
+x001         When @Format = @Format0200;
+
+                RtvMbrD(Mbrd0200Ds: %Size(Mbrd0200Ds): @Format:
+                        @PFile + @PLibrary: @Member: '0': ApiErrorDs);
+
+x001         When @Format = @Format0300;
+
+                RtvMbrD(Mbrd0300Ds: %Size(Mbrd0300Ds): @Format:
+                        @PFile + @PLibrary: @Member: '0': ApiErrorDs);
+
+e001      EndSl;
+
+b001      If  AeMsgId <> 'CPF9812';
+
+             // Object found
+             Return *On;
+
+x001      Else;
+
+             // Object not found
+             Return *Off;
+
+e001      EndIf;
+
+          End-proc;

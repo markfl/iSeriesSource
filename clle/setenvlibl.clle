@@ -1,0 +1,32 @@
+             PGM        PARM(&ENV &CURLIB)
+
+             DCL        VAR(&ENV) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&CURLIB) TYPE(*CHAR) LEN(10)
+
+/* b01 */    IF         COND(&ENV *EQ *DFT) THEN(DO)
+             RTVDTAARA  DTAARA(STRPGM (1 10)) RTNVAR(&ENV)
+/* e01 */    ENDDO
+
+             CALL       PGM(SETENVLIBR) PARM(&ENV)
+
+/* b01 */    SELECT
+
+/* b02 */    WHEN       COND(&CURLIB *EQ *CURRENT) THEN(DO)
+/* e02 */    ENDDO
+
+/* b02 */    WHEN       COND(&CURLIB *EQ *USRPRF) THEN(DO)
+             RTVUSRPRF  CURLIB(&CURLIB)
+             CHGCURLIB  CURLIB(&CURLIB)
+/* e02 */    ENDDO
+
+/* b02 */    WHEN       COND(&CURLIB *EQ *CRTDFT) THEN(DO)
+             CHGCURLIB  CURLIB(*CRTDFT)
+/* e02 */    ENDDO
+
+/* b02 */    OTHERWISE  CMD(DO)
+             CHGCURLIB  CURLIB(&CURLIB)
+/* e02 */    ENDDO
+
+/* e01 */    ENDSELECT
+
+             ENDPGM

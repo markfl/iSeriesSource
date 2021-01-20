@@ -1,0 +1,13 @@
+             CMD        PROMPT('Delete Source Tagged Comments')
+
+             PARM       KWD(SRCFILE) TYPE(SRCFILE) PROMPT('File')
+ SRCFILE:    QUAL       TYPE(*NAME) DFT(QRPGLESRC)
+             QUAL       TYPE(*NAME) DFT(*LIBL) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(MBR) TYPE(*NAME) DFT(*FIRST) +
+                          SPCVAL((*FIRST)) PROMPT('Member')
+
+             PARM       KWD(TAG) TYPE(*CHAR) LEN(9) PROMPT('From tag')
+

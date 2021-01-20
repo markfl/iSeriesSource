@@ -1,0 +1,254 @@
+     H/title     Purge Process
+     H Option(*NoDebugio)
+     H copyright ('(C) Copyright Hub Group, Inc. 2015')
+      **************************************************************************
+      *                                                                        *
+      *   H U B   G R O U P ,   I N C .                                        *
+      *                                                                        *
+      **************************************************************************
+      *                                                                        *
+      *  Program Title: Purge Process                                          *
+      *                                                                        *
+      *  Date Written:  08/28/2015                                             *
+      *                                                                        *
+      *  Input:                                                                *
+      *                                                                        *
+      *  Output:                                                               *
+      *                                                                        *
+      **************************************************************************
+      *            Design                                                      *
+      * Date       Request Mod Pgmr Description                                *
+      * ---------- ------- --- ---- ------------------------------------------ *
+      * 08-28-15   42268       MF   Initial Creation                           *
+      *                                                                        *
+      **************************************************************************
+
+     ‚* Work Display Screen
+     Fitpprgmnudcf   e             Workstn
+
+      * Program Status Data Structure
+     D                sds
+     D QProg             *Proc
+     D QParms            *Parms
+     D QErrorMessage          91    170
+     D QUser                 254    263
+
+‚     * Procedure Prototype
+     Ditpprgmnur       pr
+
+‚     * Procedure Interface
+     Ditpprgmnur       pi
+
+‚     * Screen 1 Control Procedure
+     DControl01        pr
+
+‚     * Initialize Screen 1 Procedure Prototype
+     DInitialize...
+     DScreen01         pr              n
+
+‚     * Display Screen 1 Procedure Prototype
+     DDisplayScreen01  pr
+
+‚     * Edit Screen 1 Procedure Prototype
+     DEditScreen01     pr              n
+
+     DUpdateFiles      pr                  ExtPgm('ITPPRGUPDR')
+
+     DUpdateKeys       pr                  ExtPgm('ITPPRGKEYR')
+
+     D/DEFINE ITPSHARE11
+     D/copy qcpysrc,itpshare
+     D/UNDEFINE ITPSHARE11
+
+      /free
+
+          //‚Execute display screen procedure
+          Control01();
+
+          *Inlr = *On;
+          Return;
+
+          // ************************************************************************
+          // *‚Program Initialization Subroutine
+          // ************************************************************************
+
+          BegSr *InzSr;
+
+             @1Option = *Blanks;
+             @1ErrMsg = *Blanks;
+             *In21    = *Off;
+
+          EndSr;
+
+      /end-free
+
+      ************************************************************************
+      *‚Control01 - Screen 1 Control Procedure
+      ************************************************************************
+
+     PControl01        b
+
+     DControl01        pi
+
+      /free
+
+          // Initialize Screen 1 subroutine
+b001      If InitializeScreen01();
+e001      EndIf;
+
+          // Do until exit key is pressed
+b001      Dow Not *Inkc;
+
+             // Display subfile
+             DisplayScreen01();
+
+e001      EndDo;
+
+      /end-free
+
+     PControl01        e
+
+      ************************************************************************
+      *‚Initialize01 - Initialize Screen 1 subroutine
+      ************************************************************************
+
+     PInitialize...
+     PScreen01         b
+
+     DInitialize...
+     DScreen01         pi              n
+
+      /free
+
+          // initialize screen fields
+          Reset @1Option;
+          Reset *In21;
+
+          Return *On;
+
+      /end-free
+
+     PInitialize...
+     PScreen01         e
+
+      ************************************************************************
+      *‚DisplayScreen01 - Display screen 1
+      ************************************************************************
+
+     PDisplayScreen01  b
+
+     DDisplayScreen01  pi
+
+     D/DEFINE ITPSHARE15
+     D/copy qcpysrc,itpshare
+
+      /free
+
+          // Do until exit key is pressed
+b001      Dow Not *Inkc;
+
+             // Display subfile
+             ExFmt scrn1;
+
+             Reset @1ErrMsg;
+             Reset *In21;
+
+             // Start Select
+b002         Select;
+
+                // Do until exit key is pressed
+x002            When Not *Inkc;
+
+                   // Edit Screen 1
+b003               If EditScreen01();
+
+                      // Start Select
+b004                  Select;
+
+                         // Check for key maintenance requested
+x004                     When @1Option = '1';
+
+                            // Execute keys update
+                            UpdateKeys();
+
+                         // Check for file maintenance requested
+x004                     When @1Option = '2';
+
+                            // Execute files update
+                            UpdateFiles();
+
+                         // Check for purge process requested
+x004                     When @1Option = '3';
+
+b005                        Monitor;
+
+                               @Command = '? SBMJOB CMD(ITPPURGE) JOB(ITPURGE)';
+                               @Length  = %Len(%Trim(@Command));
+                               @RunCommand(@Command: @Length);
+
+x005                        On-Error;
+e005                        EndMon;
+
+                         // Check for restore process requested
+x004                     When @1Option = '4';
+
+b005                        Monitor;
+
+                               @Command = '? SBMJOB CMD(ITPRESTORE)' +
+                                          ' JOB(ITRESTORE)';
+                               @Length  = %Len(%Trim(@Command));
+                               @RunCommand(@Command: @Length);
+
+x005                        On-Error;
+e005                        EndMon;
+
+e004                  EndSl;
+
+                      // Initialize Screen 1 subroutine
+b004                  If InitializeScreen01();
+e004                  EndIf;
+e003               EndIf;
+e002         EndSl;
+e001      EndDo;
+
+      /end-free
+
+     PDisplayScreen01  e
+
+      ************************************************************************
+      *‚EditScreen01 - Edit screen 1
+      ************************************************************************
+
+     PEditScreen01     b
+
+     DEditScreen01     pi              n
+
+      /free
+
+          // Validate from file field
+b001      If  @1Option <> '1'
+          And @1Option <> '2'
+          And @1Option <> '3'
+          And @1Option <> '4';
+
+             // Set on error ind.
+             *In21 = *On;
+
+             // Set error message id
+             Clear @1ErrMsg;
+             @1ErrMsg = 'Invalid option entered.';
+             @1ErrMsg = RtvMsgD('ERR9898': *Blanks:
+                                @1ErrMsg: %Len(%Trim(@1ErrMsg)));
+
+             // Exit procedure
+             Return *Off;
+
+e001      EndIf;
+
+          // If program passees to here all fields are good
+          Return *On;
+
+      /end-free
+
+     PEditScreen01     e
+

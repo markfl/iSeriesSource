@@ -1,0 +1,21 @@
+
+         /IF DEFINED(FNDFLDUSG01)
+
+         Dcl-Ds @qadspffdDsIn ExtName('QADSPFFD') Prefix(@) End-Ds;
+
+         /ENDIF
+
+         /IF DEFINED(FNDFLDUSG02)
+
+         Dcl-Ds @qadspffdDsOut ExtName('QADSPFFD') End-Ds;
+
+         /ENDIF
+
+         /IF DEFINED(FNDFLDUSG03)
+
+         Dcl-Pr SetFields LikeDs(@qadspffdDsOut);
+            DataStructure LikeDs(@qadspffdDsIn);
+         End-Pr;
+
+         /ENDIF
+

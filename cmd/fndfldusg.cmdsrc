@@ -1,0 +1,50 @@
+             CMD        PROMPT('Find Field Usage')
+
+             PARM       KWD(REFFIELD) TYPE(*NAME) MIN(1) +
+                          PROMPT('Field Name')
+
+             PARM       KWD(DSPFFD) TYPE(DSPFFD) DFT(*DFT) +
+                          SNGVAL((*DFT 'QDBASEDICT*CURLIB') (*NEW)) +
+                          PROMPT('Display File Field Reference')
+ DSPFFD:     QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(DSPOBJD) TYPE(DSPOBJD) DFT(*DFT) +
+                          SNGVAL((*DFT 'QDSPOBJD  *CURLIB') (*NEW)) +
+                          PROMPT('Display Object Description')
+ DSPOBJD:    QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(DSPPGMREF) TYPE(DSPPGMREF) DFT(*DFT) +
+                          SNGVAL((*DFT 'QDSPPGMREF*CURLIB') (*NEW)) +
+                          PROMPT('Display Program Reference File')
+ DSPPGMREF:  QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(FNDFLDUSG) TYPE(FNDFLDUSG) DFT(*DFT) +
+                          SNGVAL((*DFT 'QFNDFLDUSG*CURLIB')) +
+                          PROMPT('Find Field Usage Output')
+ FNDFLDUSG:  QUAL       TYPE(*NAME) MIN(1)
+             QUAL       TYPE(*NAME) DFT(*CURLIB) SPCVAL((*LIBL) +
+                          (*USRLIBL) (*CURLIB)) CHOICE(*NONE) +
+                          PROMPT('Library')
+
+             PARM       KWD(OUTMBR) TYPE(OUTMBR) PROMPT('Output +
+                          member options:')
+ OUTMBR:     ELEM       TYPE(*CHAR) LEN(10) DFT(*FIRST) +
+                          SPCVAL((*FIRST)) PROMPT('Member to +
+                          receive output')
+             ELEM       TYPE(*CHAR) LEN(8) RSTD(*YES) DFT(*ADD) +
+                          VALUES(*REPLACE *ADD) CHOICE(*NONE) +
+                          PROMPT('Replace or add records')
+
+             PARM       KWD(PRTREPORT) TYPE(*CHAR) LEN(4) RSTD(*YES) +
+                          DFT(*YES) VALUES(*YES *NO) PROMPT('Print +
+                          report')
+

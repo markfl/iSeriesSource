@@ -1,0 +1,41 @@
+             PGM        PARM(&FROMLIB &TOLIB)
+
+             DCLF       FILE(QADSPOBJ)
+
+             DCL        VAR(&FROMLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TOLIB) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             DLTF       FILE(QTEMP/QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+
+             DSPOBJD    OBJ(&FROMLIB/*ALL) OBJTYPE(*FILE) +
+                          OUTPUT(*OUTFILE) OUTFILE(QTEMP/QADSPOBJ)
+
+             OVRDBF     FILE(QADSPOBJ) TOFILE(QTEMP/QADSPOBJ)
+
+             CALL       PGM(CPYSAVFR)
+
+             RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+
+/* b01 */    DOWHILE    COND(&@MSGID *NE CPF0864)
+
+             SBMJOB     CMD(CPYF FROMFILE(&FROMLIB/&ODOBNM) +
+                          TOFILE(&TOLIB/&ODOBOW) FROMMBR(*ALL) +
+                          TOMBR(*FROMMBR) MBROPT(*REPLACE) +
+                          FMTOPT(*MAP)) JOB(&ODOBOW)
+
+ AGAIN:      RCVF
+             MONMSG     MSGID(CPF0000)
+             RCVMSG     MSGTYPE(*EXCP) MSGID(&@MSGID)
+/* e01 */    ENDDO
+
+             DLTF       FILE(QTEMP/QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

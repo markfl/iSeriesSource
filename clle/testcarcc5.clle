@@ -1,0 +1,27 @@
+             PGM
+
+             CALL       PGM(TESTCARCC4) PARM('15320')
+
+             RCLRSC
+
+             CALL       PGM(TESTCARCC4) PARM('15121')
+
+             RCLRSC
+
+             CALL       PGM(TESTCARCC4) PARM('13860')
+
+             RCLRSC
+
+             CALL       PGM(TESTCARCC4) PARM('13694')
+
+             RCLRSC
+
+             CALL       PGM(TESTCARCC4) PARM('13577')
+
+             RCLRSC
+
+             CALL       PGM(TESTCARCC4) PARM('13552')
+
+             RCLRSC
+
+ END:        ENDPGM

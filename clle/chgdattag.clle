@@ -1,0 +1,24 @@
+             PGM        PARM(&FILE &MEMBER &TAG &TODATE &SRCTYPE)
+
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TAG) TYPE(*CHAR) LEN(5)
+             DCL        VAR(&TODATE) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&SRCTYPE) TYPE(*CHAR) LEN(5)
+
+             DCL        VAR(&TOFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&TOFILE) VALUE(%SST(&FILE 1 10))
+             CHGVAR     VAR(&LIBRARY) VALUE(%SST(&FILE 11 10))
+
+             OVRDBF     FILE(QRPGLESRC) TOFILE(&LIBRARY/&TOFILE) +
+                          MBR(&MEMBER) LVLCHK(*NO)
+             CALL       PGM(CHGDATTAGR) PARM(&TAG &TODATE &SRCTYPE)
+             DLTOVR     FILE(*ALL)
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+ END:        ENDPGM

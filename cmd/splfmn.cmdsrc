@@ -1,0 +1,12 @@
+             CMD        PROMPT('Manage spool files')
+
+             PARM       KWD(USER) TYPE(*NAME) DFT(*CURRENT) +
+                          SPCVAL((*CURRENT *CURRENT) (*ALL *ALL)) +
+                          MIN(0) PROMPT('User')
+
+             PARM       KWD(OUTQ) TYPE(QUAL2) MIN(1) PROMPT('Output +
+                          queue')
+ QUAL2:      QUAL       TYPE(*NAME) LEN(10) MIN(1)
+             QUAL       TYPE(*NAME) LEN(10) DFT(*LIBL) SPCVAL((*LIBL +
+                          *LIBL)) MIN(0) PROMPT('library')
+

@@ -1,0 +1,12 @@
+             PGM
+
+             CLRPFM     FILE(CPOPOHTP)
+             CLRPFM     FILE(CPOSKUTP)
+
+             DBG        PGM(CPOWEBORD)
+
+             CALL       PGM(TESTORDXML)
+
+             ENDDBG
+
+ END:        ENDPGM

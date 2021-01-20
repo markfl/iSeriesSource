@@ -1,0 +1,487 @@
+          Ctl-opt Option(*NoDebugIo) DftActGrp(*No) BndDir('MFLORES');
+
+          Dcl-f qrpglesrc Disk(112) Usage(*Update);
+
+          /define mflores003
+          /copy qcpysrc,mflores
+          /undefine mflores003
+
+          /define RPGSTRUCT01
+          /copy qcpysrc,rpgilestrc
+          /undefine RPGSTRUCT01
+
+          /define IndDs_ColorPallet
+          /copy qcpysrc,indds
+          /undefine IndDs_ColorPallet
+
+          Dcl-Ds @SrcDta Len(100);
+             @Col Char(1);
+             @Clr Char(1) Pos(5);
+          End-Ds;
+
+          Dcl-s @Redsp   Char(8) Dim(24) ctdata;
+          Dcl-s @Redsc   Int(10) Inz(%Elem(@Redsp));
+
+          Dcl-s @Bluesp  Char(12) Dim(6) ctdata;
+          Dcl-s @Bluesc  Int(10) Inz(%Elem(@Bluesp));
+
+          Dcl-s @Pinksp  Char(8) Dim(25) ctdata;
+          Dcl-s @Pinksc  Int(10) Inz(%Elem(@Pinksp));
+
+          Dcl-s @Blue2sp Char(11) Dim(20) ctdata;
+          Dcl-s @Blue2sc Int(10) Inz(%Elem(@Blue2sp));
+
+          Dcl-s @Red2sp  Char(8) Dim(15) ctdata;
+          Dcl-s @Red2sc  Int(10) Inz(%Elem(@Red2sp));
+
+          Dcl-s @Red3sp  Char(4) Dim(2) ctdata;
+          Dcl-s @Red3sc  Int(10) Inz(%Elem(@Red3sp));
+
+          Dcl-s @Red4sp  Char(4) Dim(4) ctdata;
+          Dcl-s @Red4sc  Int(10) Inz(%Elem(@Red4sp));
+
+          Dcl-s @a        Int(10)        Inz(*Zeros);
+          Dcl-s @b        Int(10)        Inz(*Zeros);
+          Dcl-s @srcwork  Like(@_srcdta) Inz(*Blanks);
+          Dcl-s @Written  Ind            Inz(*Off);
+          Dcl-s @Continue Ind            Inz(*Off);
+          Dcl-s @Color    Char(4)        Inz(*Blanks);
+          Dcl-s @seq      Like(@_srcseq) Inz(*Zeros);
+
+          Read qrpglesrc @SourceDs;
+b001      Dow Not %Eof(qrpglesrc);
+
+             @seq = @_srcseq;
+
+             Reset @Written;
+
+             @SrcDta = @_srcdta;
+
+             @srcwork = @ToUpper(@_srcdta);
+
+             @a = %Scan('** ': %Subst(@srcwork:1:3));
+b002         If @a > *Zeros;
+                Leave;
+e002         EndIf;
+
+b002         If @Continue;
+b003            If @Col = *Blanks;
+                   @Col = @Color;
+x003            Else;
+                   @Clr = @Color;
+e003            EndIf;
+                @_Srcdta = @SrcDta;
+                Update qrpglesrc @SourceDs;
+                @Written = *On;
+b003            If @CheckForContinuation(@srcwork: @a);
+                   @Continue = *On;
+x003            Else;
+                   Reset @Continue;
+                   Reset @Color;
+e003            EndIf;
+e002         EndIf;
+
+b002         IF  Not @Written;
+b003            For @b = 1 To @Redsc;
+                   @a = %Scan(@Redsp(@b): @srcwork);
+b004               If @a > *Zeros;
+b005                  If @CheckForComment(@srcwork: @a);
+
+b006                     If @Col = *Blanks;
+                         // @Col = @Red;
+x006                     Else;
+                         // @Clr = @Red;
+e006                     EndIf;
+                         @_Srcdta = @SrcDta;
+                         Update qrpglesrc @SourceDs;
+                         @Written = *On;
+b006                     If @CheckForContinuation(@srcwork: @a);
+                            @Continue = *On;
+                         // @Color    = @Red;
+e006                     EndIf;
+                         Leave;
+
+e005                  EndIf;
+e004               EndIf;
+e003            EndFor;
+e002         EndIf;
+
+b002         If Not @Written;
+
+b003            For @b = 1 To @Bluesc;
+                   @a = %Scan(@Bluesp(@b): @srcwork);
+b004               If @a > *Zeros;
+b005                  If @CheckForComment(@srcwork: @a);
+
+b006                     If @Col = *Blanks;
+                         // @Col = @Blue;
+x006                     Else;
+                         // @Clr = @Blue;
+e006                     EndIf;
+                         @_Srcdta = @SrcDta;
+                         Update qrpglesrc @SourceDs;
+                         @Written = *On;
+                         Leave;
+
+e005                  EndIf;
+e004               EndIf;
+e003            EndFor;
+e002         EndIf;
+
+b002         IF  Not @Written
+             And @Clr =  *Blanks;
+
+b003            For @b = 1 To @Pinksc;
+                   @a = %Scan(@Pinksp(@b): @srcwork);
+b004               If @a > *Zeros;
+b005                  If @CheckForComment(@srcwork: @a);
+
+b006                     If @Col = *Blanks;
+                         // @Col = @Pink;
+x006                     Else;
+                         // @Clr = @Pink;
+e006                     EndIf;
+                         @_Srcdta = @SrcDta;
+                         Update qrpglesrc @SourceDs;
+                         @Written = *On;
+b006                     If @CheckForContinuation(@srcwork: @a);
+                            @Continue = *On;
+                         // @Color    = @Pink;
+e006                     EndIf;
+                         Leave;
+
+e005                  EndIf;
+e004               EndIf;
+e003            EndFor;
+e002         EndIf;
+
+b002         IF  Not @Written;
+b003            For @b = 1 To @Blue2sc;
+                   @a = %Scan(%Trim(@Blue2sp(@b)): @srcwork);
+b004               If @a > *Zeros;
+b005                  If @CheckForComment(@srcwork: @a);
+
+b005                     If @Col = *Blanks;
+                         // @Col = @Blue;
+x005                     Else;
+                         // @Clr = @Blue;
+e005                     EndIf;
+                         @_Srcdta = @SrcDta;
+                         Update qrpglesrc @SourceDs;
+                         @Written = *On;
+b006                     If @CheckForContinuation(@srcwork: @a);
+                            @Continue = *On;
+                         // @Color    = @Blue;
+e006                     EndIf;
+                         Leave;
+
+e005                  EndIf;
+e004               EndIf;
+e003            EndFor;
+e002         EndIf;
+
+b002         If Not @Written;
+
+b003            For @b = 1 To @Red2sc;
+                   @a = %Scan(%Trim(@Red2sp(@b)): @srcwork);
+b004               If @a > *Zeros;
+b005                  If @CheckForComment(@srcwork: @a);
+
+b006                     If @Col = *Blanks;
+                         // @Col = @Red;
+x006                     Else;
+                         // @Clr = @Red;
+e006                     EndIf;
+                         @_Srcdta = @SrcDta;
+                         Update qrpglesrc @SourceDs;
+                         @Written = *On;
+b006                     If @CheckForContinuation(@srcwork: @a);
+                            @Continue = *On;
+                         // @Color    = @Red;
+e006                     EndIf;
+                         Leave;
+
+e005                  EndIf;
+e004               EndIf;
+e003            EndFor;
+e002         EndIf;
+
+b002         If Not @Written;
+
+b003            For @b = 1 To @Red3sc;
+                   @a = %Scan(%Trim(@Red3sp(@b)): @srcwork);
+b004               If @a > *Zeros;
+b005                  If @CheckForComment(@srcwork: @a);
+
+b006                     If @Col = *Blanks;
+                         // @Col = @Red;
+x006                     Else;
+                         // @Clr = @Red;
+e006                     EndIf;
+                         @_Srcdta = @SrcDta;
+                         Update qrpglesrc @SourceDs;
+                         @Written = *On;
+b006                     If @CheckForContinuation(@srcwork: @a);
+                            @Continue = *On;
+                         // @Color    = @Red;
+e006                     EndIf;
+                         Leave;
+
+e005                  EndIf;
+e004               EndIf;
+e003            EndFor;
+e002         EndIf;
+
+b002         If Not @Written;
+
+b003            For @b = 1 To @Red4sc;
+                   @a = %Scan(%Trim(@Red4sp(@b)): @srcwork);
+b004               If @a > *Zeros;
+b005                  If @CheckForComment(@srcwork: @a);
+
+b006                     If @Col = *Blanks;
+                         // @Col = @Red;
+x006                     Else;
+                         // @Clr = @Red;
+e006                     EndIf;
+                         @_Srcdta = @SrcDta;
+                         Update qrpglesrc @SourceDs;
+                         @Written = *On;
+b006                     If @CheckForContinuation(@srcwork: @a);
+                            @Continue = *On;
+                         // @Color    = @Red;
+e006                     EndIf;
+                         Leave;
+
+e005                  EndIf;
+e004               EndIf;
+e003            EndFor;
+e002         EndIf;
+
+b002         If Not @Written;
+                @a = %Scan('DCL-PROC': @srcwork);
+b003            If @a = *Zeros;
+                   @a = %Scan('END-PROC': @srcwork);
+e003            EndIf;
+b003            If @a > *Zeros;
+                   @b = %Scan(';': @srcwork);
+                   %SubSt(@SrcDta:@a-1:1) = @YellowCS;
+                   %SubSt(@SrcDta:@b+1:1) = @ND;
+                   @_Srcdta = @SrcDta;
+                   Update qrpglesrc @SourceDs;
+                   @Written = *On;
+e003            EndIf;
+e002         EndIf;
+
+b002         If  Not @Written;
+b003            If  %Subst(@srcwork:6:1)   = 'F '
+                And %Subst(@srcwork:7:1)  <> '*'
+                Or  %Subst(@srcwork:6:1)   = 'D'
+                And %Subst(@srcwork:7:1)  <> '*'
+                Or  %Subst(@srcwork:6:1)   = 'I'
+                And %Subst(@srcwork:7:1)  <> '*'
+                Or  %Subst(@srcwork:6:1)   = 'C'
+                And %Subst(@srcwork:7:1)  <> '*';
+
+b004               If @Col = *Blanks;
+                   // @Col = @Red;
+x004               Else;
+                   // @Clr = @Red;
+e004               EndIf;
+                   @_Srcdta = @SrcDta;
+                   Update qrpglesrc @SourceDs;
+                   @Written = *On;
+
+e003            EndIf;
+e002         EndIf;
+
+b002         If  Not @Written;
+b003            If  %Subst(@srcwork:6:1) = 'F '
+                And %Subst(@srcwork:7:1) = '*'
+                Or  %Subst(@srcwork:6:1) = 'D'
+                And %Subst(@srcwork:7:1) = '*'
+                Or  %Subst(@srcwork:6:1) = 'I'
+                And %Subst(@srcwork:7:1) = '*'
+                Or  %Subst(@srcwork:6:1) = 'C'
+                And %Subst(@srcwork:7:1) = '*';
+
+b004               If @Col = *Blanks;
+                      @Col = @White;
+x004               Else;
+                      @Clr = @White;
+e004               EndIf;
+                   @_Srcdta = @SrcDta;
+                   Update qrpglesrc @SourceDs;
+                   @Written = *On;
+
+e003            EndIf;
+e002         EndIf;
+
+b002         IF  Not @Written;
+
+                @a = %Scan('// ': @srcwork);
+b003            If @a > *Zeros;
+
+b004               If @Col = *Blanks;
+                      @Col = @White;
+x004               Else;
+                      @Clr = @White;
+e004               EndIf;
+
+                   @_Srcdta = @SrcDta;
+                   Update qrpglesrc @SourceDs;
+                   @Written = *On;
+
+e003            EndIf;
+e002         EndIf;
+
+             Read qrpglesrc @SourceDs;
+e001      EndDo;
+
+          *Inlr = *On;
+          Return;
+
+          Dcl-Proc @CheckForComment;
+
+          Dcl-pi @CheckForComment Ind;
+             @Source Like(@_srcdta) Const;
+             @Start  Int(10)        Const;
+          End-pi;
+
+          Dcl-s @ChkDec Int(10) Inz(*Zeros);
+
+          @ChkDec = %Scan('// ': @Source);
+b001      If  @ChkDec > *Zeros
+          And @ChkDec < @Start;
+             Return *Off;
+e001      EndIf;
+
+          Return *On;
+
+          End-Proc;
+
+          Dcl-Proc @CheckForContinuation;
+
+          Dcl-pi @CheckForContinuation Ind;
+             @Source Like(@_srcdta) Const;
+             @Start  Int(10)        Const;
+          End-pi;
+
+          Dcl-s @a      Int(10) Inz(*Zeros);
+          Dcl-s @b      Int(10) Inz(*Zeros);
+          Dcl-s @ChkDec Int(10) Inz(*Zeros);
+
+          @ChkDec = %Scan('; ': @Source);
+b001      If  @ChkDec = *Zeros;
+
+             Return *On;
+
+e001      EndIf;
+
+          Return *Off;
+
+          End-Proc;
+
+** Dspecs Red
+CTL-OPT
+DEALLOC
+  DCL-S
+  DCL-C
+  DCL-F
+ DCL-PI
+ DCL-PR
+ DCL-DS
+END-PI;
+END-PR;
+END-DS;
+   EVAL
+   READ
+  READE
+ READPE
+  READP
+  EVALR
+  CLEAR
+  RESET
+  WRITE
+ UPDATE
+ DELETE
+   IND;
+   EXEC
+** Cpyspc Blue
+    /DEFINE
+  /UNDEFINE
+      /COPY
+/IF DEFINED(
+     /ENDIF
+     /TITLE
+** Cspecs Pink
+      IF
+      OR
+     DOW
+     DOU
+     FOR
+     AND
+    ELSE
+  ELSEIF
+   ENDIF
+   ENDDO
+  ENDFOR
+   LEAVE
+DCL_PROC
+END_PROC
+  RETURN
+  SELECT
+    WHEN
+   OTHER
+   ENDSL
+   ENDSR
+   BEGSR
+    EXSR
+ MONITOR
+ON-ERROR
+  ENDMON
+** Func   Blue
+%UNS(
+%DEC(
+%REM(
+%SIZE(
+%ALLOC(
+%ADDR(
+%CHAR(
+%SCAN(
+%SUBST(
+%OCCUR(
+%BITAND(
+%BITOR(
+%TRIM(
+%TRIMR(
+%TRIML(
+%DATE(
+%TIME(
+%TIMESTAMP(
+DCL-PROC
+END-PROC
+** Def    Red
+  ZONED(
+   CHAR(
+    INT(
+VARCHAR(
+   *PROC
+ *STATUS
+*ROUTINE
+  *PARMS
+   LIKE(
+ LIKEDS(
+ POINTER
+ PACKED(
+    POS(
+    IND
+  BASED(
+** Def    Red
+*ON
+*OFF
+** Def    Red
+=
+<>
+<=
+>=

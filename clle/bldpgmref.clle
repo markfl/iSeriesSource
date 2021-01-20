@@ -1,0 +1,79 @@
+             PGM        PARM(&DSPPGMREF)
+
+             DCL        VAR(&DSPPGMREF) TYPE(*CHAR) LEN(20)
+
+             DCL        VAR(&PGMREFFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PGMREFLIB) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&PGMREFFILE) VALUE(%SST(&DSPPGMREF 1 10))
+             CHGVAR     VAR(&PGMREFLIB) VALUE(%SST(&DSPPGMREF 11 10))
+             IF         COND(&PGMREFLIB *EQ *CURLIB) THEN(CHGVAR +
+                          VAR(&PGMREFLIB) VALUE(&CURLIB))
+
+/* b01 */    IF         COND(&PGMREFFILE *EQ QDSPPGMREF) THEN(DO)
+/* b02 */    IF         COND(&PGMREFLIB *EQ &CURLIB) THEN(DO)
+
+             DLTF       FILE(&PGMREFLIB/QDSPPGMRL1)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(&PGMREFLIB/QDSPPGMRL2)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(&PGMREFLIB/QDSPPGMRL3)
+             MONMSG     MSGID(CPF0000)
+
+             DLTF       FILE(&PGMREFLIB/&PGMREFFILE)
+             MONMSG     MSGID(CPF0000)
+
+/* e02 */    ENDDO
+/* e01 */    ENDDO
+
+             DSPPGMREF  PGM(&CURLIB/BLDDTADIC) OUTPUT(*OUTFILE) +
+                          OBJTYPE(*ALL) OUTFILE(&PGMREFLIB/&PGMREFFILE)
+             MONMSG     MSGID(CPF0000)
+
+             CLRPFM     FILE(&PGMREFLIB/&PGMREFFILE)
+             MONMSG     MSGID(CPF0000)
+
+             CHGPF      FILE(&PGMREFLIB/&PGMREFFILE) SIZE(*NOMAX) +
+                          TEXT('System supplied outfile for DSPPGMREF')
+             MONMSG     MSGID(CPF0000)
+
+             DSPPGMREF  PGM(*ALLUSR/*ALL) OUTPUT(*OUTFILE) +
+                          OBJTYPE(*ALL) +
+                          OUTFILE(&PGMREFLIB/&PGMREFFILE) +
+                          OUTMBR(*FIRST *ADD)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(QDSPPGMREF) TOFILE(&PGMREFLIB/&PGMREFFILE)
+             CALL       PGM(BLDPGMFLDR)
+             DLTOVR     FILE(*ALL)
+
+             RGZPFM     FILE(&PGMREFLIB/&PGMREFFILE)
+
+/* b01 */    IF         COND(&PGMREFFILE *EQ QDSPPGMREF) THEN(DO)
+/* b02 */    IF         COND(&PGMREFLIB *EQ &CURLIB) THEN(DO)
+
+             CRTLF      FILE(&PGMREFLIB/QDSPPGMRL1) +
+                          SRCFILE(*CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(&PGMREFLIB/QDSPPGMRL2) +
+                          SRCFILE(*CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST)
+             MONMSG     MSGID(CPF0000)
+
+             CRTLF      FILE(&PGMREFLIB/QDSPPGMRL3) +
+                          SRCFILE(*CURLIB/QDDSSRC) OPTION(*NOSRC +
+                          *NOLIST)
+             MONMSG     MSGID(CPF0000)
+
+/* e02 */    ENDDO
+/* e01 */    ENDDO
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

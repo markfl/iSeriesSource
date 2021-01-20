@@ -1,0 +1,50 @@
+             PGM        PARM(&PSEQ)
+
+             DCL        VAR(&PSEQ) TYPE(*CHAR) LEN(1)
+
+             DCL        VAR(&AUT) TYPE(*CHAR) LEN(1) VALUE('9')
+             DCL        VAR(&OPTM) TYPE(*CHAR) LEN(1) VALUE('2')
+             DCL        VAR(&DIV) TYPE(*CHAR) LEN(4) VALUE(HUBG)
+             DCL        VAR(&WHS) TYPE(*CHAR) LEN(4) VALUE(HCMO)
+             DCL        VAR(&CUST) TYPE(*CHAR)
+             DCL        VAR(&STSD) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&STS) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&YN1) TYPE(*CHAR) LEN(1) VALUE(Y)
+             DCL        VAR(&LOAD) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&LOADSEQ) TYPE(*DEC) LEN(3 0) VALUE(000)
+             DCL        VAR(&FUNC) TYPE(*CHAR) LEN(3)
+             DCL        VAR(&EXIT) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&CAR#) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&SHIPDATE) TYPE(*CHAR) LEN(12) +
+                          VALUE('0001-01-01')
+             DCL        VAR(&ORGCITY) TYPE(*CHAR) LEN(32)
+             DCL        VAR(&ORGSTATE) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&DSTCITY) TYPE(*CHAR) LEN(32)
+             DCL        VAR(&DSTSTATE) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&FPCKDATE) TYPE(*CHAR) LEN(12) +
+                          VALUE('0001-01-01')
+             DCL        VAR(&TPCKDATE) TYPE(*CHAR) LEN(12) +
+                          VALUE('0001-01-01')
+             DCL        VAR(&FDLYDATE) TYPE(*CHAR) LEN(12) +
+                          VALUE('0001-01-01')
+             DCL        VAR(&TDLYDATE) TYPE(*CHAR) LEN(12) +
+                          VALUE('0001-01-01')
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&SEQ) TYPE(*DEC) LEN(1 0) VALUE(3)
+
+             DBG        PGM(OSR2097)
+
+             CHGVAR     VAR(&SEQ) VALUE(&PSEQ)
+             MONMSG     MSGID(CPF0000) EXEC(DO)
+             CHGVAR     VAR(&SEQ) VALUE(1)
+             ENDDO
+
+             CALL       PGM(OSR2097) PARM(&AUT &OPTM &DIV &WHS &CUST +
+                          &STSD &STS &YN1 &LOAD &LOADSEQ &FUNC +
+                          &EXIT &CAR# &SHIPDATE &ORGCITY &ORGSTATE +
+                          &DSTCITY &DSTSTATE &FPCKDATE &TPCKDATE +
+                          &FDLYDATE &TDLYDATE &MSGID &SEQ)
+
+             ENDDBG
+
+ END:        ENDPGM

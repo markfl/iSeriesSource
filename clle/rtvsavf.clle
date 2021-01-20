@@ -1,0 +1,74 @@
+             PGM        PARM(&SYSTEM &SAVF &TOSAVF &USER &PASSWORD)
+
+             DCL        VAR(&SYSTEM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SAVF) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&TOSAVF) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&USER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PASSWORD) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TOSAVFFILE) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&SAVEFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SAVELIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TOSAVFLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TOSAVFLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&IPADDRESS) TYPE(*CHAR) LEN(15)
+             DCL        VAR(&CURRENT) TYPE(*CHAR) LEN(10)
+
+             INCLUDE    SRCMBR(RCVMSGSRCD) SRCFILE(QCPYSRC)
+
+             CHGVAR     VAR(&SAVEFILE) VALUE(%SST(&SAVF 1 10))
+             CHGVAR     VAR(&SAVELIB) VALUE(%SST(&SAVF 11 10))
+             IF         COND(&SAVELIB *EQ '*CURLIB') THEN(CHGVAR +
+                          VAR(&SAVELIB) VALUE(&CURLIB))
+
+             CHGVAR     VAR(&TOSAVFFILE) VALUE(%SST(&TOSAVF 1 10))
+             CHGVAR     VAR(&TOSAVFLIB) VALUE(%SST(&TOSAVF 11 10))
+/* b01 */    IF         COND(&TOSAVFFILE *EQ '*SAVF') THEN(DO)
+             CHGVAR     VAR(&TOSAVFFILE) VALUE(%SST(&SAVF 1 10))
+             CHGVAR     VAR(&TOSAVFLIB) VALUE(%SST(&SAVF 11 10))
+/* e01 */    ENDDO
+/* b01 */    ELSE       CMD(DO)
+             CHGVAR     VAR(&TOSAVFLIB) VALUE(&CURLIB)
+/* e01 */    ENDDO
+
+             DLTF       FILE(QTEMP/INPUT)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/OUTPUT)
+             MONMSG     MSGID(CPF0000)
+
+             RMVMSG     CLEAR(*ALL)
+
+             IF         COND(&TOSAVFLIB *EQ ' ') THEN(DO)
+             CHKOBJ     OBJ(&TOSAVFFILE) OBJTYPE(*FILE)
+             ENDDO
+             ELSE       CMD(DO)
+             CHKOBJ     OBJ(&TOSAVFLIB/&TOSAVFFILE) OBJTYPE(*FILE)
+             ENDDO
+
+             CRTPF      FILE(QTEMP/INPUT) RCDLEN(100)
+             CRTPF      FILE(QTEMP/OUTPUT) RCDLEN(100)
+
+             OVRDBF     FILE(INPUT) TOFILE(QTEMP/INPUT)
+             OVRDBF     FILE(OUTPUT) TOFILE(QTEMP/OUTPUT)
+
+             CALL       PGM(RTVSAVFR) PARM(&SYSTEM &SAVEFILE +
+                          &SAVELIB &TOSAVFFILE &TOSAVFLIB &USER +
+                          &PASSWORD &IPADDRESS)
+
+             FTP        RMTSYS(&IPADDRESS)
+
+             DLTOVR     FILE(*ALL)
+
+             DLTF       FILE(QTEMP/INPUT)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/OUTPUT)
+             MONMSG     MSGID(CPF0000)
+
+             IF         COND(&USER *EQ &CURRENT) THEN(DO)
+             RSTOBJ     OBJ(*ALL) SAVLIB(&TOSAVFLIB) DEV(*SAVF) +
+                          SAVF(&TOSAVFLIB/&TOSAVFFILE)
+             ENDDO
+
+             INCLUDE    SRCMBR(RCVMSGSRC) SRCFILE(QCPYSRC)
+
+             ENDPGM

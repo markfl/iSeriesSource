@@ -1,0 +1,38 @@
+     Fconconmp  up   e           k Disk
+     FconcaLdl00uf   e           k Disk
+     Fconcpldl04uf   e           k Disk
+     Fconmeldl00uf   e           k Disk
+
+          Dcl-Ds @statusDs PsDs;
+             @_user     Char(10)   Pos(254);                          // User name
+          End-Ds;
+
+b001      If conlstprf = @_user;
+
+             Setll *Loval    concaldpf;
+             Setll conconkey concaldpf;
+             Reade conconkey concaldpf;
+b002         Dow Not %Eof(concaldl00);
+                Delete           concaldpf;
+                Reade  conconkey concaldpf;
+e002         EndDo;
+
+             Setll *Loval    concpldpf;
+             Setll conconkey concpldpf;
+             Reade conconkey concpldpf;
+b002         Dow Not %Eof(concpldl04);
+                Delete           concpldpf;
+                Reade  conconkey concpldpf;
+e002         EndDo;
+
+             Setll *Loval    conmeldpf;
+             Setll conconkey conmeldpf;
+             Reade conconkey conmeldpf;
+b002         Dow Not %Eof(conmeldl00);
+                Delete           conmeldpf;
+                Reade  conconkey conmeldpf;
+e002         EndDo;
+
+             Delete conconmpf;
+
+e001      EndIf;

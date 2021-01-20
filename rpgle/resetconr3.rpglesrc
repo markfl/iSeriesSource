@@ -1,0 +1,113 @@
+     Fconconmp  up   e           k Disk
+     Fconcaldl00uf   e           k Disk
+     Fconcpldl04uf   e           k Disk
+     Fconmeldl00uf   e           k Disk
+     Fvndvndml00uf   e           k Disk
+     Fvndviddl00uf   e           k Disk
+     Fvndvaxxl00uf   e           k Disk
+     Fvndvprml00uf   e           k Disk
+     Fvndvaexl00uf   e           k Disk
+     Fvndglvtl00uf   e           k Disk
+     Fnadnadml00uf   e           k Disk
+
+          Dcl-pi resetconr1;
+             @contact Char(30);
+          End-pi;
+
+          Dcl-Ds @statusDs PsDs;
+             @_user     Char(10)   Pos(254);                          // User name
+          End-Ds;
+
+          Dcl-s @CheckDate Date       Inz(*Loval);
+          Dcl-s @ConDate   Date       Inz(*Loval);
+          Dcl-s @DaystoSub Zoned(2:0) Inz(*Zeros);
+          Dcl-s @testcontact Char(30);
+
+          @testcontact = %Trim(conconnam);
+b001      If %Trim(@contact)     = %Trim(@testcontact)
+          Or %Trim(@testcontact) = *Blanks;
+
+             Setll *Loval    concpldpf;
+             Setll conconkey concpldpf;
+             Reade conconkey concpldpf;
+b002         Dow Not %Eof(concpldl04);
+                Delete           concpldpf;
+                Reade  conconkey concpldpf;
+e002         EndDo;
+
+             Setll *Loval    conmeldpf;
+             Setll conconkey conmeldpf;
+             Reade conconkey conmeldpf;
+b002         Dow Not %Eof(conmeldl00);
+                Delete           conmeldpf;
+                Reade  conconkey conmeldpf;
+e002         EndDo;
+
+             Setll *Loval    concaldpf;
+             Setll conconkey concaldpf;
+             Reade conconkey concaldpf;
+b002         Dow Not %Eof(concaldl00);
+                Delete           concaldpf;
+                Reade  conconkey concaldpf;
+e002         EndDo;
+
+b002         If calmstvnd > 64000;
+
+                Setll *Loval    vidvndmpf;
+                Setll calmstvnd vidvndmpf;
+                Reade calmstvnd vidvndmpf;
+b003            Dow Not %Eof(vndviddl00);
+                   Delete           vidvndmpf;
+                   Reade  calmstvnd vidvndmpf;
+e003            EndDo;
+
+                Setll *Loval    vndvaxxpf;
+                Setll calmstvnd vndvaxxpf;
+                Reade calmstvnd vndvaxxpf;
+b003            Dow Not %Eof(vndvaxxl00);
+                   Delete           vndvaxxpf;
+                   Reade  calmstvnd vndvaxxpf;
+e003            EndDo;
+
+                Setll *Loval    vndvprmpf;
+                Setll calmstvnd vndvprmpf;
+                Reade calmstvnd vndvprmpf;
+b003            Dow Not %Eof(vndvprml00);
+                   Delete           vndvprmpf;
+                   Reade  calmstvnd vndvprmpf;
+e003            EndDo;
+
+                Setll *Loval    vndvaexpf;
+                Setll calmstvnd vndvaexpf;
+                Reade calmstvnd vndvaexpf;
+b003            Dow Not %Eof(vndvaexl00);
+
+                   Setll *Loval    nadnadmpf;
+                   Setll vaeadrloc nadnadmpf;
+                   Reade vaeadrloc nadnadmpf;
+b004               Dow Not %Eof(nadnadml00);
+                      Delete           nadnadmpf;
+                      Reade  vaeadrloc nadnadmpf;
+e004               EndDo;
+                   Delete           vndvaexpf;
+                   Reade  calmstvnd vndvaexpf;
+e003            EndDo;
+
+                Setll *Loval    vndglvtpf;
+                Setll calmstvnd vndglvtpf;
+                Reade calmstvnd vndglvtpf;
+b003            Dow Not %Eof(vndglvtl00);
+                   Delete           vndglvtpf;
+                   Reade  calmstvnd vndglvtpf;
+e003            EndDo;
+
+                Chain calmstvnd vndvndmpf;
+b003            If %Found(vndvndml00);
+                   Delete vndvndmpf;
+e003            EndIf;
+e002         EndIf;
+
+             Delete conconmpf;
+
+e001      EndIf;
+

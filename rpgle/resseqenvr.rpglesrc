@@ -1,0 +1,33 @@
+          Ctl-opt DftActGrp(*No) Option(*NoDebugio);
+
+     Fenvliblsv up   f   22    12aiDisk
+          Dcl-f envlibl Usage(*Output) Keyed;
+
+          Dcl-s @Sequence Like(Sequence) Inz(*Zeros);
+
+     Ienvliblsv ns
+     I                             a    1   10  env           l1
+     I                             p   11   12 0sequence
+     I                             a   13   22  library
+
+b001      If *Inl1;
+             Reset @Sequence;
+e001      EndIf;
+
+b001      If library <> *Blanks;
+
+             @Sequence += 10;
+             Sequence = @Sequence;
+
+             Write renvlibl;
+
+b002         If library <> 'QTEMP';
+
+                Clear library;
+                Except Updsv;
+
+e002         EndIf;
+e001      EndIf;
+
+     Oenvliblsv e            updsv
+     O                       library             22

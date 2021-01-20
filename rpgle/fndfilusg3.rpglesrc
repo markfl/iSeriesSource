@@ -1,0 +1,13 @@
+          Ctl-opt Option(*NoDebugio);
+
+     Fqadsppgm  up   e             Disk
+
+     Iqwhdrppr
+     I                                          whpnam        l1
+     I                                          whfnam        l1
+
+b001      If *Inl1;
+b001      Else;
+             Delete qwhdrppr;
+e001      EndIf;
+

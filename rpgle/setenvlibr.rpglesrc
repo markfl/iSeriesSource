@@ -1,0 +1,68 @@
+          Ctl-opt BndDir('MFLORES') DftActGrp(*No) Option(*NoDebugio);
+
+          Dcl-f envlibl Usage(*Input) Keyed;
+
+          Dcl-Pi setenvlibr;
+             @Environment  Const Like(env);
+          End-Pi;
+
+          /define mflores059
+          /copy qcpysrc,mflores
+          /undefine mflores059
+
+          Dcl-c @Alllibl Const('*ALLLIBL  ');
+          Dcl-c @Chglibl Const('CHGLIBL LIBL(*NONE)');
+
+          Setll @Environment renvlibl;
+b001      If %Equal(envlibl);
+
+             @Command = @Chglibl;
+             @Length = %Len(%Trim(@Command));
+             @CallCmd(@Command: @Length);
+
+x001      Else;
+
+             *Inlr = *On;
+             Return;
+
+e001      EndIf;
+
+          AddLible(@Environment);
+
+          AddLible(@AllLibl);
+
+          *Inlr = *On;
+          Return;
+
+š         Dcl-Proc AddLible;
+
+          Dcl-Pi AddLible;
+             @Env  Const Like(env);
+          End-Pi;
+
+          Dcl-Pr @RmvMsg  ExtPgm('ISFLORESM/RMVMSGC');
+          End-Pr;
+
+          Dcl-c @Addlibl1 Const('ADDLIBLE   LIB(');
+          Dcl-c @Addlibl2 Const(') POSITION(*LAST)');
+
+          Setll *Loval renvlibl;
+          Setll @Env   renvlibl;
+          Reade @Env   renvlibl;
+b001      Dow Not %Eof(envlibl);
+
+             Reset @Command;
+             Reset @Length;
+
+             @Command = @Addlibl1 + %Trim(Library) + @Addlibl2;
+             @Length = %Len(%Trim(@Command));
+             @CallCmd(@Command: @Length);
+
+             Reade @Env renvlibl;
+
+e001      EndDo;
+
+          @RmvMsg();
+
+š         End-Proc;
+

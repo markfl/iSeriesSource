@@ -1,0 +1,14 @@
+     A                                      REF(QADSPOBJ)
+     A                                      UNIQUE
+     A          R RQOBSOLETE
+     A            ODOBNM    R
+     A            ODOBAT    R
+     A            ODLBNM    R
+     A            ODOBTP    R
+     A            ODOBTX    R
+     A            ODUDAT    R
+     A            ODUCNT         5S 0       COLHDG('Days Used' 'Count')
+     A                                      TEXT('Days used count')
+     A          K ODOBNM
+     A          K ODLBNM
+     A          K ODOBTP

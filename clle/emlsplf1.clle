@@ -1,0 +1,9 @@
+             PGM        PARM(&SYSTEM)
+
+             DCL        VAR(&SYSTEM) TYPE(*CHAR) LEN(8)
+
+             RTVNETA    SYSNAME(&SYSTEM)
+
+             RETURN
+
+ END:        ENDPGM

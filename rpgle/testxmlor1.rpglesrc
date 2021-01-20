@@ -1,0 +1,90 @@
+     h DftActGrp(*NO)
+
+     d TestXMLor1      pi
+     d  @rTestNo                      2a   const
+
+     d @xmlParser      pr                  extpgm('XMLPARSE1')
+     d                             1000a
+
+     d @wXmlString     s           1000a
+
+       select;
+          when @rTestNo = '01';
+             @wXmlString = '<Input>' +
+                           '<Cust>000000001006</Cust>' +
+                           '<Ship>KG02467956</Ship>' +
+                           '<Load>01</Load>' +
+                           '</Input>';
+          when @rTestNo = '02';
+             @wXmlString = '<Input>' +
+                           '<Cust>000000001006</Cust>' +
+                           '<Ship>KG02467957</Ship>' +
+                           '<Load>02</Load>' +
+                           '</Input>';
+          when @rTestNo = '03';
+             @wXmlString = '<Input>' +
+                           '<Cust>000000001006</Cust>' +
+                           '<Ship>KG02467958</Ship>' +
+                           '<Load>03</Load>' +
+                           '</Input>';
+          when @rTestNo = '04';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '05';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '06';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '07';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '11';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '12';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '13';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '14';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '15';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '16';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '17';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '21';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '22';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '23';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '24';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '25';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '26';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+          when @rTestNo = '27';
+             @wXmlString = '<Input>' +
+                           '</Input>';
+       endsl;
+
+       @xmlParser(@wXmlString);
+
+       *inlr = *on;
+
+      /end-free

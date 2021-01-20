@@ -1,0 +1,66 @@
+/* This program illustrates how to use subfiles.                      */
+#include <stdio.h>
+#include <stdlib.h>
+#include <recio.h>
+#define LEN          10
+#define NUM_RECS     20
+#define SUBFILENAME  "*LIBL/T1520DDG"
+#define PFILENAME    "*LIBL/T1520DDH"
+
+typedef struct{
+    char name[LEN];
+    char phone[LEN];
+}pf_t;
+#define RECLEN sizeof(pf_t)
+
+void init_subfile(_RFILE *, _RFILE *);
+int main(void)
+{
+    _RFILE           *pf;
+    _RFILE           *subf;
+/* Open the subfile and the physical file.                            */
+    if ((pf = _Ropen(PFILENAME, "rr")) == NULL)
+    {
+        printf("can't open file %s\n", PFILENAME);
+        exit(1);
+    }
+    if ((subf = _Ropen(SUBFILENAME, "ar+")) == NULL)
+    {
+        printf("can't open file %s\n", SUBFILENAME);
+        exit(2);
+    }
+/* Initialize the subfile with records from the physical file.        */
+    init_subfile(pf, subf);
+
+/* Write the subfile to the display by writing a record to the        */
+/* subfile control format.                                            */
+     _Rformat(subf, "SFLCTL");
+     _Rwrite(subf, "", 0);
+     _Rreadn(subf, "", 0, __DFT);
+
+/* Close the physical file and the subfile.                           */
+     _Rclose(pf);
+     _Rclose(subf);
+}
+void init_subfile(_RFILE *pf, _RFILE *subf)
+  {
+        _RIOFB_T      *fb;
+        int           i;
+        pf_t          record;
+
+/* Select the subfile record format.                                  */
+        _Rformat(subf, "SFL");
+        for (i = 1; i <= NUM_RECS; i++)
+        {
+               fb = _Rreadn(pf, &record, RECLEN, __DFT);
+               if (fb->num_bytes != EOF)
+               {
+                 fb = _Rwrited(subf, &record, RECLEN, i);
+                 if (fb->num_bytes != RECLEN)
+                 {
+                   printf("error occurred during write\n");
+                   exit(3);
+                 }
+               }
+        }
+    }
